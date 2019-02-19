@@ -1,0 +1,19 @@
+--- 
+title: "Developing an antimicrobial strategy for sepsis in Malawi"
+author: "Joe Lewis"
+date: "`r Sys.Date()`"
+output: bookdown::gitbook
+documentclass: book
+bibliography: ["/Users/joelewis/Documents/bib/library.bib"]
+csl: bmj.csl
+biblio-style: apalike
+link-citations: yes
+description: "Joe's thesis. Yikes!"
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Preface {-}
+
+Joe's thesis 

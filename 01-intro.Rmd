@@ -1,0 +1,13 @@
+# Introduction {#intro}
+``` {r wordblock, include = F}
+# this block is for rendering this chapter as a standalone word document
+# using render("/Users/joelewis/Documents/PhD/Thesis/bookdown/01-intro.Rmd", output_format = "word_document")
+
+#---
+#bibliography: ["/Users/joelewis/Documents/bib/library.bib"]
+#csl: bmj.csl
+#biblio-style: apalike
+#---
+
+```
+You can label chapter and section titles using `{#label}` after them, e.g., we can reference Chapter  If you do not manually label them, there will be automatic labels anyway, [@Holguin2008]
