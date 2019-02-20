@@ -1,0 +1,65 @@
+﻿Study,Year,Country,Setting,Patient Population,Test used,Case definition,Confirmed acute disease
+Zida 2018,2014-15,Burkina Faso,Central reference lab,Febrile Jaundice adults and children,"In house IgM followed by MAT and PCR (acute only, > 1:400)",MAT > 1:400,27/781 (3.5%)
+Guillebaud 2018,2014-2015,Madagascar,21 healthcare centres,Febrile adults and children,PCR array,Positive PCR,1/682 (0.2%)
+Maze 2018,2012-2014,Tanzania,2 Referral Hospitals,Febrile adults and children,MAT (acute + conv),MAT > 1:800 or fourfold rise,24/1239 (1.9%)
+Gadia 2017,,Central African Republic,Central reference lab,Febrile Jaundice adults and children,IgM ELISA (acute only),Any IgM positive,0/198 (0%)
+Hagen 2017,2011-2013,Madagascar,District Hospital,Adults and children FUO,PCR,Positive PCR,0/1009 (0%)
+Biscornet 2017,2014-2015,Seychelles,Reference leptospirosis clinic,"13 or above FUO, referred to central leptospirosis clinic",In house IgM followed by MAT and PCR (acute + conv),MAT > 1:400 or fourfold rise,51/225 (23%)
+Dreyfus 2017,2014,Uganda,2 Health centres,Any adult heath centre attendee,MAT (acute only),MAT > 1:800,7/359 (1.9%)
+Hercik 2017,2014- 2015,Tanzania,District hospital,Febrile adults and children,Taqman PCR array,Positive PCR,22/842 (2.6%)
+Chipwaza 2015,2014,Tanzania,District hospital,Outpatient febrile children,IgM IgG ELISA then MAT (acute only),MAT > 1:160,26/200 (13%)
+Amoako 2018,2016-17,Ghana,2 distrct hospitals,Febrile children,Taqman PCR array,Positive PCR,1/166 (0.6%)
+Hercik 2017,2014- 2015,Tanzania,District hospital,Febrile adults and children,Taqman PCR array,Positive PCR,2/842 (0.2%)
+Boone 2017,2011-13,Madagascar,Two public health care facilities,Febrile adults and children,PCR,Positive PCR,0/1005
+Njeru 2016,2014-15,Kenya,Two district hospitals,Febrile adults and children,Phase I/II IgG ELISA and IFA; PCR on subset (acute only),Phase II IgG IFA titre > 1:128,"163/1067 (15%), 10/448 (2.2%) PCR positive"
+Mourembou 2016,2013-14,Gabon,Four health centres,Febrile children,PCR,Positive PCR,0/410 (0%)
+Maina 2016,2011-12,Kenya,District Hospital,Febrile children,IgM/IgG ELISA phase I and II (acute and conv),Phase II IgG seroc-onversion,25/370 (8.9%)
+Angelaksis 2014,2010-12,"Senegal, Mali, Gabon",Six health centres,Febrile adults and children,PCR,Positive PCR,6/1388 (0.4%)
+Cash-Goldwasser 2018,2012-14,Tanzania,Two referral hospitals,Febrile adults and children,MAT and blood culture (acute + conv),Fourfold rise in MAT,39/562 (6.9%)
+Gafiritia 2017,2014,Rwanda,District hospital,"Adults, fever",Rose Bengal test,Positive test,10/198 (6.1%)
+Boone 2017,2011-13,Madagascar,Two public health care facilities,Febrile adults and children,PCR,Positive PCR,15/1005 (1.5%)
+De Glanville 2017,2012,Kenya,Referral hospital and private clinic,Febrile adults and children,Rose Bengal test,Positive test,8/825 (9.7%)
+Njeru 2016,2014-15,Kenya,Two district hospitals,Febrile adults and children,"Rose bengal test, IgG/IgM ELISA, PCR (acute only)",Positive ELISA or PCR,146/1067 (13.7%)
+Chipwaza 2015,2014,Tanzania,District hospital,Outpatient febrile children,IgM and IgG and tube agglutination (acute only),Positive IgM,26/370 (7.0%)
+Feleke 2015,2011,Ethiopia,Health centre,Febrile adults and children,Brucella antigen test,Positive test,3/280 (1%)
+Amoako 2018,2016-17,Ghana,2 distrct hospitals,Febrile children,Taqman PCR array,Positive PCR,5/166 (3.0%) RS
+Hercik 2017,2014- 2015,Tanzania,District hospital,Febrile adults and children,Taqman PCR array,Positive PCR,2/842 (0.2%) RF
+Sothmann 2017,2012,Ghana,Referral hospital,Febrile Children,PCR,Positive PCR,6/431 (1.4%) RF
+Maina 2016,2011-12,Kenya,District Hospital,Febrile children,IgG ELISA (acute and conv),Fourfold rise in IgG titre,"63/364 (22.4%) SFG 3/364 (1.1%) TG, 10/364 (3.6%) STG"
+Elfving 2016,2011,Zanzibar,District hospital,Febrile children with no diagnosis,PCR,Positive PCR,0/83 RS
+Mourembou 2015,2013-14,Gabon,4 heath centres,Febrile children,PCR,Positive PCR,42/410 (10.2%) RF
+Amoako 2018,2016-17,Ghana,2 district hospitals,Febrile children,Taqman PCR array,Positive PCR,2/166 (1.2%)
+Guillebaud 2018,2014-2015,Madagascar,21 healthcare centres,Febrile adults and children,PCR macroarray,Positive PCR,0/682 (0%)
+Kayiwa 2018,2014-2017,Uganda,District hospital,Febrile adults and children,PCR,Positive PCR,1/384 (0.26%)
+Makiala-Mandanda 2018,2003-2012,Democratic Republic of Congo,Central lab,"Febrile Jaundice, yellow fever IgM negative",PCR,Positive PCR,16/453 (3.5%)
+Muianga 2018,2014,Mozam-bique,Not clear,Febrile adults and children,"IgG, IgM and PCR (acute only)",Positive PCR,37/99 by PCR (37.4%)
+Mugabe 2018,2016,Mozam-bique,Five health centres,Febrile adults and children,"IgM, IgG, PCR (acute only)",Positive PCR,PCR 0/163
+Hercik 2018,2014- 2015,Tanzania,District hospital,Febrile adults and children,Taqman PCR array,Positive PCR,1/191 (0.5%)
+Gadia 2017,,Central African Republic,Central reference lab,Febrile Jaundice adults and children,IgM (Acute only),Positive IgM,0/198 (0%)
+Vu 2017,2014-2015,Kenya,Two health centres,Febrile children,PCR,Positive PCR,82/1104 (7.4%)
+Waggoner 2017,2014-2015,Kenya,Two health centres and two district hospitals,Children with fever,PCR,Positive PCR,0/385 (0%)
+Kolawole 2017,2016,Nigeria,Two heath centres,Adults and children with fever,"IgM, IgG, PCR (Acute only)",Positive PCR,11/176 (6.2%)
+Nasir 2017,2016,Nigeria,Teaching hospital,Adults and children with fever,NS1 antigen,Positive antigen,15/171 (8.8%)
+Ngoi 2016,2014-2015,Kenya,"Five health clinics, one district hospital","Adults with fever, negative for acute HIV and malaria",PCR,Positive PCR,43/489 (8.8%)
+Onoja 2016,2014,Nigeria,One district hospital,Adults and children with fever,IgM (Acute only),Positive IgM,64/274 (23.3%)
+Kajeguka 2016,2013-2014,Tanzania,Three district hospitals,Probable Dengue (on clinical and IgM),PCR,Positive PCR,0/381 (0%)
+Elfving 2016,2011,Zanzibar,District hospital,Febrile children with no diagnosis,PCR,Positive PCR,0/83
+Sow 2016,2009-2013,Senegal,Seven healthcare facilities,Adults and children with fever,"IgM, PCR (acute only)",Positive PCR,"3/13,845 (0.02%)"
+Chipwaza 2014,2013,Tanzania,One district hospital,Children with fever,"IgM, PCR (acute only)",Positive PCR,29/364 (8.0%)
+Kayiwa 2018,2014-2017,Uganda,District hospital,Febrile adults and children,PCR,Positive PCR,19/384 (4.9%)
+Makiala-Mandanda 2018,2003-2012,Democratic Republic of Congo,Central lab,"Febrile Jaundice, yellow fever IgM negative",PCR,Positive PCR,2/453 (0.4%)
+Muianga 2018,2014,Mozambique,Not clear,Febrile adults and children,"IgG, IgM (acute only)",Positive IgM,8/114 by IgM (7%)
+Antonio 2018,2015-16,Mozambique,Eight health centres,Undifferentiated fever,"IgM, IgG (Acute only)",Positive IgM,6/392 (1.5%)
+Mugabe 2018,2016,Mozambique,Five health centres,Febrile adults and children,"IgM, IgG, PCR (Acute only)",Positive PCR,"PCR 0/163, IgM 17/163 (10.4%)"
+Sow 2017,2009-2010,Senegal,Fiver health centres and four schools,Febrile adults and children,"IgM, IgG, PCR (Acute only)",Positive PCR,20/1049 (1.4%)
+Gadia 2017,,Central African Republic,Central reference lab,Febrile Jaundice adults and children,IgM (Acute only),Positive IgM,0/198 (0%)
+Olajiga 2017,2015-2016,Nigeria,Seven hospitals,"Fever or joint pain or rash, over 10 years","IgM, IgG (acute only)",Positive IgM,66/172 (38.4) by IgM
+Waggoner 2017,2014-2015,Kenya,Two health centres and two district hospitals,Children with fever,PCR,Positive PCR,32/385 (8.3%)
+Ngoi 2016,2014-2015,Kenya,"Five health clinics, one district hospital","Adults with fever, negative for acute HIV and malaria",PCR,Positive PCR,0/489 (0%)
+Kajeguka 2016,2013-2014,Tanzania,Three district hospitals,Probable Chikungunya (on clinical and IgM),PCR,Positive PCR,11/263 (4.2%)
+Elfving 2016,2011,Zanzibar,District hospital,Febrile children with no diagnosis,PCR,Positive PCR,0/83
+Sow 2016,2009-2013,Senegal,Seven healthcare faciities,Adults and children with fever,"IgM, PCR (acute only)",Positive PCR,"13/13,845 (0.1%)"
+Chipwaza 2014,2013,Tanzania,One district hospital,Children with fever,IgM (acute only),Positive IgM,17/364 (4.7%)
+Kayiwa 2018,2014-2017,Uganda,District hospital,Febrile adults and children,PCR,Positive PCR,5/384 (1.3%)
+Makiala-Mandanda 2018,2003-2012,Democratic Republic of Congo,Central lab,"Febrile Jaundice, yellow fever IgM negative",PCR,Positive PCR,0/453 (0%)
+Sow 2016,2009-2013,Senegal,Seven healthcare faciities,Adults and children with fever,"IgM, PCR (Acute only)",Positive PCR,"9/13,845 (0.1%)"

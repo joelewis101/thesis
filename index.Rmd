@@ -12,6 +12,7 @@ description: "Joe's thesis. Yikes!"
 header-includes:
   \usepackage{array}
    \usepackage{threeparttable}
+   \usepackage{longtable}
 ---
 ---
 ```{r setup, include=FALSE}
