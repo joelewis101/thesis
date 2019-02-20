@@ -1,0 +1,8 @@
+﻿System,0,1,2,3,4
+Pao2 / FiO2 mmHg (kPa),400 (53.3),< 400 (53.3),< 300 (40),< 200 (26.7) with respiratory support,< 100 (13.3) with respiratory support
+"Platelets x100,000/ mL",150,< 150,< 100,< 50,< 20
+Bilirubin mg /dL (mmol/ L),<1.2 (20),1.2-1.9 (20 – 32),2.0 – 5.9 (33-101),6.0 – 11.9 (102 – 204),> 12.0 (204)
+Cardiovascular,MAP  > 70mmHg,MAP < 70mmHg,Dopamine < 5 or dobutamine any dose,Dopamine 5.1 – 15 or epinephrine < 0.1 or norepinephrine  < 0.1,Dopamine > 15 or epinephrine > 0.1 or norepinephrine > 0.1
+Glasgow coma scale,15,13-14,10-12,7-9,< 6
+Creatinine mg/dL (mmol /L),< 1.2 (110),1.2 – 1.9 (110 -170),2.0 – 3.4 (171 – 299),3.5 – 4.9 (300 – 440), > 5.9 (440)
+Urine output (ml /day),,,,< 500,< 200

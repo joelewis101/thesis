@@ -1,0 +1,16 @@
+﻿Definition,Diagnosis,Criteria
+Sepsis-1 (1991),SIRS,Two or more of:
+,,"Temperature > 38°C or < 36°C, Heart rate > 90 /min, Respiratory rate > 20 /min or PaCO2 < 32mmHg (4.3 kPa), White blood cell count > 12 x 10-9 /Lor < 4 x 10-9 /L or > 10% immature forms"
+,Sepsis,SIRS plus proven or suspected infection
+,Severe Sepsis,Sepsis plus acute organ dysfunction
+,Septic shock,Sepsis with persistent hypotension after fluid resuscitation
+Sepsis-2 (2001),Sepsis,Infection documented or suspected and some of the following
+,,"General variables: temperature > 38°C or < 36°C, heart rate > 90 min-1 or > SD above normal for age,  tachypnoea, altered mental status, significant oedema or positive fluid balance (> 20ml/kg over 24hrs), hyperglycaemia > 7.7mmol /L"
+,,"Inflammatory variables:  white blood cell count > 12 x 10-9 /L or < 4 x 10-9 /L or > 10% immature forms,  plasma C-reactive protein > SD above normal, plasma procalcitonin > 2 SD above normal"
+,,"Haemodynamic variables: arterial hypotension (SBP < 90 mmHg or MAP < 70 mmHg or SBP decrease > 40mmHg in adults or 2SD below normal range, SvO2 > 70%, Cardiac index > 3.5"
+,Severe sepsis,Sepsis plus organ dysfunction
+,,"Organ dysfunction variables:  arterial hypoxaemia (PaO2 / FiO2 ) < 300, acute oliguria (urine output < 0.5 ml kg-1 hr -1 for at least 2 hours),  creatinine increase > 0.5mg/ dL,  coagulation abnormalities (INR > 1.5 or aPTT > 60s),  ileus, thrombocytopenia (platelet count < 100,000 /mL,   hyperbilirubinaemia (plasma bilirubin > 4mg /dL or 70 mmol /L"
+,Septic shock,Sepsis plus hypotension
+,,SBP < 90mmHg or MAP < 60mmHg or reduction in SBP of 40mmHg from baseline despite adequate volume resuscitation
+Sepsis-3 (2016),Sepsis,Infection plus life threatening organ dysfunction defined by an acute change in SOFA score of 2 or more
+,Septic shock,Persisting hypotension requiring vasopressors to maintain MAP 65mmHg AND serum lactate below 2mmol /L

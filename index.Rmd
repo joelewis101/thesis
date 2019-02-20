@@ -9,6 +9,10 @@ csl: bmj.csl
 biblio-style: apalike
 link-citations: yes
 description: "Joe's thesis. Yikes!"
+header-includes:
+  \usepackage{array}
+   \usepackage{threeparttable}
+---
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)

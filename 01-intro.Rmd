@@ -1,4 +1,5 @@
 # Introduction {#intro}
+
 ``` {r wordblock, include = F}
 # this block is for rendering this chapter as a standalone word document
 # using render("/Users/joelewis/Documents/PhD/Thesis/bookdown/01-intro.Rmd", output_format = "word_document")
@@ -9,9 +10,213 @@
 #biblio-style: apalike
 #---
 
+#  also a reminder on how to render the book:
+#bookdown::render_book('index.Rmd', 'bookdown::pdf_book')
+
+#
+wd <- "/Users/joelewis/Documents/PhD/Thesis/bookdown"
+
+# and packages
+library(plyr)
+library(dplyr)
+library(ggplot2)
+library(reshape2)
+library(knitr)
+library(kableExtra)
+library(metafor)
+library(meta)
+library(grid)
+library(ggpubr)
+
+
+output = "latex"
+
 ```
 
+## Chapter Overview
 
-You can label chapter and section titles using `{#label}` after them, e.g., we can reference Chapter  If you do not manually label them, there will be automatic labels anyway, [@Holguin2008]
+The syndrome of sepsis is an ancient one; from Hippocrates to Galen and Semmelweis, the potentially serious consequences of infection have long been recognized. Modern definitions of sepsis conceptualise it as a syndrome of life threatening organ dysfunction due to a deleterious and dysregulated host response to infection, but despite increased understanding of its pathogenesis, mortality from sepsis remains high. Progress has been made in improving sepsis mortality in high income settings through timely application of basic care: early appropriate antimicrobials, aggressive fluid resuscitation and organ support largely in a critical care environment. Limited data from low resource settings including sub-Saharan Africa (sSA) suggest that mortality remains high, and increasing evidence suggests that exporting high-income setting sepsis protocols to sSA has the potential to do harm. Data to guide sepsis management protocols for sSA are urgently needed.
 
-Test test test
+Data on sepsis aetiology from sSA to guide antimicrobial strategies are lacking; currently, in Blantyre Malawi, for example, empirical management of sepsis is the norm and patients often receive prolonged empiric courses of broad spectrum antimicrobials – largely ceftriaxone, a third-generation cephalosporin antibiotic. The effects of this at an individual level are unknown, but on a population level invasive Escherichia coli and Klebsiella pneumoniae bacteria are showing an alarming increase in ceftriaxone resistance since the drug was introduced in Malawi in 2005. The majority of these resistant bacteria are so-called extended-spectrum beta lactamase producers (ESBL-producers) and are often untreatable with locally available antimicrobials. Novel antimicrobial strategies are needed to safely preserve ceftriaxone - a first and last line antibiotic -  for those who need it.
+
+It is the hypothesis of this thesis, then, that sepsis is Malawi is caused by a wide variety of infections that are currently unrecognised and untreated, and that this is contributing to high sepsis mortality. Conversely, prolonged ceftriaxone exposure in sepsis survivors is causing acquisition and carriage of resistant bacteria (principally ESBL Enterobacteriaceae, henceforth ESBL-E) and their transportation into the community. I will argue that sustainable antimicrobial strategies for sepsis in sSA can not only consider mortality; the unintended consequences in terms of antimicrobial resistance (AMR) acquisition in a setting where empiric management of infection is the norm must also be considered, and mitigated against where possible. In this chapter, I will review, firstly, the definitions, epidemiology, aetiology and management of sepsis, with a focus on aetiology and antimicrobial treatment; and secondly, the epidemiology and drivers of ESBL-E carriage, both with a focus on sSA.
+
+## Sepsis in sub-Saharan Africa
+
+### Search strategy
+
+A review of the literature was undertaken to identify prospective cohort, case control studies or randomised controlled trials (RCTs) of sepsis in sub-Saharan Africa with the search terms sepsis AND ((Angola OR Benin OR Botswana OR Burkina Faso OR Burundi OR Cameroon OR Cape Verde OR Central African Republic OR Chad OR Comoros OR Republic of the Congo OR Congo Brazzaville OR Democratic republic of the Congo OR Cote d'Ivoire OR Djibouti OR Equatorial Guinea OR Eritrea OR Ethiopia OR Gabon OR The Gambia OR Ghana OR Guinea OR Guinea-Bissau OR Kenya OR Lesotho OR Liberia OR Madagascar OR Malawi OR Mali OR Mauritania OR Mauritius OR Mozambique OR Namibia OR Niger OR Nigeria OR Reunion OR Rwanda OR Sao Tome and Principe OR Senegal OR Seychelles OR Sierra Leone OR Somalia OR South Africa OR Sudan OR Swaziland OR Eswatini OR Tanzania OR Togo OR Uganda OR Western Sahara OR Zambia OR Zimbabwe) OR Africa). Pubmed and scopus were searched, yielding 5460 unique studies on 17 July 2018. Inclusion criteria were any prospective cohort, RCT or case-control studies of sepsis in sSA (defined as taking place in the countries listed in search terms panel) recruiting patients using sepsis 1,2 or 3 definitions. Abstract review was undertaken resulting in inclusion of 91 studies for full text review. Eleven publications providing data on eight prospective cohorts[@Jacob2009; @Waitt2015; @Ssekitoleko2011; @Ssekitoleko2011a; @Chimese2012; @Moore2017a; @Huson2015c; @Amir2017] and three intervention studies (two RCTs[@Andrews2014; @Andrews2017a] and one before-after intervention[@Jacob2012]) were identified. These data inform the following review, alongside non-systematically searched studies examining sepsis in high-resource settings.
+
+In order to put sepsis aetiology data in context, systematic searches of the Pubmed and Scopus databases for leptospirosis, brucellosis, Q fever, Rickettsioses, arboviruses (dengue, or chikungunya) and histoplasmosis prevalence in unselected sepsis or fever cohorts in sSA were undertaken. Because a recent systematic review has examined these pathogens up to 2013 (see “sepsis aetiology” below), the date of these searches were restricted the 2014 to the present. Any studies examining disease prevalence in cohorts of febrile adults or children were included; outbreaks were excluded. Studies where the inclusion criteria were not clear (including those with, for example, “suspected leptospirosis” with no further details) were excluded. Finally, systematic searches of Pneumocystis Jiroveci pneumonia (PCP) were made using the search terms below; because a recent systematic review has examined the role of PCP up to 2015, the date on this search was restricted to 2015 or later. Table \@ref(tab:fever-searches) shows the search terms, number of of hits and number of included studies after full text review: nine studies provided data on Leptospirosis[@Zida2018; @Guillebaud2018; @Maze2018; @Gadia2017; @Hagen2018; @Biscornet2017; @Dreyfus2016; @Hercik2017; @Chipwaza2014], seven on Brucellosis[@Cash-Goldwasser2018; @Gafirita2017; @Boone2017; @DeGlanville2017; @Njeru2016a; @Chipwaza2015; @Feleke2015], seven on Q-fever[@Hercik2017; @Boone2017; @Amoako2018; @Njeru2016; @Mourembou2016; Maina2016; @Angelakis2014] , six on Rickettsioses[@Hercik2017; @Amoako2018; @Maina2016; @Sothmann2017; @Elfving2016; @Mourembou2015], eighteen on Dengue[@Guillebaud2018; @Gadia2017; @Hercik2017; @Chipwaza2014; @Amoako2018; @Elfving2016; @Vu2017; @Waggoner2017; @Kolawole2017; @Nasir2017; @Ngoi2016; @Onoja2016; @Kajeguka2016; @Sow2016; @Kayiwa2018; @Makiala-Mandanda2018; @Muianga2018; @Mugabe2018 ], thirteen on Chikingunya[@Gadia2017; @Chipwaza2014; @Elfving2016;@Waggoner2017; @Ngoi2016; @Kajeguka2016;@Kayiwa2018; @Makiala-Mandanda2018; @Muianga2018; @Mugabe2018; @Antonio2018; @Sow2018; @Olajiga2017 ], three on Zika [@Sow2016; @Kayiwa2018; @Makiala-Mandanda2018], two on Histoplasmosis[@Bahr2016; @Mandengue2015] and none on PCP. Details of the included studies are provided below.
+
+```{r fever-searches, tidy = F, echo = F}
+
+t2 <- read.csv(paste0(wd, "/chapter_one/t2_fever_search_terms.csv"))
+knitr::kable(t2, output, booktabs = T, caption = "Fever studies") %>%
+  kable_styling(full_width = F)  %>%
+  column_spec(2, width = "15em") %>% column_spec(4, width = "8em") %>%
+  footnote(general = "All searches inlcuded the sSA country list in addition to the disease-specific terms above.") #%>% kable_styling(latex_options = c("striped", "hold_position"))
+
+```
+
+### Defining sepsis
+
+Sepsis is a heterogenous syndrome, with no diagnostic gold standard. In 1991 the first modern sepsis diagnostic criteria were defined in a consensus conference of key opinion makers[@Bone1992] (Table \@ref(tab:sepsis-diag-criteria)).  Sepsis was defined as the presence of the systemic inflammatory response syndrome (SIRS) plus infection, with a gradient of severity increasing through severe sepsis (sepsis plus organ dysfunction) to septic shock. These definitions were widely adopted as entry points into clinical trials, but ongoing concerns that SIRS was both insensitive and nonspecific for the diagnosis of sepsis led to an expansion of the diagnostic criteria in 2001[@Levy2003] again by expert consensus. Despite these revised guidelines the SIRS criteria largely continued to be preferred both as the entry point to clinical trials of sepsis and in clinical practice until the development of the current sepsis-3 definitions in 2016[@Singer2016].
+
+The sepsis-3 definitions redefined sepsis as “life threatening organ dysfunction triggered by infection”, a definition that rendered the sepsis-2 severe sepsis category obsolete. In contrast to the previous diagnostic criteria that had relied largely on expert opinion, the sepsis-3 criteria attempted to use a probabilistic approach to defining sepsis, by mandating that sepsis should be associated with excess mortality. The sequential organ dysfunction score (SOFA, Table \@ref(tab:SOFA)), an organ-dysfunction score already in use in high income settings, and shown to be associated with mortality[@Vincent1998] was selected to operationalise the definition of sepsis. An acute change in SOFA of 2 or more points defines sepsis under sepsis-3.
+
+Mindful that the SOFA score requires a large number of variables and is difficult to apply at the bedside, the consensus guideline group suggest the use of a simpler score, quick SOFA to identify patients who may have sepsis. Any two of: altered mental status, SBP < 100mmHg or respiratory rate > 22 defines a positive qSOFA score. qSOFA does not define sepsis; rather, under sepsis-3 patients with a qSOFA score of 2 or more are at increased risk of poor outcomes and should be screened for sepsis using a full SOFA score. The qSOFA was derived by identifying factors associated with mortality in large datasets of patients with infection from the United States and validated in further US and German datasets; in these datasets it showed good discriminant ability to predict mortality, equivalent to full SOFA score outside the intensive therapy unit (ITU)[@Seymour2016].
+
+Finally, sepsis-3 defines septic shock as persistent hypotension requiring vasopressors to maintain mean arterial blood pressure (MAP) above 65mmHg and serum lactate greater than 2mmol /L. This definition was arrived at by a combination of consensus and systematic review to identify potential defining variables and validation in large datasets from the United States, where it was found to be strongly associated with mortality[@Shankar-Hari2016].
+
+```{r sepsis-diag-criteria, tidy = F, echo = F}
+t3 <- read.csv(paste0(wd, "/chapter_one/t3_sepsis_diagnostic_criteria.csv"))
+
+knitr::kable(t3, output, booktabs = T, caption = "Sepsis diagnostic criteria") %>%
+  kable_styling(full_width = F)  %>%
+  column_spec(1, width = "8em") %>% column_spec(2, width = "8em") %>% column_spec(3, width = "25em")  %>%
+  footnote(general = "SIRS = Systemic Inflammatory Response Syndrome, SD = Standard deviation, SBP = Systolic blood pressure, MAP = Mean arterial blood pressure", threeparttable = T)
+
+
+```
+
+```{r SOFA, tidy = F, echo = F}
+t4 <- read.csv(paste0(wd, "/chapter_one/t4_sofa.csv"), check.names = F)
+
+knitr::kable(t4, output, booktabs = T, caption = "Sequential organ failure assessment (SOFA) score") %>%
+  kable_styling(full_width = F) %>% 
+  column_spec(1, width = "10em") %>% 
+  column_spec(2, width = "6em") %>% 
+  column_spec(3, width = "6em") %>%
+  column_spec(4, width = "6em") %>%
+  column_spec(5, width = "6em") %>%
+  column_spec(6, width = "6em") %>%
+   add_header_above(c(" ", "Score" = 5)) %>%
+  group_rows("Respiratory",1,1 ) %>%
+  group_rows("Coagulation",2,2 ) %>%
+  group_rows("Liver",3,3 ) %>%
+ group_rows("Cardiovascular",4,4 ) %>%
+  group_rows("CNS",5,5 ) %>%
+ group_rows("Renal",6,7 ) %>%
+  footnote(general = "PaO2 = Arterial partial pressure of oxygen, FiO2 = Inspired fraction of oxygen, MAP = mean arterial blood pressure, CNS = Central nervous system. All doses of inotropes are micrograms/kg/min", threeparttable = T)
+  
+  
+```
+### Applicability of sepsis-3 definitions in sub-Saharan Africa
+
+Application of the sepsis-3 definitions, both in terms of clinical use and as inclusion criteria for research studies in sub-Saharan African low resource settings, is problematic. Several of the domains of SOFA require the results of blood tests, which may not be available. In Blantyre, and elsewhere in sSA, intensive organ support with inotropes or mechanical ventilation (invasive or non-invasive) may not be available[@Jacob2011] or be difficult to access[@Prin2016], yet use of these treatment modalities form components of the SOFA score. Both lactate measurement and inotropic support may be unavailable in some settings and yet these define septic shock. Five studies have validated the qSOFA score in sub-Saharan African settings[@Moore2017a; @Huson2017b; @Huson2017; @Aluisio2018; @Rudd2018] and found variable discriminant ability for mortality but it is not clear how this score should be deployed in this setting; no studies have been undertaken to link qSOFA score to clinical action, and it is not intended to define sepsis under sepsis-3. The optimal sepsis definitions (both clinical and for research) for sSA are therefore not clear.
+
+### Sepsis epidemiology in sub-Sahara Africa
+
+#### Incidence
+
+The changing case definition of sepsis over time hampers estimation of incidence even in high-income settings, furthermore sepsis is not included in global burden of disease estimates. Different methods of defining sepsis from disease registries can result in very different estimates[@Gaieski2013], but a recent systematic review and meta-analysis of 27 studies from 9 high income countries found a recent population incidence rate of 437/100,000 person-years (95% CI 334-571) for sepsis and 270 (95% CI 176 – 412) for severe sepsis with an increasing incidence over time from 1979 to 2015[@Fleischmann2016]. Crudely extrapolating these estimates to the worldwide population would result in 20.7 million sepsis and 10.7 million severe sepsis cases a year, largely in low resource settings. However, no data are available from low or middle income settings and these estimates must be treated with caution. 
+
+#### Risk factors: the sepsis population in sub-Saharan Africa
+
+In high-income settings, risk factors for sepsis have been identified, though once again changing definitions as well as a lack of large scale community based studies make it difficult to draw definitive conclusions. However, chronic diseases (including HIV) and immunosuppressive agents have been associated with increased sepsis incidence, as well as older age[@Angus2001; @Tsertsvadze2016]. In the United States, male sex and black ethnicity (vs white) and poverty are associated with increased sepsis incidence and severity[@Mayr2010].
+
+Though equivalent studies aiming to identify risk factors for sepsis in adults in sSA are lacking, it is clear from the available data that HIV-infection is the dominant risk factor there. Summary patient demographics from the 10 identified sepsis studies are shown in Table \@ref(tab:sepsis-studies-popn); of 2788 included patients with available HIV status, 69% (1809/2788) were HIV infected, and often with advanced disease; of 1278 HIV-infected patients from 5 studies the study median CD4 count ranges from 52-168 cells/$\mu$L. In keeping with the epidemiology of the HIV epidemic in Africa, these patients are young, with average ages (variably reported as mean or median) ranging from 30-39 across the studies. These studies recruited an equal proportion of males and females (1444/2812 males, 51%), suggesting that sex is not a risk factor. 
+
+These data contrast sharply with the sepsis population in high income settings, from whom the majority of sepsis data have been generated, and who are older and mostly HIV uninfected[@Angus2001; @Seymour2017; @PRISMInvestigators2017]. The need for data from sSA to guide sepsis treatment protocols, rather than extrapolating from the high-income setting sepsis population, is clear. 
+```{r sepsis-studies-popn, tidy = F, echo = F}
+
+t6 <- read.csv(paste0(wd, "/chapter_one/t6_sepsis_popn.csv"), check.names = F)
+
+knitr::kable(t6, output, booktabs = T, caption = "Characteristics of patients recruited to sSA sepsis studies") %>%
+  kable_styling(full_width = F) %>% 
+  column_spec(1, width = "4em") %>% 
+  column_spec(2, width = "4em") %>% 
+  column_spec(3, width = "4em") %>%
+  column_spec(4, width = "4em") %>%
+  column_spec(5, width = "4em") %>%
+  column_spec(6, width = "2em") %>%
+  column_spec(7, width = "4em") %>%
+    column_spec(8, width = "4em") %>%
+    column_spec(9, width = "4em") %>%
+    column_spec(10, width = "4em")  %>%
+  footnote(general = "RCT = randomised controlled trial. All studies use a modified sepsis-2 definition of sepsis or severe sepsis. Age is given as median (IQR) or mean (SD). Units of CD4 count are cells/microlitre. Jacob 2012 includes two cohorts of patients – results shown for both separately - and includes data from patients included in Jacob 2009. The n here includes those not included in this publication but the summary estimates include all patients as they cannot be disaggregated", threeparttable = T)
+  
+```
+
+#### Outcomes
+
+Summary outcomes for sepsis and severe sepsis in sSA from the identified studies are presented in Figure \@ref(fig:sepsis-outcome-forest) below. Summary statistics of 28 or 30-day mortality were extracted from identified studies or, if 28- or 30-day data were not available, in-hospital mortality was used. For interventional studies, in order to reflect the “usual-care” mortality, only the usual care arms were included. Pooled mortality estimates were then generated using a random effect meta-analysis of proportions with a generalised linear mixed model (GLMM, the so called binomial-normal model) using the meta package in R. Exact binomial 95% mortality confidence intervals were used throughout. 
+
+It is clear that there is significant heterogeneity in outcomes of sepsis and severe sepsis in sSA, likely reflecting diverse patient and pathogen populations and variation in availability of available resources. This heterogeneity means that summary estimates should be interpreted with extreme caution but severe sepsis (49% [95% CI 39-58]), as expected, seems to carry a higher mortality hazard than sepsis (23% [95% CI 12-38]). Data of outcomes beyond 30 days are absent.
+
+```{r sepsis-outcome-forest-setup, include = F, warning = F}
+
+
+dfin <- read.csv("/Users/joelewis/Documents/PhD/lit_rev/sepsis_metaanalysis.csv")
+
+dfin$n.mort <- dfin$n_mort_30d
+dfin$e.mort <- dfin$e_mort_30d
+
+dfin$n.mort[is.na(dfin$n.mort)] <- dfin$n_mort_IP[is.na(dfin$n.mort)]
+dfin$e.mort[is.na(dfin$e.mort)] <- dfin$e_mort_IP[is.na(dfin$e.mort)]
+
+dfin <- subset(dfin, Study != "Rudd 2017" & Study != "Seboxa 2015")
+
+dfin <- subset(dfin, Study != "Jacob 2012 (after)" & Study != "Andrews 2014 (intervention)" & Study != "Andrews 2017 (intervention)")
+  
+dfin.sepsis <- subset(dfin, Type == "Sepsis")
+dfin.severe.sepsis <- subset(dfin, Type == "Severe sepsis")
+
+m.sepsis <- metaprop(event = e.mort, n = n.mort, data = dfin.sepsis, method = "GLMM", studlab = Study)
+m.severe.sepsis <- metaprop(event = e.mort, n = n.mort, data = dfin.severe.sepsis, method = "GLMM", studlab = Study)
+
+m.sepsis$year <- dfin.sepsis$Year
+m.severe.sepsis$year <- dfin.severe.sepsis$Year
+
+
+
+#forest(m, xlim = c(0,100), pscale = 100, weight = "random", leftcols = c("studlab", "event", "n", "effect", "ci", "w.random"), rightcols = F, leftlabs = c("Study", "Number", "Total", "MOrtality (%)", "95% CI"), xlab = "Prevalence (%)", addspace = TRUE, digits = 1, squaresize = 0.5)
+grid.grabExpr(
+  forest(m.sepsis, col.square="black", hetstat=FALSE, comb.fixed = F, leftcols = c("studlab", "Year", "n"), rightcols = c("effect", "ci"), 
+       leftlabs = c("Study", "Year", "n"), rightlabs = c("Mortality (%)", "95% CI"), xlab = "", digits = 2, squaresize = 0.5,  xlim = c(0,1), fontsize = 10, width = 8, height = 8) 
+) -> p1
+
+grid.grabExpr(
+forest(m.severe.sepsis, col.square="black", hetstat=FALSE, comb.fixed = F, leftcols = c("studlab", "Year", "n"), rightcols = c("effect", "ci"), 
+       leftlabs = c("Study", "Year", "n"), rightlabs = c("Mortality (%)", "95% CI"), xlab = "", digits = 2, squaresize = 0.5, xlim = c(0,1), fontsize = 10, width = 8, height = 8)       
+) -> p2
+
+as_ggplot(p1) -> p1
+ as_ggplot(p2) -> p2
+
+```
+
+```{r sepsis-outcome-forest,  echo = F, warning = F, fig.cap= "Pooled sepsis (A, top) and severe sepsis (B, bottom) inpatient mortality in sSA", fig.align= "center", fig.height= 6, fig.width = 7}
+
+ggarrange(p1,p2, ncol = 1, nrow =2, labels = c("A", "B"))
+```
+
+How does this compare to high income settings? A recent meta-analysis of population level estimates in high income settings found that a pooled sepsis 30-day mortality estimate of 17% (95% CI 11-26%)[@Fleischmann2016], though even older cohort studies as well as the more recent large sepsis-3 derivation cohorts have found considerably lower mortalities for sepsis (as defined by sepsis-2) ranging from 4-7%[@Seymour2016; Rangel-Frausto1995; Serafim2018]. Most recent (largely post-2005) estimates of 30-day mortality from severe sepsis range from from 18-29%[@Gaieski2013; @Fleischmann2016; @PRISMInvestigators2017; @Kaukonen2014; @Stevenson2014]. It seems likely therefore, that both sepsis and severe sepsis 30-day mortality is considerably higher in sSA than in high-income settings. The reasons for this are not clear, but are likely to be multifactorial; resource limitation is likely to play a part but the HIV epidemic in sSA, differing pathogen burden and lack of data and evidence based guidelines to inform optimal management in sSA may also play a role.
+
+In the longer term, sepsis mortality continues to rise after the usual sepsis-study primary end point of 28 or 30 days, though data from sSA are absent. A systematic review in 2010 of long term sepsis mortality identified 26 studies (with none from low-resource settings) that reported long term sepsis mortality; 1 year mortality ranged from 22-72%, increasing to 45-75% at greater than 3 years[@Winters2010]. Both short and long term morbidity is formidable also, though, once again, data from low income settings including sSA are absent. Cohort studies with no comparator group may not identify morbidity that is sepsis-specific (rather morbidity that is related to critical illness) but new, long-lasting reduction in physical and cognitive function with associated functional impairment have been identified in matched cohort studies in sepsis survivors[@Shah2013; Iwashyna2010]. Health-related quality of life in sepsis survivors in high-income settings have been found to be persistently below population norms[@Winters2010]. Increased incidence of cardiovascular disease, renal failure and further episodes of infection are seen following a hospital discharge for sepsis[@Yende2014; Bergh2017; Ou2016]. Long term sepsis outcomes in sSA are unknown.
+
+### Sepsis aetiology in sub-Saharan Africa
+
+The 11 identified prospective sepsis studies in sSA carried out various combinations of diagnostic testing for malaria (either microscopy or rapid diagnostic test) and aerobic and mycobacterial blood culture; a summary is shown in Table \@ref(tab:sepsis-review-aetiology) and xx below. The commonest bloodstream infection (BSI) in all studies where mycobacterial blood cultures were carried out was tuberculosis – present in a higher proportion than of all BSI isolates from aerobic culture combined -  though it is important to note that mycobacterial blood cultures in most studies were carried out in HIV infected people and bacteraemic tuberculosis is almost exclusively HIV-associated. The importance of bacteraemic tuberculosis as a cause of sepsis is further examined in an individual patient data meta analysis in chapter 3. With the exception of one study, malaria was less common than BSI, highlighting the importance of non-malarial fever in sSA as malaria control efforts reduce the burden of malaria.
+
+```{r sepsis-review-aetiology,  echo = F, warning = F, tidy = F}
+
+t7 <- read.csv(paste0(wd, "/chapter_one/t7_sepsis_aetiology.csv"), check.names = F)
+
+knitr::kable(t7, output, booktabs = T, caption = "Aetiology of sepsis in sSA") %>%
+  kable_styling(full_width = F) %>% 
+  row_spec(nrow(t7), bold = T)
+
+```
+
+```{r sepsis-bsi-isolates,  echo = F, warning = F, tidy = F}
+
+t8 <- read.csv(paste0(wd, "/chapter_one/t8_bsi_isolates.csv"), check.names = F)
+
+knitr::kable(t8, output, booktabs = T, caption = "BSI isolates in sepsis in sSA") %>%
+  kable_styling(full_width = F) %>% 
+  row_spec(nrow(t8), bold = T) %>%  
+  footnote(general = "Excluded are coagulase-negative Staphylococci, alpha-haemolytic Streptococci other than Pneumococcus, Bacillus spp. and Micrococci as likely contaminants.", threeparttable = T)
+
+```
