@@ -266,3 +266,30 @@ No study has attempted to define the burden of PCP in sepsis in sSA, though a 20
 
 Data examining the role of Histoplasmosis as a cause of fever or sepsis in sSA are sparse. A 2015 systematic review[@Prasad2015] identified only one study up to 2013 which Histoplasma urine antigen testing in 628 febrile adults and children in Tanzania and acute serum testing on a subset of 200, finding 9/628 (1%) probable cases, 6/9 of whom were HIV infected. Since then, two studies have addressed histoplasma prevalence in varying conditions: the first, in Uganda, enrolled HIV-infected patients with suspected meningitis[@Bahr2016] and found 0/151 patients had detectable IgM to _Histoplasma capsulatum_ and no Histoplasma antigen was detected in serum (n = 57), urine (n = 37) or CSF (n=63). The second study in Cameroon[@Mandengue2015] recruited HIV infected patients with CD4 < 200 cells/$\mu$L, chronic cough and Histoplasmosis like skin manifestations. Histopathologic examination and culture found Histoplasmosis in 7/56 (13%) of patients over 3 years.
 
+### Sepsis management
+
+The cornerstone of sepsis management is rapid administration of appropriate antimicrobial therapy, source control of any infectious focus and normalisation of tissue perfusion using intravenous fluids and, if necessary, inotropes, with other organ support as necessary (e.g. intubation and mechanical ventilation and renal replacement therapy). Several international guidelines for sepsis care are available; this section will examine these and specific guidance for sepsis in adults in sSA followed by a review of the evidence to inform these guidelines. 
+
+The surviving sepsis campaign has published four editions of comprehensive guidance on the management of sepsis in adults, which are endorsed by all the major critical care organisation in high income settings and form the basis of most sepsis care in high income settings; selected major recommendations of the latest guidance[@Rhodes2017] are shown in table 11 below.
+
+```{r ssc-guidelines, echo = F, warning = F, tidy= F}
+
+t10 <- read.csv(paste0(wd, "/chapter_one/t10_SSC_guidelines.csv"), check.names = F)
+
+knitr::kable(t10, output, booktabs = T, caption = "Surviving sepsis campaign guidelines") %>%
+ # kable_styling(full_width = F, latex_options = "repeat_header") %>% 
+  column_spec(1, width = "25em") %>% 
+  column_spec(2, width = "8em") %>% 
+  column_spec(3, width = "8em") %>%
+ # column_spec(4, width = "4em") %>%
+#  column_spec(5, width = "6em") %>%
+ # column_spec(6, width = "4em") %>%
+#    column_spec(7, width = "4em") %>%
+ #   column_spec(8, width = "4em") %>%
+  group_rows("Resusitation",1,6 ) %>%
+  group_rows("Antimicrobials",7,7 ) %>%
+  group_rows("Adjunctive therapies",8,8) %>%
+ footnote(general = "BPS = best practice statement")
+
+
+```
