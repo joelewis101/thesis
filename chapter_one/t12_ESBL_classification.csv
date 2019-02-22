@@ -1,0 +1,18 @@
+﻿Bush Jacoby group,Molecular class,Distinctive substrates,BLI,EDTA,Defining hydrolysis spectrum characteristics,Representative enzymes
+1,C,Cephalosporins,No,No,"cephalosporins > benpen, hydrolyzes cephamycins","E. coli AmpC, P99, ACT-1, CMY-2, FOX-1, MIR-1"
+1e,C,Cephalosporins,No,No,ceftazidime and often other oxyimino-beta-lactams,"GC1, CMY-37"
+2a,A,Penicillins,Yes,No,benzylpen > cephalosporins,PC1
+2b,A,"Penicillins, early cephalosporins",Yes,No,"Similar hydrolysis of benzylpenicillin, cephalosporins","TEM-1, TEM-2, SHV-1"
+2be,A,"Extended-spectrum cephalosporins, monobactams",Yes,No,oxyimino-beta lactams,"TEM-3, SHV-2, CTX-M-15, PER-1, VEB-1"
+2br,A,Penicillins,No,No,Resistance to BLI,"TEM-30, SHV-10"
+2ber,A,"Extended-spectrum cephalosporins, monobactams",No,No,oxyimino-beta lactams plus  resistance to BLI,TEM-50
+2c,A,Carbenicillin,Yes,No,Increased hydrolysis of carbenicillin,"PSE-1, CARB-3"
+2ce,A,"Carbenicillin, cefepime",Yes,No,"Increased hydrolysis of carbenicillin, cefepime, and cefpirome",RTG-4
+2d,D,Cloxacillin,Variable,No,Increased hydrolysis of cloxacillin or oxacillin,"OXA-1, OXA-10"
+2de,D,Extended-spectrum cephalosporins,Variable,No,cloxacillin or oxacillin and oxyimino-beta-lactams,"OXA-11, OXA-15"
+2df,D,Carbapenems,Variable,No,cloxacillin or oxacillin and carbapenems,"OXA-23, OXA-48"
+2e,A,Extended-spectrum cephalosporins,Yes,No,Inhibited by clavulanic acid but not aztreonam,CepA
+2f,A,Carbapenems,Variable,No,"carbapenems, oxyimino-beta-lactams, cephamycins","KPC-2, IMI-1, SME-1"
+3a,B (B1),Carbapenems,No,Yes,includes carbapenems but not monobactams,"IMP-1, VIM-1,CcrA, IND-1"
+,B (B3),,,,,"L1, CAU-1, GOB-1, FEZ-1"
+3b,B (B2),Carbapenems,No,Yes,Preferential hydrolysis of carbapenems,"CphA, Sfh-1"

@@ -344,3 +344,103 @@ The same intervention was then used at the same centre in a similar trial[Andrew
 A systematic review of the literature was undertaken to answer the following questions: firstly, what is the prevalence of ESBL-E amongst invasive isolates of _Klebsiella pneumoniae_ and _Escherichia coli_ infecting humans in sub-Saharan Africa? Secondly, what is the prevalence of gut mucosal carriage of ESBL-E amongst humans in sSA, and what risk factors for carriage have been identified? To this end a search of PubMed and Scopus was carried out using the search terms (((ESBL) OR Extended-spectrum beta-lactamase)) AND (((Angola OR Benin OR Botswana OR Burkina Faso OR Burundi OR Cameroon OR Cape Verde OR Central African Republic OR Chad OR Comoros OR Republic of the Congo OR Congo Brazzaville OR Democratic republic of the Congo OR Cote d'Ivoire OR Djibouti OR Equatorial Guinea OR Eritrea OR Ethiopia OR Gabon OR The Gambia OR Ghana OR Guinea OR Guinea-Bissau OR Kenya OR Lesotho OR Liberia OR Madagascar OR Malawi OR Mali OR Mauritania OR Mauritius OR Mozambique OR Namibia OR Niger OR Nigeria OR Reunion OR Rwanda OR Sao Tome and Principe OR Senegal OR Seychelles OR Sierra Leone OR Somalia OR South Africa OR Sudan OR Swaziland OR Eswatini OR Tanzania OR Togo OR Uganda OR Western Sahara OR Zambia OR Zimbabwe) OR Africa)).
 
 Inclusion criteria were any study that took place in sSA and allowed the calculation of a prevalence of ESBL-E in _K. pneumoniae_ or _E. coli_ amongst invasive human isolates, or prevalence of human gut mucosal carriage of ESBL-E. Studies were excluded if no ESBL-E confirmatory testing was performed using phenotypic (double disc or combination disc or E-test) or molecular (PCR) methods. Invasive isolates were defined to be any blood or CSF sample other usually sterile fluid, or urine or wound swabs with clinical suspicion of infection. On 8th December 2018 this search identified 2975 unique studies; after abstract review 192 underwent full-text review, resulting in the inclusion of 86 studies, 54[@Guiral2018; @Karppinen2018; @Ibrahim2017; @Kassam2017; @Legese2017; @Manyahi2017; @Sangare2017a; @Abera2016; @Agyekum2016; @Breurec2016; @Buys2016; @Eibach2016; @Kpoda2018a; @Kabwe2016; @Leski2016; @Mohammed2016; @Naas2016; @Ndir2016; @Ouedraogo2016; @Sangare2016; @Seni2016; @Dramowski2015; @Irenge2015; @Onanuga2018; @Kateregga2015; @Opintan2015; @Pons2015; @Rafai2015; @Adeyankinnu2014; @Irenge2014; @Scherbaum2014; @Yusuf2014; @Alabi2013; @Ibrahim2013; @Seni2018; @Obeng-Nkrumah2013; @Raji2013; @VanderMeeren2013; @Idowu2011; @Moyo2010a; @Bercion2009; @Mshana2009; @Sire2007; @Blomberg2005; @Gangoue-Pieboji2005; @Zeynudin2018; @Ndugulile2005; @Dromigny2003; @Dromigny2002; @Ampaire2017; @Andrew2017; @Archary2017; @Henson2017] providing data on invasive infection and 32 [ @Chirindze2018; @Founou2018; @Magwenzi2017; @Moremi2017; @Wilmore2017; @Farra2016; @Desta2016; @Djuikoue2016; @Mshana2016; @Ribeiro2016; @Tellevik2016; @Chereau2015; @Herindrainy2018; @Micheel2015; @Nelson2014; @Lonchel2013; @Magoue2013; @Schaumburg2013; @Albrechtova2012; @Isendahl2012; @Lonchel2012; @Herindrainy2011; @Woerther2011; @Katakweba2018; @Andriatahina2010; @Ruppe2009; @Tande2009; @Marando2018; @Moremi2018; @NikiemaPessinaba2018; @Sanneh2018; @Stanley2018; @Kurz2017]  167–199 on carriage. Details of these studies are given below. A broad non-systematic review of the literature was also undertaken to place these studies in context and provide a background understanding of the classification and global epidemiology of ESBL-E, using the same literature databases.
+
+### Introduction: definition and classification of ESBL-E
+
+Beta-lactamases are enzymes that hydrolyse the active beta lactam ring in beta lactam antimicrobials. Though no standardised definition of ESBL exists, they are usually defined as enzymes which confer resistance via hydrolysis to penicillins, cephalosporins of the first, second or third generation (excluding cephamycins), aztreonam, but not carbapenems, and are inhibited by beta-lactamase inhibitors such as clavulanic acid[@Paterson2005].
+
+Two classification schemes are usually used for ESBL: the molecular (or structural) classification of Ambler[@Ambler1980], or the Bush-Jacoby-Medeiros functional classification[@Bush2010] (Table \@ref(tab:esbl-definitions)). Molecular classification is straightforward and depends on protein homology; class A, C and D enzymes are serine beta-lactamases and class B are metallo-beta lactamases, named for the composition of their active site. The functional classification is complex and clusters enzymes into four groups, with a number of subgroups, based on substrates and the effect of beta-lactamase inhibitors and EDTA: class 1 (corresponding to Ambler class C) are cephalosporinases that are not inhibited by clavulanic acid, and includes the AmpC enzymes of the Enterobacteriaceae; class 2 enzymes are beta lactamases that are largely inhibited by clavulanic acid and belong to Ambler class A or C; and class 3 are the metallo-beta-lactamases corresponding to Ambler class B. Class 4 enzymes are penicillinases which are not inhibited by clavulanic acid, though are of limited significance and not included in Table 14. The vast majority of clinically relevant ESBLs (and all of those defined as above) belong to Ambler class A, functional class 2be.
+
+```{r esbl-definitions, echo = F, warning = F, tidy= F}
+t12 <- read.csv(paste0(wd, "/chapter_one/t12_ESBL_classification.csv"), check.names = F)
+
+knitr::kable(t12, output, booktabs = T, caption = "ESBL classification. Adapted from Bush (2010)") %>%
+ # kable_styling(full_width = F, latex_options = "repeat_header") %>% 
+  column_spec(1, width = "3em") %>% 
+  column_spec(2, width = "4em") %>% 
+  column_spec(3, width = "6em") %>%
+    column_spec(4, width = "3em") %>%
+      column_spec(5, width = "3em") %>%
+      column_spec(6, width = "10em") %>%
+      column_spec(7, width = "10em") %>%
+   add_header_above(c(" " = 3, "Inhibited by" = 2)) %>%
+#  group_rows("Resusitation",1,8 ) %>%
+#  group_rows("Antimicrobials",9,10 ) %>%
+ # group_rows("Adjunctive therapies",11,11) %>%
+ footnote(general = "BLI = Beta-lactamase inhibitor")
+```
+
+### Global molecular epidemiology of ESBL-E: an overview
+
+The history of the global spread of ESBL-E is complex and an enormous number of unique ESBL amino acid sequences have been described; at the time of writing the NCBI beta-lactamase directory contains 1557 named beta-lactamase genes, many of them ESBL. However, there are 3 families which cause the majority of infections in humans: TEM, SHV, and CTX-M. They will be briefly described here in turn in the context of their putative origins and global dissemination in the latter half of the 20th century. A diverse range of other ESBL enzymes have been described, but are largely of less clinical significance than those described above, and are beyond the scope of this review: most notably the OXA type, which in contrast to TEM, SHV and CTX-M, are of the molecular class D and functional class 2d, and are characterised by a high rate of hydrolysis of cloxacillin[@Bradford2001]; like TEM and SHV, OXA beta-lactamases are not always extended-spectrum.  
+
+#### 1980s-1990s: First identificatiom of ESBL in nosocomial pathogens
+
+Beta-lactamases form an integral part of the natural armamentarium of many genera of bacteria – particularly gram negatives, including Enterobacteriaceae - and predate the antibiotic era; penicillinases were identified in E. coli, for example, prior to the widespread introduction of penicillin for treatment of human disease[@ABRAHAM1940]. These beta-lactamases are often chromosomally located; the first plasmid-mediated narrow-spectrum beta-lactamase, TEM-1 -named for the patient, Temoneira, from whose blood it was first isolated – was found in Athens in the 1960s[@Datta1965].  It rapidly disseminated globally and is thought to be responsible for a high proportion of ampicillin resistance in E. coli, for example[@Bradford2001]. This worldwide spread spurred the development and use of beta-lactamase resistant extended-spectrum cephalosporin antimicrobials, which found wide use in the 1980s. Perhaps inevitably, an enzyme conferring resistance to extended-spectrum oxyimino-cephalosporins was subsequently identified in a German clinical _Klebsiella ozaenae_ isolate in 1983, carried on a pBP60 plasmid and enzymes of this sort were named ESBLs[@Knothe1983; @Kliebe1985]. 
+
+This first ESBL enzyme was found to be similar to an existing plasmid-borne narrow spectrum beta lactamase, SHV-1, which had been described in the 1970s in E. coli, and was thought to itself be descended from a chromosomal _K. pnemoniae_ narrow spectrum beta lactamase which was liberated onto a plasmid[@Liakopoulos2016]. The point mutations in SHV-1 conferred the ESBL phenotype, and this enzyme was named SHV-2. This pattern - mutation of a narrow spectrum beta-lactamase to produce an ESBL phenotype  - also occurred in TEM, and the first ESBL TEM was described in France in 1989[@Sougakoff1988] and named TEM-3. Many TEM and SHV variants were subsequently described[@Gold1996]. However, in this early stage of the epidemic, ESBL enzymes were largely nosocomial, and often associated with _Klebsiella spp._[@Philippon1989].
+
+#### 1990s-2010s: Emergence and globalisation of CTX-M
+
+From the late 1990s onwards, there were profound changes in the global epidemiology of ESBL-E, on three fronts, all intricately interrelated, and occurring simultaneously: first, the rapid emergence and globalisation of the successful CTX-M ESBL enzyme family[@Canton2006], aided by mobile genetic elements; second, _E. coli_ joining _Klebsiella spp._ as a major ESBL host[@Livermore2006], and the emergence of so-called high risk bacterial clones; and third, the spread of ESBL-E into the community[@BenAmi2009]. CTX-M-1 was first identified and named in Germany in 1989[@Bauernfeind1990] and many variants were subsequently identified, largely in _E. coli_ and _K. pneumoniae_, from isolates all over the world[@Bonnet2004]. CTX-M genes are clustered by homology into 5 groups (CTX-M groups 1,2,8,9 and 25 ) and each group is thought to have descended from a chromosomal beta lactamase from _Kluyvera spp._[@Canton2006]
+
+A year-on-year rise in incidence of invasive ESBL-E infection was seen in most high-income settings (Figure \@ref(fig:esbl-world-prev)) throughout the 2000s and 2010s, the majority of which were CTX-M producers, though with varying proportions of different CTX-M enzymes in different locations[@Livermore2006; Bevan2017]. Risk factors for ESBL-E infection in high income settings have persistently been shown to be hospital or long-term care facility exposure, antimicrobial exposure and chronic health conditions though it was recognised in the 2000s that a large proportion of patients with invasive ESBL-E lack any of these risk factors[@BenAmi2009], suggesting acquisition in the community. Colonisation prior to infection is thought to be the norm; prior colonisation is a significant risk factor for infection and indeed when sought ESBL-E are found in the stool of healthy community members worldwide (see carriage, below). 
+
+Though less comprehensive, data from middle income countries suggests that prevalence of ESBL producers amongst invasive _E. coli_ and _K. pneumoniae_ are very high (Figure \@ref(fig:esbl-world-prev)) and in countries such as India invasive _E. coli_ and _K. pneumoniae_ that are sensitive to third-generation cephalosporins are in the minority. The reasons for this are not clear but country and regional level associations (which are open to ecologic bias) have been shown with antimicrobial consumption[@Goossens2005; Lai2011] and economic status; GDP per capita has been found to correlate inversely at a country level with third-generation cephalosporin resistance rates[@Alvarez-Uria2016]. Data from sSA have historically been lacking and are systematically reviewed below. 
+
+```{r esbl-world-prev, echo = F, warning = F, fig.cap= "Prevalence of third generation cephalosporin resistance in representative high income (EU, USA) and middle income (China, Mexico, India) areas in invasive E. coli (left panel) and K. pneumoniae (right panel) isolates. Data for EU are from ECDC surveillance atlas (https://ecdc.europa.eu/en/antimicrobial-resistance/surveillance-and-disease-data/data-ecdc) and for other countries are from CCDEP resistance map (https://resistancemap.cddep.org/AntibioticResistance.php) both accessed 28 December 2018. 3GC = third generation cephalosporin. Note that these data are 3GC-resistant isolates rather than confirmed ESBL-producers, but would be expected to be ESBL-producers in the vast majority of cases.", fig.align= "center", fig.height= 4, fig.width = 7}
+
+### get EU wide estimates of cef R from country data
+###
+
+df <- read.csv("/Users/joelewis/Documents/PhD/R/PhD/esbl_lit_review/ECDC__3gc_esco.csv", stringsAsFactors = F)
+df <- rbind(df, read.csv("/Users/joelewis/Documents/PhD/R/PhD/esbl_lit_review/ECDC_3gc_klpn.csv", stringsAsFactors = F))
+
+df %>% filter(Indicator == "Non-susceptible (I and R) isolates" | Indicator == "Total tested isolates") %>% 
+  group_by(Time, Population, Indicator) %>%
+  summarise(n = sum(as.numeric(NumValue))) %>%
+  group_by(Population, Time) -> df
+
+
+res <- df %>% filter(Indicator == "Non-susceptible (I and R) isolates")
+names(res)[names(res) == "n"] <- "resistant"
+tot <- df %>% filter(Indicator == "Total tested isolates")
+names(tot)[names(tot) == "n"] <- "total"
+tot <- select(tot, -Indicator)
+res <- select(res, -Indicator)
+merge(res, tot, by = c("Time", "Population")) -> df
+rm(res)
+rm(tot)
+
+df$organism <- "E. coli"
+df$organism[grepl("Kleb", df$Population)] <- "K. pneumoniae"
+
+df$prop <- df$resistant / df$total
+df$area <- "EU"
+
+#ggplot(df, aes(x= Time, y = prop, colour = area)) + geom_point() + geom_line() + facet_wrap(~organism)
+
+df2 <- read.csv("/Users/joelewis/Documents/PhD/R/PhD/esbl_lit_review/cddep_country_3gc.csv", stringsAsFactors = F)
+
+rbind(select(df, Time, organism, area, prop), df2) -> df
+rm(df2)  
+
+ggplot(subset(df, area %in% c("USA", "EU", "India", "Mexico", "China")), aes(x= Time, y = prop, colour = area)) + 
+  geom_point() + 
+  geom_line() + 
+  facet_wrap(~organism) + 
+  ylab("Proportion of 3GC resistance") +
+  xlab("Year") +
+  theme(legend.title = element_blank()) +
+  ylim(c(0,1))
+
+
+#ggplot(df, aes(x= Time, y = prop, colour = area)) + geom_point() + geom_line() + facet_wrap(~organism)
+
+```
+
+#### Epidemiology of gut mucosal carriage of ESBL-E: the first step towards invasive infection
+
+Invasive infections with Enterobacteriaceae are thought to usually result from infection from an individual’s own gut microbiota, irrespective of resistance pattern[@Denis2015], and whole genome sequencing has confirmed that invasive isolates are often closely related to prior gut carriage isolates[@Gorrie2018]. Strategies to minimise carriage are therefore potentially attractive as interventions to reduce invasive infection and a number of studies have attempted to understand the dynamics of gut mucosal ESBL-E carriage in health and disease. A brief overview of ESBL-E community carriage is presented here, and ESBL-E carriage in sSA is systematically reviewed below.
+
+ESBL-E community carriage in Spanish outpatients[@Mirelis2003] and healthy children in Poland[@Franiczek2003] was first described in 2001, and subsequently has been identified worldwide when sought[@Woerther2013], though there are heterogeneities between and within countries which mirror the prevalence of invasive ESBL-E prevalence amongst _E. coli_ and _K. pneumoniae_. In Europe, for example, community prevalence of ESBL-E carriage was estimated be 7.3% in the UK in 2014 in a large community study[@McNulty2018], 4.5% in the Netherlands in 2012[@Wielders2017] and 4.7% in Sweden in 2012/13[@Ny2017] and 3.7% in Spain in 2003[@Valverde2004], significantly lower than community carriage prevalence of 50.9% seen in China in 2009[@Li2011] or 33.8% in India in 2011-2013[@Babu2016].
