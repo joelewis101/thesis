@@ -27,9 +27,12 @@ library(metafor)
 library(meta)
 library(grid)
 library(ggpubr)
+library(tmap)
+library(lme4)
 
 
 output = "latex"
+n_bootstraps <- 10
 
 ```
 
@@ -444,3 +447,525 @@ ggplot(subset(df, area %in% c("USA", "EU", "India", "Mexico", "China")), aes(x= 
 Invasive infections with Enterobacteriaceae are thought to usually result from infection from an individual’s own gut microbiota, irrespective of resistance pattern[@Denis2015], and whole genome sequencing has confirmed that invasive isolates are often closely related to prior gut carriage isolates[@Gorrie2018]. Strategies to minimise carriage are therefore potentially attractive as interventions to reduce invasive infection and a number of studies have attempted to understand the dynamics of gut mucosal ESBL-E carriage in health and disease. A brief overview of ESBL-E community carriage is presented here, and ESBL-E carriage in sSA is systematically reviewed below.
 
 ESBL-E community carriage in Spanish outpatients[@Mirelis2003] and healthy children in Poland[@Franiczek2003] was first described in 2001, and subsequently has been identified worldwide when sought[@Woerther2013], though there are heterogeneities between and within countries which mirror the prevalence of invasive ESBL-E prevalence amongst _E. coli_ and _K. pneumoniae_. In Europe, for example, community prevalence of ESBL-E carriage was estimated be 7.3% in the UK in 2014 in a large community study[@McNulty2018], 4.5% in the Netherlands in 2012[@Wielders2017] and 4.7% in Sweden in 2012/13[@Ny2017] and 3.7% in Spain in 2003[@Valverde2004], significantly lower than community carriage prevalence of 50.9% seen in China in 2009[@Li2011] or 33.8% in India in 2011-2013[@Babu2016].
+
+Risk factors for colonisation have been identified in many studies and antimicrobial exposure[@Reuland2016; @Woerther2017] and healthcare facility exposure[@Babu2016; Luvsansharav2012] (including long term care facilities[@March2010]) are consistently identified as such. Colonisation of a household member has also been identified as a risk factor[@Valverde2008; Rodriguez-Bano2008], suggesting significant within-household spread. Antacid use has been associated with ESBL-E colonisation[@Reuland2016] as has exposure to farming[@[@Wielders2017]. In low prevalence areas, travel to high prevalence areas is a risk factor[@McNulty2018; @Ny2017; @Reuland2016; @Woerther2017; @VanDuijkeren2018].
+
+The majority of studies of ESBL-E carriage are cross sectional and only a handful have attempted to characterise longitudinal carriage of ESBL-E with a longitudinal sampling approach. Estimates of carriage duration vary, partly because of the difficulty in inferring them from interval-censored rectal swab or stool data, but it is clear that some patients remain colonised for many months. Following a Swedish ESBL-E outbreak, 12% of patients still carried ESBL-E at the final sampling visit, a median 58 months after the outbreak[@Alsterlund2009]. French and German studies found a median duration of carriage of 4.3[@Zahar2010] and 12.5[@Lohr2013] months respectively following hospitalisation or outbreak. More transient carriage following international travel seems to be the norm with a median of 30 days in a large Dutch study[@Arcilla2017]; the reasons for this are not clear.
+
+The largest longitudinal community study of ESBL-E carriage took place in the Netherlands which recruited 76 ESBL-E colonised and 249 uncolonised community members and carried out longitudinal stool sampling at 5 time points over 8 months. 25/76 (32.9%) of initially-colonised participants remained persistently colonised after a median 242 days. Antimicrobial exposure in the past 6 months, proton-pump inhibitor use, colonisation with _E. coli_ phylogroup B2 or D and presence of CTX-M-27 or CTX-M-14 was associated with persistent carriage, suggesting both host and bacterial factors may be important determinants of carriage duration. _K. pneumoniae_ colonisation seemed to be less common in the persistent carriage group[@VanDuijkeren2018; @Teunis2018]. This study also found significant heterogeneity of _E.coli_ sequence type in longitudinal samples of persistent carriers but that ESBL genes and often detectable plasmid replicons remained unchanged, suggesting a significant role for mobile genetic elements.
+
+#### Molecular mechanisms underlying success of CTX-M: mobile genetic elements and high-risk clones
+
+The remarkable success of CTX-M has led to efforts to understand the molecular mechanisms by which this enzyme spread so rapidly. The system is complex, and poorly understood, but should be considered at multiple levels including that of the organism; the plasmid; the transposon, which may contain integrons or insertion sequences and, at the lowest level the ESBL gene. These will briefly be reviewed here.
+
+The initial mobilisation event of CTX-M from _Kluyvera spp._ is thought to have been mediated by capture of transposable insertion sequences; the insertion sequence ISEcp1 has been experimentally demonstrated to mobilise the CTX-M precursor from _Kluyvera ascorbata_[@Lartigue2006] and ISEcp1 is most consistently associated with CTX-M genes but IS26, ISCR1 and IS10 have also persistently been described upstream from CTX-M genes, suggesting multiple mobilisation events[@Bevan2017]. There is also an association between particular pairs of CTX-M gene clusters and insertion sequences, consistent with a hypothesis of multiple mobilisation events[@Canton2012]. These insertion sequences provide two roles: they encode a transposase enabling gene mobilisation but act as a strong promotor of CTX-M, without which phenotypic cephalosporin resistance is absent or reduced[@Zhao2013].
+
+After mobilisation from the _Kluyvera_ genome, the CTX-M genes were integrated onto a plasmid backbone, a process which is likely ongoing as a substantial number of diverse CTX-M carrying plasmids have been described: there is, however, an association between CTX-M genotype and plasmid incompatibility group. The successful CTX-M 15 gene is very strongly associated with the narrow host-range IncF plasmid group, for example, which are restricted to Enterobacteriaceae[@Zhao2013; Carattoli2009]. Identical CTX-M containing plasmids have been found across diverse geographical regions and have been termed “epidemic plasmids”[@Bevan2017] though the mechanism of persistence of these plasmids within a bacterial population remains unclear. 
+
+In addition to frequently co-occurring CTX-M genes, transposable elements and plasmids, some clonal groups of _E. coli_ and _K. pneumoniae_ are both globally successful and associated with particular CTX-M genes and plasmids. These successful sequence types (STs) are known as “high risk clones.” The archetypal example is _E. Coli_ ST131 which is often associated with an IncFII plasmid containing CTX-M-15[@Coque2008]. First described in 2008, _E. coli_ ST131 is thought to be responsible for around 80% of extra-intestinal ESBL E. coli infection[@Nicolas-Chanoine2014]. Population genomics studies have demonstrated that a particular clade, ST131 clade C, is globally dominant and have shown a sequential acquisition of virulence determinants followed by mobile genetic elements conferring fluoroquinolone and ESBL resistance[@Stoesser2016; @Petty2014]. These events may have contributed to the global success of ST131, but the precise mechanism of its apparent fitness advantage remains unknown.
+
+### Epidemiology of ESBL-E in sub-Saharan Africa
+
+Of the 86 studies identified by the systematic literature review, 54 studies provided data on invasive ESBL-E and 32 provided data on human carriage is sSA. These are considered in turn below.
+
+#### Invasive ESBL-E infection
+
+Table xx in appendix xx shows the 54 included studies in this analysis, which provide data on 6067 _E. coli_ and 2974 _K. pneumoniae_ isolates. All studies were cross sectional in design. Of the 54, 18/54 were laboratory based (i.e. a survey of all samples received in the laboratory); 17/54 were truly invasive in that they included predominantly blood culture; a combination of urine, CSF, and wound swabs were included in the remaining studies. 36/54 studies provided data on adults and children; 6/54 on adults only; and 12/54 on children only. The majority of studies (42/54) include both community and nosocomial acquired infection. Of the remainder, 3/54 provided data on nosocomial infection only. Figure \@ref(esbl-invasive-ssa-prev)A  shows a map of available data by country; data are available from across the continent though Nigeria (8 studies) and Tanzania (7 studies) are over represented and many countries provide no data. 
+
+The proportion of ESBL producers amongst invasive E. coli and K. pneumoniae in sSA is heterogeneous but many studies show extremely an extremely high prevalence (Figures \@ref(esbl-invasive-ssa-prev)B and \@ref(esbl-invasive-ssa-prev)C), comparable to that seen in the Indian subcontinent and other high-prevalence areas and highlighting the scale of the public health problem posed by ESBL-E in sSA. Meta regression shows clear temporal trends of an increase over time: addition of time as a fixed-effect covariate to the random effects model gives improved fit on likelihood ratio testing of nested models (p < 0.001 for both _E. coli_ and _K. pneumoniae_). Though data are sparse pre-2000, those data that are available suggest that ESBL producing _E. coli_ and _K. pneumoniae_ were identified in West Africa even in the 1990s: a retrospective laboratory based study in Yaounde, Cameroon on isolates from a variety of clinical samples from 1995-1998 found that 13/91 _E coli._ and 12/64 _K. pneumoniae_ were ESBL producers, with the SHV-12 enzyme predominant[@Gangoue-Pieboji2005]; in Dakar, Senegal, 6/97 _K. pneumoniae_ isolates from community acquired urinary tract infections in 1999-2000 were found to be ESBL producers[@Dromigny2003]. 
+
+```{r esbl-invasive-ssa-setup, include = F}
+
+### Make map
+
+data("World")
+africa = World %>% 
+  filter(continent == "Africa")
+#tm_shape(africa) + tm_polygons()
+
+##
+
+df <- read.csv("/Users/joelewis/Documents/PhD/Thesis/lit_rev/esbl/ESBL_studies.csv", stringsAsFactors = F)
+
+df <- subset(df, Include == "Y")
+df$carriage_n_patients[df$study_id == 91] <- 244
+df$carriage_n_patients_ESBL_total[df$study_id == 91] <- 54
+df$invasive_n_kleb_ESBL[df$study_id == 37] <- 33
+df$invasive_n_kleb[df$study_id == 37] <- 36
+df$which_analysis[grepl("nvas", df$which_analysis)] <- "invasive"
+df$which_analysis[grepl("rri", df$which_analysis)] <- "carriage"
+df$which_analysis[grepl("viron", df$which_analysis)] <- "environmental"
+df$population[grepl("community", df$population)] <- "community"
+carriage <- subset(df, which_analysis == "carriage")
+#df$population[grepl("community", df$population)]
+human_carriage <- subset(carriage, species == "human")
+
+cbind(human_carriage,
+  data.frame(lci = apply(human_carriage[c(27,28)], 1, function(x) binom.test(x=x[2],n=x[1])$conf.int[1]),
+           uci = apply(human_carriage[c(27,28)], 1, function(x) binom.test(x=x[2],n=x[1])$conf.int[2]))) -> human_carriage
+hc <- subset(human_carriage, population != "hospital_workers" & population != "institution")
+
+hc$population = factor(hc$population, levels=c('IP','on_hospital_admission','OP','community'))
+
+invasive <- subset(df, which_analysis == "invasive")
+invasive$country[grepl("entral",  invasive$country)] <- "Central African Rep."
+invasive$country[grepl("of congo",  invasive$country)] <- "Dem. Rep. Congo"
+invasive$country[grepl("Sierra",  invasive$country)] <- "Sierra Leone"
+
+n_studies <- invasive %>% group_by(country) %>% summarise(n = length(country))
+names(n_studies)[1] <- "name"
+n_studies$name <- as.factor(n_studies$name)
+africa <- left_join(africa, n_studies, by = "name")
+
+#tm_shape(africa) + tm_polygons("n")
+
+#plot(africa["n"])
+africa$n[is.na(africa$n)] <- 0
+
+ggplot(africa) + 
+  geom_sf(aes(fill = n)) + 
+  scale_fill_gradient(low = "white", high = "black") + 
+  theme_bw() + 
+  theme(panel.border = element_blank(),
+        axis.line.x = element_blank(), 
+        axis.line.y =  element_blank(), 
+        axis.ticks = element_blank(), 
+        axis.text = element_blank(), 
+        legend.position = "bottom") + 
+  labs(fill = "No. studies") -> nstuds_map
+
+```
+
+```{r esbl-invasive-ssa-prev, echo = F, warning = F, fig.cap= "Invasive ESBL-E in sSA. A: Available studies by country. B and C: meta regression of proportion of invasive \\textit{E. coli} and \\textit{K. pneumoniae} respectively as a function of time. In both cases time is statistically significantly associated with proportion of ESBL (p < 0.001 on likelihood ratio testing of nested models). 95\\% CI generated from 1000 bootstrap replicates.", fig.align= "center", fig.height= 5, fig.width = 8}
+
+#A: available studies by country; B: proportion of ESBL producing E. coli and C: proportion of ESBL producing K. pneumoniae over time. Regression lines are from normal-binomial meta-analysis of proportions including study effect as random effect and time as a covariate using lme4 package in R. 95% CI generated from 1000 bootstrap replicates from fitted models. In both cases time is statistically significantly associated with proportion of ESBL (p < 0.001 on likelihood ratio testing of nested models).
+
+##### make plots
+
+
+invasive$esco_prob_esbl <- invasive$invasive_n_ESCO_ESBL / invasive$invasive_n_ESCO
+invasive$klpn_prob_esbl <- invasive$invasive_n_kleb_ESBL / invasive$invasive_n_kleb
+
+## ok do proper normal-binomial glmm
+
+invasive_back <- invasive
+
+invasive$year <- invasive$year_of_samples_start - 1995
+
+
+invasive <- subset(invasive, !(is.na(year_of_samples_start) | is.na(invasive_n_ESCO_ESBL)))
+
+mod <- glmer( formula = cbind(  invasive_n_ESCO_ESBL, invasive_n_ESCO - invasive_n_ESCO_ESBL ) ~ 
+                  year + (1 | study_id) , data = invasive , family = binomial  ) 
+
+newdata <- data.frame("year" = seq(0,20,1))
+newdata$study_id <- "new"
+
+
+sfun2 <- function(x) {
+  predict(x,newdata=newdata,
+          allow.new.levels=TRUE)
+}
+
+sumBoot <- function(merBoot) {
+  return(
+    data.frame(fit = apply(merBoot$t, 2, function(x) as.numeric(quantile(x, probs=.5, na.rm=TRUE))),
+               lwr = apply(merBoot$t, 2, function(x) as.numeric(quantile(x, probs=.025, na.rm=TRUE))),
+               upr = apply(merBoot$t, 2, function(x) as.numeric(quantile(x, probs=.975, na.rm=TRUE)))
+    )
+  )
+}
+
+
+
+b2 <- lme4::bootMer(mod, FUN = sfun2, nsim = n_bootstraps)
+
+b2sum <- sumBoot(b2)
+
+newdata$fit <- plogis(b2sum$fit)
+newdata$lwr <- plogis(b2sum$lwr)
+newdata$upr <- plogis(b2sum$upr)
+
+
+#newdata <- data.frame(newdata, "esco_prob_esbl" = plogis(predict(mod, newdata = newdata, allow.new.levels = T)))
+
+newdata$year <- newdata$year + 1995
+
+#mod <- glmer( formula = cbind(  TP, MTB.BSI - TP ) ~  prop + (1 | primary.study), data = l , family = binomial  ) 
+
+names(newdata)[1] <- "year_of_samples_start"
+names(newdata)[3] <- "esco_prob_esbl"
+ggplot(invasive, aes(year_of_samples_start, esco_prob_esbl)) + geom_point(aes(size = invasive_n_ESCO), alpha = 0.7) +
+  geom_line(data = newdata) + 
+  geom_ribbon(data = newdata, aes(ymin = lwr, ymax = upr), alpha = 0.3) + 
+#  theme_bw() +
+  ylab("E. coli") +
+  xlab("Year") +
+  labs(size = "Study size") -> p1
+
+###
+
+#invasive$year <- invasive$year_of_samples_start - 1995
+
+invasive <- invasive_back
+#invasive$year <- invasive$year_of_samples_start - 1995
+
+invasive <- subset(invasive, !(is.na(year_of_samples_start) | is.na(invasive_n_kleb_ESBL)))
+invasive$year <- invasive$year_of_samples_start - 1995
+mod2 <- glmer( formula = cbind(  invasive_n_kleb_ESBL, invasive_n_kleb - invasive_n_kleb_ESBL ) ~ 
+                year + (1 | study_id) , data = invasive , family = binomial  ) 
+
+newdata2 <- data.frame("year" = seq(0,20,1))
+newdata2$study_id <- "new"
+
+sfun3 <- function(x) {
+  predict(x,newdata=newdata2,
+          allow.new.levels=TRUE)
+}
+
+b3 <- lme4::bootMer(mod2, FUN = sfun3, nsim = n_bootstraps)
+
+b3sum <- sumBoot(b3)
+
+newdata2$fit <- plogis(b3sum$fit)
+newdata2$lwr <- plogis(b3sum$lwr)
+newdata2$upr <- plogis(b3sum$upr)
+
+
+
+newdata2$year <- newdata2$year + 1995
+
+#mod <- glmer( formula = cbind(  TP, MTB.BSI - TP ) ~  prop + (1 | primary.study), data = l , family = binomial  ) 
+
+names(newdata2)[1] <- "year_of_samples_start"
+names(newdata2)[3] <- "klpn_prob_esbl"
+
+ggplot(invasive, aes(year_of_samples_start, klpn_prob_esbl)) + geom_point(aes(size = invasive_n_kleb), alpha = 0.7) +
+  geom_line(data = newdata2) + 
+  geom_ribbon(data = newdata2, aes(ymin = lwr, ymax = upr), alpha = 0.3) + 
+#  theme_bw() +
+  ylab("K. pneumoniae") +
+  xlab("Year") +
+  labs(size = "Study size") -> p2
+
+ggarrange(nstuds_map, 
+          ggarrange(p1,p2, labels = c("B","C"), ncol = 1, nrow = 2),
+          labels = c("A",NULL),
+           ncol = 2, nrow = 1, widths = c(0.8,1))
+
+
+```
+
+Some of the heterogeneity in prevalence does however seem to be explained by sample type; a clearer picture appears when the analysis is restricted to the 16 studies including predominantly blood culture (Figure \@ref(fig:esbl-invasive-ssa-prev-bc))[@Legese2017; @Sangare2017a; @Sangare2016; @Dramowski2015; @Irenge2014; @Pons2015; @Blomberg2005; @Henson2017; @Abera2016; @Agyekum2016; @Breurec2016; @Buys2016; @Eibach2016; @Kabwe2016; @Naas2016; @Ndir2016]. In this analysis it seems clear that the worldwide epidemiology of ESBL-E was mirrored in sSA; ESBL initially spread amongst invasive K. pneumoniae post 2000 (particularly post 2005) before becoming established in E. coli after 2010. In 2014, the latest available data, the pooled population prevalence of ESBL from binomal-normal random effects meta analysis was 61% [95% CI 40-80%] amongst _E. coli_ and 86% [95% CI 73-92%] amongst _K. pneumoniae_ bloodstream infection isolates, suggesting endemicity of ESBL amongst these pathogens in sSA, and comparable to the highest prevalence areas in the world.
+
+```{r esbl-invasive-ssa-prev-bc, echo = F, warning = F, fig.cap= "Meta regression of proportion of ESBL producing \\textit{E. coli} and \\textit{K. pneumoniae} amongst invasive isolate in sSA from studies carrying out blood culture, as a function of time. Includes 1242 \\textit{K. pneumoniae} and 489 \\textit{E. coli} isolates. 95\\% CI generated from 1000 bootstrap replicates from fitted models. In both cases time is statistically significantly associated with proportion of ESBL (p < 0.001 on likelihood ratio testing of nested models).", fig.align= "center", fig.height= 3, fig.width = 5}
+
+
+bl <- subset(invasive, grepl("blo", invasive$sample_type))
+bl$year <- bl$year_of_samples_start - 1995
+bl.k <- subset(bl, !is.na(invasive_n_kleb))
+mod.bl.k <- glmer( formula = cbind(  invasive_n_kleb_ESBL, invasive_n_kleb - invasive_n_kleb_ESBL ) ~ 
+                          year + (1 | study_id) , data = bl.k , family = binomial  ) 
+newdata <- data.frame("year" = seq(0,20,1))
+newdata$study_id <- "new"
+newdata$year_of_samples_start <- newdata$year + 1995
+b2 <- lme4::bootMer(mod.bl.k, FUN = sfun2, nsim = n_bootstraps)
+b2sum <- sumBoot(b2)
+newdata$fit <- plogis(b2sum$fit)
+newdata$lwr <- plogis(b2sum$lwr)
+newdata$upr <- plogis(b2sum$upr)
+newdata$year <- newdata$year + 1995
+names(newdata)[names(newdata) == "fit"] <- "klpn_prob_esbl"
+
+bl.e <- subset(bl, !is.na(invasive_n_ESCO_ESBL))
+mod.bl.e <- glmer( formula = cbind(  invasive_n_ESCO_ESBL, invasive_n_ESCO - invasive_n_ESCO_ESBL ) ~ 
+                     year + (1 | study_id) , data = bl.e , family = binomial  ) 
+newdata2 <- data.frame("year" = seq(0,20,1))
+newdata2$study_id <- "new"
+newdata2$year_of_samples_start <- newdata$year + 1995
+b3 <- lme4::bootMer(mod.bl.e, FUN = sfun3, nsim = n_bootstraps)
+b3sum <- sumBoot(b3)
+newdata2$fit <- plogis(b3sum$fit)
+newdata2$lwr <- plogis(b3sum$lwr)
+newdata2$upr <- plogis(b3sum$upr)
+names(newdata2)[names(newdata2) == "fit"] <- 'esco_prob_esbl'
+bl.e$organism <- "E. coli"
+sub("_esco", "", names(bl.e)) -> names(bl.e)
+sub("esco_", "", names(bl.e)) -> names(bl.e)
+sub("_ESCO", "", names(bl.e)) -> names(bl.e)
+sub("ESCO_", "", names(bl.e)) -> names(bl.e)
+sub("esco_", "", names(newdata2)) -> names(newdata2)
+newdata2$organism <- "E. coli"
+bl.k$organism <- "K. pneumoniae"
+sub("_klpn", "", names(bl.k)) -> names(bl.k)
+sub("klpn_", "", names(bl.k)) -> names(bl.k)
+sub("_klpn", "", names(bl.k)) -> names(bl.k)
+sub("_kleb", "", names(bl.k)) -> names(bl.k)
+sub("klpn_", "", names(newdata)) -> names(newdata)
+newdata$organism <- "K. pneumoniae"
+
+bl.t <- rbind(dplyr::select(bl.e, year_of_samples_start, prob_esbl, organism, invasive_n), dplyr::select(bl.k, year_of_samples_start, prob_esbl, organism, invasive_n) )
+newdata2$year_of_samples_start <- newdata2$year_of_samples_start - 1995
+ggplot(bl.t, aes(year_of_samples_start, prob_esbl, fill = organism, colour = organism)) + geom_point(aes(size = invasive_n), alpha = 0.8) +
+  geom_line(data = newdata) + 
+  geom_line(data = newdata2) +
+  geom_ribbon(data = newdata, aes(ymin = lwr, ymax = upr), alpha = 0.3, colour = NA) + 
+  geom_ribbon(data = newdata2, aes(ymin = lwr, ymax = upr), alpha = 0.3, colour = NA) + 
+#  theme_bw() +
+  ylab("Proportion of ESBL") +
+  xlab("Year") +
+  labs(size = "Study size", fill = "Organism", colour = "Organism") 
+
+```
+ESBL genes were characterised in 10 studies by whole genome sequencing[@Henson2017] (n=1) or by PCR[ @Manyahi2017; @Agyekum2016; @Breurec2016; @Eibach2016; @Ouedraogo2016; @Pons2015; @Rafai2015; @Blomberg2005; @Ndugulile2005] (n=9) for 821 _E. coli_ and 791 _K. pneumoniae_ isolates (Figure \@ref(fig:esbl-invasive-ssa-enzymes)). CTX-M enzymes were the most commonly occurring ESBL genes, and the majority of these were CTX-M-15 in both organisms. OXA, TEM and SHV genes were also commonly found but were often not further characterised, presenting some problems of interpretation, as these enzymes can be narrow or broad-spectrum beta-lactamases. Certainly, SHV-1 and TEM-1 are narrow spectrum beta lactamase enzymes, which were commonly identified in these studies, though only a handful of isolates had characterisation of SHV enzymes beyond identification of the SHV group. All the identified OXA genes were narrow spectrum beta lactamases (OXA-1). These data suggest that the genomic landscape of invasive ESBL-E in sSA is dominated by CTX-M, and CTX-M-15 in particular, mirroring that seen worldwide.
+
+```{r esbl-invasive-ssa-enzymes, echo = F, warning = F, fig.cap= "Disribution of beta-lactamase genes in invasive ESBL producing \\textit{E. coli} (n= 821) and \\textit{K. pneumoniae} (n = 791) from 10 studies", fig.align= "center", fig.height= 4, fig.width = 5}
+
+
+subset(invasive, !( is.na(n_esco_seqq) | is.na(n_kleb_seq))) -> esco_genes
+
+esco_genes <- esco_genes[grepl("CTXM", names(esco_genes)) | 
+                           grepl("TEM", names(esco_genes)) |
+                           grepl("SHV", names(esco_genes)) |
+                           grepl("OXA", names(esco_genes)) |
+                           names(esco_genes) == "first_author" |
+                           names(esco_genes) == "year_of_samples_start" ]
+
+melt(esco_genes, id.vars = c("first_author", "year_of_samples_start")) -> geneplot
+
+geneplot <- subset(geneplot, !is.na(value))
+
+geneplot$organism <- "E. coli"
+geneplot$organism[grepl( "klpn", geneplot$variable)] <- "K. pneumoniae"
+
+geneplot$variable <- sub("_esco", "", geneplot$variable)
+geneplot$variable <- sub("_klpn", "", geneplot$variable)
+
+geneplot %>% group_by(variable, organism) %>% summarise(n = sum(value)) -> gp
+
+
+gp$variable[gp$variable == "anyCTXM"] <- "CTX-M not specified"
+gp$variable[gp$variable == "CTXM8.group"] <- "CTX-M not specified"
+gp$variable[gp$variable == "CTXMgroup"] <- "CTX-M not specified"
+
+gp$variable[gp$variable == "SHV_group"] <- "SHV not specified"
+gp$variable[gp$variable == "SHVgroup"] <- "SHV not specified"
+gp$variable[gp$variable == "TEMgroup"] <- "TEM not specified"
+gp$variable[gp$variable == "TEM_group"] <- "TEM not specified"
+gp$enzyme_group <- "CTX-M"
+gp$enzyme_group[grepl("TEM", gp$variable)] <- "TEM"
+gp$enzyme_group[grepl("SHV", gp$variable)] <- "SHV"
+gp$enzyme_group[grepl("OXA", gp$variable)] <- "OXA"
+
+gp$variable[gp$variable == "CTXM14"] <- "CTXM-other"
+gp$variable[gp$variable == "CTXM27"] <- "CTXM-other"
+gp$variable[gp$variable == "CTXM9"] <- "CTXM-other"
+
+gp$variable[gp$variable == "OXA.30"] <- "OXA30"
+
+gp$variable[gp$variable == "SHV.1"] <- "SHV1"
+gp$variable[gp$variable == "SHV.12"] <- "SHV12"
+
+gp$variable[gp$variable == "SHV28.1"] <- "SHV28"
+gp$variable[gp$variable == "SHV121"] <- "SHV12"
+gp$variable[gp$variable == "SHV2" | gp$variable == "SHV28" | gp$variable == "SHV33" | gp$variable == "SHV5"] <- "SHV-other"
+
+gp$variable[grepl("not specified",gp$variable)] <- NA
+
+lab <- c(unique(gp$variable))
+lab <- c(lab[!is.na(lab)], "Not available")
+
+ggplot(gp, aes(x= enzyme_group, y = n, fill = variable)) +
+  geom_col() + facet_wrap(~ organism) +  #theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + xlab("Enzyme group") + 
+  ylab("") +
+  labs(fill = "") + scale_fill_discrete(labels  = lab)
+
+```
+
+Though no data were identified from Malawi that fulfilled the inclusion criteria of the systematic review, there are three studies that suggest the epidemiology of invasive ESBL-E in Malawi is similar to that described above. A study from Blantyre in 2004-2005 found that ESBL-E were unusual in blood stream infection (BSI) isolates: of 1191 Enterobacteriaeciae BSI, only 8 unique isolates showed an ESBL phenotype (K. pneumoniae 4/8, K. oxytoca, 1/8, Enterobacter cloacae 2/8 and E. coli 1/8) though no denominators are provided to allow calculation of prevalence. CTX-M-15 (n = 1) was described, though in the minority: SHV-11 (n = 1), SHV-12 (n = 3), SHV-27 (n = 1) and TEM-63 (n = 2) were the other enzymes identified[@Gray2006]. Longitudinal blood culture surveillance in Blantyre suggests that after 2005 – which coincided with the introduction of ceftriaxone in government hospitals – the prevalence of ceftriaxone resistance rapidly increased, to 90.5% in K. pneumoniae and 30.3% in E. coli BSI isolates by 2016[@Musicha2017b], though this study did not carry out confirmatory ESBL testing. Finally, a retrospective whole-genome sequencing study which selected 94 diverse (largely invasive) clinical E. coli isolates from Blantyre from 1996-2014 found that 21/94 isolates carried an ESBL gene, with CTX-M predominating (20/21)[@Musicha2017a].
+
+#### Gut mucosal carriage of ESBL-E in sub-Saharan Africa
+
+Table xx in appendix xx shows the 32 identified studies that provide data on gut mucosal carriage in different populations in sSA. The populations recruited to the studies are heterogeneous but include community members, hospitalised patients, outpatients, orphanage residents, hospital workers and food handlers in schools. Adults and children are included. Data on 10,232 individuals from 19 countries are available in total (Figure A). The earliest samples were collected from staff and children in a Malian orphanage in 2003, when 49/68 participants were found to be colonised with ESBL-E[@Tande2009]. There is significant heterogeneity in prevalence, some of which is explained by the study population (Figure \@ref(esbl-carriage-ssa-prev)); inpatients tend to have a higher ESBL-E carriage prevalence than community members. Outpatients have similar carriage prevalence to community members but inpatients even on hospital admission seem to have a higher carriage prevalence than community members. 
+
+```{r esbl-carriage-ssa-prev, echo = F, warning = F, fig.cap= "ESBL-E gut mucosal carriage in sSA. A: included studies by country; B: forest plot of ESBL-E carriage prevalence stratified by population. Pooled random effect summary estimates shown.", fig.align= "center", fig.height= 9, fig.width = 10}
+
+hc$population <- as.character(hc$population)
+hc$population[hc$population == "community"] <- "Community"
+hc$population[hc$population == "IP"] <- "Inpatient"
+hc$population[hc$population == "OP"] <- "Outpatient"
+hc$population[hc$population == 'on_hospital_admission'] <- "On hospital admission"
+hc$population = factor(hc$population, levels=c('Inpatient','On hospital admission','Outpatient','Community'))
+hc$studlab <- paste0(hc$first_author, " ", hc$year_pub)
+hc$studlab <- sub(",", "", hc$studlab)
+hc <- filter(hc, sample_type != "nasal swab")
+
+metaprop(event = carriage_n_patients_ESBL_total, 
+         n = carriage_n_patients, data = hc, 
+         byvar = population,
+         studlab = studlab) -> ma
+
+
+grid.grabExpr(forest(ma, fontsize = 8, plotheight = "20cm", plotwidth = "5cm", 
+       col.square = "black", comb.fixed = F, 
+       leftcols = c("studlab", "event", "n"), 
+       rightcols = c("effect", "ci"), weight.study = "fixed", 
+       overall = F, 
+       subgroup = T,
+       spacing = 0.8,
+       bylab = "Population")
+) -> fplot
+
+as_ggplot(fplot) -> fplot
+###
+
+data("World")
+africa = World %>% 
+  filter(continent == "Africa")
+
+h <- unique(select(human_carriage, study_id, country))
+
+n_studies <- h %>% group_by(country) %>% summarise(n = length(country))
+
+
+
+n_studies$country[n_studies$country == "Central african republic"] <- "Central African Rep."
+n_studies$country[n_studies$country == "Ethopia"] <- "Ethiopia"
+n_studies$country[n_studies$country == "Guinae-Bissau" ] <- "Guinea-Bissau"
+n_studies$country[n_studies$country == "The Gambia" ] <- "Gambia"
+names(n_studies)[1] <- "name"
+n_studies$name <- as.factor(n_studies$name)
+
+
+
+africa <- left_join(africa, n_studies, by = "name")
+
+africa$n[is.na(africa$n)] <- 0
+
+ggplot(africa) + 
+  geom_sf(aes(fill = n)) + 
+  scale_fill_gradient(low = "white", high = "black") + 
+  theme_bw() + 
+  theme(panel.border = element_blank(),
+        axis.line.x = element_blank(), 
+        axis.line.y =  element_blank(), 
+        axis.ticks = element_blank(), 
+        axis.text = element_blank(), 
+        legend.position = "bottom") + 
+  labs(fill = "No. studies") -> nstuds_map
+
+ggarrange(nstuds_map, fplot, ncol = 2, nrow = 1, labels = c("A", "B"), widths = c(0.7,1))
+
+```
+Significant heterogeneity in prevalence persists across all groups meaning that summary estimates should be interpreted with caution; community carriage if ESBL-E ranges from 5% in adults in The Gambia in 2015[@Sanneh2018] to 59% in children in the Central African Republic in 2013[@Farra2016], but a summary estimate from a random effect meta analysis is that 18% (95% CI 12-28%) of community members in sSA are colonised with ESBL-E, significantly higher than the prevalence in high-income settings.
+
+Hospitalisation is clearly a driver of ESBL-E colonisation in the included studies - hospitalised cohorts have persistently higher prevalence of ESBL-E carriage – and prior antimicrobial exposure is consistently identified as a risk factor for carriage[@Djuikoue2016; @Nelson2014; Lonchel2012; @Sanneh2018]. Consistent with a putative faecal-oral transmission route, boiling water and using a borehole as a source of water were identified as protective factors in studies in Rwanda[@NikiemaPessinaba2018] and Togo[@Kurz2017] respectively. Data to elucidate the role of within-household transmission are sparse, though one study in Rwanda found that a colonised family member was independently associated with ESBL-E carriage on admission to hospital[@Kurz2017]. Lower socioeconomic status was found to both be protective against ESBL-E colonisation in the Central African Rebulblic[@Farra2016] and be associated with ESBL-E colonisation in Madagascar[@Herindrainy2011]; this relationship is likely to be complex and mediated by, for example, local availability and cost of antimicrobials. The role of HIV is not clear: in children in Dar-es-salaam, Tanzania, ESBL-E carriage was much more common amongst HIV infected children[@Tellevik2016], and in Harare Zimbabwe, receipt of ART for less than a year was associated with carriage[@Wilmore2017]. This relationship is very open to confounding and many studies have not found an association between ESBL-E carriage and HIV infection[@Djuikoue2016; @Nelson2014; @Lonchel2012; @Sanneh2018; @Moremi2018; @Kurz2017].
+
+Data on beta lactamase genes present in carriage isolates are available for 996 E. coli and 607 K. pneumoniae from 8 studies (Figure \@ref(esbl-carriage-ssa-enzymes)), showing a similar picture to invasive isolates; the landscape is dominated by CTX-M-15. One study used whole-genome sequencing [@Marando2018], the remainder used a variety of PCR techniques[@Moremi2017; @Lonchel2013; @Magoue2013; @Schaumburg2013; @Lonchel2012; @Woerther2011; @Moremi2018]. 
+
+Only 4 studies are longitudinal cohorts which could provide insight into temporal trends and determinants of carriage[@Woerther2011; @Andriatahina2010; @Moremi2018; @Kurz2017]; all of these studies were health facility based and ascertained ESBL status on admission and discharge. Significant increases in ESBL-E carriage were seen in all studies: from 50 to 65% in Rwanda; from 30 to 95% in Niger; from 21.2 to 57% in Madagascar; and from 23% to 36% in Tanzania. No studies followed patients into the community, thus carriage duration of ESBL-E in sSA remains unknown and no interventional studies identified aiming to reduce ESBL-E carriage were identified.
+
+```{r esbl-carriage-ssa-enzymes, echo = F, warning = F, fig.cap= "Distribution of beta-lactamase genes in carriage ESBL producing \\textit{E. coli} (n= 996) and \\textit{K. pneumoniae} (n = 607) from 9 studies.", fig.align= "center", fig.height= 4, fig.width = 5}
+
+
+subset(hc, !( is.na(n_esco_seqq) | is.na(n_kleb_seq)) ) -> esco_genes
+
+esco_genes <- esco_genes[grepl("CTXM", names(esco_genes)) | 
+                           grepl("TEM", names(esco_genes)) |
+                           grepl("SHV", names(esco_genes)) |
+                           grepl("OXA", names(esco_genes)) |
+                           names(esco_genes) == "first_author" |
+                           names(esco_genes) == "year_of_samples_start" ]
+
+melt(esco_genes, id.vars = c("first_author", "year_of_samples_start")) -> geneplot
+
+geneplot <- subset(geneplot, !is.na(value))
+
+geneplot$organism <- "E. coli"
+geneplot$organism[grepl( "klpn", geneplot$variable)] <- "K. pneumoniae"
+
+geneplot$variable <- sub("_esco", "", geneplot$variable)
+geneplot$variable <- sub("_klpn", "", geneplot$variable)
+
+geneplot %>% group_by(variable, organism) %>% summarise(n = sum(value)) -> gp
+
+
+gp$variable[gp$variable == "anyCTXM"] <- "CTX-M not specified"
+gp$variable[gp$variable == "CTXM8.group"] <- "CTX-M not specified"
+gp$variable[gp$variable == "CTXMgroup"] <- "CTX-M not specified"
+
+gp$variable[gp$variable == "SHV_group"] <- "SHV not specified"
+gp$variable[gp$variable == "SHVgroup"] <- "SHV not specified"
+gp$variable[gp$variable == "TEMgroup"] <- "TEM not specified"
+gp$variable[gp$variable == "TEM_group"] <- "TEM not specified"
+gp$enzyme_group <- "CTX-M"
+gp$enzyme_group[grepl("TEM", gp$variable)] <- "TEM"
+gp$enzyme_group[grepl("SHV", gp$variable)] <- "SHV"
+gp$enzyme_group[grepl("OXA", gp$variable)] <- "OXA"
+
+gp$variable[gp$variable == "CTXM14"] <- "CTXM-other"
+gp$variable[gp$variable == "CTXM27"] <- "CTXM-other"
+gp$variable[gp$variable == "CTXM9"] <- "CTXM-other"
+
+gp$variable[gp$variable == "OXA.30"] <- "OXA30"
+
+gp$variable[gp$variable == "SHV.1"] <- "SHV1"
+gp$variable[gp$variable == "SHV.12"] <- "SHV12"
+
+gp$variable[gp$variable == "SHV28.1"] <- "SHV28"
+gp$variable[gp$variable == "SHV121"] <- "SHV12"
+gp$variable[gp$variable == "SHV2" | gp$variable == "SHV28" | gp$variable == "SHV33" | gp$variable == "SHV5"] <- "SHV-other"
+
+gp$variable[grepl("not specified",gp$variable)] <- NA
+
+lab <- c(unique(gp$variable))
+lab <- c(lab[!is.na(lab)], "Not available")
+
+ggplot(gp, aes(x= enzyme_group, y = n, fill = variable)) +
+  geom_col() + facet_wrap(~ organism) +  #theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + xlab("Enzyme group") + 
+  ylab("") +
+  labs(fill = "") + scale_fill_discrete(labels  = lab)
+
+```
+
+## Conclusions
+
+The aetiology of sepsis in sSA is poorly defined, hence optimal antimicrobial strategies are unknown; disseminated TB is likely to play a significant role, but data to guide tuberculosis therapy strategies in the critically unwell are lacking. The role of bacterial zoonoses, arboviruses and HIV opportunistic infections are not well defined, but may be significant. Diagnostic uncertainty and paucity of microbiologic support across sSA may be creating a permissive environment for the widespread broad spectrum antimicrobial use, often third-generation cephalosporins. It is likely that dose, duration and indication are frequently inappropriate, and thus could contribute both to increased mortality and to spread of ESBL-E.
+
+Certainly, ESBL-E are endemic in sSA and are a problem of serious public health concern; sSA has rates of ESBL-E in invasive disease that are comparable to the highest in the world and ESBL-E gut mucosal carriage in healthy populations across the continent is common. Whilst it is clear that health care facilities are strongly associated with ESBL-E acquisition, a deeper understanding of the determinants and sources of acquisition, and carriage duration is lacking. In order to understand the role of health facilities in driving the ESBL-E pandemic, a high quality longitudinal ESBL-E carriage data from both healthy and sick (health facility exposed) populations are required.
+
+It may be that optimising the treatment of severe febrile illness in hospitals is the best place to start to reduce over prescription of broad-spectrum antimicrobials and reduce selection pressure for ESBL-E whilst ensuring timely and appropriate access to the right treatments for those who need them. This is the central hypothesis of this thesis, and the following chapters present the data that can be used to define such a strategy. 
+
+### Specific aims
+
+The specific aims of this thesis are:
+
+1. To describe the presentation, aetiology, outcome, and determinants of mortality from sepsis in adults presenting to Queen Elizabeth Central Hospital, Blantyre Malawi;
+2. To describe the acquisition and carriage of ESBL-E in sepsis survivors, with an analysis of determinants of carriage.
+
+## Thesis overview
+
+Chapter 2 (methods) presents the clinical study that forms the basis of the rest of this thesis; given the likely importance of disseminated TB in sepsis in sSA, chapter 3 presents a systematic review and individual patient data meta anlaysis of prevalence, diagnosis, and mortality hazard or TB bloodstream infection. Chapter 4 presents data on the clinical presentation, aetiology and outcomes of sepsis in Blantyre, Malawi; chapter 5 describes the determinants of long-term carriage of ESBL-E amongst sepsis survivors. Chapter 6 presents an overview of the genomic landscape of ESBL-E in Blantyre, Malawi whilst chapter 7 combines the genomic and epidemiologic data from chapters 5 and 6 to understand mechanisms and drivers of ESBL-E carriage in health and disease in Malawian adults. [microbiome stuff if available]. Finally, chapter 8 provides suggestions of further work. 
+
+## Appendix
+
+```{r esbl-ssa-invasive-studies, tidy = F, echo = F,warning= F}
+
+t13 <- read.csv(paste0(wd, "/chapter_one/t13_ssa_invasive_ESBL_results.csv"), check.names = F)
+
+# 
+
+knitr::kable(t13, output, booktabs = T, longtable = T, caption = "included studies providing an estimate of proportion of ESBL producers in invasive \\textit{E. coli} and \\textit{K. pneumoniae} isolates in sSA.") %>%
+  kable_styling(full_width = F, latex_options = c("repeat_header")) %>% 
+  column_spec(1, width = "4em") %>% 
+  column_spec(2, width = "6em") %>% 
+  column_spec(3, width = "6em") %>%
+  column_spec(4, width = "6em") %>%
+  column_spec(5, width = "6em") %>%
+  column_spec(6, width = "6em") %>%
+  column_spec(7, width = "6em") %>%
+  footnote(general = "A = Adults, C = children, IP = inpatients OP = outpatients, ND = not done.")
+  
+```
