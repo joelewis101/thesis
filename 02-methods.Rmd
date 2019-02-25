@@ -1,0 +1,76 @@
+# Methods {#methods}
+
+```{r ch2-setup, include = F}
+
+library(plyr)
+library(dplyr)
+library(ggplot2)
+library(tmap)
+library(ggmap)
+
+```
+## Chapter Overview
+
+This chapter gives an overview of the clinical study which underpins this thesis, and the laboratory and computational procedures used in analysis. Further details are given in the individual chapters, where necessary.
+
+## Study site
+
+### Malawi
+
+Malawi is a country of 18 million people in South-Eastern Africa ()
+
+```{r plot-malawi-map, warning = F,  echo = F, message = F, fig.cap = "Malawi, showing Lilongwe, the capital city and Blantyre, the study location."}
+
+
+afbox <- bbox <- c(left = -21.22, right = 55.02, top= 17.17, bottom = -37.75)
+
+bbox <- c(left = 25.840, right = 42.737, top= -8.277, bottom = -18.167)
+bbox2 <- c(left = 25.955, right = 38.717, top= -8.277, bottom = -18.167)
+#get_stamenmap(bbox2, zoom = 8) -> m
+get_stamenmap(bbox2, zoom = 7, maptype = "terrain-background") -> m2
+
+get_stamenmap(afbox, zoom = 4, maptype= "terrain-background") -> a
+
+#ggmap(m2) 
+
+cities <- data.frame(city = c("Blantyre", "Lilongwe"), lat = c(-15.7667,-13.9626), lon = c(35.0168, 33.7741))
+
+
+ggmap(a) + geom_polygon(data = mal2, aes(x= long, y = lat, group = group), fill = "black") +
+  theme_inset() +
+  geom_rect(xmin = bbox2["left"], xmax = bbox2["right"], ymin = bbox2["bottom"], ymax = bbox2["top"], fill = NA, colour = "black" )-> p1
+
+ggmap(m2) +
+  geom_path(data = mal2, aes(x= long, y = lat, group = group), alpha = 0.8) + 
+  geom_point(data = cities, aes(x = lon, y = lat)) + 
+  geom_text(data = cities, aes(x = lon, y = lat,label = city,  vjust = -0.5, hjust = 0.5, size = 7, fontface = "bold")) +
+  theme_void() + theme(legend.position = "none") +  inset(grob = ggplotGrob(p1), xmin = 26.5, xmax = 31.5, ymin = -13, ymax = -9)
+
+
+```
+
+### Queen Elizabeth Central Hospital
+
+### Participating Laboratories
+
+## Clinical Study
+
+### Summary
+
+### Entry Criteria
+
+### Study Team
+
+### Study Visits and Patient Sampling
+
+## Diagnostic Laboratory Procedures
+
+## Quality Assurance
+
+## Data Storage
+
+## Molecular Methods
+
+## Bioinformatics
+
+## Ethical Approval and Consent
