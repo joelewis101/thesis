@@ -1,5 +1,4 @@
 # Introduction {#intro}
-
 ``` {r wordblock, include = F}
 # this block is for rendering this chapter as a standalone word document
 # using render("/Users/joelewis/Documents/PhD/Thesis/bookdown/01-intro.Rmd", output_format = "word_document")
@@ -32,12 +31,10 @@ library(lme4)
 
 
 output = "latex"
-n_bootstraps <- 10
+n_bootstraps <- 1000
 
 ```
-
 ## Chapter Overview
-
 The syndrome of sepsis is an ancient one; from Hippocrates to Galen and Semmelweis, the potentially serious consequences of infection have long been recognized. Modern definitions of sepsis conceptualise it as a syndrome of life threatening organ dysfunction due to a deleterious and dysregulated host response to infection, but despite increased understanding of its pathogenesis, mortality from sepsis remains high. Progress has been made in improving sepsis mortality in high income settings through timely application of basic care: early appropriate antimicrobials, aggressive fluid resuscitation and organ support largely in a critical care environment. Limited data from low resource settings including sub-Saharan Africa (sSA) suggest that mortality remains high, and increasing evidence suggests that exporting high-income setting sepsis protocols to sSA has the potential to do harm. Data to guide sepsis management protocols for sSA are urgently needed.
 
 Data on sepsis aetiology from sSA to guide antimicrobial strategies are lacking; currently, in Blantyre Malawi, for example, empirical management of sepsis is the norm and patients often receive prolonged empiric courses of broad spectrum antimicrobials – largely ceftriaxone, a third-generation cephalosporin antibiotic. The effects of this at an individual level are unknown, but on a population level invasive Escherichia coli and Klebsiella pneumoniae bacteria are showing an alarming increase in ceftriaxone resistance since the drug was introduced in Malawi in 2005. The majority of these resistant bacteria are so-called extended-spectrum beta lactamase producers (ESBL-producers) and are often untreatable with locally available antimicrobials. Novel antimicrobial strategies are needed to safely preserve ceftriaxone - a first and last line antibiotic -  for those who need it.
@@ -45,13 +42,10 @@ Data on sepsis aetiology from sSA to guide antimicrobial strategies are lacking;
 It is the hypothesis of this thesis, then, that sepsis is Malawi is caused by a wide variety of infections that are currently unrecognised and untreated, and that this is contributing to high sepsis mortality. Conversely, prolonged ceftriaxone exposure in sepsis survivors is causing acquisition and carriage of resistant bacteria (principally ESBL Enterobacteriaceae, henceforth ESBL-E) and their transportation into the community. I will argue that sustainable antimicrobial strategies for sepsis in sSA can not only consider mortality; the unintended consequences in terms of antimicrobial resistance (AMR) acquisition in a setting where empiric management of infection is the norm must also be considered, and mitigated against where possible. In this chapter, I will review, firstly, the definitions, epidemiology, aetiology and management of sepsis, with a focus on aetiology and antimicrobial treatment; and secondly, the epidemiology and drivers of ESBL-E carriage, both with a focus on sSA.
 
 ## Sepsis in sub-Saharan Africa
-
 ### Search strategy
-
 A review of the literature was undertaken to identify prospective cohort, case control studies or randomised controlled trials (RCTs) of sepsis in sub-Saharan Africa with the search terms sepsis AND ((Angola OR Benin OR Botswana OR Burkina Faso OR Burundi OR Cameroon OR Cape Verde OR Central African Republic OR Chad OR Comoros OR Republic of the Congo OR Congo Brazzaville OR Democratic republic of the Congo OR Cote d'Ivoire OR Djibouti OR Equatorial Guinea OR Eritrea OR Ethiopia OR Gabon OR The Gambia OR Ghana OR Guinea OR Guinea-Bissau OR Kenya OR Lesotho OR Liberia OR Madagascar OR Malawi OR Mali OR Mauritania OR Mauritius OR Mozambique OR Namibia OR Niger OR Nigeria OR Reunion OR Rwanda OR Sao Tome and Principe OR Senegal OR Seychelles OR Sierra Leone OR Somalia OR South Africa OR Sudan OR Swaziland OR Eswatini OR Tanzania OR Togo OR Uganda OR Western Sahara OR Zambia OR Zimbabwe) OR Africa). Pubmed and scopus were searched, yielding 5460 unique studies on 17 July 2018. Inclusion criteria were any prospective cohort, RCT or case-control studies of sepsis in sSA (defined as taking place in the countries listed in search terms panel) recruiting patients using sepsis 1,2 or 3 definitions. Abstract review was undertaken resulting in inclusion of 91 studies for full text review. Eleven publications providing data on eight prospective cohorts[@Jacob2009; @Waitt2015; @Ssekitoleko2011; @Ssekitoleko2011a; @Chimese2012; @Moore2017a; @Huson2015c; @Amir2017] and three intervention studies (two RCTs[@Andrews2014; @Andrews2017a] and one before-after intervention[@Jacob2012]) were identified. These data inform the following review, alongside non-systematically searched studies examining sepsis in high-resource settings.
 
 In order to put sepsis aetiology data in context, systematic searches of the Pubmed and Scopus databases for leptospirosis, brucellosis, Q fever, Rickettsioses, arboviruses (dengue, or chikungunya) and histoplasmosis prevalence in unselected sepsis or fever cohorts in sSA were undertaken. Because a recent systematic review has examined these pathogens up to 2013 (see “sepsis aetiology” below), the date of these searches were restricted the 2014 to the present. Any studies examining disease prevalence in cohorts of febrile adults or children were included; outbreaks were excluded. Studies where the inclusion criteria were not clear (including those with, for example, “suspected leptospirosis” with no further details) were excluded. Finally, systematic searches of Pneumocystis Jiroveci pneumonia (PCP) were made using the search terms below; because a recent systematic review has examined the role of PCP up to 2015, the date on this search was restricted to 2015 or later. Table \@ref(tab:fever-searches) shows the search terms, number of of hits and number of included studies after full text review: nine studies provided data on Leptospirosis[@Zida2018; @Guillebaud2018; @Maze2018; @Gadia2017; @Hagen2018; @Biscornet2017; @Dreyfus2016; @Hercik2017; @Chipwaza2014], seven on Brucellosis[@Cash-Goldwasser2018; @Gafirita2017; @Boone2017; @DeGlanville2017; @Njeru2016a; @Chipwaza2015; @Feleke2015], seven on Q-fever[@Hercik2017; @Boone2017; @Amoako2018; @Njeru2016; @Mourembou2016; Maina2016; @Angelakis2014] , six on Rickettsioses[@Hercik2017; @Amoako2018; @Maina2016; @Sothmann2017; @Elfving2016; @Mourembou2015], eighteen on Dengue[@Guillebaud2018; @Gadia2017; @Hercik2017; @Chipwaza2014; @Amoako2018; @Elfving2016; @Vu2017; @Waggoner2017; @Kolawole2017; @Nasir2017; @Ngoi2016; @Onoja2016; @Kajeguka2016; @Sow2016; @Kayiwa2018; @Makiala-Mandanda2018; @Muianga2018; @Mugabe2018 ], thirteen on Chikingunya[@Gadia2017; @Chipwaza2014; @Elfving2016;@Waggoner2017; @Ngoi2016; @Kajeguka2016;@Kayiwa2018; @Makiala-Mandanda2018; @Muianga2018; @Mugabe2018; @Antonio2018; @Sow2018; @Olajiga2017 ], three on Zika [@Sow2016; @Kayiwa2018; @Makiala-Mandanda2018], two on Histoplasmosis[@Bahr2016; @Mandengue2015] and none on PCP. Details of the included studies are provided below.
-
 ```{r fever-searches, tidy = F, echo = F}
 
 t2 <- read.csv(paste0(wd, "/chapter_one/t2_fever_search_terms.csv"))
@@ -63,60 +57,31 @@ knitr::kable(t2, output, booktabs = T, longtable = T, caption = "Fever studies")
 ```
 
 ### Defining sepsis
-
 Sepsis is a heterogenous syndrome, with no diagnostic gold standard. In 1991 the first modern sepsis diagnostic criteria were defined in a consensus conference of key opinion makers[@Bone1992] (Table \@ref(tab:sepsis-diag-criteria)).  Sepsis was defined as the presence of the systemic inflammatory response syndrome (SIRS) plus infection, with a gradient of severity increasing through severe sepsis (sepsis plus organ dysfunction) to septic shock. These definitions were widely adopted as entry points into clinical trials, but ongoing concerns that SIRS was both insensitive and nonspecific for the diagnosis of sepsis led to an expansion of the diagnostic criteria in 2001[@Levy2003] again by expert consensus. Despite these revised guidelines the SIRS criteria largely continued to be preferred both as the entry point to clinical trials of sepsis and in clinical practice until the development of the current sepsis-3 definitions in 2016[@Singer2016].
 
-The sepsis-3 definitions redefined sepsis as “life threatening organ dysfunction triggered by infection”, a definition that rendered the sepsis-2 severe sepsis category obsolete. In contrast to the previous diagnostic criteria that had relied largely on expert opinion, the sepsis-3 criteria attempted to use a probabilistic approach to defining sepsis, by mandating that sepsis should be associated with excess mortality. The sequential organ dysfunction score (SOFA, Table \@ref(tab:SOFA)), an organ-dysfunction score already in use in high income settings, and shown to be associated with mortality[@Vincent1998] was selected to operationalise the definition of sepsis. An acute change in SOFA of 2 or more points defines sepsis under sepsis-3.
+The sepsis-3 definitions redefined sepsis as “life threatening organ dysfunction triggered by infection”, a definition that rendered the sepsis-2 severe sepsis category obsolete. In contrast to the previous diagnostic criteria that had relied largely on expert opinion, the sepsis-3 criteria attempted to use a probabilistic approach to defining sepsis, by mandating that sepsis should be associated with excess mortality. The sequential organ dysfunction score (SOFA, Table \@ref(tab:SOFA), Appendix), an organ-dysfunction score already in use in high income settings, and shown to be associated with mortality[@Vincent1998] was selected to operationalise the definition of sepsis. An acute change in SOFA of 2 or more points defines sepsis under sepsis-3.
 
 Mindful that the SOFA score requires a large number of variables and is difficult to apply at the bedside, the consensus guideline group suggest the use of a simpler score, quick SOFA to identify patients who may have sepsis. Any two of: altered mental status, SBP < 100mmHg or respiratory rate > 22 defines a positive qSOFA score. qSOFA does not define sepsis; rather, under sepsis-3 patients with a qSOFA score of 2 or more are at increased risk of poor outcomes and should be screened for sepsis using a full SOFA score. The qSOFA was derived by identifying factors associated with mortality in large datasets of patients with infection from the United States and validated in further US and German datasets; in these datasets it showed good discriminant ability to predict mortality, equivalent to full SOFA score outside the intensive therapy unit (ITU)[@Seymour2016].
 
 Finally, sepsis-3 defines septic shock as persistent hypotension requiring vasopressors to maintain mean arterial blood pressure (MAP) above 65mmHg and serum lactate greater than 2mmol /L. This definition was arrived at by a combination of consensus and systematic review to identify potential defining variables and validation in large datasets from the United States, where it was found to be strongly associated with mortality[@Shankar-Hari2016].
-
 ```{r sepsis-diag-criteria, tidy = F, echo = F}
 t3 <- read.csv(paste0(wd, "/chapter_one/t3_sepsis_diagnostic_criteria.csv"))
 
 knitr::kable(t3, output, booktabs = T, caption = "Sepsis diagnostic criteria") %>%
-  kable_styling(full_width = F)  %>%
+  kable_styling(full_width = F, latex_options = c("hold_position"))  %>%
   column_spec(1, width = "8em") %>% column_spec(2, width = "8em") %>% column_spec(3, width = "25em")  %>%
   footnote(general = "SIRS = Systemic Inflammatory Response Syndrome, SD = Standard deviation, SBP = Systolic blood pressure, MAP = Mean arterial blood pressure", threeparttable = T)
 
-
 ```
 
-```{r SOFA, tidy = F, echo = F}
-t4 <- read.csv(paste0(wd, "/chapter_one/t4_sofa.csv"), check.names = F)
-
-knitr::kable(t4, output, booktabs = T, caption = "Sequential organ failure assessment (SOFA) score") %>%
-  kable_styling(full_width = F) %>% 
-  column_spec(1, width = "10em") %>% 
-  column_spec(2, width = "6em") %>% 
-  column_spec(3, width = "6em") %>%
-  column_spec(4, width = "6em") %>%
-  column_spec(5, width = "6em") %>%
-  column_spec(6, width = "6em") %>%
-   add_header_above(c(" ", "Score" = 5)) %>%
-  group_rows("Respiratory",1,1 ) %>%
-  group_rows("Coagulation",2,2 ) %>%
-  group_rows("Liver",3,3 ) %>%
- group_rows("Cardiovascular",4,4 ) %>%
-  group_rows("CNS",5,5 ) %>%
- group_rows("Renal",6,7 ) %>%
-  footnote(general = "PaO2 = Arterial partial pressure of oxygen, FiO2 = Inspired fraction of oxygen, MAP = mean arterial blood pressure, CNS = Central nervous system. All doses of inotropes are micrograms/kg/min", threeparttable = T)
-  
-  
-```
 ### Applicability of sepsis-3 definitions in sub-Saharan Africa
-
 Application of the sepsis-3 definitions, both in terms of clinical use and as inclusion criteria for research studies in sub-Saharan African low resource settings, is problematic. Several of the domains of SOFA require the results of blood tests, which may not be available. In Blantyre, and elsewhere in sSA, intensive organ support with inotropes or mechanical ventilation (invasive or non-invasive) may not be available[@Jacob2011] or be difficult to access[@Prin2016], yet use of these treatment modalities form components of the SOFA score. Both lactate measurement and inotropic support may be unavailable in some settings and yet these define septic shock. Five studies have validated the qSOFA score in sub-Saharan African settings[@Moore2017a; @Huson2017b; @Huson2017; @Aluisio2018; @Rudd2018] and found variable discriminant ability for mortality but it is not clear how this score should be deployed in this setting; no studies have been undertaken to link qSOFA score to clinical action, and it is not intended to define sepsis under sepsis-3. The optimal sepsis definitions (both clinical and for research) for sSA are therefore not clear.
 
 ### Sepsis epidemiology in sub-Sahara Africa
-
 #### Incidence
-
 The changing case definition of sepsis over time hampers estimation of incidence even in high-income settings, furthermore sepsis is not included in global burden of disease estimates. Different methods of defining sepsis from disease registries can result in very different estimates[@Gaieski2013], but a recent systematic review and meta-analysis of 27 studies from 9 high income countries found a recent population incidence rate of 437/100,000 person-years (95% CI 334-571) for sepsis and 270 (95% CI 176 – 412) for severe sepsis with an increasing incidence over time from 1979 to 2015[@Fleischmann2016]. Crudely extrapolating these estimates to the worldwide population would result in 20.7 million sepsis and 10.7 million severe sepsis cases a year, largely in low resource settings. However, no data are available from low or middle income settings and these estimates must be treated with caution. 
 
 #### Risk factors: the sepsis population in sub-Saharan Africa
-
 In high-income settings, risk factors for sepsis have been identified, though once again changing definitions as well as a lack of large scale community based studies make it difficult to draw definitive conclusions. However, chronic diseases (including HIV) and immunosuppressive agents have been associated with increased sepsis incidence, as well as older age[@Angus2001; @Tsertsvadze2016]. In the United States, male sex and black ethnicity (vs white) and poverty are associated with increased sepsis incidence and severity[@Mayr2010].
 
 Though equivalent studies aiming to identify risk factors for sepsis in adults in sSA are lacking, it is clear from the available data that HIV-infection is the dominant risk factor there. Summary patient demographics from the 10 identified sepsis studies are shown in Table \@ref(tab:sepsis-studies-popn); of 2788 included patients with available HIV status, 69% (1809/2788) were HIV infected, and often with advanced disease; of 1278 HIV-infected patients from 5 studies the study median CD4 count ranges from 52-168 cells/$\mu$L. In keeping with the epidemiology of the HIV epidemic in Africa, these patients are young, with average ages (variably reported as mean or median) ranging from 30-39 across the studies. These studies recruited an equal proportion of males and females (1444/2812 males, 51%), suggesting that sex is not a risk factor. 
@@ -143,11 +108,9 @@ knitr::kable(t6, output, booktabs = T, caption = "Characteristics of patients re
 ```
 
 #### Outcomes
-
 Summary outcomes for sepsis and severe sepsis in sSA from the identified studies are presented in Figure \@ref(fig:sepsis-outcome-forest) below. Summary statistics of 28 or 30-day mortality were extracted from identified studies or, if 28- or 30-day data were not available, in-hospital mortality was used. For interventional studies, in order to reflect the “usual-care” mortality, only the usual care arms were included. Pooled mortality estimates were then generated using a random effect meta-analysis of proportions with a generalised linear mixed model (GLMM, the so called binomial-normal model) using the meta package in R. Exact binomial 95% mortality confidence intervals were used throughout. 
 
 It is clear that there is significant heterogeneity in outcomes of sepsis and severe sepsis in sSA, likely reflecting diverse patient and pathogen populations and variation in availability of available resources. This heterogeneity means that summary estimates should be interpreted with extreme caution but severe sepsis (49% [95% CI 39-58]), as expected, seems to carry a higher mortality hazard than sepsis (23% [95% CI 12-38]). Data of outcomes beyond 30 days are absent.
-
 ```{r sepsis-outcome-forest-setup, include = F, warning = F}
 
 
@@ -177,32 +140,28 @@ m.severe.sepsis$year <- dfin.severe.sepsis$Year
 #forest(m, xlim = c(0,100), pscale = 100, weight = "random", leftcols = c("studlab", "event", "n", "effect", "ci", "w.random"), rightcols = F, leftlabs = c("Study", "Number", "Total", "MOrtality (%)", "95% CI"), xlab = "Prevalence (%)", addspace = TRUE, digits = 1, squaresize = 0.5)
 grid.grabExpr(
   forest(m.sepsis, col.square="black", hetstat=FALSE, comb.fixed = F, leftcols = c("studlab", "Year", "n"), rightcols = c("effect", "ci"), 
-       leftlabs = c("Study", "Year", "n"), rightlabs = c("Mortality (%)", "95% CI"), xlab = "", digits = 2, squaresize = 0.5,  xlim = c(0,1), fontsize = 10, width = 8, height = 8) 
+       leftlabs = c("Study", "Year", "n"), rightlabs = c("Mortality (%)", "95% CI"), xlab = "", digits = 2, squaresize = 0.5,  xlim = c(0,1), fontsize = 8, width = "4cm", height = "3cm",spacing = 0.8) 
 ) -> p1
 
 grid.grabExpr(
 forest(m.severe.sepsis, col.square="black", hetstat=FALSE, comb.fixed = F, leftcols = c("studlab", "Year", "n"), rightcols = c("effect", "ci"), 
-       leftlabs = c("Study", "Year", "n"), rightlabs = c("Mortality (%)", "95% CI"), xlab = "", digits = 2, squaresize = 0.5, xlim = c(0,1), fontsize = 10, width = 8, height = 8)       
+       leftlabs = c("Study", "Year", "n"), rightlabs = c("Mortality (%)", "95% CI"), xlab = "", digits = 2, squaresize = 0.5, xlim = c(0,1), fontsize = 8,  width = "4cm", height = "3cm", spacing = 0.8)       
 ) -> p2
 
 as_ggplot(p1) -> p1
  as_ggplot(p2) -> p2
 
 ```
-
-```{r sepsis-outcome-forest,  echo = F, warning = F, fig.cap= "Pooled sepsis (A, top) and severe sepsis (B, bottom) inpatient mortality in sSA", fig.align= "center", fig.height= 6, fig.width = 7}
+```{r sepsis-outcome-forest,  echo = F, warning = F, fig.cap= "Pooled sepsis (A, top) and severe sepsis (B, bottom) inpatient mortality in sSA", fig.align= "center",fig.height = 4.5, fig.width = 6 }
 
 ggarrange(p1,p2, ncol = 1, nrow =2, labels = c("A", "B"))
 ```
-
 How does this compare to high income settings? A recent meta-analysis of population level estimates in high income settings found that a pooled sepsis 30-day mortality estimate of 17% (95% CI 11-26%)[@Fleischmann2016], though even older cohort studies as well as the more recent large sepsis-3 derivation cohorts have found considerably lower mortalities for sepsis (as defined by sepsis-2) ranging from 4-7%[@Seymour2016; @Rangel-Frausto1995; @Serafim2018]. Most recent (largely post-2005) estimates of 30-day mortality from severe sepsis range from from 18-29%[@Gaieski2013; @Fleischmann2016; @PRISMInvestigators2017; @Kaukonen2014; @Stevenson2014]. It seems likely therefore, that both sepsis and severe sepsis 30-day mortality is considerably higher in sSA than in high-income settings. The reasons for this are not clear, but are likely to be multifactorial; resource limitation is likely to play a part but the HIV epidemic in sSA, differing pathogen burden and lack of data and evidence based guidelines to inform optimal management in sSA may also play a role.
 
 In the longer term, sepsis mortality continues to rise after the usual sepsis-study primary end point of 28 or 30 days, though data from sSA are absent. A systematic review in 2010 of long term sepsis mortality identified 26 studies (with none from low-resource settings) that reported long term sepsis mortality; 1 year mortality ranged from 22-72%, increasing to 45-75% at greater than 3 years[@Winters2010]. Both short and long term morbidity is formidable also, though, once again, data from low income settings including sSA are absent. Cohort studies with no comparator group may not identify morbidity that is sepsis-specific (rather morbidity that is related to critical illness) but new, long-lasting reduction in physical and cognitive function with associated functional impairment have been identified in matched cohort studies in sepsis survivors[@Shah2013; @Iwashyna2010]. Health-related quality of life in sepsis survivors in high-income settings have been found to be persistently below population norms[@Winters2010]. Increased incidence of cardiovascular disease, renal failure and further episodes of infection are seen following a hospital discharge for sepsis[@Yende2014; @Bergh2017; @Ou2016]. Long term sepsis outcomes in sSA are unknown.
 
 ### Sepsis aetiology in sub-Saharan Africa
-
 The 11 identified prospective sepsis studies in sSA carried out various combinations of diagnostic testing for malaria (either microscopy or rapid diagnostic test) and aerobic and mycobacterial blood culture; a summary is shown in Table \@ref(tab:sepsis-review-aetiology) and \@ref(tab:sepsis-bsi-isolates) below. The commonest bloodstream infection (BSI) in all studies where mycobacterial blood cultures were carried out was tuberculosis – present in a higher proportion than of all BSI isolates from aerobic culture combined -  though it is important to note that mycobacterial blood cultures in most studies were carried out in HIV infected people and bacteraemic tuberculosis is almost exclusively HIV-associated. The importance of bacteraemic tuberculosis as a cause of sepsis is further examined in an individual patient data meta analysis in chapter 3. With the exception of one study, malaria was less common than BSI, highlighting the importance of non-malarial fever in sSA as malaria control efforts reduce the burden of malaria.
-
 ```{r sepsis-review-aetiology,  echo = F, warning = F, tidy = F}
 
 t7 <- read.csv(paste0(wd, "/chapter_one/t7_sepsis_aetiology.csv"), check.names = F)
@@ -212,7 +171,6 @@ knitr::kable(t7, output, booktabs = T, caption = "Aetiology of sepsis in sSA") %
   row_spec(nrow(t7), bold = T)
 
 ```
-
 ```{r sepsis-bsi-isolates,  echo = F, warning = F, tidy = F}
 
 t8 <- read.csv(paste0(wd, "/chapter_one/t8_bsi_isolates.csv"), check.names = F)
@@ -225,10 +183,9 @@ knitr::kable(t8, output, booktabs = T, caption = "BSI isolates in sepsis in sSA"
 ```
 
 #### Bacterial zoonoses, Rickettsioses and arboviruses
-
 There are several reasons to suspect that aetiologic agents other than bacterial BSI and tuberculosis may be significant in sSA, though data in sepsis are sparse. Studies of febrile illness in sSA have implicated Rickettsioses, arboviruses and bacterial zoonoses as causes of fever, accounting for a third of fever in hospitalised adults in one study in Tanzania[@Crump2013]. Historically, however, data on these pathogens have been lacking. A 2015 systematic review of fever aetiology in LMIC (considering studies from 1980-2013) found that small numbers of patients had been systematically screened for these pathogens: in sSA 40/453 (8.8%) of adults with fever fulfilled diagnostic criteria for Leptospirosis, 16/453 (3.5%) for Brucellosis, 36/450 (8.0%) for spotted fever group Rickettsiosis, 24/482 (5%) for Q-fever and 55/700 (7.9%) for Chikingunya[@Prasad2015]. 
 
-Increasing interest in non-malarial fever, however, has meant that data are accumulating from different settings in sSA, post-2013, as identified by the systematic review of the literature performed for this thesis. Details of the studies identified from this review are shown below in Table \@ref(tab:fever-study-review). These data highlight, firstly, the heterogeneity in diagnostics which are used for these pathogens – a combination of serology, PCR and antigen testing (often not using gold-standard case definitions), and secondly, the spatial and temporal heterogeneity across the continent. 
+Increasing interest in non-malarial fever, however, has meant that data are accumulating from different settings in sSA, post-2013, as identified by the systematic review of the literature performed for this thesis. Details of the studies identified from this review are shown below in Table \@ref(tab:fever-study-review) in the chapter Appendix. These data highlight, firstly, the heterogeneity in diagnostics which are used for these pathogens – a combination of serology, PCR and antigen testing (often not using gold-standard case definitions), and secondly, the spatial and temporal heterogeneity across the continent. 
 
 These studies also demonstrate an increase, post-2013, in the use of molecular tests, particularly multiplex PCR assays (TaqMan array cards or PCR macroarrays) to detect multiple pathogens in fever aetiology studies. Despite the attractiveness of these assays – the ability to detect tens of pathogens in one assay on one body fluid sample – many infections will have only transiently detectable pathogen genetic material in blood and as such may have limited sensitivity. The post-2013 fever aetiology data strongly suggest paired sera will maximise the diagnostic yield of bacterial zoonoses and Rickettsioses: for example, in studies of leptospirosis using PCR only 23/2533 (0.9%) of samples were positive versus 75/1464 (5.1%) in studies using paired sera; for Q-fever 9/3811 (0.2%) of samples were positive in PCR only studies versus 25/370 (6.8%) for paired sera studies; for Brucellosis PCR only studies 15/1005 (1.5%) of samples were positive versus 39/562 (6.9%) for paired sera studies; and for Rickettsioses 55/1932 (2.8%) of samples were positive for PCR studies vs paired sera 63/364 (17%). Some care must be taken with this conclusion: there are no studies that aim to directly compare paired sera and PCR assays for diagnosis of febrile illness, so the possibility of confounding remains.
 
@@ -236,33 +193,7 @@ Available data therefore suggest that bacterial zoonoses, Rickettsioses and arbo
 
 The second study[@Rubach2015] is a retrospective analysis of a fever aetiology cohort from Tanzania, in which paired serology for bacterial zoonoses and Rickettsioses was carried out, as well as arboviral PCR. Of 423 enrolled adults, 25 were retrospectively classified as having septic shock, 37 severe respiratory distress without shock and 109 severe pneumonia by WHO Integrated Management of Adolescent and Adult Illness (IMAI) District Clinician Manual criteria[@WorldHealthOrganisation2011]. These patients would likely fulfil sepsis criteria under sepsis-2 or 3 guidelines, and were found to have a variety of diagnoses, though not all patients had all diagnostic tests: Chikungunya (6/154 [3%]),Leptospirosis (5/82 [6%]), Coxiella burnetti (7/83 [8%]) and spotted fever group Rickettsioses (6/83 [7%]).
 
-```{r fever-study-review, echo = F, warning= F}
-
-t9 <- read.csv(paste0(wd, "/chapter_one/t9_fever_studies.csv"), check.names = F)
-
-knitr::kable(t9, output, booktabs = T,longtable = T, caption = "Causes of fever in sSA since 2013") %>%
-  kable_styling(full_width = F, latex_options = "repeat_header") %>% 
-  column_spec(1, width = "6em") %>% 
-  column_spec(2, width = "4em") %>% 
-  column_spec(3, width = "4em") %>%
-  column_spec(4, width = "4em") %>%
-  column_spec(5, width = "6em") %>%
-  column_spec(6, width = "4em") %>%
-    column_spec(7, width = "4em") %>%
-    column_spec(8, width = "4em") %>%
-  group_rows("Leptospirosis",1,9 ) %>%
-  group_rows("Q-fever",10,16 ) %>%
-  group_rows("Brucellosis",17,23 ) %>%
- group_rows("Rickettsioses",24,29 ) %>%
-  group_rows("Dengue",30,47 ) %>%
- group_rows("Chikingunya",48,61 ) %>%
-  group_rows("Zika",62,64 ) %>%
- footnote(general = "RS = Rickettsia spp., RF = R. felis, SFG/TG/STG = spotted fever/ typhus/scrub typhus group")
-
-```
-
 #### HIV opportunistic infections: PCP, histoplasmosis and cryptococcal disease
-
 The burden of HIV opportunistic infections in sepsis in sSA (including PCP, cryptococcal disease and including here Histoplasmosis as an opportunistic infection) is unclear. Beyond blood culture identification of _Cryptococcus neoformans_ (present in 20/365 of positive blood cultures in the sepsis studies identified in this review) none of these pathogens have been systematically sought in sepsis cohorts in sSA, and their role as causative agents of sepsis is far from clear. Cryptococcal disease most commonly manifests as cryptococcal meningitis, is common in HIV infection and is thought to account globally for 15% of AIDS-related deaths[@Rajasingham2017]. It is likely therefore to contribute significantly to aetiology of sepsis; of the 11 identified sSA sepsis cohorts, three[@Ssekitoleko2011a; @Chimese2012; @Andrews2014] provide data on suspected site of infection, and CNS infection accounts for 14-31% of the total, of which cryptococcal disease is likely to be responsible for a large proportion. One study2 performed CSF examination on 41/213 patients for suspected meninigoencephalitis. Of these, 3/41 cultured _C. neoformans_.
 
 No study has attempted to define the burden of PCP in sepsis in sSA, though a 2016 systematic review[@Wasserman2013] addressed the prevalence and attributable mortality of PCP. Searches were limited to post-1995; 48 studies were identified comprising 6884 individuals from 18 countries, with a varying patient population including inpatients and outpatients with respiratory presentation or clinical or radiological community acquired pneumonia, often sputum smear negative for TB, and some autopsy studies. A number of diagnostic tests including bronchoscopy and bronchoalveolar lavage were carried out. Many of the inpatient cohorts would include patients with sepsis; the pooled prevalence of PCP in inpatients (n = 2593, 23 studies) was 22% (90% CI 17 – 27%) in random effect meta-analysis. Clearly there are significant difficulties with obtaining lower respiratory tract specimens in unwell hypoxic, shocked or obtruded patients; newer serologic tests (1,3, beta-d glucan) which have reasonable diagnostic characteristics for PCP in high-income settings[@Onishi2012] and may have a role to play, but no study in sSA has attempted to use or validate this assay in any condition.
@@ -270,11 +201,9 @@ No study has attempted to define the burden of PCP in sepsis in sSA, though a 20
 Data examining the role of Histoplasmosis as a cause of fever or sepsis in sSA are sparse. A 2015 systematic review[@Prasad2015] identified only one study up to 2013 which Histoplasma urine antigen testing in 628 febrile adults and children in Tanzania and acute serum testing on a subset of 200, finding 9/628 (1%) probable cases, 6/9 of whom were HIV infected. Since then, two studies have addressed histoplasma prevalence in varying conditions: the first, in Uganda, enrolled HIV-infected patients with suspected meningitis[@Bahr2016] and found 0/151 patients had detectable IgM to _Histoplasma capsulatum_ and no Histoplasma antigen was detected in serum (n = 57), urine (n = 37) or CSF (n=63). The second study in Cameroon[@Mandengue2015] recruited HIV infected patients with CD4 < 200 cells/$\mu$L, chronic cough and Histoplasmosis like skin manifestations. Histopathologic examination and culture found Histoplasmosis in 7/56 (13%) of patients over 3 years.
 
 ### Sepsis management
-
 The cornerstone of sepsis management is rapid administration of appropriate antimicrobial therapy, source control of any infectious focus and normalisation of tissue perfusion using intravenous fluids and, if necessary, inotropes, with other organ support as necessary (e.g. intubation and mechanical ventilation and renal replacement therapy). Several international guidelines for sepsis care are available; this section will examine these and specific guidance for sepsis in adults in sSA followed by a review of the evidence to inform these guidelines. 
 
 The surviving sepsis campaign has published four editions of comprehensive guidance on the management of sepsis in adults, which are endorsed by all the major critical care organisation in high income settings and form the basis of most sepsis care in high income settings; selected major recommendations of the latest guidance[@Rhodes2017] are shown in Table \@ref(tab:ssc-guidelines)  below.
-
 ```{r ssc-guidelines, echo = F, warning = F, tidy= F}
 
 t10 <- read.csv(paste0(wd, "/chapter_one/t10_SSC_guidelines.csv"), check.names = F)
@@ -289,9 +218,7 @@ knitr::kable(t10, output, booktabs = T, caption = "Surviving sepsis campaign gui
   group_rows("Adjunctive therapies",8,8) %>%
  footnote(general = "BPS = best practice statement")
 ```
-
 Mindful that guidelines aimed at high-income settings may be impossible to implement in low-resource settings (including large areas of sSA) the Global Intensive Care Working Group of the European Society of Intensive Care Medicine (ESICM) published recommendations for sepsis management in resource-limited settings in 2012[@Dunser2012], endorsed by a number of national and international sepsis organisations, and supplements in 2016-17 covering general supportive care[@Mer2017], infection management[@Thwaites2016], management of severe malaria and severe dengue[@Dunser2012] and haemodynamic assessment and support[@Misango2017] in sepsis in low-resource settings. The major recommendations of this guidance are consolidated in Table \@ref(tab:ssc-guidelines-low-resource) below.
-
 ```{r ssc-guidelines-low-resource, echo = F, warning = F, tidy= F}
 t11 <- read.csv(paste0(wd, "/chapter_one/t11_SSC_guidelines_low_resource.csv"), check.names = F)
 
@@ -305,15 +232,12 @@ knitr::kable(t11, output, booktabs = T, caption = "ESICM low resource setting se
   group_rows("Adjunctive therapies",11,11) %>%
  footnote(general = "MAP = Mean arterial blood pressure")
 ```
-
 The World Health Organisation (WHO) in 2011 published the integrated management of adolescent and adult illness (IMAI) guidance[@WorldHealthOrganisation2011], which includes guidance on the management of septic shock and is aimed at district-level clinicians in resource limited settings rather than critical care clinicians. This suggests defining shock as SBP < 90mmHg or pulse > 110/minute and suggest that, once shock is identified, oxygen should be given, a 1 litre bolus of fluid should be given immediately and pulse, SBP and signs of perfusion (urine output, mental status) should be rechecked. If shock persists, another litre should be given; if shock persists after the second litre then help should be sought. Antimicrobials should be administered: ceftriaxone IV or IM, and antimalarials if indicated. No evidence base is referenced for these recommendations.
 
 #### Early goal directed therapy
-
 In 2001 a pivotal single centre study in the United States of 263 patients with severe sepsis or septic shock[@Rivers2001] found that protocolised aggressive early resuscitation (called Early Goal Directed Therapy, EGDT) significantly reduced mortality from 46.5% to 30.5%. EGDT called for early central venous catheterisation and protocolised resuscitation to central venous pressure (CVP), MAP and central venous oxygen saturation targets (ScvO2), and was widely adopted. However three large multicentre randomised controlled trials of EGDT – ProCESS in the United States[@Yealy2014], ARISE in Australasia[@Peake2014] and ProMISe[@Mouncey2015] in the United Kingdom, reporting in 2014 and 2015 failed to show any difference in outcomes between the EGDT and usual-care arms. A pre-planned individual level meta-analysis of the 3723 patients included in these trials confirmed similar 90 day mortality in both arms (24.9% for EGDT vs 25.4% for usual care, aOR 0.97 [95% CI 0.82-1.14]) with no benefit found in pre-planned subgroup analysis for patients with worse shock or in hospitals with lower propensity for vasopressors or fluid administration[@PRISMInvestigators2017]. It is likely therefore that the tenets of EGDT that improve outcomes (early antimicrobials and aggressive fluid resuscitation) have been absorbed into usual care in the fifteen years since the original EGDT study, as evidenced by the reduction is sepsis mortality over this time period, and so the specific package of protocolised care and EGDT targets does not in itself improve outcomes. Unanswered questions now remain regarding the most effective use of the individual components of EGDT (fluids, vasopressors etc). A number of attempts have been made to develop protocolised sepsis care packages in the style of EGDT for sSA; these are described below in relation to the individual components of sepsis care.
 
 #### Evidence to guide antimicrobial therapy in sSA
-
 There is evidence from high income settings that delay in appropriate antimicrobial administration is associated with worse outcomes in sepsis. The first study to investigate this relationship, published in 2006, found a very strong relationship between time to appropriate antimicrobial administration from onset of hypotension and mortality with an absolute increase in mortality of 7.6% for each hour delay over the first six hours[@Kumar2006]. Subsequent data have been more nuanced: a 2015 meta-analysis addressing this question identified 11 studies of 16,178 patients and found no relationship between antimicrobial delay and mortality[@Sterling2015], though many of the included studies are open to confounding by indication (sicker patients are given antimicrobials more quickly), timed antimicrobial administration to non-physiological events (e.g. arrival to hospital or time of blood culture draw rather than onset of hypotension) and did not assess the appropriateness of antimicrobial therapy, all of which could mask a relationship. Appropriate antimicrobial therapy has certainly been shown to be associated with improved survival: a 2010 meta-analysis quantified the pooled adjusted odds ratio to be 1.6 (95% CI 1.4-1.9) from 26 studies for appropriate versus inappropriate antimicrobial therapy[Paul2010]. A recent large retrospective study of 49,331 patients in New York hospitals[@Seymour2017] confirmed the relationship between antimicrobial delay and mortality with an adjusted odds ratio of in-hospital death of 1.04 per hour delay (95% CI, 1.03 – 1.06), and rapid antimicrobial administration forms a key recommendation of current sepsis guidelines.
 
 Data from sSA are lacking, however; neither of the meta analyses above (including between them 37 studies) included any data from sSA, but three of the sepsis studies identified in this systematic review attempt to address the question. The first[@Jacob2009], in an observational study of 382 adults with severe sepsis in Uganda found no association between administration of antibiotics within 1 hour and mortality (OR 0.9 [95% CI 0.6-1.6]) but a total of 42 antibiotic regimens were used and there was a high proportion (22%) of bacteraemic tuberculosis; no assessment of appropriateness of antimicrobials was undertaken and it is possible that inappropriate antimicrobials could mask any association between time of administration and mortality, if one existed. 
@@ -325,7 +249,6 @@ A third observational study in a Ugandan teaching hospital[@Amir2016] provides d
 Only one study provides limited evidence that appropriate antimicrobial therapy improves outcomes in infection in sSA[@Chalya2012]: a combined retrospective-prospective analysis of 104 patients with typhoid perforation (defined by clinical and operative findings rather than culture) from a single Tanzanian teaching hospital found that adequate antimicrobial exposure (defined as at least 3 days of antimicrobial active against S. Typhi prior to hospital admission) was associated with improved in-hospital survival in multivariable analysis (aOR  2.9 [95% CI 2.1-4.5]), however it is doubtful that this very specific complication of typhoid fever is generalizable. 
 
 #### Evidence to guide intravenous fluid therapy in sub-Saharan Africa
-
 The evidence base for rapid fluid administration – and the surviving sepsis recommendation of 30ml/kg within 3hrs following diagnosis - is less secure than for rapid antimicrobial administration. As with antimicrobial administration, adoption of guidelines in response to the EGDT study has meant that disentangling the independent effect of fluid administration is difficult. The data are contradictory. Several large retrospective observational analyses have found no impact on rapidity of fluid bolus administration following sepsis diagnosis: one multicentre study of 2796 adults with severe sepsis[@Ferrer2009] found no propensity adjusted difference in in-hospital mortality for patients with shock or elevated lactate whether they received fluid bolus within the first 6hr following diagnosis (aOR 1.01 [95% CI 0.73 – 1.39]); the New York study of 49,331 septic adults described above[@Seymour2017] found no association between time to completion of fluid bolus and mortality (aOR 1.01 per hour [95% CI 0.99 – 1.02]). Indeed, fluid clearly has the potential for harm; positive fluid balance for patients with sepsis in the ITU has been persistently linked with worse outcomes[@[@Seymour2017; Boyd2011; Vincent2006].
 
 In contrast, several studies contradict these findings; a retrospective single centre of 594 adults with severe sepsis or septic shock[@Lee2014] found improved mortality in patients who had a higher proportion of 6-hour fluid administered in the first 3hr, when adjusted for total volume of fluid administered over 6hr (aOR 0.34  [95% CI 0.15 – 0.75]); a larger retrospective multicentre study of 11,182 patients with sepsis and hypotension[@Leisman2016] found an independent mortality benefit for early intravenous crystalloid administration, with fluid administration within 30mins having the largest effect (aOR 0.74 [95% CI 0.62 – 0.87] versus > 120mins). A prospective study of 1866 patients from the same authors[@@Leisman2017] had similar findings (aOR 0.63 [95% CI  0.46-0.86]).
@@ -341,24 +264,20 @@ Two randomised controlled trials of protocolised early sepsis care in adults hav
 The same intervention was then used at the same centre in a similar trial[Andrews2017], this time recruiting patients with two SIRS criteria and hypotension (SBP < 90mmHg or MAP < 65mmHg), but excluding patients with baseline respiratory compromise( RR > 40/min or oxygen saturation < 90%) and randomising them 1:1 to the intervention protocol. 209 patients were recruited and patients in the intervention group (n = 106) at 6 hours received more fluid (median 3.5L vs 2.0L, p <0.001 ) with more vasopressor use  (12% vs 2%, p = 0.01), but similar proportions of blood transfusion (16% vs 12%, p = 0.48). Lactate change by 6 hours was greater in the intervention group (median -1.2 vs -0.5 mmol/L, p = 0.02), but so too was in hospital mortality (48% vs 33%, p = 0.03). The reasons for this are not clear. More respiratory compromise (defined as increase in respiratory rate by 5 breaths/min or reduction in oxygen saturation of 3% or more) occurred in the intervention group (35% vs 22%, p =0.03) but persisted beyond 6 hours in similar numbers in both groups (17% vs 15%, p = 0.63).
 
 ## ESBL-E in sub-Saharan Africa
-
 ### Search strategy
-
 A systematic review of the literature was undertaken to answer the following questions: firstly, what is the prevalence of ESBL-E amongst invasive isolates of _Klebsiella pneumoniae_ and _Escherichia coli_ infecting humans in sub-Saharan Africa? Secondly, what is the prevalence of gut mucosal carriage of ESBL-E amongst humans in sSA, and what risk factors for carriage have been identified? To this end a search of PubMed and Scopus was carried out using the search terms (((ESBL) OR Extended-spectrum beta-lactamase)) AND (((Angola OR Benin OR Botswana OR Burkina Faso OR Burundi OR Cameroon OR Cape Verde OR Central African Republic OR Chad OR Comoros OR Republic of the Congo OR Congo Brazzaville OR Democratic republic of the Congo OR Cote d'Ivoire OR Djibouti OR Equatorial Guinea OR Eritrea OR Ethiopia OR Gabon OR The Gambia OR Ghana OR Guinea OR Guinea-Bissau OR Kenya OR Lesotho OR Liberia OR Madagascar OR Malawi OR Mali OR Mauritania OR Mauritius OR Mozambique OR Namibia OR Niger OR Nigeria OR Reunion OR Rwanda OR Sao Tome and Principe OR Senegal OR Seychelles OR Sierra Leone OR Somalia OR South Africa OR Sudan OR Swaziland OR Eswatini OR Tanzania OR Togo OR Uganda OR Western Sahara OR Zambia OR Zimbabwe) OR Africa)).
 
 Inclusion criteria were any study that took place in sSA and allowed the calculation of a prevalence of ESBL-E in _K. pneumoniae_ or _E. coli_ amongst invasive human isolates, or prevalence of human gut mucosal carriage of ESBL-E. Studies were excluded if no ESBL-E confirmatory testing was performed using phenotypic (double disc or combination disc or E-test) or molecular (PCR) methods. Invasive isolates were defined to be any blood or CSF sample other usually sterile fluid, or urine or wound swabs with clinical suspicion of infection. On 8th December 2018 this search identified 2975 unique studies; after abstract review 192 underwent full-text review, resulting in the inclusion of 86 studies, 54[@Guiral2018; @Karppinen2018; @Ibrahim2017; @Kassam2017; @Legese2017; @Manyahi2017; @Sangare2017a; @Abera2016; @Agyekum2016; @Breurec2016; @Buys2016; @Eibach2016; @Kpoda2018a; @Kabwe2016; @Leski2016; @Mohammed2016; @Naas2016; @Ndir2016; @Ouedraogo2016; @Sangare2016; @Seni2016; @Dramowski2015; @Irenge2015; @Onanuga2018; @Kateregga2015; @Opintan2015; @Pons2015; @Rafai2015; @Adeyankinnu2014; @Irenge2014; @Scherbaum2014; @Yusuf2014; @Alabi2013; @Ibrahim2013; @Seni2018; @Obeng-Nkrumah2013; @Raji2013; @VanderMeeren2013; @Idowu2011; @Moyo2010a; @Bercion2009; @Mshana2009; @Sire2007; @Blomberg2005; @Gangoue-Pieboji2005; @Zeynudin2018; @Ndugulile2005; @Dromigny2003; @Dromigny2002; @Ampaire2017; @Andrew2017; @Archary2017; @Henson2017] providing data on invasive infection and 32 [ @Chirindze2018; @Founou2018; @Magwenzi2017; @Moremi2017; @Wilmore2017; @Farra2016; @Desta2016; @Djuikoue2016; @Mshana2016; @Ribeiro2016; @Tellevik2016; @Chereau2015; @Herindrainy2018; @Micheel2015; @Nelson2014; @Lonchel2013; @Magoue2013; @Schaumburg2013; @Albrechtova2012; @Isendahl2012; @Lonchel2012; @Herindrainy2011; @Woerther2011; @Katakweba2018; @Andriatahina2010; @Ruppe2009; @Tande2009; @Marando2018; @Moremi2018; @NikiemaPessinaba2018; @Sanneh2018; @Stanley2018; @Kurz2017]  167–199 on carriage. Details of these studies are given below. A broad non-systematic review of the literature was also undertaken to place these studies in context and provide a background understanding of the classification and global epidemiology of ESBL-E, using the same literature databases.
 
 ### Introduction: definition and classification of ESBL-E
-
 Beta-lactamases are enzymes that hydrolyse the active beta lactam ring in beta lactam antimicrobials. Though no standardised definition of ESBL exists, they are usually defined as enzymes which confer resistance via hydrolysis to penicillins, cephalosporins of the first, second or third generation (excluding cephamycins), aztreonam, but not carbapenems, and are inhibited by beta-lactamase inhibitors such as clavulanic acid[@Paterson2005].
 
 Two classification schemes are usually used for ESBL: the molecular (or structural) classification of Ambler[@Ambler1980], or the Bush-Jacoby-Medeiros functional classification[@Bush2010] (Table \@ref(tab:esbl-definitions)). Molecular classification is straightforward and depends on protein homology; class A, C and D enzymes are serine beta-lactamases and class B are metallo-beta lactamases, named for the composition of their active site. The functional classification is complex and clusters enzymes into four groups, with a number of subgroups, based on substrates and the effect of beta-lactamase inhibitors and EDTA: class 1 (corresponding to Ambler class C) are cephalosporinases that are not inhibited by clavulanic acid, and includes the AmpC enzymes of the Enterobacteriaceae; class 2 enzymes are beta lactamases that are largely inhibited by clavulanic acid and belong to Ambler class A or C; and class 3 are the metallo-beta-lactamases corresponding to Ambler class B. Class 4 enzymes are penicillinases which are not inhibited by clavulanic acid, though are of limited significance and not included in Table 14. The vast majority of clinically relevant ESBLs (and all of those defined as above) belong to Ambler class A, functional class 2be.
-
 ```{r esbl-definitions, echo = F, warning = F, tidy= F}
 t12 <- read.csv(paste0(wd, "/chapter_one/t12_ESBL_classification.csv"), check.names = F)
 
 knitr::kable(t12, output, booktabs = T, caption = "ESBL classification. Adapted from Bush (2010)") %>%
- # kable_styling(full_width = F, latex_options = "repeat_header") %>% 
+  kable_styling(full_width = F, latex_options = c("repeat_header","HOLD_position")) %>% 
   column_spec(1, width = "3em") %>% 
   column_spec(2, width = "4em") %>% 
   column_spec(3, width = "6em") %>%
@@ -374,24 +293,20 @@ knitr::kable(t12, output, booktabs = T, caption = "ESBL classification. Adapted 
 ```
 
 ### Global molecular epidemiology of ESBL-E: an overview
-
 The history of the global spread of ESBL-E is complex and an enormous number of unique ESBL amino acid sequences have been described; at the time of writing the NCBI beta-lactamase directory contains 1557 named beta-lactamase genes, many of them ESBL. However, there are 3 families which cause the majority of infections in humans: TEM, SHV, and CTX-M. They will be briefly described here in turn in the context of their putative origins and global dissemination in the latter half of the 20th century. A diverse range of other ESBL enzymes have been described, but are largely of less clinical significance than those described above, and are beyond the scope of this review: most notably the OXA type, which in contrast to TEM, SHV and CTX-M, are of the molecular class D and functional class 2d, and are characterised by a high rate of hydrolysis of cloxacillin[@Bradford2001]; like TEM and SHV, OXA beta-lactamases are not always extended-spectrum.  
 
 #### 1980s-1990s: First identificatiom of ESBL in nosocomial pathogens
-
 Beta-lactamases form an integral part of the natural armamentarium of many genera of bacteria – particularly gram negatives, including Enterobacteriaceae - and predate the antibiotic era; penicillinases were identified in E. coli, for example, prior to the widespread introduction of penicillin for treatment of human disease[@ABRAHAM1940]. These beta-lactamases are often chromosomally located; the first plasmid-mediated narrow-spectrum beta-lactamase, TEM-1 -named for the patient, Temoneira, from whose blood it was first isolated – was found in Athens in the 1960s[@Datta1965].  It rapidly disseminated globally and is thought to be responsible for a high proportion of ampicillin resistance in E. coli, for example[@Bradford2001]. This worldwide spread spurred the development and use of beta-lactamase resistant extended-spectrum cephalosporin antimicrobials, which found wide use in the 1980s. Perhaps inevitably, an enzyme conferring resistance to extended-spectrum oxyimino-cephalosporins was subsequently identified in a German clinical _Klebsiella ozaenae_ isolate in 1983, carried on a pBP60 plasmid and enzymes of this sort were named ESBLs[@Knothe1983; @Kliebe1985]. 
 
 This first ESBL enzyme was found to be similar to an existing plasmid-borne narrow spectrum beta lactamase, SHV-1, which had been described in the 1970s in E. coli, and was thought to itself be descended from a chromosomal _K. pnemoniae_ narrow spectrum beta lactamase which was liberated onto a plasmid[@Liakopoulos2016]. The point mutations in SHV-1 conferred the ESBL phenotype, and this enzyme was named SHV-2. This pattern - mutation of a narrow spectrum beta-lactamase to produce an ESBL phenotype  - also occurred in TEM, and the first ESBL TEM was described in France in 1989[@Sougakoff1988] and named TEM-3. Many TEM and SHV variants were subsequently described[@Gold1996]. However, in this early stage of the epidemic, ESBL enzymes were largely nosocomial, and often associated with _Klebsiella spp._[@Philippon1989].
 
 #### 1990s-2010s: Emergence and globalisation of CTX-M
-
 From the late 1990s onwards, there were profound changes in the global epidemiology of ESBL-E, on three fronts, all intricately interrelated, and occurring simultaneously: first, the rapid emergence and globalisation of the successful CTX-M ESBL enzyme family[@Canton2006], aided by mobile genetic elements; second, _E. coli_ joining _Klebsiella spp._ as a major ESBL host[@Livermore2006], and the emergence of so-called high risk bacterial clones; and third, the spread of ESBL-E into the community[@BenAmi2009]. CTX-M-1 was first identified and named in Germany in 1989[@Bauernfeind1990] and many variants were subsequently identified, largely in _E. coli_ and _K. pneumoniae_, from isolates all over the world[@Bonnet2004]. CTX-M genes are clustered by homology into 5 groups (CTX-M groups 1,2,8,9 and 25 ) and each group is thought to have descended from a chromosomal beta lactamase from _Kluyvera spp._[@Canton2006]
 
 A year-on-year rise in incidence of invasive ESBL-E infection was seen in most high-income settings (Figure \@ref(fig:esbl-world-prev)) throughout the 2000s and 2010s, the majority of which were CTX-M producers, though with varying proportions of different CTX-M enzymes in different locations[@Livermore2006; Bevan2017]. Risk factors for ESBL-E infection in high income settings have persistently been shown to be hospital or long-term care facility exposure, antimicrobial exposure and chronic health conditions though it was recognised in the 2000s that a large proportion of patients with invasive ESBL-E lack any of these risk factors[@BenAmi2009], suggesting acquisition in the community. Colonisation prior to infection is thought to be the norm; prior colonisation is a significant risk factor for infection and indeed when sought ESBL-E are found in the stool of healthy community members worldwide (see carriage, below). 
 
 Though less comprehensive, data from middle income countries suggests that prevalence of ESBL producers amongst invasive _E. coli_ and _K. pneumoniae_ are very high (Figure \@ref(fig:esbl-world-prev)) and in countries such as India invasive _E. coli_ and _K. pneumoniae_ that are sensitive to third-generation cephalosporins are in the minority. The reasons for this are not clear but country and regional level associations (which are open to ecologic bias) have been shown with antimicrobial consumption[@Goossens2005; Lai2011] and economic status; GDP per capita has been found to correlate inversely at a country level with third-generation cephalosporin resistance rates[@Alvarez-Uria2016]. Data from sSA have historically been lacking and are systematically reviewed below. 
-
-```{r esbl-world-prev, echo = F, warning = F, fig.cap= "Prevalence of third generation cephalosporin resistance in representative high income (EU, USA) and middle income (China, Mexico, India) areas in invasive E. coli (left panel) and K. pneumoniae (right panel) isolates. Data for EU are from ECDC surveillance atlas (https://ecdc.europa.eu/en/antimicrobial-resistance/surveillance-and-disease-data/data-ecdc) and for other countries are from CCDEP resistance map (https://resistancemap.cddep.org/AntibioticResistance.php) both accessed 28 December 2018. 3GC = third generation cephalosporin. Note that these data are 3GC-resistant isolates rather than confirmed ESBL-producers, but would be expected to be ESBL-producers in the vast majority of cases.", fig.align= "center", fig.height= 4, fig.width = 7}
+```{r esbl-world-prev, echo = F, warning = F, fig.cap= "Prevalence of third generation cephalosporin resistance in representative high income (EU, USA) and middle income (China, Mexico, India) areas in invasive E. coli (left panel) and K. pneumoniae (right panel) isolates. Data for EU are from ECDC surveillance atlas (https://ecdc.europa.eu/en/antimicrobial-resistance/surveillance-and-disease-data/data-ecdc) and for other countries are from CCDEP resistance map (https://resistancemap.cddep.org/AntibioticResistance.php) both accessed 28 December 2018. 3GC = third generation cephalosporin. Note that these data are 3GC-resistant isolates rather than confirmed ESBL-producers, but would be expected to be ESBL-producers in the vast majority of cases.", fig.align= "center", fig.height= 3, fig.width = 6}
 
 ### get EU wide estimates of cef R from country data
 ###
@@ -443,7 +358,6 @@ ggplot(subset(df, area %in% c("USA", "EU", "India", "Mexico", "China")), aes(x= 
 ```
 
 #### Epidemiology of gut mucosal carriage of ESBL-E: the first step towards invasive infection
-
 Invasive infections with Enterobacteriaceae are thought to usually result from infection from an individual’s own gut microbiota, irrespective of resistance pattern[@Denis2015], and whole genome sequencing has confirmed that invasive isolates are often closely related to prior gut carriage isolates[@Gorrie2018]. Strategies to minimise carriage are therefore potentially attractive as interventions to reduce invasive infection and a number of studies have attempted to understand the dynamics of gut mucosal ESBL-E carriage in health and disease. A brief overview of ESBL-E community carriage is presented here, and ESBL-E carriage in sSA is systematically reviewed below.
 
 ESBL-E community carriage in Spanish outpatients[@Mirelis2003] and healthy children in Poland[@Franiczek2003] was first described in 2001, and subsequently has been identified worldwide when sought[@Woerther2013], though there are heterogeneities between and within countries which mirror the prevalence of invasive ESBL-E prevalence amongst _E. coli_ and _K. pneumoniae_. In Europe, for example, community prevalence of ESBL-E carriage was estimated be 7.3% in the UK in 2014 in a large community study[@McNulty2018], 4.5% in the Netherlands in 2012[@Wielders2017] and 4.7% in Sweden in 2012/13[@Ny2017] and 3.7% in Spain in 2003[@Valverde2004], significantly lower than community carriage prevalence of 50.9% seen in China in 2009[@Li2011] or 33.8% in India in 2011-2013[@Babu2016].
@@ -455,7 +369,6 @@ The majority of studies of ESBL-E carriage are cross sectional and only a handfu
 The largest longitudinal community study of ESBL-E carriage took place in the Netherlands which recruited 76 ESBL-E colonised and 249 uncolonised community members and carried out longitudinal stool sampling at 5 time points over 8 months. 25/76 (32.9%) of initially-colonised participants remained persistently colonised after a median 242 days. Antimicrobial exposure in the past 6 months, proton-pump inhibitor use, colonisation with _E. coli_ phylogroup B2 or D and presence of CTX-M-27 or CTX-M-14 was associated with persistent carriage, suggesting both host and bacterial factors may be important determinants of carriage duration. _K. pneumoniae_ colonisation seemed to be less common in the persistent carriage group[@VanDuijkeren2018; @Teunis2018]. This study also found significant heterogeneity of _E.coli_ sequence type in longitudinal samples of persistent carriers but that ESBL genes and often detectable plasmid replicons remained unchanged, suggesting a significant role for mobile genetic elements.
 
 #### Molecular mechanisms underlying success of CTX-M: mobile genetic elements and high-risk clones
-
 The remarkable success of CTX-M has led to efforts to understand the molecular mechanisms by which this enzyme spread so rapidly. The system is complex, and poorly understood, but should be considered at multiple levels including that of the organism; the plasmid; the transposon, which may contain integrons or insertion sequences and, at the lowest level the ESBL gene. These will briefly be reviewed here.
 
 The initial mobilisation event of CTX-M from _Kluyvera spp._ is thought to have been mediated by capture of transposable insertion sequences; the insertion sequence ISEcp1 has been experimentally demonstrated to mobilise the CTX-M precursor from _Kluyvera ascorbata_[@Lartigue2006] and ISEcp1 is most consistently associated with CTX-M genes but IS26, ISCR1 and IS10 have also persistently been described upstream from CTX-M genes, suggesting multiple mobilisation events[@Bevan2017]. There is also an association between particular pairs of CTX-M gene clusters and insertion sequences, consistent with a hypothesis of multiple mobilisation events[@Canton2012]. These insertion sequences provide two roles: they encode a transposase enabling gene mobilisation but act as a strong promotor of CTX-M, without which phenotypic cephalosporin resistance is absent or reduced[@Zhao2013].
@@ -465,15 +378,12 @@ After mobilisation from the _Kluyvera_ genome, the CTX-M genes were integrated o
 In addition to frequently co-occurring CTX-M genes, transposable elements and plasmids, some clonal groups of _E. coli_ and _K. pneumoniae_ are both globally successful and associated with particular CTX-M genes and plasmids. These successful sequence types (STs) are known as “high risk clones.” The archetypal example is _E. Coli_ ST131 which is often associated with an IncFII plasmid containing CTX-M-15[@Coque2008]. First described in 2008, _E. coli_ ST131 is thought to be responsible for around 80% of extra-intestinal ESBL E. coli infection[@Nicolas-Chanoine2014]. Population genomics studies have demonstrated that a particular clade, ST131 clade C, is globally dominant and have shown a sequential acquisition of virulence determinants followed by mobile genetic elements conferring fluoroquinolone and ESBL resistance[@Stoesser2016; @Petty2014]. These events may have contributed to the global success of ST131, but the precise mechanism of its apparent fitness advantage remains unknown.
 
 ### Epidemiology of ESBL-E in sub-Saharan Africa
-
 Of the 86 studies identified by the systematic literature review, 54 studies provided data on invasive ESBL-E and 32 provided data on human carriage is sSA. These are considered in turn below.
 
 #### Invasive ESBL-E infection
-
 Table xx in appendix xx shows the 54 included studies in this analysis, which provide data on 6067 _E. coli_ and 2974 _K. pneumoniae_ isolates. All studies were cross sectional in design. Of the 54, 18/54 were laboratory based (i.e. a survey of all samples received in the laboratory); 17/54 were truly invasive in that they included predominantly blood culture; a combination of urine, CSF, and wound swabs were included in the remaining studies. 36/54 studies provided data on adults and children; 6/54 on adults only; and 12/54 on children only. The majority of studies (42/54) include both community and nosocomial acquired infection. Of the remainder, 3/54 provided data on nosocomial infection only. Figure \@ref(esbl-invasive-ssa-prev)A  shows a map of available data by country; data are available from across the continent though Nigeria (8 studies) and Tanzania (7 studies) are over represented and many countries provide no data. 
 
 The proportion of ESBL producers amongst invasive E. coli and K. pneumoniae in sSA is heterogeneous but many studies show extremely an extremely high prevalence (Figures \@ref(esbl-invasive-ssa-prev)B and \@ref(esbl-invasive-ssa-prev)C), comparable to that seen in the Indian subcontinent and other high-prevalence areas and highlighting the scale of the public health problem posed by ESBL-E in sSA. Meta regression shows clear temporal trends of an increase over time: addition of time as a fixed-effect covariate to the random effects model gives improved fit on likelihood ratio testing of nested models (p < 0.001 for both _E. coli_ and _K. pneumoniae_). Though data are sparse pre-2000, those data that are available suggest that ESBL producing _E. coli_ and _K. pneumoniae_ were identified in West Africa even in the 1990s: a retrospective laboratory based study in Yaounde, Cameroon on isolates from a variety of clinical samples from 1995-1998 found that 13/91 _E coli._ and 12/64 _K. pneumoniae_ were ESBL producers, with the SHV-12 enzyme predominant[@Gangoue-Pieboji2005]; in Dakar, Senegal, 6/97 _K. pneumoniae_ isolates from community acquired urinary tract infections in 1999-2000 were found to be ESBL producers[@Dromigny2003]. 
-
 ```{r esbl-invasive-ssa-setup, include = F}
 
 ### Make map
@@ -534,11 +444,6 @@ ggplot(africa) +
         legend.position = "bottom") + 
   labs(fill = "No. studies") -> nstuds_map
 
-```
-
-```{r esbl-invasive-ssa-prev, echo = F, warning = F, fig.cap= "Invasive ESBL-E in sSA. A: Available studies by country. B and C: meta regression of proportion of invasive \\textit{E. coli} and \\textit{K. pneumoniae} respectively as a function of time. In both cases time is statistically significantly associated with proportion of ESBL (p < 0.001 on likelihood ratio testing of nested models). 95\\% CI generated from 1000 bootstrap replicates.", fig.align= "center", fig.height= 5, fig.width = 8}
-
-#A: available studies by country; B: proportion of ESBL producing E. coli and C: proportion of ESBL producing K. pneumoniae over time. Regression lines are from normal-binomial meta-analysis of proportions including study effect as random effect and time as a covariate using lme4 package in R. 95% CI generated from 1000 bootstrap replicates from fitted models. In both cases time is statistically significantly associated with proportion of ESBL (p < 0.001 on likelihood ratio testing of nested models).
 
 ##### make plots
 
@@ -640,6 +545,12 @@ newdata2$year <- newdata2$year + 1995
 names(newdata2)[1] <- "year_of_samples_start"
 names(newdata2)[3] <- "klpn_prob_esbl"
 
+
+```
+```{r esbl-invasive-ssa-prev, echo = F, warning = F, comment=F, fig.cap= "Invasive ESBL-E in sSA. A: Available studies by country. B and C: meta regression of proportion of invasive \\textit{E. coli} and \\textit{K. pneumoniae} respectively as a function of time. In both cases time is statistically significantly associated with proportion of ESBL (p < 0.001 on likelihood ratio testing of nested models). 95\\% CI generated from 1000 bootstrap replicates.", fig.align= "center", fig.height= 5, fig.width = 8}
+
+#A: available studies by country; B: proportion of ESBL producing E. coli and C: proportion of ESBL producing K. pneumoniae over time. Regression lines are from normal-binomial meta-analysis of proportions including study effect as random effect and time as a covariate using lme4 package in R. 95% CI generated from 1000 bootstrap replicates from fitted models. In both cases time is statistically significantly associated with proportion of ESBL (p < 0.001 on likelihood ratio testing of nested models).
+
 ggplot(invasive, aes(year_of_samples_start, klpn_prob_esbl)) + geom_point(aes(size = invasive_n_kleb), alpha = 0.7) +
   geom_line(data = newdata2) + 
   geom_ribbon(data = newdata2, aes(ymin = lwr, ymax = upr), alpha = 0.3) + 
@@ -655,10 +566,9 @@ ggarrange(nstuds_map,
 
 
 ```
-
 Some of the heterogeneity in prevalence does however seem to be explained by sample type; a clearer picture appears when the analysis is restricted to the 16 studies including predominantly blood culture (Figure \@ref(fig:esbl-invasive-ssa-prev-bc))[@Legese2017; @Sangare2017a; @Sangare2016; @Dramowski2015; @Irenge2014; @Pons2015; @Blomberg2005; @Henson2017; @Abera2016; @Agyekum2016; @Breurec2016; @Buys2016; @Eibach2016; @Kabwe2016; @Naas2016; @Ndir2016]. In this analysis it seems clear that the worldwide epidemiology of ESBL-E was mirrored in sSA; ESBL initially spread amongst invasive K. pneumoniae post 2000 (particularly post 2005) before becoming established in E. coli after 2010. In 2014, the latest available data, the pooled population prevalence of ESBL from binomal-normal random effects meta analysis was 61% [95% CI 40-80%] amongst _E. coli_ and 86% [95% CI 73-92%] amongst _K. pneumoniae_ bloodstream infection isolates, suggesting endemicity of ESBL amongst these pathogens in sSA, and comparable to the highest prevalence areas in the world.
 
-```{r esbl-invasive-ssa-prev-bc, echo = F, warning = F, fig.cap= "Meta regression of proportion of ESBL producing \\textit{E. coli} and \\textit{K. pneumoniae} amongst invasive isolate in sSA from studies carrying out blood culture, as a function of time. Includes 1242 \\textit{K. pneumoniae} and 489 \\textit{E. coli} isolates. 95\\% CI generated from 1000 bootstrap replicates from fitted models. In both cases time is statistically significantly associated with proportion of ESBL (p < 0.001 on likelihood ratio testing of nested models).", fig.align= "center", fig.height= 3, fig.width = 5}
+```{r esbl-invasive-ssa-prev-bc-setup, include = F}
 
 
 bl <- subset(invasive, grepl("blo", invasive$sample_type))
@@ -706,6 +616,13 @@ newdata$organism <- "K. pneumoniae"
 
 bl.t <- rbind(dplyr::select(bl.e, year_of_samples_start, prob_esbl, organism, invasive_n), dplyr::select(bl.k, year_of_samples_start, prob_esbl, organism, invasive_n) )
 newdata2$year_of_samples_start <- newdata2$year_of_samples_start - 1995
+
+
+```
+
+
+```{r esbl-invasive-ssa-prev-bc, echo = F, warning = F, comment = F, fig.cap= "Meta regression of proportion of ESBL producing \\textit{E. coli} and \\textit{K. pneumoniae} amongst invasive isolate in sSA from studies carrying out blood culture, as a function of time. Includes 1242 \\textit{K. pneumoniae} and 489 \\textit{E. coli} isolates. 95\\% CI generated from 1000 bootstrap replicates from fitted models. In both cases time is statistically significantly associated with proportion of ESBL (p < 0.001 on likelihood ratio testing of nested models).", fig.align= "center", fig.height= 3, fig.width = 5}
+
 ggplot(bl.t, aes(year_of_samples_start, prob_esbl, fill = organism, colour = organism)) + geom_point(aes(size = invasive_n), alpha = 0.8) +
   geom_line(data = newdata) + 
   geom_line(data = newdata2) +
@@ -718,8 +635,7 @@ ggplot(bl.t, aes(year_of_samples_start, prob_esbl, fill = organism, colour = org
 
 ```
 ESBL genes were characterised in 10 studies by whole genome sequencing[@Henson2017] (n=1) or by PCR[ @Manyahi2017; @Agyekum2016; @Breurec2016; @Eibach2016; @Ouedraogo2016; @Pons2015; @Rafai2015; @Blomberg2005; @Ndugulile2005] (n=9) for 821 _E. coli_ and 791 _K. pneumoniae_ isolates (Figure \@ref(fig:esbl-invasive-ssa-enzymes)). CTX-M enzymes were the most commonly occurring ESBL genes, and the majority of these were CTX-M-15 in both organisms. OXA, TEM and SHV genes were also commonly found but were often not further characterised, presenting some problems of interpretation, as these enzymes can be narrow or broad-spectrum beta-lactamases. Certainly, SHV-1 and TEM-1 are narrow spectrum beta lactamase enzymes, which were commonly identified in these studies, though only a handful of isolates had characterisation of SHV enzymes beyond identification of the SHV group. All the identified OXA genes were narrow spectrum beta lactamases (OXA-1). These data suggest that the genomic landscape of invasive ESBL-E in sSA is dominated by CTX-M, and CTX-M-15 in particular, mirroring that seen worldwide.
-
-```{r esbl-invasive-ssa-enzymes, echo = F, warning = F, fig.cap= "Disribution of beta-lactamase genes in invasive ESBL producing \\textit{E. coli} (n= 821) and \\textit{K. pneumoniae} (n = 791) from 10 studies", fig.align= "center", fig.height= 4, fig.width = 5}
+```{r esbl-invasive-ssa-enzymes, echo = F, warning = F, fig.cap= "Disribution of beta-lactamase genes in invasive ESBL producing \\textit{E. coli} (n= 821) and \\textit{K. pneumoniae} (n = 791) from 10 studies", fig.align= "center", fig.height= 3, fig.width = 5}
 
 
 subset(invasive, !( is.na(n_esco_seqq) | is.na(n_kleb_seq))) -> esco_genes
@@ -782,14 +698,11 @@ ggplot(gp, aes(x= enzyme_group, y = n, fill = variable)) +
   labs(fill = "") + scale_fill_discrete(labels  = lab)
 
 ```
-
 Though no data were identified from Malawi that fulfilled the inclusion criteria of the systematic review, there are three studies that suggest the epidemiology of invasive ESBL-E in Malawi is similar to that described above. A study from Blantyre in 2004-2005 found that ESBL-E were unusual in blood stream infection (BSI) isolates: of 1191 Enterobacteriaeciae BSI, only 8 unique isolates showed an ESBL phenotype (K. pneumoniae 4/8, K. oxytoca, 1/8, Enterobacter cloacae 2/8 and E. coli 1/8) though no denominators are provided to allow calculation of prevalence. CTX-M-15 (n = 1) was described, though in the minority: SHV-11 (n = 1), SHV-12 (n = 3), SHV-27 (n = 1) and TEM-63 (n = 2) were the other enzymes identified[@Gray2006]. Longitudinal blood culture surveillance in Blantyre suggests that after 2005 – which coincided with the introduction of ceftriaxone in government hospitals – the prevalence of ceftriaxone resistance rapidly increased, to 90.5% in K. pneumoniae and 30.3% in E. coli BSI isolates by 2016[@Musicha2017b], though this study did not carry out confirmatory ESBL testing. Finally, a retrospective whole-genome sequencing study which selected 94 diverse (largely invasive) clinical E. coli isolates from Blantyre from 1996-2014 found that 21/94 isolates carried an ESBL gene, with CTX-M predominating (20/21)[@Musicha2017a].
-
 #### Gut mucosal carriage of ESBL-E in sub-Saharan Africa
-
 Table xx in appendix xx shows the 32 identified studies that provide data on gut mucosal carriage in different populations in sSA. The populations recruited to the studies are heterogeneous but include community members, hospitalised patients, outpatients, orphanage residents, hospital workers and food handlers in schools. Adults and children are included. Data on 10,232 individuals from 19 countries are available in total (Figure A). The earliest samples were collected from staff and children in a Malian orphanage in 2003, when 49/68 participants were found to be colonised with ESBL-E[@Tande2009]. There is significant heterogeneity in prevalence, some of which is explained by the study population (Figure \@ref(esbl-carriage-ssa-prev)); inpatients tend to have a higher ESBL-E carriage prevalence than community members. Outpatients have similar carriage prevalence to community members but inpatients even on hospital admission seem to have a higher carriage prevalence than community members. 
 
-```{r esbl-carriage-ssa-prev, echo = F, warning = F, fig.cap= "ESBL-E gut mucosal carriage in sSA. A: included studies by country; B: forest plot of ESBL-E carriage prevalence stratified by population. Pooled random effect summary estimates shown.", fig.align= "center", fig.height= 9, fig.width = 10}
+```{r esbl-carriage-ssa-prev, echo = F, warning = F, fig.cap= "ESBL-E gut mucosal carriage in sSA. A: included studies by country; B: forest plot of ESBL-E carriage prevalence stratified by population. Pooled random effect summary estimates shown.", fig.align= "center", fig.pos='H', fig.height= 9, fig.width = 10}
 
 hc$population <- as.character(hc$population)
 hc$population[hc$population == "community"] <- "Community"
@@ -865,8 +778,7 @@ Hospitalisation is clearly a driver of ESBL-E colonisation in the included studi
 Data on beta lactamase genes present in carriage isolates are available for 996 E. coli and 607 K. pneumoniae from 8 studies (Figure \@ref(esbl-carriage-ssa-enzymes)), showing a similar picture to invasive isolates; the landscape is dominated by CTX-M-15. One study used whole-genome sequencing [@Marando2018], the remainder used a variety of PCR techniques[@Moremi2017; @Lonchel2013; @Magoue2013; @Schaumburg2013; @Lonchel2012; @Woerther2011; @Moremi2018]. 
 
 Only 4 studies are longitudinal cohorts which could provide insight into temporal trends and determinants of carriage[@Woerther2011; @Andriatahina2010; @Moremi2018; @Kurz2017]; all of these studies were health facility based and ascertained ESBL status on admission and discharge. Significant increases in ESBL-E carriage were seen in all studies: from 50 to 65% in Rwanda; from 30 to 95% in Niger; from 21.2 to 57% in Madagascar; and from 23% to 36% in Tanzania. No studies followed patients into the community, thus carriage duration of ESBL-E in sSA remains unknown and no interventional studies identified aiming to reduce ESBL-E carriage were identified.
-
-```{r esbl-carriage-ssa-enzymes, echo = F, warning = F, fig.cap= "Distribution of beta-lactamase genes in carriage ESBL producing \\textit{E. coli} (n= 996) and \\textit{K. pneumoniae} (n = 607) from 9 studies.", fig.align= "center", fig.height= 4, fig.width = 5}
+```{r esbl-carriage-ssa-enzymes, echo = F, warning = F, fig.cap= "Distribution of beta-lactamase genes in carriage ESBL producing \\textit{E. coli} (n= 996) and \\textit{K. pneumoniae} (n = 607) from 9 studies.", fig.align= "center", fig.pos = 'h', fig.height= 3, fig.width = 5}
 
 
 subset(hc, !( is.na(n_esco_seqq) | is.na(n_kleb_seq)) ) -> esco_genes
@@ -927,11 +839,8 @@ ggplot(gp, aes(x= enzyme_group, y = n, fill = variable)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) + xlab("Enzyme group") + 
   ylab("") +
   labs(fill = "") + scale_fill_discrete(labels  = lab)
-
 ```
-
 ## Conclusions
-
 The aetiology of sepsis in sSA is poorly defined, hence optimal antimicrobial strategies are unknown; disseminated TB is likely to play a significant role, but data to guide tuberculosis therapy strategies in the critically unwell are lacking. The role of bacterial zoonoses, arboviruses and HIV opportunistic infections are not well defined, but may be significant. Diagnostic uncertainty and paucity of microbiologic support across sSA may be creating a permissive environment for the widespread broad spectrum antimicrobial use, often third-generation cephalosporins. It is likely that dose, duration and indication are frequently inappropriate, and thus could contribute both to increased mortality and to spread of ESBL-E.
 
 Certainly, ESBL-E are endemic in sSA and are a problem of serious public health concern; sSA has rates of ESBL-E in invasive disease that are comparable to the highest in the world and ESBL-E gut mucosal carriage in healthy populations across the continent is common. Whilst it is clear that health care facilities are strongly associated with ESBL-E acquisition, a deeper understanding of the determinants and sources of acquisition, and carriage duration is lacking. In order to understand the role of health facilities in driving the ESBL-E pandemic, a high quality longitudinal ESBL-E carriage data from both healthy and sick (health facility exposed) populations are required.
@@ -939,18 +848,63 @@ Certainly, ESBL-E are endemic in sSA and are a problem of serious public health 
 It may be that optimising the treatment of severe febrile illness in hospitals is the best place to start to reduce over prescription of broad-spectrum antimicrobials and reduce selection pressure for ESBL-E whilst ensuring timely and appropriate access to the right treatments for those who need them. This is the central hypothesis of this thesis, and the following chapters present the data that can be used to define such a strategy. 
 
 ### Specific aims
-
 The specific aims of this thesis are:
-
 1. To describe the presentation, aetiology, outcome, and determinants of mortality from sepsis in adults presenting to Queen Elizabeth Central Hospital, Blantyre Malawi;
-2. To describe the acquisition and carriage of ESBL-E in sepsis survivors, with an analysis of determinants of carriage.
+2. To describe the acquisition and carriage of ESBL-E in sepsis survivors, with an analysis of determinants of carriage.  
 
 ## Thesis overview
+Chapter 2 (methods) presents the clinical study that forms the basis of the rest of this thesis; given the likely importance of disseminated TB in sepsis in sSA, chapter 3 presents a systematic review and individual patient data meta anlaysis of prevalence, diagnosis, and mortality hazard or TB bloodstream infection. Chapter 4 presents data on the clinical presentation, aetiology and outcomes of sepsis in Blantyre, Malawi; chapter 5 describes the determinants of long-term carriage of ESBL-E amongst sepsis survivors. Chapter 6 presents an overview of the genomic landscape of ESBL-E in Blantyre, Malawi whilst chapter 7 combines the genomic and epidemiologic data from chapters 5 and 6 to understand mechanisms and drivers of ESBL-E carriage in health and disease in Malawian adults. [microbiome stuff if available]. Finally, chapter 8 provides suggestions of further work.  
 
-Chapter 2 (methods) presents the clinical study that forms the basis of the rest of this thesis; given the likely importance of disseminated TB in sepsis in sSA, chapter 3 presents a systematic review and individual patient data meta anlaysis of prevalence, diagnosis, and mortality hazard or TB bloodstream infection. Chapter 4 presents data on the clinical presentation, aetiology and outcomes of sepsis in Blantyre, Malawi; chapter 5 describes the determinants of long-term carriage of ESBL-E amongst sepsis survivors. Chapter 6 presents an overview of the genomic landscape of ESBL-E in Blantyre, Malawi whilst chapter 7 combines the genomic and epidemiologic data from chapters 5 and 6 to understand mechanisms and drivers of ESBL-E carriage in health and disease in Malawian adults. [microbiome stuff if available]. Finally, chapter 8 provides suggestions of further work. 
+\vfill
 
 ## Appendix
 
+```{r SOFA, tidy = F, echo = F}
+t4 <- read.csv(paste0(wd, "/chapter_one/t4_sofa.csv"), check.names = F)
+
+knitr::kable(t4, output, booktabs = T, caption = "Sequential organ failure assessment (SOFA) score") %>%
+  kable_styling(full_width = F, latex_options = c("HOLD_position")) %>% 
+  column_spec(1, width = "10em") %>% 
+  column_spec(2, width = "6em") %>% 
+  column_spec(3, width = "6em") %>%
+  column_spec(4, width = "6em") %>%
+  column_spec(5, width = "6em") %>%
+  column_spec(6, width = "6em") %>%
+   add_header_above(c(" ", "Score" = 5)) %>%
+  group_rows("Respiratory",1,1 ) %>%
+  group_rows("Coagulation",2,2 ) %>%
+  group_rows("Liver",3,3 ) %>%
+ group_rows("Cardiovascular",4,4 ) %>%
+  group_rows("CNS",5,5 ) %>%
+ group_rows("Renal",6,7 ) %>%
+  footnote(general = "PaO2 = Arterial partial pressure of oxygen, FiO2 = Inspired fraction of oxygen, MAP = mean arterial blood pressure, CNS = Central nervous system. All doses of inotropes are micrograms/kg/min", threeparttable = T)
+  
+  
+```
+```{r fever-study-review, echo = F, warning= F}
+
+t9 <- read.csv(paste0(wd, "/chapter_one/t9_fever_studies.csv"), check.names = F)
+
+knitr::kable(t9, output, booktabs = T,longtable = T, caption = "Selected causes of fever in sSA since 2013") %>%
+  kable_styling(full_width = F, latex_options = c("repeat_header")) %>% 
+  column_spec(1, width = "6em") %>% 
+  column_spec(2, width = "4em") %>% 
+  column_spec(3, width = "4em") %>%
+  column_spec(4, width = "4em") %>%
+  column_spec(5, width = "6em") %>%
+  column_spec(6, width = "4em") %>%
+    column_spec(7, width = "4em") %>%
+    column_spec(8, width = "4em") %>%
+  group_rows("Leptospirosis",1,9 ) %>%
+  group_rows("Q-fever",10,16 ) %>%
+  group_rows("Brucellosis",17,23 ) %>%
+ group_rows("Rickettsioses",24,29 ) %>%
+  group_rows("Dengue",30,47 ) %>%
+ group_rows("Chikingunya",48,61 ) %>%
+  group_rows("Zika",62,64 ) %>%
+ footnote(general = "RS = Rickettsia spp., RF = R. felis, SFG/TG/STG = spotted fever/ typhus/scrub typhus group")
+
+```
 ```{r esbl-ssa-invasive-studies, tidy = F, echo = F,warning= F}
 
 t13 <- read.csv(paste0(wd, "/chapter_one/t13_ssa_invasive_ESBL_results.csv"), check.names = F)
@@ -958,7 +912,7 @@ t13 <- read.csv(paste0(wd, "/chapter_one/t13_ssa_invasive_ESBL_results.csv"), ch
 # 
 
 knitr::kable(t13, output, booktabs = T, longtable = T, caption = "included studies providing an estimate of proportion of ESBL producers in invasive \\textit{E. coli} and \\textit{K. pneumoniae} isolates in sSA.") %>%
-  kable_styling(full_width = F, latex_options = c("repeat_header")) %>% 
+  kable_styling(full_width = F, latex_options = c("repeat_header", "hold_position")) %>% 
   column_spec(1, width = "4em") %>% 
   column_spec(2, width = "6em") %>% 
   column_spec(3, width = "6em") %>%
@@ -969,3 +923,4 @@ knitr::kable(t13, output, booktabs = T, longtable = T, caption = "included studi
   footnote(general = "A = Adults, C = children, IP = inpatients OP = outpatients, ND = not done.")
   
 ```
+## References
