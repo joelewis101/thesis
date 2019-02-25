@@ -12,6 +12,15 @@
 #  also a reminder on how to render the book:
 #bookdown::render_book('index.Rmd', 'bookdown::pdf_book')
 
+# and the chapter
+
+#bookdown::preview_chapter("01-intro.Rmd",
+#                output_format = "bookdown::word_document2",
+#                output_file = paste0("thesis-intro-", format(Sys.Date(), ("%d-%m-%y")), ".docx"),
+#                output_dir = "chapter-previews",
+#                output_options = list(reference_docx = "word-style-ref.docx"))
+
+
 #
 wd <- "/Users/joelewis/Documents/PhD/Thesis/bookdown"
 
@@ -31,7 +40,7 @@ library(lme4)
 
 
 output = "latex"
-n_bootstraps <- 1000
+n_bootstraps <- 10
 
 ```
 ## Chapter Overview
@@ -635,6 +644,7 @@ ggplot(bl.t, aes(year_of_samples_start, prob_esbl, fill = organism, colour = org
 
 ```
 ESBL genes were characterised in 10 studies by whole genome sequencing[@Henson2017] (n=1) or by PCR[ @Manyahi2017; @Agyekum2016; @Breurec2016; @Eibach2016; @Ouedraogo2016; @Pons2015; @Rafai2015; @Blomberg2005; @Ndugulile2005] (n=9) for 821 _E. coli_ and 791 _K. pneumoniae_ isolates (Figure \@ref(fig:esbl-invasive-ssa-enzymes)). CTX-M enzymes were the most commonly occurring ESBL genes, and the majority of these were CTX-M-15 in both organisms. OXA, TEM and SHV genes were also commonly found but were often not further characterised, presenting some problems of interpretation, as these enzymes can be narrow or broad-spectrum beta-lactamases. Certainly, SHV-1 and TEM-1 are narrow spectrum beta lactamase enzymes, which were commonly identified in these studies, though only a handful of isolates had characterisation of SHV enzymes beyond identification of the SHV group. All the identified OXA genes were narrow spectrum beta lactamases (OXA-1). These data suggest that the genomic landscape of invasive ESBL-E in sSA is dominated by CTX-M, and CTX-M-15 in particular, mirroring that seen worldwide.
+
 ```{r esbl-invasive-ssa-enzymes, echo = F, warning = F, fig.cap= "Disribution of beta-lactamase genes in invasive ESBL producing \\textit{E. coli} (n= 821) and \\textit{K. pneumoniae} (n = 791) from 10 studies", fig.align= "center", fig.height= 3, fig.width = 5}
 
 
