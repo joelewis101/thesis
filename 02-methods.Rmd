@@ -8,6 +8,9 @@ library(ggplot2)
 library(tmap)
 library(ggmap)
 
+wd <- "/Users/joelewis/Documents/PhD/Thesis/bookdown/chapter_2/"
+output = "latex"
+
 ```
 ## Chapter Overview
 
@@ -20,9 +23,9 @@ This chapter gives an overview of the clinical study which underpins this thesis
 Malawi is a country of 17.5 million people in South-Eastern Africa (2018 Census, Malawi national statistical office). It is one of the poorest countries in the world: it is a low income country under the World Bank classifcation, with a 2017 Gross National Income (GNI) per capita of \$320 in US dollars, and was ranked 171st of 189 countries in 2017 by the human development index (HDI), a composite statistic of life expectancy, education and income per capita indicators (UNDP human development reports). In 2010, 71% of the population was estimated to survive on less than \$1.90 per day (World Bank). Life expectancy at birth in 2017 was 63 years, and though significant progress is being made, neonatal and under-5 mortality remains high at 23 and 55 per 1000 live births, respectively (world bank). The population is largely rural (83% in 2017, World Bank), with a young population (44% under the age of 15, 2017, World Bank) and high fertility rate (4.6, 2016 data, World Bank). Malaria is endemic, and there is an ongoing generalised HIV epidemic: adult HIV prevalance (age 15-49) was estimated to be 9.6% in 2017 (UNAIDS), though falling from a peak of 16.6% in 1999. HIV antiretroviral therapy (ART) national scale up began in 2004 and in 2017 71% of elibigible adults and children were estimated to be recieveing ART (UNAIDS). It is classed by the WHO as a high-TB/high-HIV burden country, with an estimated TB incidence rate of 131 (95% CI 70-210) cases per 100000 population per year. 
 
 
-It has a subtropcial climate, with three main seasons: a warm wet season from November to April, a cooler dry winter period from May to August and a hot dry period from September to October. Blantyre city, the location of the study in this thesis, is the second city of Malawi with a population of 585000. It is located in Blantyre district, population 995000 in 2018 (Malawi ONS), in the Shire highlands at an altitude of 1000m (Figure \@ref(tab:plot-malawi-map)).
+It has a subtropcial climate, with three main seasons: a warm wet season from November to April, a cooler dry winter period from May to August and a hot dry period from September to October. Blantyre city, the location of the study in this thesis, is the second city of Malawi with a population of 585000. It is located in Blantyre district, population 995000 in 2018 (Malawi ONS), in the Shire highlands at an altitude of 1000m (Figure \@ref(fig:malawi-map)).
 
-```{r plot-malawi-map, warning = F,  echo = F, message = F, fig.scap="Map of study site", out.extra='', fig.cap = "Malawi, showing administrative boundaries (North, Central, and South regions), Lilongwe, the capital city and Blantyre, the study location. Source: openstreetmap.org, used under Creative Commons Attribution ShareAlike 2.0 licence CC-BY-SA"}
+```{r malawi-map, warning = F,  echo = F, message = F, fig.scap="Map of study site", out.extra='', fig.cap = "Malawi, showing administrative boundaries (North, Central, and South regions), Lilongwe, the capital city and Blantyre, the study location. Source: openstreetmap.org, used under Creative Commons Attribution ShareAlike 2.0 licence CC-BY-SA", fig.align= 'center'}
 
 
 afbox <- bbox <- c(left = -21.22, right = 55.02, top= 17.17, bottom = -37.75)
@@ -75,15 +78,25 @@ The DASSIM (Developing an Antimicrobial Strategy for Sepsis in Malawi) study was
 
 ### Entry Criteria
 
-The study was open for recruitment between 19 February 2017 and 2 October 2018; there were three arms. Firstly, adults with sepsis attending AETC; secondly, adults attending AETC who are antibiotic unexposed and with no plan for antimicrobial administration; and finally antibiotic-unexposed community members. Detailed inclusion ane exclusion criteria for each arm are given shown in Table \@ref(tab:plot-malawi-map)
+The study was open for recruitment between 19 February 2017 and 2 October 2018; there were three arms. Firstly, adults with sepsis attending AETC; secondly, adults attending AETC who are antibiotic unexposed and with no plan for antimicrobial administration; and finally antibiotic-unexposed community members. Detailed inclusion and exclusion criteria for each arm are given shown in Table \@ref(tab:inc-crit). Exlclusion criteria were the same for all arms of the study: Particiapnts were not eligible for enrollment if they were unable to give informed consent and no guardian available to provide proxy consent; they spoke neither English nor Chichewa; or they lived > 30km from Blantyre city.
+
+```{r inc-crit, echo = F, warning= F, tidy = F}
+
+t1 <- read.csv(paste0(wd, "t1_inclusion_criteria.csv"), check.names = F, stringsAsFactors = F)
 
 
-```{r study-inc-crit}
+knitr::kable(t1, format = "latex", booktabs = T, longtable = T, caption = "Study inclusion criteria") %>%
+  kable_styling(full_width = F, latex_options = c("hold_position"))  %>% 
+  column_spec(1, width = "10em") %>%
+  column_spec(2, width = "25em") %>%
+ footnote(general = "AETC = Adult Emergency and Trauma Centre")
+
 
 ```
-### Study Team
 
 ### Study Visits and Patient Sampling
+
+### Study Team
 
 ### Sample size calculations
 

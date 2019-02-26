@@ -17,10 +17,11 @@ biblio-style: apalike
 link-citations: yes
 description: "Joe's thesis. Yikes!"
 header-includes:
-  \usepackage{array}
+   \usepackage{array}
    \usepackage{threeparttable}
    \usepackage{longtable}
    \usepackage{float}
+   \usepackage{booktabs}
 ---
 ---
 ```{r setup, include=FALSE}
