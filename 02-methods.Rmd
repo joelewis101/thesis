@@ -17,7 +17,10 @@ This chapter gives an overview of the clinical study which underpins this thesis
 
 ### Malawi
 
-Malawi is a country of 17.5 million people in South-Eastern Africa (2018 Census, Malawi national statistical office). It is one of the poorest countries in the world: it is a low income country under the World Bank classifcation, with a 2017 Gross National Income (GNI) per capita of \$320 in US dollars, and was ranked 171st of 189 countries in 2017 by the human development index (HDI), a composite statistic of life expectancy, education and income per capita indicators (UNDP human development reports). In 2010, 71% of the population was estimated to survive on less than \$1.90 per day (World Bank). Life expectancy at birth in 2017 was 63 years, and though significant progress is being made, neonatal and under-5 mortality remains high at 23 and 55 per 1000 live births, respectively (world bank). The population is largely rural (83% in 2017, World Bank), with a young population (44% under the age of 15, 2017, World Bank) and high fertility rate (4.6, 2016 data, World Bank). Malaria is endemic, and there is an ongoing generalised HIV epidemic: adult HIV prevalance (age 15-49) was estimated to be 9.6% in 2017 (UNAIDS). It is classed by the WHO as a high-TB/high-HIV burdern country, with an estimated TB incidence rate of 131 (95% CI 70-210) cases per 100000 population per year. It has a subtropcial climate, with three main seasons: a warm wet season from November to April, a cooler dry winter period from May to August and a hot dry period from September to October. Blantyre city, the location of the study in this thesis, is the second city of Malawi with a population of 995000 in 2018 (Malawi ONS). It is located in Blantyre district in the Shire highlands at an altitude of 1000m (Figure \@ref(tab:plot-malawi-map)).
+Malawi is a country of 17.5 million people in South-Eastern Africa (2018 Census, Malawi national statistical office). It is one of the poorest countries in the world: it is a low income country under the World Bank classifcation, with a 2017 Gross National Income (GNI) per capita of \$320 in US dollars, and was ranked 171st of 189 countries in 2017 by the human development index (HDI), a composite statistic of life expectancy, education and income per capita indicators (UNDP human development reports). In 2010, 71% of the population was estimated to survive on less than \$1.90 per day (World Bank). Life expectancy at birth in 2017 was 63 years, and though significant progress is being made, neonatal and under-5 mortality remains high at 23 and 55 per 1000 live births, respectively (world bank). The population is largely rural (83% in 2017, World Bank), with a young population (44% under the age of 15, 2017, World Bank) and high fertility rate (4.6, 2016 data, World Bank). Malaria is endemic, and there is an ongoing generalised HIV epidemic: adult HIV prevalance (age 15-49) was estimated to be 9.6% in 2017 (UNAIDS), though falling from a peak of 16.6% in 1999. HIV antiretroviral therapy (ART) national scale up began in 2004 and in 2017 71% of elibigible adults and children were estimated to be recieveing ART (UNAIDS). It is classed by the WHO as a high-TB/high-HIV burden country, with an estimated TB incidence rate of 131 (95% CI 70-210) cases per 100000 population per year. 
+
+
+It has a subtropcial climate, with three main seasons: a warm wet season from November to April, a cooler dry winter period from May to August and a hot dry period from September to October. Blantyre city, the location of the study in this thesis, is the second city of Malawi with a population of 585000. It is located in Blantyre district, population 995000 in 2018 (Malawi ONS), in the Shire highlands at an altitude of 1000m (Figure \@ref(tab:plot-malawi-map)).
 
 ```{r plot-malawi-map, warning = F,  echo = F, message = F, fig.cap = "Malawi, showing administrative boundaries (North, Central, and South regions), Lilongwe, the capital city and Blantyre, the study location. Source: openstreetmap.org, used under Creative Commons Attribution ShareAlike 2.0 licence CC-BY-SA"}
 
@@ -51,11 +54,26 @@ ggmap(m2) +
 
 ### Queen Elizabeth Central Hospital
 
+Queen Elizabeth Central Hospital (QECH), located in Blantyre city, is the tertiary referral hospital for the Southern Region of Malawi. It has 1300 beds but often operates above capacity, and is the only site providing free inpatient healthcare to the adult population of Blantyre district. Since 2011 it has had a dedicated emergency department for adults, the Adult Emergency and Trauma Centre, staffed 24 hours a day. Since 2015 (and for the whole of the study period), attendees to the AETC must be referred from a primary health clinic. Adults attending the AETC are triaged by a nurse and then reviewed by a doctor or clinical officer; if admission under a specialty team (including medicine) is deemed appropriate then a patient will be reviewed by an intern or registrar from the admitting specialty and usually by a consultant within 24 hours. There is a 6-bed AETC resusitation area in which oxygen concentrators, cardiac monitors and a defibrillator are available; none of these items are available in the rest of the AETC. 
+
+There are two dedicated single-sex medical wards, each of approximately 60 beds, and one mixed-sex TB ward. Male and female high-dependency units (HDUs), each with a capacity of six beds, have oxygen concentrators (or, if available, oxygen cylinders) to deliver supplemental oxygen. The medical wards are staffed by two or three trained nurses and a variable number of nursing students. Basic nursing care is usually provided by a patients relative or friend, called a 'guardian.' Patients on the medical wards are reviewed twice-weekly by a consultant physician and then variably at other times by junior doctors, clinical officers or medical students depending on the availability of staff. Malawi national treatment guidelines suggest ceftriaxone for the treatment of sepsis requiring hospitalisation. 
+
+
 ### Participating Laboratories
+
+#### Malawi-Liverpool-Wellcome Clinical Research Programme
+
+The Malawi-Liverpool Wellcome Trust Clinical Research Programme was established in 1995 and since them has been active in researching priority health issues in Malawi. It is an affiliate of the Malawi College of Medicine, and is based in the grounds of QECH in Blantyre. It runs an on-site microbiology laboratory which has provided an aerobic blood culture service to QECH since 1998, and also provides CSF microscopy and culture. Bacterial culture is carried out as per British Society of Antimicrobial Chemotherapy (BSAC) guidelines and the laboratory adheres to UK NEQAS external quality control. It is core funded by the Wellcome Trust.
+
+#### Wellcome Trust Sanger Institute
+
+The Wellcome Sanger Institute is a research institute based in Hinxton, UK, which was established in 1993, and undertakes research in all aspects of genomics including bacterial genomics as part of the parasite and microbes programme. It has one of the largest DNA sequencing facilities in the world as well as high performace computing clusters. It is funded by the Wellcome Trust.
 
 ## Clinical Study
 
 ### Summary
+
+
 
 ### Entry Criteria
 
