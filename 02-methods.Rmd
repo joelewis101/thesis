@@ -22,7 +22,7 @@ Malawi is a country of 17.5 million people in South-Eastern Africa (2018 Census,
 
 It has a subtropcial climate, with three main seasons: a warm wet season from November to April, a cooler dry winter period from May to August and a hot dry period from September to October. Blantyre city, the location of the study in this thesis, is the second city of Malawi with a population of 585000. It is located in Blantyre district, population 995000 in 2018 (Malawi ONS), in the Shire highlands at an altitude of 1000m (Figure \@ref(tab:plot-malawi-map)).
 
-```{r plot-malawi-map, warning = F,  echo = F, message = F, fig.cap = "Malawi, showing administrative boundaries (North, Central, and South regions), Lilongwe, the capital city and Blantyre, the study location. Source: openstreetmap.org, used under Creative Commons Attribution ShareAlike 2.0 licence CC-BY-SA"}
+```{r plot-malawi-map, warning = F,  echo = F, message = F, fig.scap="Map of study site", out.extra='', fig.cap = "Malawi, showing administrative boundaries (North, Central, and South regions), Lilongwe, the capital city and Blantyre, the study location. Source: openstreetmap.org, used under Creative Commons Attribution ShareAlike 2.0 licence CC-BY-SA"}
 
 
 afbox <- bbox <- c(left = -21.22, right = 55.02, top= 17.17, bottom = -37.75)
@@ -71,15 +71,21 @@ The Wellcome Sanger Institute is a research institute based in Hinxton, UK, whic
 
 ## Clinical Study
 
-### Summary
-
-
+The DASSIM (Developing an Antimicrobial Strategy for Sepsis in Malawi) study was an observational cohort study, recruiting from the AETC at QECH with two broad aims: firstly, to describe the presentation, aetiology and determinents of outcome in sepsis in Malawi; and secondly to determinents of carriage of ESBL-E in sepsis survivors.
 
 ### Entry Criteria
 
+The study was open for recruitment between 19 February 2017 and 2 October 2018; there were three arms. Firstly, adults with sepsis attending AETC; secondly, adults attending AETC who are antibiotic unexposed and with no plan for antimicrobial administration; and finally antibiotic-unexposed community members. Detailed inclusion ane exclusion criteria for each arm are given shown in Table \@ref(tab:plot-malawi-map)
+
+
+```{r study-inc-crit}
+
+```
 ### Study Team
 
 ### Study Visits and Patient Sampling
+
+### Sample size calculations
 
 ## Diagnostic Laboratory Procedures
 
