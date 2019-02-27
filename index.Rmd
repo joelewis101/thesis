@@ -7,7 +7,7 @@ subtitle:  |
   | 
   | August 2019
 output: bookdown::gitbook
-linestretch: 1.5
+linestretch: 1
 lof: yes
 lot: yes
 documentclass: book

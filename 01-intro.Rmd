@@ -22,7 +22,7 @@
 
 
 #
-wd <- "/Users/joelewis/Documents/PhD/Thesis/bookdown"
+wd <- "/Users/joelewis/Documents/PhD/Thesis/bookdown/chapter_1/"
 
 # and packages
 library(plyr)
@@ -57,7 +57,7 @@ A review of the literature was undertaken to identify prospective cohort, case c
 In order to put sepsis aetiology data in context, systematic searches of the Pubmed and Scopus databases for leptospirosis, brucellosis, Q fever, Rickettsioses, arboviruses (dengue, or chikungunya) and histoplasmosis prevalence in unselected sepsis or fever cohorts in sSA were undertaken. Because a recent systematic review has examined these pathogens up to 2013 (see “sepsis aetiology” below), the date of these searches were restricted the 2014 to the present. Any studies examining disease prevalence in cohorts of febrile adults or children were included; outbreaks were excluded. Studies where the inclusion criteria were not clear (including those with, for example, “suspected leptospirosis” with no further details) were excluded. Finally, systematic searches of Pneumocystis Jiroveci pneumonia (PCP) were made using the search terms below; because a recent systematic review has examined the role of PCP up to 2015, the date on this search was restricted to 2015 or later. Table \@ref(tab:fever-searches) shows the search terms, number of of hits and number of included studies after full text review: nine studies provided data on Leptospirosis[@Zida2018; @Guillebaud2018; @Maze2018; @Gadia2017; @Hagen2018; @Biscornet2017; @Dreyfus2016; @Hercik2017; @Chipwaza2014], seven on Brucellosis[@Cash-Goldwasser2018; @Gafirita2017; @Boone2017; @DeGlanville2017; @Njeru2016a; @Chipwaza2015; @Feleke2015], seven on Q-fever[@Hercik2017; @Boone2017; @Amoako2018; @Njeru2016; @Mourembou2016; Maina2016; @Angelakis2014] , six on Rickettsioses[@Hercik2017; @Amoako2018; @Maina2016; @Sothmann2017; @Elfving2016; @Mourembou2015], eighteen on Dengue[@Guillebaud2018; @Gadia2017; @Hercik2017; @Chipwaza2014; @Amoako2018; @Elfving2016; @Vu2017; @Waggoner2017; @Kolawole2017; @Nasir2017; @Ngoi2016; @Onoja2016; @Kajeguka2016; @Sow2016; @Kayiwa2018; @Makiala-Mandanda2018; @Muianga2018; @Mugabe2018 ], thirteen on Chikingunya[@Gadia2017; @Chipwaza2014; @Elfving2016;@Waggoner2017; @Ngoi2016; @Kajeguka2016;@Kayiwa2018; @Makiala-Mandanda2018; @Muianga2018; @Mugabe2018; @Antonio2018; @Sow2018; @Olajiga2017 ], three on Zika [@Sow2016; @Kayiwa2018; @Makiala-Mandanda2018], two on Histoplasmosis[@Bahr2016; @Mandengue2015] and none on PCP. Details of the included studies are provided below.
 ```{r fever-searches, tidy = F, echo = F}
 
-t2 <- read.csv(paste0(wd, "/chapter_one/t2_fever_search_terms.csv"))
+t2 <- read.csv(paste0(wd, "t2_fever_search_terms.csv"))
 knitr::kable(t2, output, booktabs = T, longtable = T, caption = "Fever studies") %>%
   kable_styling(full_width = F)  %>%
   column_spec(2, width = "15em") %>% column_spec(4, width = "8em") %>%
@@ -74,7 +74,7 @@ Mindful that the SOFA score requires a large number of variables and is difficul
 
 Finally, sepsis-3 defines septic shock as persistent hypotension requiring vasopressors to maintain mean arterial blood pressure (MAP) above 65mmHg and serum lactate greater than 2mmol /L. This definition was arrived at by a combination of consensus and systematic review to identify potential defining variables and validation in large datasets from the United States, where it was found to be strongly associated with mortality[@Shankar-Hari2016].
 ```{r sepsis-diag-criteria, tidy = F, echo = F}
-t3 <- read.csv(paste0(wd, "/chapter_one/t3_sepsis_diagnostic_criteria.csv"))
+t3 <- read.csv(paste0(wd, "t3_sepsis_diagnostic_criteria.csv"))
 
 knitr::kable(t3, output, booktabs = T, caption = "Sepsis diagnostic criteria") %>%
   kable_styling(full_width = F, latex_options = c("hold_position"))  %>%
@@ -98,7 +98,7 @@ Though equivalent studies aiming to identify risk factors for sepsis in adults i
 These data contrast sharply with the sepsis population in high income settings, from whom the majority of sepsis data have been generated, and who are older and mostly HIV uninfected[@Angus2001; @Seymour2017; @PRISMInvestigators2017]. The need for data from sSA to guide sepsis treatment protocols, rather than extrapolating from the high-income setting sepsis population, is clear. 
 ```{r sepsis-studies-popn, tidy = F, echo = F}
 
-t6 <- read.csv(paste0(wd, "/chapter_one/t6_sepsis_popn.csv"), check.names = F)
+t6 <- read.csv(paste0(wd, "t6_sepsis_popn.csv"), check.names = F)
 
 knitr::kable(t6, output, booktabs = T, caption = "Characteristics of patients recruited to sSA sepsis studies") %>%
   kable_styling(full_width = F) %>% 
@@ -173,7 +173,7 @@ In the longer term, sepsis mortality continues to rise after the usual sepsis-st
 The 11 identified prospective sepsis studies in sSA carried out various combinations of diagnostic testing for malaria (either microscopy or rapid diagnostic test) and aerobic and mycobacterial blood culture; a summary is shown in Table \@ref(tab:sepsis-review-aetiology) and \@ref(tab:sepsis-bsi-isolates) below. The commonest bloodstream infection (BSI) in all studies where mycobacterial blood cultures were carried out was tuberculosis – present in a higher proportion than of all BSI isolates from aerobic culture combined -  though it is important to note that mycobacterial blood cultures in most studies were carried out in HIV infected people and bacteraemic tuberculosis is almost exclusively HIV-associated. The importance of bacteraemic tuberculosis as a cause of sepsis is further examined in an individual patient data meta analysis in chapter 3. With the exception of one study, malaria was less common than BSI, highlighting the importance of non-malarial fever in sSA as malaria control efforts reduce the burden of malaria.
 ```{r sepsis-review-aetiology,  echo = F, warning = F, tidy = F}
 
-t7 <- read.csv(paste0(wd, "/chapter_one/t7_sepsis_aetiology.csv"), check.names = F)
+t7 <- read.csv(paste0(wd, "t7_sepsis_aetiology.csv"), check.names = F)
 
 knitr::kable(t7, output, booktabs = T, caption = "Aetiology of sepsis in sSA") %>%
   kable_styling(full_width = F) %>% 
@@ -182,7 +182,7 @@ knitr::kable(t7, output, booktabs = T, caption = "Aetiology of sepsis in sSA") %
 ```
 ```{r sepsis-bsi-isolates,  echo = F, warning = F, tidy = F}
 
-t8 <- read.csv(paste0(wd, "/chapter_one/t8_bsi_isolates.csv"), check.names = F)
+t8 <- read.csv(paste0(wd, "t8_bsi_isolates.csv"), check.names = F)
 
 knitr::kable(t8, output, booktabs = T, caption = "BSI isolates in sepsis in sSA") %>%
   kable_styling(full_width = F) %>% 
@@ -215,7 +215,7 @@ The cornerstone of sepsis management is rapid administration of appropriate anti
 The surviving sepsis campaign has published four editions of comprehensive guidance on the management of sepsis in adults, which are endorsed by all the major critical care organisation in high income settings and form the basis of most sepsis care in high income settings; selected major recommendations of the latest guidance[@Rhodes2017] are shown in Table \@ref(tab:ssc-guidelines)  below.
 ```{r ssc-guidelines, echo = F, warning = F, tidy= F}
 
-t10 <- read.csv(paste0(wd, "/chapter_one/t10_SSC_guidelines.csv"), check.names = F)
+t10 <- read.csv(paste0(wd, "t10_SSC_guidelines.csv"), check.names = F)
 
 knitr::kable(t10, output, booktabs = T, caption = "Surviving sepsis campaign guidelines") %>%
  # kable_styling(full_width = F, latex_options = "repeat_header") %>% 
@@ -229,7 +229,7 @@ knitr::kable(t10, output, booktabs = T, caption = "Surviving sepsis campaign gui
 ```
 Mindful that guidelines aimed at high-income settings may be impossible to implement in low-resource settings (including large areas of sSA) the Global Intensive Care Working Group of the European Society of Intensive Care Medicine (ESICM) published recommendations for sepsis management in resource-limited settings in 2012[@Dunser2012], endorsed by a number of national and international sepsis organisations, and supplements in 2016-17 covering general supportive care[@Mer2017], infection management[@Thwaites2016], management of severe malaria and severe dengue[@Dunser2012] and haemodynamic assessment and support[@Misango2017] in sepsis in low-resource settings. The major recommendations of this guidance are consolidated in Table \@ref(tab:ssc-guidelines-low-resource) below.
 ```{r ssc-guidelines-low-resource, echo = F, warning = F, tidy= F}
-t11 <- read.csv(paste0(wd, "/chapter_one/t11_SSC_guidelines_low_resource.csv"), check.names = F)
+t11 <- read.csv(paste0(wd, "t11_SSC_guidelines_low_resource.csv"), check.names = F)
 
 knitr::kable(t11, output, booktabs = T, caption = "ESICM low resource setting sepsis recommendations") %>%
  # kable_styling(full_width = F, latex_options = "repeat_header") %>% 
@@ -283,7 +283,7 @@ Beta-lactamases are enzymes that hydrolyse the active beta lactam ring in beta l
 
 Two classification schemes are usually used for ESBL: the molecular (or structural) classification of Ambler[@Ambler1980], or the Bush-Jacoby-Medeiros functional classification[@Bush2010] (Table \@ref(tab:esbl-definitions)). Molecular classification is straightforward and depends on protein homology; class A, C and D enzymes are serine beta-lactamases and class B are metallo-beta lactamases, named for the composition of their active site. The functional classification is complex and clusters enzymes into four groups, with a number of subgroups, based on substrates and the effect of beta-lactamase inhibitors and EDTA: class 1 (corresponding to Ambler class C) are cephalosporinases that are not inhibited by clavulanic acid, and includes the AmpC enzymes of the Enterobacteriaceae; class 2 enzymes are beta lactamases that are largely inhibited by clavulanic acid and belong to Ambler class A or C; and class 3 are the metallo-beta-lactamases corresponding to Ambler class B. Class 4 enzymes are penicillinases which are not inhibited by clavulanic acid, though are of limited significance and not included in Table 14. The vast majority of clinically relevant ESBLs (and all of those defined as above) belong to Ambler class A, functional class 2be.
 ```{r esbl-definitions, echo = F, warning = F, tidy= F}
-t12 <- read.csv(paste0(wd, "/chapter_one/t12_ESBL_classification.csv"), check.names = F)
+t12 <- read.csv(paste0(wd, "t12_ESBL_classification.csv"), check.names = F)
 
 knitr::kable(t12, output, booktabs = T, caption = "ESBL classification. Adapted from Bush (2010)") %>%
   kable_styling(full_width = F, latex_options = c("repeat_header","HOLD_position")) %>% 
@@ -871,7 +871,7 @@ Chapter 2 (methods) presents the clinical study that forms the basis of the rest
 ## Appendix
 
 ```{r SOFA, tidy = F, echo = F}
-t4 <- read.csv(paste0(wd, "/chapter_one/t4_sofa.csv"), check.names = F)
+t4 <- read.csv(paste0(wd, "t4_sofa.csv"), check.names = F)
 
 knitr::kable(t4, output, booktabs = T, caption = "Sequential organ failure assessment (SOFA) score") %>%
   kable_styling(full_width = F, latex_options = c("HOLD_position")) %>% 
@@ -894,7 +894,7 @@ knitr::kable(t4, output, booktabs = T, caption = "Sequential organ failure asses
 ```
 ```{r fever-study-review, echo = F, warning= F}
 
-t9 <- read.csv(paste0(wd, "/chapter_one/t9_fever_studies.csv"), check.names = F)
+t9 <- read.csv(paste0(wd, "t9_fever_studies.csv"), check.names = F)
 
 knitr::kable(t9, output, booktabs = T,longtable = T, caption = "Selected causes of fever in sSA since 2013") %>%
   kable_styling(full_width = F, latex_options = c("repeat_header")) %>% 
@@ -918,7 +918,7 @@ knitr::kable(t9, output, booktabs = T,longtable = T, caption = "Selected causes 
 ```
 ```{r esbl-ssa-invasive-studies, tidy = F, echo = F,warning= F}
 
-t13 <- read.csv(paste0(wd, "/chapter_one/t13_ssa_invasive_ESBL_results.csv"), check.names = F)
+t13 <- read.csv(paste0(wd, "t13_ssa_invasive_ESBL_results.csv"), check.names = F)
 
 # 
 
