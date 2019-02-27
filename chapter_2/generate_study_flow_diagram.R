@@ -44,7 +44,7 @@ f -> g -> h -> i -> j
 
 subgraph cluster_arm_1 {
 label = 'Arm 1: Hospital inpatients, sepsis'
-a[label = 'Enrollment \n Blood \n Stool \n Urine >']
+a[label = 'Enrollment \n Blood \n Stool \n Urine']
 b[label = 'Week 1 \n Stool']
 c[label = 'Week 4 \n Blood \n Stool']
 d[label = 'Week 12 \n Stool']

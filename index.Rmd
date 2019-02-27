@@ -22,6 +22,7 @@ header-includes:
    \usepackage{longtable}
    \usepackage{float}
    \usepackage{booktabs}
+   \raggedbottom
 ---
 ---
 ```{r setup, include=FALSE}
