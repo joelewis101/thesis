@@ -1,8 +1,0 @@
-﻿Organism,Search,n_abstracts,n_included
-Leprospirosis,Leptospir AND,187,9
-Brucellosis,Brucell AND,123,7
-Q-fever,((Q fever) OR (coxiella)) AND,315,7
-Rickettsioses,(Ricketts OR typhus OR (spotted fever)) AND,375,6
-Arboviruses,(dengue OR chikungunya OR arbovir) AND ,1422,"Dengue 18, Chikungunya 13, Zika 3"
-Histoplasmosis,Histoplasm AND ,72,2
-PCP,"(((((PCP) OR pneumocystis) OR ""pneumocystis carini*"") OR ""pneumocystis jiroveci"")) AND ",87,0
