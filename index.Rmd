@@ -6,8 +6,9 @@ subtitle:  |
   | Thesis submitted in accordance with the requirements of the Liverpool School of Tropical Medicine for the degree of Doctor in Philosophy by Joseph Michael Lewis
   | 
   | August 2019
-output: bookdown::gitbook
+output: bookdown::pdf_book
 linestretch: 1
+geometry: "left=3cm, right=3cm, top=2.5cm, bottom=2.5cm"
 lof: yes
 lot: yes
 documentclass: book
