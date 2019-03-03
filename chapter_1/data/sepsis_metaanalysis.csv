@@ -1,0 +1,20 @@
+﻿Study,Year,Country,Type,n,male,median_age,HIV_prop,median_cd4,prop_ART,n_mort_IP,e_mort_IP,n_mort_30d,e_mort_30d
+Jacob 2009,2006,Uganda,Severe sepsis,382,0.41,34.8,0.85,52,0.12,380,90,338,192
+Jacob 2012 (before),2006,Uganda,Severe sepsis,245,0.39,34,0.86,43,0.13,NA,NA,227,104
+Jacob 2012 (after),2008,Uganda,Severe sepsis,426,0.49,34,0.85,63,0.235,NA,NA,389,128
+Wait 2015,2008,Malawi,Sepsis,213,0.46,30,0.83,NA,0.435,213,46,NA,NA
+Wait 2015,2008,Malawi,Severe sepsis,32,0.34,33,0.81,NA,0.46,32,16,NA,NA
+Ssekitoleko 2011 (1) ,2009,Uganda,Sepsis,96,0.46,35.1,0.83,NA,NA,96,40,NA,NA
+Ssekitoleko 2011 (2) ,2009,Uganda,Sepsis,150,0.63,35,0.64,NA,0.22,150,45,NA,NA
+Ssekitoleko 2011 (2) ,2009,Uganda,Severe sepsis,98,NA,NA,NA,NA,NA,98,40,NA,NA
+Chimese 2012,2010,Zambia,Sepsis,161,0.53,35,0.81,NA,,161,65,NA,NA
+Andrews 2014 (usual care),2012,Zambia,Severe sepsis,56,0.54,35,0.82,70,0.35,56,34,49,37
+Andrews 2014 (intervention),2012,Zambia,Severe sepsis,53,0.53,35,0.79,40,0.43,53,35,54,38
+Auma 2013,2012,Uganda,Sepsis,216,0.49,35,0.56,NA,0.36,216,42,NA,NA
+Andrews 2017 (usual care),2012,Zambia,Severe sepsis,103,0.53,35,0.9,65,0.49,103,34,97,44
+Andrews 2017 (intervention),2012,Zambia,Severe sepsis,106,0.58,38,0.89,72,0.53,106,51,97,65
+Huson 2014,2012,Gabon,Sepsis,384,0.37,34,0.2,168,0.27,382,16,NA,NA
+Amir 2016,2014,Uganda,Severe sepsis,218,0.5,35,0.57,78,0.66,218,70,NA,NA
+Rudd 2017,2013,Uganda,Sepsis,20,0.55,36.5,0.3,NA,NA,20,2,NA,NA
+Seboxa 2015,2012,Ethiopia,Sepsis,292,0.52,27,0.19,169,NA,292,44,NA,NA
+Nadjm 2015,2007,Tanzania,Severe febrile illness,222,0.3,36.5,0.38,NA,NA,198,22,NA,NA

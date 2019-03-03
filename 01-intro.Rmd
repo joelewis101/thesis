@@ -123,7 +123,8 @@ It is clear that there is significant heterogeneity in outcomes of sepsis and se
 ```{r sepsis-outcome-forest-setup, include = F, warning = F}
 
 
-dfin <- read.csv("/Users/joelewis/Documents/PhD/lit_rev/sepsis_metaanalysis.csv")
+dfin <- read.csv(paste0(wd, "data/sepsis_metaanalysis.csv"))
+
 
 dfin$n.mort <- dfin$n_mort_30d
 dfin$e.mort <- dfin$e_mort_30d
@@ -320,8 +321,8 @@ Though less comprehensive, data from middle income countries suggests that preva
 ### get EU wide estimates of cef R from country data
 ###
 
-df <- read.csv("/Users/joelewis/Documents/PhD/R/PhD/esbl_lit_review/ECDC__3gc_esco.csv", stringsAsFactors = F)
-df <- rbind(df, read.csv("/Users/joelewis/Documents/PhD/R/PhD/esbl_lit_review/ECDC_3gc_klpn.csv", stringsAsFactors = F))
+df <- read.csv(paste0(wd, "data/ECDC__3gc_esco.csv"), stringsAsFactors = F)
+df <- rbind(df, read.csv(paste0(wd,"/data/ECDC_3gc_klpn.csv"), stringsAsFactors = F))
 
 df %>% filter(Indicator == "Non-susceptible (I and R) isolates" | Indicator == "Total tested isolates") %>% 
   group_by(Time, Population, Indicator) %>%
@@ -347,7 +348,7 @@ df$area <- "EU"
 
 #ggplot(df, aes(x= Time, y = prop, colour = area)) + geom_point() + geom_line() + facet_wrap(~organism)
 
-df2 <- read.csv("/Users/joelewis/Documents/PhD/R/PhD/esbl_lit_review/cddep_country_3gc.csv", stringsAsFactors = F)
+df2 <- read.csv(paste0(wd,"data/cddep_country_3gc.csv"), stringsAsFactors = F)
 
 rbind(select(df, Time, organism, area, prop), df2) -> df
 rm(df2)  
@@ -404,7 +405,7 @@ africa = World %>%
 
 ##
 
-df <- read.csv("/Users/joelewis/Documents/PhD/Thesis/lit_rev/esbl/ESBL_studies.csv", stringsAsFactors = F)
+df <- read.csv(paste0(wd, "data/ESBL_studies.csv"), stringsAsFactors = F)
 
 df <- subset(df, Include == "Y")
 df$carriage_n_patients[df$study_id == 91] <- 244
