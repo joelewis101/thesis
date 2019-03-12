@@ -1,1 +1,37 @@
 # Sepsis presentation, treatment, aetiology and outcome in Blantyre, Malawi
+ 
+## Chapter overview
+
+## Methods
+
+## Study population
+
+Figure - Consort diagram
+
+Table - demographics
+
+Table - presentation
+
+Table - health seeking behaviour
+
+## Aetiology
+
+Table
+
+Figure to show crossover
+
+## Treatment
+
+Table:
+Time to antimicrobials
+Time to fluid
+Amount of fluid
+
+## Outcome
+
+Table - 28 and 90 day mortality
+
+Figure - KM survival curve
+
+Logistic regression - determinants of 28 day mortality
+
