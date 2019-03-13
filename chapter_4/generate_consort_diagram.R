@@ -273,7 +273,7 @@ d180.died <- paste0("Died \n  n = ",
 
 
 export_svg(grViz(diagram =" digraph {
-  graph [fontsize=10]
+  graph [fontsize=12]
       node [shape=box, width = 2, fontname = Arial] 
   Screened[pos='1,1',pin=true,label = 'Participants Screened \n n = xxx']
   Screened -> A[arrowhead='none']
