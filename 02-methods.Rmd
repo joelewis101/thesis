@@ -11,6 +11,9 @@ library(ggmap)
 wd <- "/Users/joelewis/Documents/PhD/Thesis/bookdown/chapter_2/"
 output = "latex"
 
+# generate figures
+source("chapter_2/generate_study_flow_diagram.R")
+
 ```
 ## Chapter Overview
 
@@ -122,7 +125,7 @@ The decision to collect sputum for Xpert testing for tuberculosis or to perform 
 
 ```{r study-sampl-flow-diag, echo = F, warning = F, fig.scap="Overview of patient sampling schedule", out.extra='', fig.cap= "Overview of patient sampling schedule.FBC = Full blood count, U\\&E = Urea and elctrolytes, mRDT = Malaria rapid diagnostic test, uLAM = Urinary LAM, FASH USS = Focussed assessment for HIV-associated tubercusosis ultrasound scan", fig.align= "center", out.width= "400px"}
 
-knitr::include_graphics(paste0(wd, "/figures/study_flow_diagram.png"))
+knitr::include_graphics(paste0(wd, "/figures/study_flow_diagram.pdf"))
 
 ```
 
