@@ -324,10 +324,10 @@ Though less comprehensive, data from middle income countries suggests that preva
 df <- read.csv(paste0(wd, "data/ECDC__3gc_esco.csv"), stringsAsFactors = F)
 df <- rbind(df, read.csv(paste0(wd,"/data/ECDC_3gc_klpn.csv"), stringsAsFactors = F))
 
-df %>% filter(Indicator == "Non-susceptible (I and R) isolates" | Indicator == "Total tested isolates") %>% 
-  group_by(Time, Population, Indicator) %>%
-  summarise(n = sum(as.numeric(NumValue))) %>%
-  group_by(Population, Time) -> df
+df %>% dplyr::filter(Indicator == "Non-susceptible (I and R) isolates" | Indicator == "Total tested isolates") %>% 
+  dplyr::group_by(Time, Population, Indicator) %>%
+  dplyr::summarise(n = sum(as.numeric(NumValue))) %>%
+  dplyr::group_by(Population, Time) -> df
 
 
 res <- df %>% filter(Indicator == "Non-susceptible (I and R) isolates")
@@ -432,7 +432,7 @@ invasive$country[grepl("entral",  invasive$country)] <- "Central African Rep."
 invasive$country[grepl("of congo",  invasive$country)] <- "Dem. Rep. Congo"
 invasive$country[grepl("Sierra",  invasive$country)] <- "Sierra Leone"
 
-n_studies <- invasive %>% group_by(country) %>% summarise(n = length(country))
+n_studies <- invasive %>% dplyr::group_by(country) %>% dplyr::summarise(n = length(country))
 names(n_studies)[1] <- "name"
 n_studies$name <- as.factor(n_studies$name)
 africa <- left_join(africa, n_studies, by = "name")
@@ -668,7 +668,7 @@ geneplot$organism[grepl( "klpn", geneplot$variable)] <- "K. pneumoniae"
 geneplot$variable <- sub("_esco", "", geneplot$variable)
 geneplot$variable <- sub("_klpn", "", geneplot$variable)
 
-geneplot %>% group_by(variable, organism) %>% summarise(n = sum(value)) -> gp
+geneplot %>% dplyr::group_by(variable, organism) %>% dplyr::summarise(n = sum(value)) -> gp
 
 
 gp$variable[gp$variable == "anyCTXM"] <- "CTX-M not specified"
@@ -751,7 +751,7 @@ africa = World %>%
 
 h <- unique(select(human_carriage, study_id, country))
 
-n_studies <- h %>% group_by(country) %>% summarise(n = length(country))
+n_studies <- h %>% dplyr::group_by(country) %>% dplyr::summarise(n = length(country))
 
 
 
@@ -812,7 +812,7 @@ geneplot$organism[grepl( "klpn", geneplot$variable)] <- "K. pneumoniae"
 geneplot$variable <- sub("_esco", "", geneplot$variable)
 geneplot$variable <- sub("_klpn", "", geneplot$variable)
 
-geneplot %>% group_by(variable, organism) %>% summarise(n = sum(value)) -> gp
+geneplot %>% dplyr::group_by(variable, organism) %>% dplyr::summarise(n = sum(value)) -> gp
 
 
 gp$variable[gp$variable == "anyCTXM"] <- "CTX-M not specified"
