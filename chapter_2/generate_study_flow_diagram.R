@@ -1,8 +1,9 @@
 library(DiagrammeR)
+library(DiagrammeRsvg) #Needed if you want to export the image
+library(rsvg) #Needed if you want to export the image
 
 
-
-DiagrammeR::grViz("digraph {
+export_svg(DiagrammeR::grViz("digraph {
   
 graph[compound = true, layout = dot, rankdir = LR, color = black, style = dashed, fontname= Arial, fontsize = 18]
 
@@ -60,8 +61,11 @@ a -> b -> c -> d -> e
 
 
 
-}") 
+}") ) ->sv
 
+
+writeLines(sv, "chapter_2/figures/study_flow_diagram.svg")
+rsvg_pdf("chapter_2/figures/study_flow_diagram.svg", "chapter_2/figures/study_flow_diagram.pdf", width = 620, height = 519)
 
 # export 620 x 519
 # study_flow_diagram
