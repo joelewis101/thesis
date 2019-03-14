@@ -1,1 +1,1 @@
-# _Mycobacterium tuberculosis_ bloodstream infection: an individual patient level meta analysis
+# _Mycobacterium tuberculosis_ BSI: an IPD meta analysis
