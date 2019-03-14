@@ -1,10 +1,37 @@
-# Sepsis presentation, treatment, aetiology and outcome in Blantyre, Malawi
+# Sepsis in Blantyre, Malawi
  
+```{r ch4-setup, include = F}
+
+library(plyr)
+library(dplyr)
+library(ggplot2)
+library(tmap)
+library(ggmap)
+
+wd <- "chapter_4/"
+output = "latex"
+
+# generate figures
+source("chapter_4/generate_consort_diagram.R")
+
+```
+
 ## Chapter overview
 
 ## Methods
 
+blah blah
+
+
+
 ## Study population
+
+
+```{r consort-diag, echo = F, fig.cap = "Study recruitment and follow up."}
+
+knitr::include_graphics(paste0(wd, "/figures/consort_diagram.pdf"))
+
+```
 
 Figure - Consort diagram
 

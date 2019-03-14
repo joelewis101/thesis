@@ -1,14 +1,12 @@
 ### generate consort diagram
 
 library(DiagrammeR)
-library(DiagrammeR)
+
 library(DiagrammeRsvg) #Needed if you want to export the image
 library(rsvg) #Needed if you want to export the image
 library(reshape2)
 
-## get data
-
-
+# functions to remove duplicates
 
 remove_dups <- function(df) {
   df[order(df$hospoutcomedate),]
@@ -33,18 +31,8 @@ library(dplyr)
 enroll <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/dassim_enrolment_raw.csv", stringsAsFactors = F)
 followup <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/dassim_followup_raw.csv", stringsAsFactors = F)
 outcome <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/dassim_outcome_raw.csv", stringsAsFactors = F)
-
 withd <- read.csv("/Users/joelewis/Documents/PhD/datasets/withdrawals/withdrawals_clean.csv", header = TRUE, stringsAsFactors = FALSE)
 
-# how do we deal with two outcome entries?
-
-# set death date to data date if no death date
-
-# put the earliest into the visit dataframe
-# then add back in any deaths - the earliest if ther are more than 1
-# (you can go from alive to dead but not vice-versa)
-
-#
 
 outcome$hospoutcomedate <- as.Date(outcome$hospoutcomedate, "%d%b%Y")
 outcome$data_date<- as.Date(outcome$data_date, "%d%b%Y")
@@ -58,8 +46,6 @@ two_oc <- subset(two_oc, n_died > 0 & n != n_died)
 extra_deaths <- subset(outcome, hospoutcome == 3 & pid %in% two_oc$pid)
 ddply(extra_deaths, "pid", remove_dups) -> extra_deaths
 outcome <- ddply(outcome, "pid", remove_dups) 
-
-
 
 # chop out rubbish
 
@@ -85,7 +71,6 @@ outcome$hospoutcome[outcome$hospoutcome == 3] <- "Died"
 outcome$hospoutcome[outcome$hospoutcome == 1] <- "Discharge"
 outcome$hospoutcome[outcome$hospoutcome == 2] <- "Discharge"
 names(enroll)[names(enroll) == "data_date"] <- "enrolled"
-
 enroll$pid[enroll$pid == "DAS1437K" & enroll$arm == 3] <- "TEMP1"
 enroll$pid[enroll$pid == "DAS1436M" & enroll$arm == 3] <- "TEMP2"
 
@@ -95,26 +80,17 @@ enroll$pid[enroll$pid == "DAS1436M" & enroll$arm == 3] <- "TEMP2"
 source("/Users/joelewis/Documents/PhD/R/PhD/followup/correct_mislabelled_fu.R")
 
 followup$d2visit[is.na(followup$d2visit)] <- 2
-
-# add extra_deaths back into followup
-
 names(enroll)[names(enroll) == "enrolled"] <- "data_date"
 enroll$d2visit <- 0
 enroll$foutcome<- "Alive"
-## graph
+
 
 allfu <- rbind(select(enroll, -arm), select(followup, -d2visitndeathdate))
-
 allfu <- unique(select(allfu, -foutcome))
 
-#subset(allfu, !(pid == "DAS14870" & data_date == "2018-06-20")) -> allfu
-
 ddply(allfu, c("pid", "d2visit"), remove_dups_data_date) -> allfu
-
 as.character(allfu$data_date) -> allfu$data_date
-
 dcast(allfu, pid ~ d2visit, value.var = "data_date") -> fu.matrix
-
 as.Date(fu.matrix$`0`) -> fu.matrix$`0`
 as.Date(fu.matrix$`1`) -> fu.matrix$`1`
 as.Date(fu.matrix$`2`) -> fu.matrix$`2`
@@ -125,7 +101,6 @@ as.Date(fu.matrix$`4`) -> fu.matrix$`4`
 
 died <- subset(outcome, hospoutcome == "Died")
 names(died) <- c("pid","outcome","outcome_date")
-
 fu.died <- subset(followup, foutcome == "Died")
 fu.died <- select(fu.died, pid, foutcome, d2visitndeathdate)
 names(fu.died) <- c("pid","outcome","outcome_date")
@@ -145,38 +120,28 @@ withd$outcome <- NA
 withd$outcome[withd$ltfu] <- "LTFU"
 withd$outcome[withd$withd] <- "Withdrew"
 withd$outcome[withd$transfer_out] <- "Transfer out"
-
 withd <- select(withd, pid, outcome, withdrawal_date)
 names(withd) <- c("pid","outcome","outcome_date")
 
 died <- rbind(died, withd)
-
 died <- unique(died)
 
-
+# rem dups
 died <- ddply(died, "pid", remove_dups_died)
-
 merge(fu.matrix, died, all.x = T) -> fu.matrix
-
 merge(fu.matrix, select(enroll, pid,arm), all.x= T) -> fu.matrix
-
 fu.matrix <- subset(fu.matrix, arm != 4)
-
 fu.matrix$outcome[is.na(fu.matrix$outcome) & !is.na(fu.matrix$`4`)] <- 'completed'
 fu.matrix$outcome[is.na(fu.matrix$outcome)] <- 'followup ongoing'
-
 as.Date(fu.matrix$`0`) -> fu.matrix$`0`
 as.Date(fu.matrix$`1`) -> fu.matrix$`1`
 as.Date(fu.matrix$`2`) -> fu.matrix$`2`
 as.Date(fu.matrix$`3`) -> fu.matrix$`3`
 as.Date(fu.matrix$`4`) -> fu.matrix$`4`
 as.Date(fu.matrix$outcome_date) -> fu.matrix$outcome_date
-
 fu.matrix$censor_date <- fu.matrix$outcome_date
-
 (apply(fu.matrix[2:6], 1, function(x) max(x, na.rm = T) )) -> fu.matrix$max
 fu.matrix$censor_date[is.na(fu.matrix$outcome_date)]  <- fu.matrix$max[is.na(fu.matrix$outcome_date)]
-
 fu.matrix$fu_days <- as.numeric(fu.matrix$censor_date - fu.matrix$`0`)
 
 ## populate consort diagram schizzle
@@ -339,5 +304,8 @@ D -> LTFU_B4_D180
       [10]: d180.died
 ")) -> sv
 
-writeLines(sv, "chapter_4/consort_diagram.svg")
-rsvg_pdf("chapter_4/consort_diagram.svg", "chapter_4/consort_diagram.pdf")
+writeLines(sv, "chapter_4/figures/consort_diagram.svg")
+
+rsvg_pdf("chapter_4/figures/consort_diagram.svg", "chapter_4/figures/consort_diagram.pdf", height = 600)
+rsvg_png("chapter_4/figures/consort_diagram.svg", "chapter_4/figures/consort_diagram.png")
+
