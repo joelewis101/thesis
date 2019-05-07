@@ -1,4 +1,27 @@
-# Genomics of ESBL _E. coli_ 
+# Whole genome sequencing of ESBL _E. coli_ carriage isolates
 
 ## Chapter overview
 
+This chapter describes the use of whole-genome sequencing (WGS) of ESBL producing _E. coli_ to understand the drivers of gut mucosal ESBL-E carriage. I will begin with a description of the genomic landscape of the isolates form this study: using simple descriptions of _E. coli_ phylogroup and multilocus sequence type (MLST) I will place the isolates from this study in the context of the _E. coli_ population, followed by higher-resolution contextulaistaion using phylogenetics to place isolates from this study in the context of a global _E. coli_ collection. I will describe the genetic basis of antimicrobial resistance in these isolates and explore the extent to which AMR genes tend to cluster together beyond what would be expected by chance. Finally, I will attempt to use the resolution offered by WGS to contirbute to the answer two specific questions: firstly, what is the mechanism by which antimicrobial exposure (over and above hospitalisation) is driving the increase in ESBL-E carriage prevalence in hospitalised adults in this study? Secondly, what is the likely unit of ESBL-E transmission within and between patients in this study? Are bacteria, or mobile genetic elements (MGE) implicated? And if, MGE, which: plasmids, transposons or integrons?
+
+These questions, a phrased in this way seem difficult or impossible to answer given the available WGS data, but by slightly reframing them they become tractable: first, what is the diversity of apparent hospital-acquired ESBL _E. coli_ in comparison to apparent community-acquired isolates? Apparent hospital acquisitions could represent true acquisitions of, for example, a hospital-associated clone - but equally they could be an "unmasking" of minority variant _E. coli_ in the microbiota, acquired in the community but not detected by culture because of low abundance, until enriched for by antimicrobial exposure. The second question - what is the unit of transmission in this system - can be reframed by asking: what is the unit that is most conserved within patients, as compared to between patients?  The questions then reduce to a dimensionality redcution problem: in order to address them both, it is necessary to classify either bacteria or MGE into mutually exclusive categories, in order to compare hospital to community isolates, and between-patient to within-patient. I describe the approach I have taken to this below. 
+
+## Methods
+
+The bioinformatic pipeline used is described in detail in Chapter 2, methods. Briefly, following quality control, _de novo_ assembly was undertaken with SPAdes[@Bankevich2012a] v3.11.0, annotation with Prokka[@Seemann2014a] v1.5 with a genus specific database from RefSeq and the Roary v1.007 pan-genome pipeline[@Page2015] was used to construct a core genome. A core gene multiple sequence alignment was generated using maaft[@Katoh2013] v7.205, SNP-sites identified using SNP-sites[@Page2016] v2.4.1 and the resultant SNP alignment used to build a maximum likelihood phylogenetic tree using IQ-TREE[@Nguyen2015] v1.6.3. Trees were visualised in the ggtree v1.14.4 package[@Yu2017] in R. 
+
+Ariba[@Hunt2017a] v2.12.1 was used to identify AMR-associated genes using the SRST2[@Inouye2014] database, to identify plasmid replicons using the PlasmidFinder database[@Carattoli2014] and to perform _in silico_ muli-locus sequence typing (MLST) using the database from http://mlst.warwick.ac.uk/mlst/dbs/Ecoli accessed via www.pubmlst.org. _E. coli_ phylogrouping was performed with a quadruplex _in silico_ PCR using the Clermont scheme[@Clermont2013]. 
+
+In order to explore clustering of AMR genes, Jaccard index was calculated for a given AMR-gene pair. The Jaccard index, a measure of the similarity of two sets of data, is defined as _intersection over union_; in this context, for a given pair of AMR genes $x$ and $y$, the Jaccard index $J(x,y)$ is the number of isolates that contain both gene $x$ and $y$ divided by the total number that contain either $x$ or $y$:
+
+$$J(x,y) = \displaystyle \frac{| x \cap y |}{| x \cup y| }$$
+
+By definition it lies between 0 ($x$ and $y$ never co-occur) and 1 ($x$ and $y$ always co-occur).
+
+Rhierbaps package v1.1.0 in R[@Cheng2013] was used to cluster the core genome pseudosequence with 2 levels and these levels used to test associations. To track putative mobile genetic elements (MGE), a difficult task with short-read sequencing, isolates ESBL-gene containing contigs were identified using BLASTn[@Altschul1990] v2.7.0 with and then contigs clustered using cd-hit[@Li2006] v4.6 to produce mutually exclusive ESBL-gene contig groupings.
+
+## Genomic landscape of ESBL _E. coli_
+
+
+
+## Antimicrobial resistance determinents
