@@ -148,7 +148,7 @@
 <title>D180</title>
 <polygon fill="none" stroke="#000000" points="179.5662,-41.4019 -.189,-41.4019 -.189,-.1981 179.5662,-.1981 179.5662,-41.4019"/>
 <text text-anchor="middle" x="89.6886" y="-25" font-family="Arial" font-size="14.00" fill="#000000">Included in D160 analysis </text>
-<text text-anchor="middle" x="89.6886" y="-8.2" font-family="Arial" font-size="14.00" fill="#000000"> &#160;n = 200</text>
+<text text-anchor="middle" x="89.6886" y="-8.2" font-family="Arial" font-size="14.00" fill="#000000"> &#160;n = 201</text>
 </g>
 <!-- D&#45;&gt;D180 -->
 <g id="edge8" class="edge">
@@ -160,10 +160,10 @@
 <g id="node17" class="node">
 <title>LTFU_B4_D180</title>
 <polygon fill="none" stroke="#000000" points="383.6886,-186.3002 239.6886,-186.3002 239.6886,-77.6998 383.6886,-77.6998 383.6886,-186.3002"/>
-<text text-anchor="middle" x="311.6886" y="-169.8" font-family="Arial" font-size="14.00" fill="#000000">Excluded n = 13 </text>
+<text text-anchor="middle" x="311.6886" y="-169.8" font-family="Arial" font-size="14.00" fill="#000000">Excluded n = 12 </text>
 <text text-anchor="middle" x="311.6886" y="-153" font-family="Arial" font-size="14.00" fill="#000000"> &#160;</text>
 <text text-anchor="middle" x="311.6886" y="-136.2" font-family="Arial" font-size="14.00" fill="#000000"> &#160;Withdrawn = 0 </text>
-<text text-anchor="middle" x="311.6886" y="-119.4" font-family="Arial" font-size="14.00" fill="#000000"> Transfer out = 10 </text>
+<text text-anchor="middle" x="311.6886" y="-119.4" font-family="Arial" font-size="14.00" fill="#000000"> Transfer out = 9 </text>
 <text text-anchor="middle" x="311.6886" y="-102.6" font-family="Arial" font-size="14.00" fill="#000000"> LTFU = 1 </text>
 <text text-anchor="middle" x="311.6886" y="-85.8" font-family="Arial" font-size="14.00" fill="#000000"> Ongoing fu = 2</text>
 </g>
