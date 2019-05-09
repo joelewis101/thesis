@@ -182,7 +182,7 @@ The output from quast and checkM are shown in Figure \@ref(fig:wgs-qc), where N5
 
 In total, therefore, 46/520 (11%) of samples which were submitted for sequencing were excluded from downstream analysis. The remaining 474 samples represent 69% (474/686) of the cutured _E. coli_ in this study; 354 are from patients with sepsis, 86 are from hospitalised inpatients and 33 are from community members, with a median of 2 (range 1-5) samples per participant. N50, total assembled length and number of assembled contigs are shown in the appendix to this chapter.
 
-```{r wgs-qc, echo = F, warning = F, message = F, fig.scap="N50 as a function of total assembly length", fig.cap= "N50 as a function of total assembled length. Failed assemblies with less than 1Mb assembled shown as triangles. Contaminated assemblies with checkM-defined contamination above 25\\% shown in blue." }
+```{r wgs-qc, echo = F, warning = F, message = F, fig.scap="N50 as a function of total assembly length for included assemblies", out.extra='', fig.cap= "N50 as a function of total assembled length. Failed assemblies with less than 1Mb assembled shown as triangles. Contaminated assemblies with checkM-defined contamination above 25\\% shown in blue." }
 
 df.qc <- subset(df.qc, Reads > 300000)
 
@@ -210,7 +210,7 @@ ggplot(mlst, aes(fct_infreq(ST))) + geom_bar() + coord_flip()  +
 ```
 
 
-```{r wgs-tree, echo = F, warning = F, message = F, fig.scap="ML phylogenetic tree of study \\textit{E. coli}", fig.cap="Maximum likelihood phylogenetic tree of included study \\textit{E. coli} isolates showing phylogroups and sequence types. Bootstrap support of less than 90\\% is indicated by a black circle at a given node. Scale bar indicates 0.01 SNPs/site.", fig.height = 10, fig.width=8}
+```{r wgs-tree, echo = F, warning = F, message = F, fig.scap="ML phylogenetic tree of study \\textit{E. coli}", out.extra='', fig.cap="Maximum likelihood phylogenetic tree of included study \\textit{E. coli} isolates showing phylogroups and sequence types. Bootstrap support of less than 90\\% is indicated by a black circle at a given node. Scale bar indicates 0.01 SNPs/site.", fig.height = 10, fig.width=8}
 
 
 rownames(pgroups) <- pgroups$Lane
