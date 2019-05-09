@@ -12,6 +12,7 @@ library(knitr)
 library(kableExtra)
 library(grid)
 library(ggpubr)
+library(ggtree)
 
  parse_checkm_lines <- function(s, n) {
   strsplit(s, " ") -> stemp
@@ -36,7 +37,7 @@ These questions, phrased in this way, seem difficult or impossible to answer giv
 
 ### Bioinformatic pipeline
 
-The basic bioinformatic pipeline used is described in detail in Chapter 2, methods. Briefly, one _E. coli_ colony from each patient sample was taken forward for DNA extraction and paired-end short-read whole genome sequencing using Illumina HiSeq X at the Wellcome Sanger Institute. Read quality control was undertaken with Kraken[@Wood2014] v0.10.6 to assign reads to species and WSI QC pipeline which maps a random 100 Mbases fron each sample to a reference and calculates depth of coverage, number of heterogeneous SNPs, GC content and insert size. Samples that contained > 20% non _E coli._ reads were discarded and _de novo_ assembly was undertaken with SPAdes[@Bankevich2012a] v3.11.0. Assembly statistics were calculated with QUAST[@Gurevich2013] v4.6.0 and completeness and contamination of the assemblies assessed by checkM[@Parks2015] v1.0.7. Contaminated assemblies (with checkM-defined contamination of > 25%) or poor assemblies (with N50 < xxx) were discarded. Annotation was carried out with Prokka[@Seemann2014a] v1.5 with a genus specific database from RefSeq and the Roary v1.007 pan-genome pipeline[@Page2015] was used to construct a core genome. A core gene multiple sequence alignment was generated using maaft[@Katoh2013] v7.205, SNP-sites identified using SNP-sites[@Page2016] v2.4.1 and the resultant SNP alignment used to build a maximum likelihood phylogenetic tree using IQ-TREE[@Nguyen2015] v1.6.3, with the ModelFinder module used to find the best fitting nucleotide substition model. Trees were visualised in the ggtree v1.14.4 package[@Yu2017] in R. 
+The basic bioinformatic pipeline used is described in detail in Chapter 2, methods. Briefly, one _E. coli_ colony from each patient sample was taken forward for DNA extraction and paired-end short-read whole genome sequencing using Illumina HiSeq X at the Wellcome Sanger Institute. Read quality control was undertaken with Kraken[@Wood2014] v0.10.6 to assign reads to species and WSI QC pipeline which maps a random 100 Mbases fron each sample to a reference and calculates depth of coverage, number of heterogeneous SNPs, GC content and insert size. Samples that contained > 20% non _E coli._ reads were discarded and _de novo_ assembly was undertaken with SPAdes[@Bankevich2012a] v3.11.0. Assembly statistics were calculated with QUAST[@Gurevich2013] v4.6.0 and completeness and contamination of the assemblies assessed by checkM[@Parks2015] v1.0.7. Contaminated assemblies (with checkM-defined contamination of > 25%) or poor assemblies (with N50 < xxx) were discarded. Annotation was carried out with Prokka[@Seemann2014a] v1.5 with a genus specific database from RefSeq and the Roary v1.007 pan-genome pipeline[@Page2015] was used to construct a core genome. A core gene multiple sequence alignment was generated using maaft[@Katoh2013] v7.205, SNP-sites identified using SNP-sites[@Page2016] v2.4.1 and the resultant SNP alignment used to build a maximum likelihood phylogenetic tree using IQ-TREE[@Nguyen2015] v1.6.3, using ascertainment bias correction to correct for the fact that the input pseudosequence contained only variable sites, and using the ModelFinder module used to find the best fitting nucleotide substition model. This calculates the likeliood of a number of different models and chooses the model with the lowest (best fitting) Bayesian Information Criterion, a statistic which penalises model parameters. Reliability of inferred branch partitions was assessed with 1000 bootstrap replicates. Trees were visualised in the ggtree v1.14.4 package[@Yu2017] in R. 
 
 Ariba[@Hunt2017a] v2.12.1 was used to identify AMR-associated genes using the SRST2[@Inouye2014] database, to identify plasmid replicons using the PlasmidFinder database[@Carattoli2014] and to perform _in silico_ muli-locus sequence typing (MLST) using the database from http://mlst.warwick.ac.uk/mlst/dbs/Ecoli accessed via www.pubmlst.org. Because quinolone resistance often results from SNPs in the chromasome in the quinolone resistance determining regions (QRDRs) of the _gyrA_, _gyrB_, _parE_ and _parC_ genes - rather than acquisition of whole AMR-determining genes, as is the case with the other genes sought by Ariba - these genes were downloaded from the comprehensive antimicrobial resistance database (CARD, https://card.mcmaster.ca/) and Ariba used to call SNPs in them, with default settings. _E. coli_ phylogrouping was performed with a quadruplex _in silico_ PCR using the Clermont scheme[@Clermont2013] and isPcr v33x2 (https://github.com/bowhan/kent/tree/master/src/isPcr) 
 
@@ -83,7 +84,7 @@ dftemp$variable <- factor(dftemp$variable, levels = unique(dftemp$variable[order
 
 dftemp$name <- factor(dftemp$name, levels = df.brac$name[order(df.brac$`Escherichia coli`, decreasing = T)])
 
-ggplot(dftemp, aes(name, value, fill = variable)) + geom_col() + coord_flip() + scale_fill_brewer(palette = "Paired") + theme(axis.text.y = element_text(size = 3), legend.title = element_blank()) + labs(x= "Sample ID", y = "% reads" )
+ggplot(dftemp, aes(name, value, fill = variable)) + geom_col() + coord_flip() + scale_fill_brewer(palette = "Paired") + theme(axis.text.y = element_text(size = 3), legend.title = element_blank()) + labs(x= "Sample ID", y = "% reads" ) 
 
 
 ```
@@ -175,25 +176,94 @@ df.qc <- subset(df.qc, `Escherichia coli` > 20)
 
 ```
 
-Of the remaining 508 samples, there were a median (IQR) of `r paste0(median(df.qc$Reads), " (", quantile(df.qc$Reads, 0.25)[[1]], "-", quantile(df.qc$Reads, 0.75)[[1]], ")")` reads, with a median (IQR) depth of coverage (obtained by mapping a random 100Mbases to a refernce _E. coli_ genome, Escherichia coli strain K-12 substrain MG1655, NCBI reference NC_000913.3) of `r paste0(round(median(df.qc$Depth.of.Coverage)), " (", round(quantile(df.qc$Depth.of.Coverage, 0.25)[[1]]), "-", round(quantile(df.qc$Depth.of.Coverage, 0.75)[[1]]), ")")`. One sample had an order of magnitude lower number of reads (291556) with depth of coverage 0; it was assumed to represent sequencing failure and excluded from further analysis.
+Of the remaining 508 samples, there were a median (IQR) of `r paste0(median(df.qc$Reads), " (", quantile(df.qc$Reads, 0.25)[[1]], "-", quantile(df.qc$Reads, 0.75)[[1]], ")")` reads, with a median (IQR) depth of coverage (obtained by mapping a random 100Mbases to a refernce _E. coli_ genome, Escherichia coli strain K-12 substrain MG1655, NCBI reference NC_000913.3) of `r paste0(round(median(df.qc$Depth.of.Coverage)), " (", round(quantile(df.qc$Depth.of.Coverage, 0.25)[[1]]), "-", round(quantile(df.qc$Depth.of.Coverage, 0.75)[[1]]), ")")`. One sample had an order of magnitude lower number of reads (291556) with depth of coverage 0; this was assumed to represent sequencing failure and it was excluded from further analysis.
 
-The output from quast and checkM are shown in Figure \@ref(fig:wgs-qc), where N50 (the minimum contig length upon which at least half assembled bases are contained) is plotted as a function of total assembled length. The expected _E. coli_ genome length is around 4.6Mb and most samples cluster close to this at a total assembled length of ~ 5Mb. Howvever it is clear that some assemblies  have failed, with low N50 and low assembled length. It is also apparent that some samples seem to be contaminated, as indicated by low N50 and much longer than expected total assembled length. Defining assembly failure as < 1Mb assembled length (triangles in the plot, n = 9) and contamination as checkM-defined contamination of > 25% (blue points in the plot, n = 24) and excluding both groups results in 33 further samples being exlcluded from further analysis.
+The output from quast and checkM are shown in Figure \@ref(fig:wgs-qc), where N50 (the minimum contig length upon which at least half assembled bases are contained) is plotted as a function of total assembled length. The expected _E. coli_ genome length is around 4.6Mb and most samples cluster close to this at a total assembled length of ~ 5Mb. Howvever it is clear that some assemblies  have failed, with low N50 and low assembled length. It is also apparent that some samples seem to be contaminated, as indicated by low N50 and much longer than expected total assembled length. Defining assembly failure as < 1Mb assembled length (triangles in the plot, n = 9) and contamination as checkM-defined contamination of > 25% (blue points in the plot, n = 24) and excluding both groups results in 33 further samples being excluded from further analysis.
 
-In total, therefore, 46/520 (11%) of samples which were intended for sequencing were excluded from downstream analysis. The remaining 474 samples represent 69% (474/686) of the cutured _E. coli_ in this study; 354 are from patients with sepsis, 86 are from hospitalised inpatients and 33 are from community members, with a median of 2 (range 1-5) samples per participant.
+In total, therefore, 46/520 (11%) of samples which were submitted for sequencing were excluded from downstream analysis. The remaining 474 samples represent 69% (474/686) of the cutured _E. coli_ in this study; 354 are from patients with sepsis, 86 are from hospitalised inpatients and 33 are from community members, with a median of 2 (range 1-5) samples per participant. N50, total assembled length and number of assembled contigs are shown in the appendix to this chapter.
 
-```{r wgs-qc, echo = F, warning = F, message = F, fig.scap="N50 as a function of total assembly length ", fig.cap= "N50 as a function of total assembled length. Failed assemblies with fewer than 10 contigs shown as triangles. Contaminated assemblies with checkM-defined contamination above 25\\% shown in blue." }
+```{r wgs-qc, echo = F, warning = F, message = F, fig.scap="N50 as a function of total assembly length", fig.cap= "N50 as a function of total assembled length. Failed assemblies with less than 1Mb assembled shown as triangles. Contaminated assemblies with checkM-defined contamination above 25\\% shown in blue." }
 
 df.qc <- subset(df.qc, Reads > 300000)
 
-ggplot(df.qc, aes(Totallength, N50, colour = Contamination > 25, shape = Xcontigs < 10)) + geom_point() + theme_bw() + labs(shape = "< 1Mb assembled", colour = "Contamination > 25%", x = "Total assembled length (bp)")
+ggplot(df.qc, aes(Totallength, N50, colour = Contamination > 25, shape = Xcontigs < 10)) + geom_point() + theme_bw() + labs(shape = "< 1Mb assembled", colour = "Contamination > 25%", x = "Total assembled length (bp)") 
+
+```
+
+```{r wgs-mlst-pgroup, echo = F, warning = F, message = F }
+
+mlst <- read_csv(paste0(wd, "phylogroup_and_mlst/mlst.csv"))
+pgroups <- read_csv(paste0(wd, "phylogroup_and_mlst/phylogroups.csv"))
+```
+
+### Phylogroup, MLST and core genome phylogeny of study isolates
+
+The commonset _E. coli_ phylogroup was phylogroup A: 204/473 (43%) samples belonged to phylogroup A, followed by phylogroup B2 (96/473 [20%]), F (53/473 [11%]), B1 (43/473 [9%]) and C (43/473 [9%]) and D (26/473 [5%]). Two samples were Clade I or II (so called cryptic clades) and 6/473 (1%) were unknown phylogroup using the Clermont PCR scheme. In the MLST analysis, 56 recognised sequence types (STs) were identified, and 12 samples were novel STs; however over half (249/473 [53%]) of samples were represented by the top seven most frequent STs (Figure \@ref(fig:wgs-mlst)). ST131 was the most commonly isolated sequence type (64/473 [14%] of isolates) followed by ST410 (45/473 [10%] of isolates) and ST167 (38/473 [8%] of isolates).
+
+The Roary pan-genome pipeline identified a core genome in the study isolates of 2966 genes, with a pan-genome of 26840 genes. The resultant core gene pseudosequence of length 1388742 bases contained 99693 variable sites, which were used to infer the maximum likelihood phylogenetic tree. The IQTREE ModelFinder module determined that a general time reversible (GTR) model with FreeRate site heterogeneity with 5 parameters provided the best fit to the data. The inferred tree is shown in Figure \@ref(fig:wgs-mlst) along with isolate phylogroup and sequence types; in general, as expected, sequence types were largely monophyletic and phylogroups tended to cluster together.
+
+```{r wgs-mlst, echo = F, warning = F, message = F, fig.cap="\\textit{E. coli} sequence type distribution", fig.height = 5, fig.width=5}
+
+ggplot(mlst, aes(fct_infreq(ST))) + geom_bar() + coord_flip()  +
+  xlab("E. coli sequence type") + ylab("Count") + theme(axis.text=element_text(size=6))
 
 ```
 
 
-### Phylogroup, MLST and ML phylogeny of study isolates
+```{r wgs-tree, echo = F, warning = F, message = F, fig.scap="ML phylogenetic tree of study \\textit{E. coli}", fig.cap="Maximum likelihood phylogenetic tree of included study \\textit{E. coli} isolates showing phylogroups and sequence types. Bootstrap support of less than 90\\% is indicated by a black circle at a given node. Scale bar indicates 0.01 SNPs/site.", fig.height = 10, fig.width=8}
+
+
+rownames(pgroups) <- pgroups$Lane
+dcast(mlst, lane ~ ST, fun.aggregate = length) -> mlst.onehot
+#mlst.onehot <- subset(mlst.onehot, lane %in% tree$tip.label)
+
+rownames(mlst.onehot) <- mlst.onehot$lane
+mlst.onehot <- select(mlst.onehot, -lane)
+n.mlsts <- sort(apply(mlst.onehot,2, sum), decreasing = T)
+mlst.onehot[names(n.mlsts[n.mlsts > 1])] -> mlst.onehot
+
+apply(mlst.onehot, 1, sum) == 0 -> mlst.onehot$other
+mlst.onehot$other<- as.numeric(mlst.onehot$other)
+
+
+
+mlst.onehot[mlst.onehot == 0] <- "Z_No"
+mlst.onehot[mlst.onehot == 1] <- "Z_Yes"
+
+
+
+
+
+
+#mlst.onehot[c(sort(as.numeric(names(mlst.onehot)[names(mlst.onehot) != "Novel"])), "Novel")] -> mlst.onehot
+
+
+col <- c(hue_pal()(8), "lightgrey", "black")
+names(col) <- c("A","B1","B2","C","Clade I or II", "D","F", "Unknown", "Z_No", "Z_Yes")
+
+ggtree(tree) %>% gheatmap(select(pgroups, Phylogroup), font.size = 3, width = 0.1, 
+                          colnames_position = "top", color = NA, colnames_offset_y = 5) +
+  scale_fill_manual(values =col, labels = c("A","B1","B2","C","Clade I/II", "D","F", 
+                                            "Unknown", "Absent", "Present"))-> p1x
+
+leg1 <- get_legend(p1x)
+
+ggtree(tree) %>% gheatmap(select(pgroups, Phylogroup), width = 0.1, 
+                          color = NA, font.size = 4, colnames_angle = 90,
+                          colnames_position = "top", colnames_offset_y = 30)  %>% gheatmap((mlst.onehot), font.size = 2.5, color = NA, 
+                          colnames_angle = 90, offset=.03, colnames_offset_y = 10, colnames_position = "top",)  + geom_treescale(x =0, y = 0, offset = 5)  +   geom_point2(aes(subset = as.numeric(label) < 90 & !isTip), size = 1) + theme(legend.position = "none") +
+  scale_fill_manual(values =col, labels = c("A","B1","B2","C","Clade I or II", "D","F", 
+                                            "Unknown", "Absent", "Present")) + annotate("text", x= 0.28, y =510, label = "Sequence Type") -> p
+
+plot_grid(p, leg1, ncol = 2, rel_widths = c(1,0.1))
+
+
+```
+
 
 ### Study isolates in a global context
 
 ### Antimicrobial resistance determinents
 
+### Clustering core gene alignment and MGE
 ## Appendix
