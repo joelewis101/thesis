@@ -6,6 +6,7 @@
 wd <- "chapter_7/"
 
 # and packages
+library(plyr)
 library(tidyverse)
 library(reshape2)
 library(knitr)
@@ -13,6 +14,12 @@ library(kableExtra)
 library(grid)
 library(ggpubr)
 library(ggtree)
+library(ape)
+library(phytools)
+library(RColorBrewer)
+library(scales)
+library(cowplot)
+
 
  parse_checkm_lines <- function(s, n) {
   strsplit(s, " ") -> stemp
@@ -37,7 +44,7 @@ These questions, phrased in this way, seem difficult or impossible to answer giv
 
 ### Bioinformatic pipeline
 
-The basic bioinformatic pipeline used is described in detail in Chapter 2, methods. Briefly, one _E. coli_ colony from each patient sample was taken forward for DNA extraction and paired-end short-read whole genome sequencing using Illumina HiSeq X at the Wellcome Sanger Institute. Read quality control was undertaken with Kraken[@Wood2014] v0.10.6 to assign reads to species and WSI QC pipeline which maps a random 100 Mbases fron each sample to a reference and calculates depth of coverage, number of heterogeneous SNPs, GC content and insert size. Samples that contained > 20% non _E coli._ reads were discarded and _de novo_ assembly was undertaken with SPAdes[@Bankevich2012a] v3.11.0. Assembly statistics were calculated with QUAST[@Gurevich2013] v4.6.0 and completeness and contamination of the assemblies assessed by checkM[@Parks2015] v1.0.7. Contaminated assemblies (with checkM-defined contamination of > 25%) or poor assemblies (with N50 < xxx) were discarded. Annotation was carried out with Prokka[@Seemann2014a] v1.5 with a genus specific database from RefSeq and the Roary v1.007 pan-genome pipeline[@Page2015] was used to construct a core genome. A core gene multiple sequence alignment was generated using maaft[@Katoh2013] v7.205, SNP-sites identified using SNP-sites[@Page2016] v2.4.1 and the resultant SNP alignment used to build a maximum likelihood phylogenetic tree using IQ-TREE[@Nguyen2015] v1.6.3, using ascertainment bias correction to correct for the fact that the input pseudosequence contained only variable sites, and using the ModelFinder module used to find the best fitting nucleotide substition model. This calculates the likeliood of a number of different models and chooses the model with the lowest (best fitting) Bayesian Information Criterion, a statistic which penalises model parameters. Reliability of inferred branch partitions was assessed with 1000 bootstrap replicates. Trees were visualised in the ggtree v1.14.4 package[@Yu2017] in R. 
+The basic bioinformatic pipeline used is described in detail in Chapter 2, methods. Briefly, one _E. coli_ colony from each patient sample was taken forward for DNA extraction and paired-end short-read whole genome sequencing using Illumina HiSeq X at the Wellcome Sanger Institute. Read quality control was undertaken with Kraken[@Wood2014] v0.10.6 to assign reads to species and WSI QC pipeline which maps a random 100 Mbases fron each sample to a reference and calculates depth of coverage, number of heterogeneous SNPs, GC content and insert size. Samples that contained > 80% non _E coli._ reads were discarded and _de novo_ assembly was undertaken with SPAdes[@Bankevich2012a] v3.11.0. Assembly statistics were calculated with QUAST[@Gurevich2013] v4.6.0 and completeness and contamination of the assemblies assessed by checkM[@Parks2015] v1.0.7. Contaminated assemblies (with checkM-defined contamination of > 25%) or poor assemblies (with less than 1Mb assembled length) were discarded. Annotation was carried out with Prokka[@Seemann2014a] v1.5 with a genus specific database from RefSeq and the Roary v1.007 pan-genome pipeline[@Page2015] was used to identify a core genome. A core gene multiple sequence alignment was generated using maaft[@Katoh2013] v7.205, SNP-sites identified using SNP-sites[@Page2016] v2.4.1 and the resultant SNP alignment used to build a maximum likelihood phylogenetic tree using IQ-TREE[@Nguyen2015] v1.6.3, using ascertainment bias correction to correct for the fact that the input pseudosequence contained only variable sites, and using the ModelFinder module used to find the best fitting nucleotide substition model. This calculates the likeliood of a number of different models and chooses the model with the lowest (best fitting) Bayesian Information Criterion, a statistic which penalises model parameters. Reliability of inferred branch partitions was assessed with 1000 bootstrap replicates. Trees were visualised in the ggtree v1.14.4 package[@Yu2017] in R. 
 
 Ariba[@Hunt2017a] v2.12.1 was used to identify AMR-associated genes using the SRST2[@Inouye2014] database, to identify plasmid replicons using the PlasmidFinder database[@Carattoli2014] and to perform _in silico_ muli-locus sequence typing (MLST) using the database from http://mlst.warwick.ac.uk/mlst/dbs/Ecoli accessed via www.pubmlst.org. Because quinolone resistance often results from SNPs in the chromasome in the quinolone resistance determining regions (QRDRs) of the _gyrA_, _gyrB_, _parE_ and _parC_ genes - rather than acquisition of whole AMR-determining genes, as is the case with the other genes sought by Ariba - these genes were downloaded from the comprehensive antimicrobial resistance database (CARD, https://card.mcmaster.ca/) and Ariba used to call SNPs in them, with default settings. _E. coli_ phylogrouping was performed with a quadruplex _in silico_ PCR using the Clermont scheme[@Clermont2013] and isPcr v33x2 (https://github.com/bowhan/kent/tree/master/src/isPcr) 
 
@@ -46,6 +53,8 @@ Rhierbaps package v1.1.0 in R[@Cheng2013] was used to cluster the core genome ps
 ### Global _E. coli_ collection
 
 In order to place the isolates from this study in a global context, published _E. coli_ assemblies were downloaded from the WSI servers. These included 149 ESBL-producing _E. coli_ from a single centre study in Chachoengsao province, eastern Thailand[@Runcharoen2017]. In this study, human clinical isolates from standard care in Bhuddhasothorn hospital were selected on the basis of the ESBL phenotype, and environmental samples were collected as part of a cross sectional study and selectively cultured for ESBL-E in 2014-2015. I also downloaded assemblies of 362 enterotoxogenic _E. coli_ (ETEC), selected for an ETEC genomic study from the Gothenburg University ETEC collection to represent a broad collection of ETEC isolated worldwide from 1980-2011[@VonMentzer2014]; 185 atypical enteropathogenic _E. coli_ (aEPEC) sequenced for a study of aEPEC and selected from samples frrm the Global Enteric Multicentre Study (GEMS) in seven centres in Africa and Asia between 2007-2011[@Ingle2016]; and 94 _E. coli_ from QECH in Blantyre, Malawi, a combination of invasive (bloodstream and CSF) and carriage isolates, selected for diversity in AMR phenotype from 1996-2014[@Musicha2017]. Details of the year, sample andcountry of isolation for these samples are given in the appendix to this chapter.
+
+Phylogroup and MLST were determined for these context genomes as described above. AMR genes were identified with Ariba and the SRST2 database, as above, and context genomes were classified as ESBL if they contained any Bush-Jacoby group 2be ESBL gene .
 
 ### Statistical analysis
 
@@ -210,8 +219,11 @@ ggplot(mlst, aes(fct_infreq(ST))) + geom_bar() + coord_flip()  +
 ```
 
 
+
 ```{r wgs-tree, echo = F, warning = F, message = F, fig.scap="ML phylogenetic tree of study \\textit{E. coli}", out.extra='', fig.cap="Maximum likelihood phylogenetic tree of included study \\textit{E. coli} isolates showing phylogroups and sequence types. Bootstrap support of less than 90\\% is indicated by a black circle at a given node. Scale bar indicates 0.01 SNPs/site.", fig.height = 10, fig.width=8}
 
+tree <- read.tree(paste0(wd, "core_genome_tree/core_alnD2ESCO_snp_sites.aln.treefile"))
+midpoint.root(tree) -> tree
 
 rownames(pgroups) <- pgroups$Lane
 dcast(mlst, lane ~ ST, fun.aggregate = length) -> mlst.onehot
@@ -263,7 +275,192 @@ plot_grid(p, leg1, ncol = 2, rel_widths = c(1,0.1))
 
 ### Study isolates in a global context
 
+```{r wgs-global-tree, echo = F, warning = F, message = F, fig.scap="ML phylogenetic tree of study \\textit{E. coli} in global context", out.extra='', fig.cap="Midpoint rooted maximum likelihood phylogenetic tree of included study \\textit{E. coli} isolates along with global context isolates, showing phylogroups, source sample type and continent of isolation (coloured bars). Dark grey bars indicate isolates from this study or isolates with ESBL gene presence, as labelled (this study or ESBL, respectively). Two most frequently isolated STs (131 and 410) labelled.  Bootstrap support of less than 90\\% is indicated by a black circle at a given node. Scale bar indicates 0.009 SNPs/site.", fig.height = 10, fig.width=8}
+
+
+tree <- read.tree(paste0(wd, "global_tree/all_ESCO_core_snps.aln.treefile"))
+
+midpoint.root(tree) -> tree
+
+#metadata
+
+metadata <- read_csv(paste0(wd, "global_tree/all_ESCO_metadata.csv"))
+sub("#", "_", metadata$Lane.Name ) -> metadata$Lane.Name
+metadata <- data.frame(metadata)
+rownames(metadata) <- metadata$Lane.Name
+
+metadata$Continent <- NA
+metadata$Continent[metadata$Country == "Argentina" |
+                     metadata$Country == "Bolivia" |
+                     metadata$Country == "Guatemala" |
+                     metadata$Country == "Mexico" |
+                     metadata$Country == "Venezuela" ] <- "Z_S. America"
+
+metadata$Continent[metadata$Country == "Bangladesh" | 
+                     metadata$Country == "Burma" |
+                     metadata$Country == "China" |
+                     metadata$Country == "India" |
+                     metadata$Country == "Indonesia" |
+                     metadata$Country == "Japan" |
+                     metadata$Country == "Nepal" |
+                     metadata$Country == "Pakistan" |
+                     metadata$Country == "thailand" |
+                     metadata$Country == "Thailand"] <- "Z_Asia"
+
+metadata$Continent[metadata$Country == "Egypt" | 
+                     metadata$Country == "Gambia" |
+                     metadata$Country == "Guinea Bissau" |
+                     metadata$Country == "Kenya" |
+                     metadata$Country == "Malawi" |
+                     metadata$Country == "Mali" |
+                     metadata$Country == "Morocco" |
+                     metadata$Country == "Mozambique" |
+                     metadata$Country == "Tunisia" |
+                     metadata$Country == "Zaire"] <- "Z_Africa"
+
+metadata$source.cat <- metadata$Source
+
+metadata$source.cat[metadata$source.cat == "Canal" |
+                      metadata$source.cat == "Farm" |
+                      metadata$source.cat == "Untreated hospital sewage"] <- "_Environment"
+
+metadata$source.cat[metadata$source.cat == "Blood" |
+                      metadata$source.cat == "CSF"] <- "_Clinical - _Blood/CSF"
+
+metadata$source.cat[metadata$source.cat == "Urine" |
+                      metadata$source.cat == "Pus" |
+                      metadata$source.cat == "Sputum" ] <- "_Clinical - Other"
+
+metadata$source.cat[metadata$source.cat == "stool" |
+                      metadata$source.cat == "Stool" |
+                      metadata$source.cat == "RS"] <- "_Clinical - _Stool"
+
+metadata$malawi <- as.factor(as.numeric(metadata$Country == "Malawi"))
+
+metadata$this_study <- as.factor(as.numeric(grepl("DASSIM", metadata$study)))
+# pgroups
+
+pgroups <- read.csv(paste0(wd, "global_tree/phylogroups_and_mlst/all_ESCO_pgroups.csv"), stringsAsFactors = F)
+pgroups.d <- read.csv(paste0(wd, "phylogroup_and_mlst/phylogroups.csv"), stringsAsFactors = F)
+pgroups <- select(pgroups, V1, phylogroup)
+names(pgroups) <- c("Lane", "Phylogroup") 
+pgroups <- rbind(pgroups, pgroups.d)
+rownames(pgroups) <- pgroups$Lane
+pgroups$Phylogroup[pgroups$Phylogroup == "Clade I"] <- "Clade I or II"
+
+# mlst
+
+
+## load mlst and plot
+
+mlst.d <- read.csv(paste0(wd, "phylogroup_and_mlst/mlst.csv"), stringsAsFactors = F)
+mlst <- read.csv(paste0(wd, "global_tree/phylogroups_and_mlst/mlst_summary.csv"), stringsAsFactors = F)
+mlst <- select(mlst, lane, ST)
+
+mlst <- rbind(mlst.d, mlst)
+dcast(mlst, lane ~ ST, fun.aggregate = length) -> mlst.onehot
+#mlst.onehot <- subset(mlst.onehot, lane %in% tree$tip.label)
+
+rownames(mlst.onehot) <- mlst.onehot$lane
+mlst.onehot <- select(mlst.onehot, -lane)
+n.mlsts <- sort(apply(mlst.onehot,2, sum), decreasing = T)
+mlst.onehot[names(n.mlsts[n.mlsts > 1])] -> mlst.onehot
+
+apply(mlst.onehot, 1, sum) == 0 -> mlst.onehot$other
+mlst.onehot$other<- as.numeric(mlst.onehot$other)
+mlst.onehot[mlst.onehot == 0] <- "Z_No"
+mlst.onehot[mlst.onehot == 1] <- "Z_Yes"
+
+#### AMR
+
+srst2 <- read.csv(paste0(wd, "global_tree/srst2/srst2_summary_cleaned_pres_abs.csv"), stringsAsFactors = F)
+srst2.d <- read.csv(paste0(wd, "amr/srst2_pres_abs.csv"), stringsAsFactors = F)
+bind_rows(srst2, srst2.d) -> srst
+srst[is.na(srst)] <- 0
+rownames(srst) <- srst$name
+
+narrow_spec <- c("TEM_1", "TEM_95", "TEM_135", "TEM_90",
+                 "OXA_1", 
+                 "SHV_1")
+
+esbl <- c(names(srst)[grepl("CTX", names(srst))], 
+          names(srst)[grepl("TEM", names(srst))],
+          names(srst)[grepl("OXA", names(srst))],
+          names(srst)[grepl("SHV", names(srst))],
+          names(srst)[grepl("NDM", names(srst))])
+
+esbl <- esbl[!(esbl %in% narrow_spec)]
+data.frame(esbl = apply(srst[esbl], 1,sum)) -> esbl.cat
+esbl.cat$esbl[esbl.cat$esbl > 0] <- 1
+esbl.cat$Lane <- rownames(esbl.cat)
+esbl.cat$esbl <- as.factor(esbl.cat$esbl)
+##
+
+col <- c(hue_pal()(8), "white", "grey30", brewer.pal(4,"Set1"),brewer.pal(4,"Dark2") )
+names(col) <- c("A","B1","B2","C","Clade I or II", "D","F", "Unknown",
+                "0", "1","_Clinical - _Blood/CSF", "_Clinical - _Stool", "_Environment",  "_Clinical - Other",
+                "Z_Africa", "Z_Asia", "Z_S. America"
+               )
+
+names(metadata)[names(metadata) == "this_study"] <- "This study"
+names(esbl.cat)[names(esbl.cat) == "esbl"] <- "ESBL"
+names(metadata)[names(metadata) == "Source"] <- "Source1"
+names(metadata)[names(metadata) == "source.cat"] <- "Source"
+
+ggtree(tree, size = 0.3) %>% 
+  gheatmap(select(metadata, `This study`), width = 0.05, color = NA, font.size = 4, colnames_angle = 90,
+           colnames_position = "top", colnames_offset_y = 80,offset = 0.006 ) %>%
+  gheatmap(select(pgroups, Phylogroup), width = 0.05, 
+           color = NA, font.size = 4, colnames_angle = 90,
+           colnames_position = "top", colnames_offset_y = 80, offset = 0.001)  %>%
+  gheatmap(select(esbl.cat, ESBL), width = 0.05, color = NA, font.size = 4, colnames_angle = 90,
+           colnames_position = "top", colnames_offset_y = 80, offset = 0.011 ) %>%
+  gheatmap(select(metadata, Source), width = 0.05, color = NA, font.size = 4, colnames_angle = 90,
+           colnames_position = "top", colnames_offset_y = 80, offset = 0.016 ) %>%
+  gheatmap(select(metadata, Continent), width = 0.05, color = NA, font.size = 4, colnames_angle = 90,
+           colnames_position = "top", colnames_offset_y = 80, offset = 0.021 ) +
+ # gheatmap(select(metadata, malawi), width = 0.04, color = NA, font.size = 4, colnames_angle = 90,
+      #     colnames_position = "top", colnames_offset_y = 80, offset = 0.025 )+ 
+  scale_fill_manual(values =col) + theme(legend.position = "none") +
+  geom_treescale(x =0.02, y = 1100, offset = 5)  +   
+  geom_point2(aes(subset = as.numeric(label) < 90 & !isTip), size = 0.3)+ 
+  geom_cladelabel(node = 1351, label = "ST131", fontsize = 2.5) + 
+  geom_cladelabel(node = 1866, label = "ST410", fontsize = 2.5) -> p #, labels = c("0", "1","A","B1","B2","C","Clade I or II", "D","F", 
+    
+ggtree(tree) %>% 
+
+  gheatmap(select(pgroups, Phylogroup), width = 0.05, 
+           color = NA, font.size = 4, colnames_angle = 90,
+           colnames_position = "top", colnames_offset_y = 80) +
+  scale_fill_manual(values =col) + labs(fill = "Phylogroup") + theme(legend.title = element_text()) -> p1x
+
+leg.pgroup <- get_legend(p1x)
+
+ggtree(tree) %>% 
+  
+  gheatmap(select(metadata, Source), width = 0.05, color = NA, font.size = 4, colnames_angle = 90,
+           colnames_position = "top", colnames_offset_y = 80, offset = 0.015 ) +
+  scale_fill_manual(values =col, labels = c("Clinical: Blood/CSF", "Clinical: Stool", "Clinicial: Other", "Environment", "")) + labs(fill = "Source") + theme(legend.title = element_text())-> p1x
+  
+leg.source <- get_legend(p1x)
+
+ggtree(tree) %>% 
+  
+  gheatmap(select(metadata, Continent), width = 0.05, color = NA, font.size = 4, colnames_angle = 90,
+           colnames_position = "top", colnames_offset_y = 80, offset = 0.020 ) +
+  scale_fill_manual(values =col, labels = c("Africa", "Asia", "S. America","")) + labs(fill = "Continent") + theme(legend.title = element_text())-> p1x
+
+leg.continent <- get_legend(p1x)
+
+ggarrange(p, 
+          ggarrange(NULL, leg.pgroup, leg.source, leg.continent, NULL, ncol = 1, nrow = 5, heights = c(1,1,0.7,0.4,1)),
+          ncol = 2, nrow = 1, widths = c(3,1))
+
+```
+
 ### Antimicrobial resistance determinents
 
-### Clustering core gene alignment and MGE
+### Testing associations: Sequence clusters and ESBL-clusters
+
+
 ## Appendix
