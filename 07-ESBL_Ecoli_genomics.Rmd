@@ -468,7 +468,7 @@ ggarrange(p,
 
 ### Antimicrobial resistance determinents
 
-```{r wgs-amr-sum, echo = F, warning = F, message = F, fig.scap="AMR", out.extra='', fig.cap="AMR", fig.height = 10, fig.width=8}
+```{r wgs-amr-sum, echo = F, warning = F, message = F, fig.scap="Frequency distribution of AMR genes", out.extra='', fig.cap="Frequency distribution of AMR genes", fig.height = 7, fig.width=5}
 
 m.c <- read.csv(paste0(wd, "amr/srst2_pres_abs.csv"), stringsAsFactors = F)
 q.res <- read.csv(paste0(wd, "amr/qrdr_mut_presence.csv"), stringsAsFactors = F)
@@ -481,7 +481,8 @@ amr.melt$class[grepl("Par", amr.melt$variable) |
                  grepl("Par", amr.melt$variable) |
                  grepl("Qnr", amr.melt$variable) |
                  grepl("Qep", amr.melt$variable) |
-                 grepl("Oqx", amr.melt$variable)] <- "Quinolone"
+                 grepl("Oqx", amr.melt$variable) |
+                 grepl("Nor", amr.melt$variable)] <- "Quinolone"
 
 amr.melt$class[grepl("Tet", amr.melt$variable) ] <- "Tetracycline"
 
@@ -498,12 +499,47 @@ amr.melt$class[grepl("Str", amr.melt$variable) |
                  grepl("Aad", amr.melt$variable) | 
                  grepl("Aac", amr.melt$variable) |
                  grepl("Aph", amr.melt$variable) |
-                 grepl("Rmt", amr.melt$variable) ] <- "Aminoglycosides"
+                 grepl("Rmt", amr.melt$variable) |
+                 grepl("APH", amr.melt$variable)] <- "Aminoglycosides"
 
 amr.melt$class[grepl("Sat", amr.melt$variable) ] <- "Streptothricin"
 
 amr.melt$class[grepl("LEN", amr.melt$variable) ] <- "Penicillins"
-amr.melt$class[grepl("SCO", amr.melt$variable) ] <- "Penicillins"
+amr.melt$class[grepl("SCO", amr.melt$variable)  |
+                grepl("BlaZ", amr.melt$variable) |
+                 grepl("CARB", amr.melt$variable) |
+                 grepl("PBP", amr.melt$variable) ] <- "Penicillins"
+
+amr.melt$class[grepl("NDM", amr.melt$variable) ] <- "Carbapenems"
+
+amr.melt <- subset(amr.melt, variable != "MrdA")
+amr.melt <- subset(amr.melt, variable != "LAP_2")
+
+amr.melt$class[grepl("Mph", amr.melt$variable) ] <- "Tetracyclines"
+amr.melt$class[grepl("Mef", amr.melt$variable) |
+                grepl("Erm", amr.melt$variable)  ] <- "Tetracyclines"
+
+amr.melt$class[grepl("Fos", amr.melt$variable) ] <- "Fosfomycin"
+
+amr.melt$class[grepl("Cat", amr.melt$variable) | 
+                 grepl("FloR", amr.melt$variable) |
+                 grepl("Cml", amr.melt$variable) ] <- "Choramphenicol"
+
+amr.melt$class[grepl("Dha", amr.melt$variable) | 
+                 grepl("CMY", amr.melt$variable) ] <- "AmpC"
+
+amr.melt$class[grepl("Dfr", amr.melt$variable) ] <- "Trimethoprim"
+
+
+amr.melt$class[grepl("Arr", amr.melt$variable) ] <- "Rifampicin"
+
+amr.melt <- subset(amr.melt, !(grepl("Amp", variable) | grepl("AMP", variable)))
+
+classlevels <- amr.melt %>% group_by(variable, class) %>% summarise(n = n())
+
+amr.melt$variable<- factor(amr.melt$variable, levels = classlevels$variable[order(classlevels$class, classlevels$n, decreasing = TRUE)])
+
+ggplot(amr.melt, aes(variable, fill = class)) + geom_bar() + coord_flip() + theme(axis.text.y = element_text(size = 5))
 
 ```
 ### Testing associations: Sequence clusters and ESBL-clusters
