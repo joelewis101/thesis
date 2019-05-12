@@ -93,7 +93,9 @@ dftemp$variable <- factor(dftemp$variable, levels = unique(dftemp$variable[order
 
 dftemp$name <- factor(dftemp$name, levels = df.brac$name[order(df.brac$`Escherichia coli`, decreasing = T)])
 
-ggplot(dftemp, aes(name, value, fill = variable)) + geom_col() + coord_flip() + scale_fill_brewer(palette = "Paired") + theme(axis.text.y = element_text(size = 3), legend.title = element_blank()) + labs(x= "Sample ID", y = "% reads" ) 
+ggplot(dftemp, aes(name, value, fill = variable)) + geom_col() + coord_flip() + scale_fill_brewer(palette = "Paired") + theme(axis.text.y = element_text(size = 2), legend.title = element_blank(), legend.text = element_text(size = 8)) + labs(x= "Sample ID", y = "% reads" ) 
+
+
 
 
 ```
@@ -191,7 +193,7 @@ The output from quast and checkM are shown in Figure \@ref(fig:wgs-qc), where N5
 
 In total, therefore, 46/520 (11%) of samples which were submitted for sequencing were excluded from downstream analysis. The remaining 474 samples represent 69% (474/686) of the cutured _E. coli_ in this study; 354 are from patients with sepsis, 86 are from hospitalised inpatients and 33 are from community members, with a median of 2 (range 1-5) samples per participant. N50, total assembled length and number of assembled contigs are shown in the appendix to this chapter.
 
-```{r wgs-qc, echo = F, warning = F, message = F, fig.scap="N50 as a function of total assembly length for included assemblies", out.extra='', fig.cap= "N50 as a function of total assembled length. Failed assemblies with less than 1Mb assembled shown as triangles. Contaminated assemblies with checkM-defined contamination above 25\\% shown in blue." }
+```{r wgs-qc, echo = F, warning = F, message = F, fig.scap="N50 as a function of total assembly length for included assemblies", out.extra='', fig.cap= "N50 as a function of total assembled length. Failed assemblies with less than 1Mb assembled shown as triangles. Contaminated assemblies with checkM-defined contamination above 25\\% shown in blue.", fig.height = 3, fig.width = 5, fig.align="center"  }
 
 df.qc <- subset(df.qc, Reads > 300000)
 
@@ -211,10 +213,10 @@ The commonset _E. coli_ phylogroup was phylogroup A: 204/473 (43%) samples belon
 
 The Roary pan-genome pipeline identified a core genome in the study isolates of 2966 genes, with a pan-genome of 26840 genes. The resultant core gene pseudosequence of length 1388742 bases contained 99693 variable sites, which were used to infer the maximum likelihood phylogenetic tree. The IQTREE ModelFinder module determined that a general time reversible (GTR) model with FreeRate site heterogeneity with 5 parameters provided the best fit to the data. The inferred tree is shown in Figure \@ref(fig:wgs-mlst) along with isolate phylogroup and sequence types; in general, as expected, sequence types were largely monophyletic and phylogroups tended to cluster together.
 
-```{r wgs-mlst, echo = F, warning = F, message = F, fig.cap="\\textit{E. coli} sequence type distribution", fig.height = 5, fig.width=5}
+```{r wgs-mlst, echo = F, warning = F, message = F, fig.cap="\\textit{E. coli} sequence type distribution", fig.height = 4, fig.width=5}
 
 ggplot(mlst, aes(fct_infreq(ST))) + geom_bar() + coord_flip()  +
-  xlab("E. coli sequence type") + ylab("Count") + theme(axis.text=element_text(size=6))
+  xlab("E. coli sequence type") + ylab("Count") + theme(axis.text=element_text(size=5))
 
 ```
 
@@ -466,6 +468,44 @@ ggarrange(p,
 
 ### Antimicrobial resistance determinents
 
+```{r wgs-amr-sum, echo = F, warning = F, message = F, fig.scap="AMR", out.extra='', fig.cap="AMR", fig.height = 10, fig.width=8}
+
+m.c <- read.csv(paste0(wd, "amr/srst2_pres_abs.csv"), stringsAsFactors = F)
+q.res <- read.csv(paste0(wd, "amr/qrdr_mut_presence.csv"), stringsAsFactors = F)
+amr <- merge(m.c, q.res, by.x = "name", by.y = "sample")
+amr.melt <- melt(amr) %>% subset(value > 0)
+
+amr.melt$class <- NA
+amr.melt$class[grepl("Par", amr.melt$variable) | 
+                 grepl("Gyr", amr.melt$variable) | 
+                 grepl("Par", amr.melt$variable) |
+                 grepl("Qnr", amr.melt$variable) |
+                 grepl("Qep", amr.melt$variable) |
+                 grepl("Oqx", amr.melt$variable)] <- "Quinolone"
+
+amr.melt$class[grepl("Tet", amr.melt$variable) ] <- "Tetracycline"
+
+narrow_spec <- c("TEM_1", "TEM_95", "TEM_135", "TEM_90",
+                 "OXA_1", 
+                 "SHV_1")
+
+amr.melt$class[amr.melt$variable %in% esbl] <- "ESBL"
+amr.melt$class[amr.melt$variable %in% narrow_spec] <- "Penicillins"
+
+amr.melt$class[grepl("Sul", amr.melt$variable) ] <- "Sulphonamides"
+
+amr.melt$class[grepl("Str", amr.melt$variable) | 
+                 grepl("Aad", amr.melt$variable) | 
+                 grepl("Aac", amr.melt$variable) |
+                 grepl("Aph", amr.melt$variable) |
+                 grepl("Rmt", amr.melt$variable) ] <- "Aminoglycosides"
+
+amr.melt$class[grepl("Sat", amr.melt$variable) ] <- "Streptothricin"
+
+amr.melt$class[grepl("LEN", amr.melt$variable) ] <- "Penicillins"
+amr.melt$class[grepl("SCO", amr.melt$variable) ] <- "Penicillins"
+
+```
 ### Testing associations: Sequence clusters and ESBL-clusters
 
 
