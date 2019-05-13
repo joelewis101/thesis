@@ -31,6 +31,7 @@ library(cowplot)
 
 
 output = "latex"
+source("other_scripts/load_metadata.R")
 
 
 ```
@@ -46,7 +47,7 @@ These questions, phrased in this way, seem difficult or impossible to answer giv
 
 The basic bioinformatic pipeline used is described in detail in Chapter 2, methods. Briefly, one _E. coli_ colony from each patient sample was taken forward for DNA extraction and paired-end short-read whole genome sequencing using Illumina HiSeq X at the Wellcome Sanger Institute. Read quality control was undertaken with Kraken[@Wood2014] v0.10.6 to assign reads to species and WSI QC pipeline which maps a random 100 Mbases fron each sample to a reference and calculates depth of coverage, number of heterogeneous SNPs, GC content and insert size. Samples that contained > 80% non _E coli._ reads were discarded and _de novo_ assembly was undertaken with SPAdes[@Bankevich2012a] v3.11.0. Assembly statistics were calculated with QUAST[@Gurevich2013] v4.6.0 and completeness and contamination of the assemblies assessed by checkM[@Parks2015] v1.0.7. Contaminated assemblies (with checkM-defined contamination of > 25%) or poor assemblies (with less than 1Mb assembled length) were discarded. Annotation was carried out with Prokka[@Seemann2014a] v1.5 with a genus specific database from RefSeq and the Roary v1.007 pan-genome pipeline[@Page2015] was used to identify a core genome. A core gene multiple sequence alignment was generated using maaft[@Katoh2013] v7.205, SNP-sites identified using SNP-sites[@Page2016] v2.4.1 and the resultant SNP alignment used to build a maximum likelihood phylogenetic tree using IQ-TREE[@Nguyen2015] v1.6.3, using ascertainment bias correction to correct for the fact that the input pseudosequence contained only variable sites, and using the ModelFinder module used to find the best fitting nucleotide substition model. This calculates the likeliood of a number of different models and chooses the model with the lowest (best fitting) Bayesian Information Criterion, a statistic which penalises model parameters. Reliability of inferred branch partitions was assessed with 1000 bootstrap replicates. Trees were visualised in the ggtree v1.14.4 package[@Yu2017] in R. 
 
-Ariba[@Hunt2017a] v2.12.1 was used to identify AMR-associated genes using the SRST2[@Inouye2014] database, to identify plasmid replicons using the PlasmidFinder database[@Carattoli2014] and to perform _in silico_ muli-locus sequence typing (MLST) using the database from http://mlst.warwick.ac.uk/mlst/dbs/Ecoli accessed via www.pubmlst.org. Because quinolone resistance often results from SNPs in the chromasome in the quinolone resistance determining regions (QRDRs) of the _gyrA_, _gyrB_, _parE_ and _parC_ genes - rather than acquisition of whole AMR-determining genes, as is the case with the other genes sought by Ariba - these genes were downloaded from the comprehensive antimicrobial resistance database (CARD, https://card.mcmaster.ca/) and Ariba used to call SNPs in them, with default settings. _E. coli_ phylogrouping was performed with a quadruplex _in silico_ PCR using the Clermont scheme[@Clermont2013] and isPcr v33x2 (https://github.com/bowhan/kent/tree/master/src/isPcr) 
+Ariba[@Hunt2017a] v2.12.1 was used to identify AMR-associated genes using the SRST2[@Inouye2014] database, to identify plasmid replicons using the PlasmidFinder database[@Carattoli2014] and to perform _in silico_ muli-locus sequence typing (MLST) using the database from http://mlst.warwick.ac.uk/mlst/dbs/Ecoli accessed via www.pubmlst.org. The $\beta$-lactamase genes $ampC1$, $ampC2$ and $ampH$ were excluded from the analysis of AMR determinents as they do not usually cause a resistant phenotype in _E. coli_. Because quinolone resistance often results from SNPs in the chromasome in the quinolone resistance determining regions (QRDRs) of the _gyrA_, _gyrB_, _parE_ and _parC_ genes - rather than acquisition of whole AMR-determining genes, as is the case with the other genes sought by Ariba - these genes were downloaded from the comprehensive antimicrobial resistance database (CARD, https://card.mcmaster.ca/) and Ariba used to call SNPs in them, with default settings. _E. coli_ phylogrouping was performed with a quadruplex _in silico_ PCR using the Clermont scheme[@Clermont2013] and isPcr v33x2 (https://github.com/bowhan/kent/tree/master/src/isPcr) 
 
 Rhierbaps package v1.1.0 in R[@Cheng2013] was used to cluster the core genome pseudosequence into sequence clusters (SCs). Two levels were used and these level 2 clusters used to test associations (see statistical analysis, below). To track putative mobile genetic elements ESBL-gene containing contigs were identified using BLASTn[@Altschul1990] v2.7.0 of all contigs against the SRST2 database and then contigs containing any given ESBL gene  were grouped by the ESBL gene they contained (for example, all $bla_{ctxm15}$ gene-containing clusters were grouped together), and each group clustered using cd-hit[@Li2006] v4.6 to produce mutually exclusive ESBL-gene-containing contig clusters for each identified ESBL gene. Henceforth, these clusters will be referred to as ESBL-clusters, for brevity. In order to attempt to determine the biological significance of the identified ESBL-clusters (i.e. what kind of MGE element they are likely to represent), basic statistics were plotted (number of samples contained withing each cluster, length of longest contig in cluster in kbases, length distribution of all contigs is cluster relative to longest contig and distribution of sequence identity compared to the longest contig in the cluster). Presence of compound trasposons, AMR determinents and plasmid replicons were identified by using BLAST with default settings of each ESBL-cluster representative sequence (as determined by cd-hit i.e one, the longest, for each ESBL-cluster) against the insertion sequence finder (ISfinder) database and the SRST2 database, taking the top hit (as determined by bitscore) for any given location, and visualising the results in gggenes v0.3.2. To assess lineage association, the ESBL-clusters were mapped back to the core genome SNP tree. 
 
@@ -93,7 +94,7 @@ dftemp$variable <- factor(dftemp$variable, levels = unique(dftemp$variable[order
 
 dftemp$name <- factor(dftemp$name, levels = df.brac$name[order(df.brac$`Escherichia coli`, decreasing = T)])
 
-ggplot(dftemp, aes(name, value, fill = variable)) + geom_col() + coord_flip() + scale_fill_brewer(palette = "Paired") + theme(axis.text.y = element_text(size = 2), legend.title = element_blank(), legend.text = element_text(size = 8)) + labs(x= "Sample ID", y = "% reads" ) 
+ggplot(dftemp, aes(name, value, fill = variable)) + geom_col() + coord_flip() + scale_fill_brewer(palette = "Paired") +  theme_bw() + theme(axis.text.y = element_text(size = 2), legend.title = element_blank(), legend.text = element_text(size = 8)) + labs(x= "Sample ID", y = "% reads" ) 
 
 
 
@@ -213,10 +214,10 @@ The commonset _E. coli_ phylogroup was phylogroup A: 204/473 (43%) samples belon
 
 The Roary pan-genome pipeline identified a core genome in the study isolates of 2966 genes, with a pan-genome of 26840 genes. The resultant core gene pseudosequence of length 1388742 bases contained 99693 variable sites, which were used to infer the maximum likelihood phylogenetic tree. The IQTREE ModelFinder module determined that a general time reversible (GTR) model with FreeRate site heterogeneity with 5 parameters provided the best fit to the data. The inferred tree is shown in Figure \@ref(fig:wgs-mlst) along with isolate phylogroup and sequence types; in general, as expected, sequence types were largely monophyletic and phylogroups tended to cluster together.
 
-```{r wgs-mlst, echo = F, warning = F, message = F, fig.cap="\\textit{E. coli} sequence type distribution", fig.height = 4, fig.width=5}
+```{r wgs-mlst, echo = F, warning = F, message = F, fig.cap="\\textit{E. coli} sequence type distribution", fig.height = 2, fig.width=6}
 
-ggplot(mlst, aes(fct_infreq(ST))) + geom_bar() + coord_flip()  +
-  xlab("E. coli sequence type") + ylab("Count") + theme(axis.text=element_text(size=5))
+ggplot(mlst, aes(fct_infreq(ST))) + geom_bar()+
+  xlab("E. coli sequence type") + ylab("Count") + theme(axis.text.x=element_text(size=5, angle = 90) )
 
 ```
 
@@ -468,7 +469,17 @@ ggarrange(p,
 
 ### Antimicrobial resistance determinents
 
-```{r wgs-amr-sum, echo = F, warning = F, message = F, fig.scap="Frequency distribution of AMR genes", out.extra='', fig.cap="Frequency distribution of AMR genes", fig.height = 7, fig.width=4}
+#### $\beta$-lactamse genes 
+
+Identified AMR genes are shown in Figure \@ref(fig:wgs-amr-sum). All isolates contained at least one gene that conferred resistance to third-generation cephalosporins, either an ESBL gene (n= 472) or a carbapenamase (n=1). The majority of ESBL-gene containing isolates contained only one ESBL gene (432/472 [92%]); fewer contained 2 (36/472 [8%]) or 3 (4/472 [1%]); none contained more than 3. $bla_{CTX-M}$ was the commonest ESBL gene, and over two thirds (320/473 [68%]) of isolates contained $bla_{CTX-M-15}$. ESBL $bla_{SHV}$ (27/473 [6%] of isolates) and $bla_{TEM}$ (16/473 [3%] of isolates) were also seen, though were rare; however, narrow spectrum $bla_{TEM}$ $\beta$-lactamases were common (297/473 [62%] of isolates). This pattern was also seen with $bla_{OXA}$ $\beta$-lactamases: narrow spectrum $bla_{OXA-1}$ was commonly seen (187/473 [40%] of isolates) but ESBL $bla_{OXA}$ genes were very unusual, occuring in only 2/473 (0.4%) of isolates. Plasmid-mediated $ampC$ genes were identified in 45/473 (9%) of isolates, almost all (44/45) $bla_{CMY-42}$; this was unexpected as all of these isolates were comfirmed to be ESBL-producers by combination disc testing. This testing uses cephalosporin-containing discs both with and without clavulanic acid, and confirms EBSL production by a difference in zone size between these discs, as ESBL enzymes are inactivated by clavulanic acid. However, the cephalosporins used in this test are hydrolysed by $ampC$ enzymes, and if these isolates were producing such enzymes it would be expected to confer cephalosporin resistance regardless of the presence or absence of clavulanic acid, and the test would therefore not confirm ESBL production. This was not the case for any of these isolates; none of them hydorolised the cephalosporins used in the combination disc testing. It may be that the $bla_{CMY}$ genes were not expressed.
+
+The carbapenamase gene identified was s $bla_{NDM-5}$; the isolate harbouring this gene was recovered from the  stool of a 67-year old man with no history of foreign travel nor hospitalistion. He had been admitted to the hospital with fever seven days previously and treated with seven days of intravenous ceftriaxone for sepsis, the source of which was not clear. He made an uneventful recovery, and no carpapenamase-containing isolate was recovered from his stool at any other time. The $bla_{NDM-5}$ gene was carried on a partially assembled IncX3 plasmid. BLAST of this assembly against the NCBI database showed that this contig had 99% sequence identity with a previously sequenced pNDM-MGR194 46.2 kbp blaNDM-5 containing Inc-X3 plasmid found in India between 2011-13[@Krishnaraju2015]. We fully assembled the plasmid by mapping reads back to pNDM-MGR194 with Burrows-Wheeler alignment and found it to be extremely similar, with only 13 SNPs compared to pNDM-MGR194.
+
+#### Quinolone resistance genes
+
+116/473 (25%) of isoltes contained plasmid-mediated quinolone resistance genes, either $qnr$ or $qep$. 
+
+```{r wgs-amr-sum, echo = F, warning = F, message = F, fig.scap="Frequency distribution of AMR genes", out.extra='', fig.cap="A: Frequency distribution of AMR genes identified in isolates. Class of antimicrobial to which gene confers resistance is shown. B: Frequency distribution of class resistance of isolates, based on presence of AMR gene. C: Phenotypic resistance patterns for subset of samples in this analysis that also underwent phenotypic testing (n = 440)", fig.height = 10, fig.width=8}
 
 m.c <- read.csv(paste0(wd, "amr/srst2_pres_abs.csv"), stringsAsFactors = F)
 q.res <- read.csv(paste0(wd, "amr/qrdr_mut_presence.csv"), stringsAsFactors = F)
@@ -586,13 +597,50 @@ ggplot(amr.melt, aes(variable, fill = class)) + geom_bar()+ theme_bw() + theme(a
 amr.class <- unique(select(amr.melt, name, class))
 amr.class$class <- factor(amr.class$class, levels = rev(levels(classlevels$class)))
 
-ggplot(amr.class, aes(class, fill = as.character(class))) + geom_bar() +theme_bw() + theme(axis.text.x = element_text(angle = 90), legend.position = "none", axis.title = element_blank()) -> p2
+ggplot(amr.class, aes(class, fill = as.character(class))) + geom_bar() +theme_bw() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5), legend.position = "none", axis.title = element_blank()) -> p2
 
-ggarrange(p1, ggarrange(p2, NULL, ncol = 1, nrow = 2, labels =c("B","C")), ncol = 2, nrow = 1, widths = c(1.5,1), labels = c("A", NA))
+
 
 # load phenotypic data
 
+orgs <- read.csv("/Users/joelewis/Documents/PhD/Data/ESBL/ESBL_orgs.csv", stringsAsFactors = F)
+orgs <- subset(orgs,profile_name == "DASSIM Culture")
 
+orgs <- orgs[c(1,4,5:10)]
+
+melt(orgs, id.vars = c('sample_number', 'organism')) -> orgs
+subset(orgs, value != "") -> orgs
+subset(orgs, organism == "Escherichia coli" ) -> orgs
+subset(orgs, value != "Sensitive") -> orgs
+
+#orgs$value <- factor(orgs$value, levels = c("Resistant", "Sensitive", "Intermediate" ))
+orgs$variable <- map_chr(as.character(orgs$variable), function(x) strsplit(x , "\\.")[[1]][[1]])
+
+
+
+sub("#","_", sample_ids$Lane) -> sample_ids$Lane
+subset(sample_ids, Lane %in% tree$tip.label) -> sample_ids
+orgs <- subset(orgs, sample_number %in% sample_ids$Supplier.Name)
+
+rbind(orgs, 
+      data.frame(sample_number = unique(orgs$sample_number),
+                 organism = rep("Escherichia coli", length(unique(orgs$sample_number))),
+                 variable = rep("ESBL", length(unique(orgs$sample_number))),
+                 value = rep("Resistant", length(unique(orgs$sample_number)))
+      )
+      )-> orgs
+                 
+                                
+cols <- hue_pal()(14)
+
+orgs$variable <- factor(orgs$variable, 
+                        levels = c("ESBL", "Meropenam", "Amikacin", "Gentamicin",
+                                   "Chloramphenicol", "Cotrimoxazole", "Ciprofloxacin") )
+ggplot(orgs, aes(variable, fill =variable)) + geom_bar() + theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5), legend.position  = "none", axis.title = element_blank()) + 
+  scale_fill_manual(values = cols[c(5,3,1,1,4,14,8)]) -> p3
+
+ggarrange(p1, ggarrange(NULL,p2, p3,NULL, ncol = 1, nrow = 4, labels =c(NA,"B","C", NA), heights = c(0.5,1,1,0.5)), ncol = 2, nrow = 1, widths = c(1.5,1), labels = c("A", NA))
 
 ```
 ### Testing associations: Sequence clusters and ESBL-clusters
