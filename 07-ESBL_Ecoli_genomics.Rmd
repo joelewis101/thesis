@@ -19,6 +19,7 @@ library(phytools)
 library(RColorBrewer)
 library(scales)
 library(cowplot)
+library(pheatmap)
 
 
  parse_checkm_lines <- function(s, n) {
@@ -475,11 +476,7 @@ Identified AMR genes are shown in Figure \@ref(fig:wgs-amr-sum). All isolates co
 
 The carbapenamase gene identified was s $bla_{NDM-5}$; the isolate harbouring this gene was recovered from the  stool of a 67-year old man with no history of foreign travel nor hospitalistion. He had been admitted to the hospital with fever seven days previously and treated with seven days of intravenous ceftriaxone for sepsis, the source of which was not clear. He made an uneventful recovery, and no carpapenamase-containing isolate was recovered from his stool at any other time. The $bla_{NDM-5}$ gene was carried on a partially assembled IncX3 plasmid. BLAST of this assembly against the NCBI database showed that this contig had 99% sequence identity with a previously sequenced pNDM-MGR194 46.2 kbp blaNDM-5 containing Inc-X3 plasmid found in India between 2011-13[@Krishnaraju2015]. We fully assembled the plasmid by mapping reads back to pNDM-MGR194 with Burrows-Wheeler alignment and found it to be extremely similar, with only 13 SNPs compared to pNDM-MGR194.
 
-#### Quinolone resistance genes
-
-116/473 (25%) of isoltes contained plasmid-mediated quinolone resistance genes, either $qnr$ or $qep$. 
-
-```{r wgs-amr-sum, echo = F, warning = F, message = F, fig.scap="Frequency distribution of AMR genes", out.extra='', fig.cap="A: Frequency distribution of AMR genes identified in isolates. Class of antimicrobial to which gene confers resistance is shown. B: Frequency distribution of class resistance of isolates, based on presence of AMR gene. C: Phenotypic resistance patterns for subset of samples in this analysis that also underwent phenotypic testing (n = 440)", fig.height = 10, fig.width=8}
+```{r wgs-amr-sum, echo = F, warning = F, message = F, fig.scap="Frequency distribution of AMR genes", out.extra='', fig.cap="A: Frequency distribution of AMR genes identified in isolates. Class of antimicrobial to which gene confers resistance is shown. B: Number of isolates with any mutation to a given class. Any mutation that could possibly confer resistance to a given class is included, including any mutation in the QRDR for quinolones. C: Phenotypic resistance patterns for subset of samples in this analysis that also underwent phenotypic testing (n = 449)", fig.height = 10, fig.width=8}
 
 m.c <- read.csv(paste0(wd, "amr/srst2_pres_abs.csv"), stringsAsFactors = F)
 q.res <- read.csv(paste0(wd, "amr/qrdr_mut_presence.csv"), stringsAsFactors = F)
@@ -611,7 +608,7 @@ orgs <- orgs[c(1,4,5:10)]
 melt(orgs, id.vars = c('sample_number', 'organism')) -> orgs
 subset(orgs, value != "") -> orgs
 subset(orgs, organism == "Escherichia coli" ) -> orgs
-subset(orgs, value != "Sensitive") -> orgs
+
 
 #orgs$value <- factor(orgs$value, levels = c("Resistant", "Sensitive", "Intermediate" ))
 orgs$variable <- map_chr(as.character(orgs$variable), function(x) strsplit(x , "\\.")[[1]][[1]])
@@ -621,6 +618,8 @@ orgs$variable <- map_chr(as.character(orgs$variable), function(x) strsplit(x , "
 sub("#","_", sample_ids$Lane) -> sample_ids$Lane
 subset(sample_ids, Lane %in% tree$tip.label) -> sample_ids
 orgs <- subset(orgs, sample_number %in% sample_ids$Supplier.Name)
+orgsall <- orgs
+subset(orgs, value != "Sensitive") -> orgs
 
 rbind(orgs, 
       data.frame(sample_number = unique(orgs$sample_number),
@@ -643,6 +642,140 @@ ggplot(orgs, aes(variable, fill =variable)) + geom_bar() + theme_bw() +
 ggarrange(p1, ggarrange(NULL,p2, p3,NULL, ncol = 1, nrow = 4, labels =c(NA,"B","C", NA), heights = c(0.5,1,1,0.5)), ncol = 2, nrow = 1, widths = c(1.5,1), labels = c("A", NA))
 
 ```
+
+#### Quinolone resistance genes
+
+116/473 (25%) of isolates contained plasmid-mediated quinolone resistance PMQR) genes, either $qnr$ or $qep$. Mutations were identified in at least one quinolone resistance-determining regions (QRDR) in 349/449 (78%) of isolates. The majority of mutations were well-described QRDR mutations (codon 83 and 87 in $gyrA$, codon 80 and 84 in $parC$ and codon 458 in $parE$, Figure \@ref(fig:wgs-amr-quin)A). QRDR mutations tended to cluster togather (Figure \@ref(fig:wgs-amr-quin)B) but alone they correlated poorly with phenotypic resistance. Of the 449 samples with available phenotypic sensitivity data, 294/449 (65%) were intermediate or resistant to ciprofloxacin, but 349/449 (78%) had a mutation in any codon in one of the four QRDR; presence of any QRDR mutation together with presence of PMQR had sensitivity of 95% (95% CI 93-98%) but specificity of 23% (95% CI 17-31%) for phenotypic quinolone resistance. Presence of mutations at all of codon 83 and 87 of $gyrA$ and at codon 80 of $parC$ had improved, but still poor, discrimination for phenotypic resistance with sensitivity 89% (95% 85-93%) and specificity 51% (95% CI 43-59%).
+
+```{r wgs-quin-setup, include = F}
+
+read_tsv(paste0(wd, "amr/QRDR_ariba_output.tsv")) -> q.df
+
+
+
+
+names(q.df)[length(names(q.df))] <- "sample"
+
+subset(q.df, ref_name != "ref_name") -> q.df
+
+sub("#", "_", q.df$sample) -> q.df$sample
+subset(q.df, sample %in% tree$tip.label) -> q.df
+
+select(q.df, sample, ref_name, ref_ctg_change) -> q.df
+
+q.df$codon_posn <- str_sub(q.df$ref_ctg_change,2,-2)
+
+q.df$wt_codon <-  str_sub(q.df$ref_ctg_change,1,1)
+
+q.df$mut_codon <- str_sub(q.df$ref_ctg_change,-1,-1)
+
+q.df$codon_posn <- as.numeric(q.df$codon_posn)
+
+q.df <- subset(q.df, (ref_name == "GyrA" & codon_posn >= 67 & codon_posn <= 108) |
+                 (ref_name == "GyrB" & codon_posn >= 331 & codon_posn <= 480) |
+                (ref_name == "ParC" & codon_posn >= 38 & codon_posn <= 169) |
+                (ref_name == "ParE" & codon_posn >= 365 & codon_posn <= 525) )
+
+df.gyra <- subset(q.df, ref_name == "GyrA" & codon_posn >= 67 & codon_posn <= 108)
+
+q.df %>% dplyr::group_by(ref_name, codon_posn) %>% dplyr::summarise(n=n()) -> df.sum
+
+df.gyra <- subset(df.sum, ref_name == "GyrA" & codon_posn >= 67 & codon_posn <= 108)
+df.gyrb <- subset(df.sum, ref_name == "GyrB" & codon_posn >= 331 & codon_posn <= 480)
+df.parc <- subset(df.sum, ref_name == "ParC" & codon_posn >= 38 & codon_posn <= 169)
+df.pare <- subset(df.sum, ref_name == "ParE" & codon_posn >= 365 & codon_posn <= 525)
+
+
+ggplot(df.gyra, aes(x= codon_posn, y = n)) + geom_point()  + xlim(c(67,108)) +
+  theme_bw() + ylim(c(0,400)) + ggtitle("GyrA") + xlab("Codon position")-> p1
+  
+ggplot(df.gyrb, aes(x= codon_posn, y = n)) + geom_point()  + xlim(c(331,480)) +
+  theme_bw() + ylim(c(0,400)) + ggtitle("GyrB")  + xlab("Codon position") -> p2
+     
+ggplot(df.parc, aes(x= codon_posn, y = n)) + geom_point()  + xlim(c(38,169)) +
+  theme_bw() + ylim(c(0,400)) + ggtitle("ParC")  + xlab("Codon position")-> p3
+
+ggplot(df.pare, aes(x= codon_posn, y = n)) + geom_point()  + xlim(c(365,525)) +
+  theme_bw()  + ylim(c(0,400)) + ggtitle("ParE") + xlab("Codon position") -> p4
+
+
+
+orgs.cip <- subset(orgsall, variable == "Ciprofloxacin")
+
+orgs.cip <- merge( select(sample_ids, Supplier.Name, Lane),select(orgs.cip,sample_number, value),   by.x = "Supplier.Name", by.y = "sample_number")
+
+orgs.cip <- merge(orgs.cip, q.res, by.x = "Lane", by.y = "sample")
+
+q.df$key <- paste0(q.df$ref_name, q.df$codon_posn)
+
+q.df.new <- subset(q.df, key == "GyrA83" |  key == "GyrA87" | key == "ParC80" | key == "ParE458")
+
+dcast(q.df.new,sample ~ key, fun.aggregate = length) -> q.df.new
+
+orgs.cip <- merge(orgs.cip, q.df.new, by.x = "Lane", by.y = "sample", all.x = T)
+orgs.cip[is.na(orgs.cip)] <- 0
+orgs.cip$value[orgs.cip$value == "Resistant" |orgs.cip$value == "Intermediate" ] <- 1
+orgs.cip$value[orgs.cip$value == "Sensitive" ] <- 0
+orgs.cip$value <- as.numeric(orgs.cip$value)
+
+pmqr <- m.c[ c("name", grep("Qnr", names(m.c), value = T) , grep("Qep", names(m.c), value = T) )]
+
+pmqr$Qnr <- apply(pmqr[grep("Qnr", names(pmqr), value = TRUE )], 1, sum)
+pmqr$Qep <- apply(pmqr[grep("Qep", names(pmqr), value = TRUE )], 1, sum)
+
+pmqr$Qnr[pmqr$Qnr > 1] <- 1
+pmqr$Qep[pmqr$Qep > 1] <- 1
+
+orgs.cip <- merge(orgs.cip, select(pmqr, name, Qnr, Qep), by.x = "Lane", by.y = "name")
+names(orgs.cip)[names(orgs.cip) == "value"] <- "Phenotypic resistance"
+
+orgs.cip$gyra.parc.and.plasm <-(orgs.cip$GyrA83 & orgs.cip$GyrA87 & orgs.cip$ParC80) | orgs.cip$Qnr | orgs.cip$Qep
+
+orgs.cip$gyra.parc.or.plasm <-(orgs.cip$GyrA83 | orgs.cip$GyrA87 | orgs.cip$ParC80) | orgs.cip$Qnr | orgs.cip$Qep
+
+orgs.cip %>% summarise(TP = sum(`Phenotypic resistance` == 1 & gyra.parc.and.plasm == TRUE),
+                       FP = sum(`Phenotypic resistance` == 0 & gyra.parc.and.plasm == TRUE),
+                       TN = sum(`Phenotypic resistance` == 0 & gyra.parc.and.plasm == FALSE),
+                       FN = sum(`Phenotypic resistance` == 1 & gyra.parc.and.plasm == FALSE)) -> summ
+
+#binom.test(summ$TP, (summ$TP + summ$FN))
+#binom.test(summ$TN, (summ$TN + summ$FP))
+
+orgs.cip %>% summarise(TP = sum(`Phenotypic resistance` == 1 & gyra.parc.or.plasm == TRUE),
+                       FP = sum(`Phenotypic resistance` == 0 & gyra.parc.or.plasm == TRUE),
+                       TN = sum(`Phenotypic resistance` == 0 & gyra.parc.or.plasm == FALSE),
+                       FN = sum(`Phenotypic resistance` == 1 & gyra.parc.or.plasm == FALSE)) -> summ2
+
+#binom.test(summ2$TP, (summ2$TP + summ2$FN))
+#binom.test(summ2$TN, (summ2$TN + summ2$FP))
+#dev.off()
+grid.grabExpr(pheatmap(orgs.cip[c(3,8,9,10,11,12,13)], cluster_cols = FALSE, show_rownames = FALSE,
+                       legend = FALSE)) -> hm
+hm <- as_ggplot(hm)
+#dev.off()
+
+ggarrange(ggarrange(p1,p2,p3,p4, ncol =2, nrow =2), hm, ncol = 2, nrow = 1, labels = c("A", "B")) -> parrange
+
+ggsave(paste0(wd,"quinolone_plot.pdf"), plot = parrange, width = 18, height = 8, units = "cm")
+
+```
+
+
+
+
+```{r wgs-amr-quin, echo = F, warning = F, message = F, fig.scap="Quinolone resistance mutations and phenotypic resistance", out.extra='', fig.cap="A: Mutation positions in Quinolone resistance-determining regions, B: Co-occurance heatmap of QRDR mutations, plamid-mediated quinolone resistance and phenotypic resistance. Each row is one sample, red = presence, blue = absence."}
+
+knitr::include_graphics(paste0(wd,"quinolone_plot.pdf"))
+```
+
+#### Aminoglycoside resistance
+
+Blah blah blah blah aminogycoside resistance.
+
+Yes indeedy aminoglycosie resistance
+
+Oh yes
+
 ### Testing associations: Sequence clusters and ESBL-clusters
 
 
