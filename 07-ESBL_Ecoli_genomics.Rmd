@@ -468,7 +468,7 @@ ggarrange(p,
 
 ### Antimicrobial resistance determinents
 
-```{r wgs-amr-sum, echo = F, warning = F, message = F, fig.scap="Frequency distribution of AMR genes", out.extra='', fig.cap="Frequency distribution of AMR genes", fig.height = 7, fig.width=5}
+```{r wgs-amr-sum, echo = F, warning = F, message = F, fig.scap="Frequency distribution of AMR genes", out.extra='', fig.cap="Frequency distribution of AMR genes", fig.height = 7, fig.width=4}
 
 m.c <- read.csv(paste0(wd, "amr/srst2_pres_abs.csv"), stringsAsFactors = F)
 q.res <- read.csv(paste0(wd, "amr/qrdr_mut_presence.csv"), stringsAsFactors = F)
@@ -537,9 +537,62 @@ amr.melt <- subset(amr.melt, !(grepl("Amp", variable) | grepl("AMP", variable)))
 
 classlevels <- amr.melt %>% group_by(variable, class) %>% summarise(n = n())
 
-amr.melt$variable<- factor(amr.melt$variable, levels = classlevels$variable[order(classlevels$class, classlevels$n, decreasing = TRUE)])
+temp <- c("Penicillins", "ESBL", "AmpC", "Carbapenems")
 
-ggplot(amr.melt, aes(variable, fill = class)) + geom_bar() + coord_flip() + theme(axis.text.y = element_text(size = 5))
+
+classlevels$class <- factor(classlevels$class, levels = rev(c(temp, unique(amr.melt$class)[!(unique(amr.melt$class) %in% temp)])))
+
+amr.melt$variable<- factor(amr.melt$variable, levels = classlevels$variable[order(classlevels$class, classlevels$n)])
+
+
+
+col <- c(brewer.pal(8,"Dark2"),brewer.pal(8,"Dark2") )
+
+data.frame((table(classlevels$class))) -> linebreaks
+linebreaks$cumsum <- cumsum(linebreaks$Freq)
+
+start <- list()
+end <- list()
+label <- list()
+
+for (i in 1:nrow(linebreaks)) {
+  if (i == 1) {
+    start[[i]] <- 1
+    end[[i]] <- linebreaks$cumsum[i]
+    label[[i]] <- as.character(linebreaks$Var1[i])
+  } else {
+    start[[i]] <- linebreaks$cumsum[i-1] + 1
+    end[[i]] <- linebreaks$cumsum[i]
+    label[[i]] <- as.character(linebreaks$Var1[i])
+  }
+}
+
+do.call(rbind, start) -> start
+do.call(rbind, end) -> end
+do.call(rbind, label) -> label
+
+data.frame(start = start, end = end, label = label) -> pos
+
+pos$text.y <- pos$start + (pos$end - pos$start)/2
+
+pos$start == pos$end -> chflag
+
+pos$start[chflag] <- pos$start[chflag] - 0.2
+pos$end[chflag] <- pos$end[chflag] + 0.2
+
+
+ggplot(amr.melt, aes(variable, fill = class)) + geom_bar()+ theme_bw() + theme(axis.text.y = element_text(size = 5), legend.position = "none", plot.margin = unit(c(0.2,0.2,0.2,3.5), "cm"), axis.title = element_blank() )   + coord_flip(ylim = c(-5,473),clip = "off", expand = FALSE) +  annotate(geom = "segment", x = pos$start, xend = pos$end, y = -100, yend = -100 )  + annotate(geom = "text", y = -110, x = pos$text.y, label = pos$label, size = 3, hjust = 1) -> p1
+
+amr.class <- unique(select(amr.melt, name, class))
+amr.class$class <- factor(amr.class$class, levels = rev(levels(classlevels$class)))
+
+ggplot(amr.class, aes(class, fill = as.character(class))) + geom_bar() +theme_bw() + theme(axis.text.x = element_text(angle = 90), legend.position = "none", axis.title = element_blank()) -> p2
+
+ggarrange(p1, ggarrange(p2, NULL, ncol = 1, nrow = 2, labels =c("B","C")), ncol = 2, nrow = 1, widths = c(1.5,1), labels = c("A", NA))
+
+# load phenotypic data
+
+
 
 ```
 ### Testing associations: Sequence clusters and ESBL-clusters
