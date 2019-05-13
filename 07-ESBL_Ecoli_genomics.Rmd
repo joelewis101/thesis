@@ -763,7 +763,7 @@ ggsave(paste0(wd,"quinolone_plot.pdf"), plot = parrange, width = 18, height = 8,
 
 
 
-```{r wgs-amr-quin, echo = F, warning = F, message = F, fig.scap="Quinolone resistance mutations and phenotypic resistance", out.extra='', fig.cap="A: Mutation positions in Quinolone resistance-determining regions, B: Co-occurance heatmap of QRDR mutations, plamid-mediated quinolone resistance and phenotypic resistance. Each row is one sample, red = presence, blue = absence."}
+```{r wgs-amr-quin, echo = F, warning = F, message = F, fig.scap="Quinolone resistance mutations and phenotypic resistance", out.extra='', fig.cap="A: Mutation positions in Quinolone resistance-determining regions, showing that most mutations are well-recognised (see text for details) B: Co-occurance heatmap of QRDR mutations, plamid-mediated quinolone resistance and phenotypic resistance. Each row is one sample, red = presence, blue = absence."}
 
 knitr::include_graphics(paste0(wd,"quinolone_plot.pdf"))
 ```
