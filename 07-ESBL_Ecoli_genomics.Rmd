@@ -80,7 +80,7 @@ Finally, to inform the question as to what the likely unit of transmission in th
 
 In total, 520 _E. coli_ underwent DNA extraction and were shipped from Malawi to WSI; these represented all sequential isolates at the time of final DNA extraction, which occured in two batches in February 2018 and October 2018. Kracken/Bracken read assignment of these samples is shown in Figure \@ref(fig:wgs-qc-braken). The majority of samples have > 90% or reads assigned to _E. coli_; a minority have < 90% of reads assigned to _E. coli_ but a very closely related species such as _Shigella_, amd as such are likely to be pure _E. coli_ culture with read misclassification. However, 12 samples have > 80% reads assigned to a non- _E. coli_ species such as _Klebsiella pneumoniae_. These samples were assumed to represent upstream species misidentification or, perhaps more likely, selection of the wrong sample from the freezer archive for culture and DNA extraction, given that for any sample ID there are often several bacterial species identified and cryopreserved. These samples were excluded from further analysis.
 
-```{r wgs-qc-braken,  echo = F, warning = F, message = F, fig.scap="Kraken/bracken read assignment", out.extra='', fig.cap= "Read assignment by Kracken and Bracken of all samples", fig.align= "center",fig.height = 10, fig.width = 6 }
+```{r wgs-qc-braken,  echo = F, warning = F, message = F, fig.scap="Species read assignment of sequenced isolates", out.extra='', fig.cap= "Species read assignment of all samples", fig.align= "center",fig.height = 10, fig.width = 6 }
 
 df1 <- read_tsv(paste0(wd, "D1_Braken_readscreen_species_composition.tsv"))
 df2 <- read_tsv(paste0(wd, "D2_Bracken_species_composition.tsv"))
@@ -731,29 +731,29 @@ pmqr$Qnr[pmqr$Qnr > 1] <- 1
 pmqr$Qep[pmqr$Qep > 1] <- 1
 
 orgs.cip <- merge(orgs.cip, select(pmqr, name, Qnr, Qep), by.x = "Lane", by.y = "name")
-names(orgs.cip)[names(orgs.cip) == "value"] <- "Phenotypic resistance"
+names(orgs.cip)[names(orgs.cip) == "value"] <- "Quinolone resistance"
 
 orgs.cip$gyra.parc.and.plasm <-(orgs.cip$GyrA83 & orgs.cip$GyrA87 & orgs.cip$ParC80) | orgs.cip$Qnr | orgs.cip$Qep
 
 orgs.cip$gyra.parc.or.plasm <-(orgs.cip$GyrA83 | orgs.cip$GyrA87 | orgs.cip$ParC80) | orgs.cip$Qnr | orgs.cip$Qep
 
-orgs.cip %>% summarise(TP = sum(`Phenotypic resistance` == 1 & gyra.parc.and.plasm == TRUE),
-                       FP = sum(`Phenotypic resistance` == 0 & gyra.parc.and.plasm == TRUE),
-                       TN = sum(`Phenotypic resistance` == 0 & gyra.parc.and.plasm == FALSE),
-                       FN = sum(`Phenotypic resistance` == 1 & gyra.parc.and.plasm == FALSE)) -> summ
+orgs.cip %>% summarise(TP = sum(`Quinolone resistance` == 1 & gyra.parc.and.plasm == TRUE),
+                       FP = sum(`Quinolone resistance` == 0 & gyra.parc.and.plasm == TRUE),
+                       TN = sum(`Quinolone resistance` == 0 & gyra.parc.and.plasm == FALSE),
+                       FN = sum(`Quinolone resistance` == 1 & gyra.parc.and.plasm == FALSE)) -> summ
 
 #binom.test(summ$TP, (summ$TP + summ$FN))
 #binom.test(summ$TN, (summ$TN + summ$FP))
 
-orgs.cip %>% summarise(TP = sum(`Phenotypic resistance` == 1 & gyra.parc.or.plasm == TRUE),
-                       FP = sum(`Phenotypic resistance` == 0 & gyra.parc.or.plasm == TRUE),
-                       TN = sum(`Phenotypic resistance` == 0 & gyra.parc.or.plasm == FALSE),
-                       FN = sum(`Phenotypic resistance` == 1 & gyra.parc.or.plasm == FALSE)) -> summ2
+orgs.cip %>% summarise(TP = sum(`Quinolone resistance` == 1 & gyra.parc.or.plasm == TRUE),
+                       FP = sum(`Quinolone resistance` == 0 & gyra.parc.or.plasm == TRUE),
+                       TN = sum(`Quinolone resistance` == 0 & gyra.parc.or.plasm == FALSE),
+                       FN = sum(`Quinolone resistance` == 1 & gyra.parc.or.plasm == FALSE)) -> summ2
 
 #binom.test(summ2$TP, (summ2$TP + summ2$FN))
 #binom.test(summ2$TN, (summ2$TN + summ2$FP))
 
-orgs.cip <- orgs.cip[order(orgs.cip$`Phenotypic resistance`, orgs.cip$GyrA83, orgs.cip$GyrA87, orgs.cip$ParC80, orgs.cip$ParE458, orgs.cip$Qnr, orgs.cip$Qep),]
+orgs.cip <- orgs.cip[order(orgs.cip$`Quinolone resistance`, orgs.cip$GyrA83, orgs.cip$GyrA87, orgs.cip$ParC80, orgs.cip$ParE458, orgs.cip$Qnr, orgs.cip$Qep),]
 #dev.off()
 grid.grabExpr(pheatmap(orgs.cip[c(3,8,9,10,11,12,13)], cluster_cols = FALSE, cluster_rows = FALSE, show_rownames = FALSE,
                        legend = FALSE)) -> hm
@@ -766,7 +766,7 @@ ggsave(paste0(wd,"quinolone_plot.pdf"), plot = parrange, width = 18, height = 8,
 
 ```
 
-```{r wgs-amr-quin, echo = F, warning = F, message = F, fig.scap="Quinolone resistance mutations and phenotypic resistance", out.extra='', fig.cap="A: Mutation positions in quinolone resistance-determining regions, showing that most mutations are well-recognised (see text for details) B: Co-occurance heatmap of QRDR mutations (\\textit{gyrA}, \\textit{parC}, or \\textit{parE}) plamid-mediated quinolone resistance mutations (\\textit{qnr} or \\textit{qep} and phenotypic resistance. Each row is one sample, red = presence, blue = absence."}
+```{r wgs-amr-quin, echo = F, warning = F, message = F, fig.scap="Quinolone resistance mutations and phenotypic resistance", out.extra='', fig.cap="A: Mutation positions in quinolone resistance-determining regions, showing that most mutations are well-recognised (see text for details) B: Co-occurance heatmap of QRDR mutations (\\textit{gyrA}, \\textit{parC}, or \\textit{parE}) plamid-mediated quinolone resistance mutations (\\textit{qnr} or \\textit{qep}) and phenotypic resistance. Each row is one sample, red = presence, blue = absence."}
 
 knitr::include_graphics(paste0(wd,"quinolone_plot.pdf"))
 ```
@@ -849,7 +849,7 @@ ggsave(paste0(wd,"aminoglycoside_plot.pdf"), plot = parrange, width = 20, height
 
 ```
 
-```{r wgs-amr-aminogly, echo = F, warning = F, message = F, fig.scap="Aminoglycoside resistance mutations and phenotypic resistance", out.extra='', fig.cap="A: Aminoglycoside mutations and expected resistance to gentamicin, amikacin and kanamycin B: Heatmap showning phenotypic amikacin and gentamicin resistance and identified resistance genes that could be expected to confer resistance to these agents (see text for details). Aac\\_II in heatmap indicates presence of either \\textit{aac(3)-IIa} or\\textit{aac(3)-IIa} gene, red = presence, blue = absence."}
+```{r wgs-amr-aminogly, echo = F, warning = F, message = F, fig.scap="Aminoglycoside resistance mutations and phenotypic resistance", out.extra='', fig.cap="A: Aminoglycoside mutations and expected resistance to gentamicin, amikacin and kanamycin B: Heatmap showning phenotypic amikacin and gentamicin resistance and identified resistance genes that could be expected to confer resistance to these agents (see text for details). Aac\\_II in heatmap indicates presence of either \\textit{aac(3)-IIa} or\\textit{aac(3)-IIa} gene. Each row is one sample, red = presence, blue = absence."}
 
 knitr::include_graphics(paste0(wd,"aminoglycoside_plot.pdf"))
 ```
@@ -915,15 +915,19 @@ ggarrange(hm1,hm2, ncol = 2, nrow = 1, labels = c("A","B")) -> parrange
 
 ggsave(paste0(wd,"chor_cotrim_plot.pdf"), plot = parrange, width = 20, height = 10, units = "cm")
 ```
-```{r wgs-amr-chlor-cotrim, echo = F, warning = F, message = F, fig.scap="Chloramphenicol and cotrimoxazole resistance mutations and phenotypic resistance", out.extra='', fig.cap="Heatmap showning phenotypic chlramphenicol (A) and cotrimoxazole (B) resistance and identified resistance genes that could be expected to confer resistance to these agents."}
+```{r wgs-amr-chlor-cotrim, echo = F, warning = F, message = F, fig.scap="Chloramphenicol and cotrimoxazole resistance mutations and phenotypic resistance", out.extra='', fig.cap="Heatmap showning phenotypic chlramphenicol (A) and cotrimoxazole (B) resistance and identified resistance genes that could be expected to confer resistance to these agents. Each row is one sample, red = presence, blue = absence"}
 
 knitr::include_graphics(paste0(wd,"chor_cotrim_plot.pdf"))
 
 ```
 
+### Lineage association and clustering of AMR determinents
+
+Next, I explored associations of AMR determinents, both with bacterial lineages, and with other AMR determinents.
 
 
-### Testing associations: Sequence clusters and ESBL-clusters
+
+### Testing metadata associations: Sequence clusters and ESBL-clusters
 
 
 ## Appendix
