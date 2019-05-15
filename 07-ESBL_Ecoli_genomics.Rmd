@@ -20,6 +20,9 @@ library(RColorBrewer)
 library(scales)
 library(cowplot)
 library(pheatmap)
+library(viridis)
+library(ggraph)
+library(igraph)
 
 
  parse_checkm_lines <- function(s, n) {
@@ -916,7 +919,7 @@ ggarrange(NULL,hm1,NULL,hm2,NULL, ncol = 5, nrow = 1, labels = c("A",NA,"B",NA,N
 ggsave(paste0(wd,"chor_cotrim_plot.pdf"), plot = parrange, width = 20, height = 10, units = "cm")
 ```
 
-```{r wgs-amr-chlor-cotrim, echo = F, warning = F, message = F, fig.scap="Chloramphenicol and cotrimoxazole resistance mutations and phenotypic resistance", out.extra='', fig.cap="Heatmap showning phenotypic chlramphenicol (A) and cotrimoxazole (B) resistance and identified resistance genes that could be expected to confer resistance to these agents. Each row is one sample, red = presence, blue = absence"}
+```{r wgs-amr-chlor-cotrim, echo = F, warning = F, message = F, fig.scap="Chloramphenicol and cotrimoxazole resistance mutations and phenotypic resistance", out.extra='', fig.cap="Heatmap showning phenotypic chloramphenicol (A) and cotrimoxazole (B) resistance and identified resistance genes that could be expected to confer resistance to these agents. Each row is one sample, red = presence, blue = absence"}
 
 knitr::include_graphics(paste0(wd,"chor_cotrim_plot.pdf"))
 
@@ -924,9 +927,9 @@ knitr::include_graphics(paste0(wd,"chor_cotrim_plot.pdf"))
 
 ### Lineage association and clustering of AMR determinents
 
-Next, I explored associations of AMR determinents, both with bacterial lineages, and with other AMR determinents. First, I mapped the identified AMR determinents back to the maximum likelihood tree (Figure \@ref(fig:wgs-amr-maptotree)), demonstrating a clear lineage association, in that certain AMR genes tend to cluster within lineages. To explore this further, the matrix of pairwise jaccard indices was constructed 
+Next, I explored associations of AMR determinents, both with bacterial lineages, and with other AMR determinents. First, I mapped the identified AMR determinents back to the maximum likelihood tree (Figure \@ref(wgs-amr-cooccur-plot)), demonstrating a clear lineage association, in that certain AMR genes tend to cluster within lineages. To explore this further, the matrix of pairwise jaccard indices was constructed 
 
-```{r wgs-amr-maptotree, echo = F, warning = F, message = F, fig.scap="AMR determinents mapped back to tree", out.extra='', fig.cap="AMR determinents mapped back to tree, showing lineage associations of AMR genes and plasmid replicons. Presence of QRDR mutations is indicated by blue (any nonsynonymous mutation in any QRDR shown), plasmid replicons purple and other AMR genes red.", fig.width = 12, fig.height = 8}
+```{r wgs-amr-maptotree,include = F}
 
 tree <- read.tree(paste0(wd, "core_genome_tree/core_alnD2ESCO_snp_sites.aln.treefile"))
 midpoint.root(tree) -> tree
@@ -962,39 +965,73 @@ hm <- select(hm, -AmpC1, -AmpC2, -AMPH, -MrdA)
 rownames(hm) <- hm$sample
 ggtree(tree) %>% gheatmap(hm[,-1], font.size = 2,
 colnames_position = "top", colnames_angle = 90, colnames_offset_y = 20,
-color = "lightgrey", width = 3, offset = 0.02)  + scale_fill_manual(values = c("white", "red", "purple", "blue")) +
-  theme(legend.position = "none")
-
+color = NA, width = 3, offset = 0.02)  + scale_fill_manual(values = c("white", cols[1],cols[12], cols[8])) +
+  theme(legend.position = "none") -> p3
 
 
 ```
 
 
-```{r wgs-amr-jaccmat, echo = F, warning = F, message = F, fig.scap="Co-occurance of AMR genes expressed as Jaccard index", out.extra='', fig.cap="Heatmap of row and column clustered matrix of pairwise Jaccard indices to compare co-occurance of AMR genes", fig.width = 5, fig.height = 5}
-
+```{r wgs-amr-jaccmat, include = F}
 
 jcoefs <- read.csv(paste0(wd, "amr/amr_jaccard_matrix.csv"), stringsAsFactors = F, row.names = 1)
 
 #jpvals <- read.csv("/Users/joelewis/Documents/Sanger/final_analysis/all_DASSIM_esco/ariba #amr/cleaned/amr_jaccard_pvals.csv", stringsAsFactors = F, row.names = 1)
 
-jcoefs <- select(jcoefs, -AmpC1, -AmpC2, -AMPH, -MrdA)
-jcoefs[!(rownames(jcoefs) %in% c("AmpC1", "AmpC2", "AMPH", "Mrd")),] -> jcoefs
-pheatmap(jcoefs, fontsize = 5, color = viridis(n = 100, option = "inferno"), border_color = NA)
 
+ grid.grabExpr( pheatmap(jcoefs, fontsize = 5, color = viridis(n = 100, option = "plasma"), border_color = NA) ) ->p2
+p2 <- as_ggplot(p2)
 
 ```
 
-```{r wgs-amr-cooccurnet, echo = F, warning = F, message = F, fig.scap="Co-occurance of AMR genes expressed as Jaccard index", out.extra='', fig.cap="Heatmap of row and column clustered matrix of pairwise Jaccard indices to compare co-occurance of AMR genes", fig.width = 5, fig.height = 5}
-
-
-jcoefs <- read.csv(paste0(wd, "amr/amr_jaccard_matrix.csv"), stringsAsFactors = F, row.names = 1)
-
-#jpvals <- read.csv("/Users/joelewis/Documents/Sanger/final_analysis/all_DASSIM_esco/ariba #amr/cleaned/amr_jaccard_pvals.csv", stringsAsFactors = F, row.names = 1)
+```{r wgs-amr-cooccurnet, include = F}
 
 jcoefs <- select(jcoefs, -AmpC1, -AmpC2, -AMPH, -MrdA)
 jcoefs[!(rownames(jcoefs) %in% c("AmpC1", "AmpC2", "AMPH", "Mrd")),] -> jcoefs
-#pheatmap(jcoefs, fontsize = 5, color = viridis(n = 100, option = "inferno"), border_color = NA)
 
+jpvals <- read.csv(paste0(wd, "amr/amr_jaccard_pvals.csv"), stringsAsFactors = F, row.names = 1)
+jpvals <- select(jpvals, -AmpC1, -AmpC2, -AMPH, -MrdA)
+jpvals[!(rownames(jpvals) %in% c("AmpC1", "AmpC2", "AMPH", "Mrd")),] -> jpvals
+jpvals$gene <- rownames(jpvals)
+melt(jpvals, id.vars = "gene") -> jpvals_long
+names(jpvals_long) <- c("gene1", "gene2", "pval")
+jcoefs$gene <- rownames(jcoefs)
+melt(jcoefs, id.vars = "gene") -> jcoefs_long
+names(jcoefs_long) <- c("gene1", "gene2", "jacc")
+jtots <- merge(jcoefs_long, jpvals_long, by = c("gene1", "gene2"))
+jpvals_sig <- subset(jpvals_long, pval < 0.05/nrow(jpvals_long))
+
+# ok lets make a graph of these
+
+jtots2 <- subset(jtots, jacc > 0.5 & pval < 0.05/nrow(jpvals_long))
+apply(select(jpvals_sig, gene1, gene2), 1, 
+      function(x) paste(sort(x), collapse = "")) -> jpvals_sig$key
+
+subset(jpvals_sig, !duplicated(key)) -> jpvals_sig_unique
+
+g1 <- graph_from_data_frame(jtots[1:3], directed = F)
+g2 <- graph_from_data_frame(jtots2[1:3], directed = F)
+#g3 <- graph_from_data_frame(jtots3[1:3], directed = F)
+
+
+n_genes <- apply(sapply(all[-1], as.numeric), 2, sum)
+
+
+g2 %>%
+  ggraph(layout="kk") +
+  geom_edge_link(colour = "grey", alpha = 0.7) + geom_node_point(aes(size = (n_genes[V(g2)$name])), colour = viridis::plasma(100)[50], alpha = 0.8) +
+  geom_node_text(aes(label = name), size = 4, repel = T) +
+  theme_graph(foreground=NA) + theme(legend.position = "none") -> p1
+ 
+
+```
+
+```{r wgs-amr-cooccur-plot, echo = F, warning = F, message = F, fig.scap="Co-occurance and lineage asociation of AMR genes", out.extra='', fig.cap="A:  Row and column clustered heatmap of pairwise Jaccard index matrix, showing clustering of AMR genes to compare co-occurance of AMR genes". B: Networks of commonly occuring (jaccard index > 0.5) and significantly co-occuring (p < 0.05, Bonferroni corrected) AMR genes. C: AMR genes mapped back to midpoint rooted maximum likelihood phylogenetic tree, showing lineage associations of genes.", fig.width = 11, fig.height = 14}
+
+ggarrange(ggarrange(p2,
+                    ggarrange(NULL,p1,NULL, heights = c(0.1,1,0.1), ncol = 1, nrow =3, labels = c("B", NA,NA)),
+                    nrow =1, ncol= 2, widths = c(1.2,0.8), labels = c("A", NA)), 
+          p3, ncol = 1, nrow = 2, labels = c(NA, "C"), heights = c(0.8,1))
 
 ```
 ### Plasmid replicons
