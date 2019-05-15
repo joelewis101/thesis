@@ -7,8 +7,8 @@ subtitle:  |
   | 
   | August 2019
 output: bookdown::pdf_book
-linestretch: 1
-geometry: "left=3cm, right=3cm, top=2.5cm, bottom=2.5cm"
+fontsize: 12pt
+geometry: margin = 1.2in
 lof: yes
 lot: yes
 documentclass: book
@@ -23,7 +23,11 @@ header-includes:
    \usepackage{longtable}
    \usepackage{float}
    \usepackage{booktabs}
+   \usepackage{setspace}
+   \usepackage[font={small}]{caption}
    \raggedbottom
+   \onehalfspacing
+   
 ---
 ---
 ```{r setup, include=FALSE}
