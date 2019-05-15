@@ -862,13 +862,13 @@ ggsave(paste0(wd,"aminoglycoside_plot.pdf"), plot = parrange, width = 20, height
 
 knitr::include_graphics(paste0(wd,"aminoglycoside_plot.pdf"))
 ```
-#### Chloramphenicol, co-trimoxazole and tetracycline resistance
+#### Chloramphenicol, co-trimoxazole, tetracycline and other resistance determinents
 
 248/473 (52%) of isolates contained at least one chloramphenicol resistance gene (Figure \@ref(fig:wgs-amr-sum)), usually 1 (210/248 [85%]), less commonly 2 (37/248 [15%]) or 3 (1/248 [<1%]). _catB4_ was the most commonly identified gene but once again phenotypic chloramphenicol resistance correlated poorly with presence of chloramphenicol resistnce genes (\@ref(fig:wgs-amr-chlor-cotrim)A)) with presence of any chloramphenicol resistance gene predicting phenotypic resistance with a sensitivity of 70% (95% 62-78%) and specificity of 55% (95% CI 49-60%).
 
 Almost all isolates contained either a trimethoprim resistance (459/473 [97%]) or a sulphonamide resistance gene (468/473 [99%]); only 3/473 isolates did not contain either. Trimethoprim resistance genes were all of the _dfrA_ family; _sulII_ was the commonest sulphonamide resistance determinent (Figures \@ref(fig:wgs-amr-sum) and \@ref(fig:wgs-amr-chlor-cotrim)B). Summary sensitivity of presence of any _dfrA_ or _sul_ gene as a predictor of phenotypic resistance was 100% [95% CI 99- 100%] but (partially due to the rarity of cotrimoxazole sensitivity in this datset) specificity was 13% [95% CI 2-40%].
 
-Tetracycline resistance genes were also very common, identified in 422/473 (89%) of isolates, most commonly _mphA_ (324/473 [68%] of isolates), followed by _tetB_ (262/473 [55%] of isolates) and _tetA_ (193/473 [41%] of isolates). No antimicrobial sensitivity testing was carried out for any agent of the tetracycline class.
+Tetracycline resistance genes were also very common, identified in 422/473 (89%) of isolates, most commonly _mphA_ (324/473 [68%] of isolates), followed by _tetB_ (262/473 [55%] of isolates) and _tetA_ (193/473 [41%] of isolates). No antimicrobial sensitivity testing was carried out for any agent of the tetracycline class. Resistance determinents for rifampicin (_arr2_ and _arr3_) were rarely identified, in 2 isolates and the _sat2_ gene, conferrning resistance to streptothricin (a nucleoside antibiotic with no clinical compounds in use) was seen in 69/473 [15%] of isolates; the significance of this is unknown. Finally, the fosfomycin resistance determinent _fosA_ was seen in 28/473 [6%] of isolates, despite this antimicrobial being unavailable in Malawi.
 
 ```{r wgs-amr-chlor-cotrim-setup, include= FALSE}
 
@@ -935,21 +935,17 @@ knitr::include_graphics(paste0(wd,"chor_cotrim_plot.pdf"))
 
 ```
 
-### Lineage association and clustering of AMR determinents
+#### Clustering and lineage association of AMR determinents
 
-Next, I explored associations of AMR determinents, both with bacterial lineages, and with other AMR determinents. First, I mapped the identified AMR determinents back to the maximum likelihood tree (Figure \@ref(wgs-amr-cooccur-plot)), demonstrating a clear lineage association, in that certain AMR genes tend to cluster within lineages. To explore this further, the matrix of pairwise jaccard indices was constructed 
+Next, I explored associations of AMR determinents, both with bacterial lineages, and with other AMR determinents, in an attempt to identify putative clusters that could represent mobile genetic elements (MGE) that could be tracked within and between patients. There was clear clustering of AMR genes beyond what would be expected by chance (Figures \@ref(wgs-amr-cooccur-plot)A and B), including clustering of the ESBL gene $bla_{CTX-M-15}$ with penicillinases $bla_{OXA-1}$ and $bla_{TEM-95}$. Though some identified clusters correspond to known MGE (e.g. the _sulII-strA-strB_ cluster[@Anantham2012]), there was a clear lineage association of certain gene combinations on mapping the presence or absence of AMR determinents back to the phylogeny (Figure \@ref(wgs-amr-cooccur-plot)C), meaning that these AMR-gene associations likely represent a combination of colocation on MGE and confounding by association with lineage.
 
 ```{r wgs-amr-maptotree,include = F}
-
 tree <- read.tree(paste0(wd, "core_genome_tree/core_alnD2ESCO_snp_sites.aln.treefile"))
 midpoint.root(tree) -> tree
-
 plasm <- read.csv(paste0(wd, "amr/plasm_Inc_pres_abs.csv"), stringsAsFactors = F)
 m.c <- read.csv(paste0(wd, "amr/srst2_pres_abs.csv"), stringsAsFactors = F)
 m.c <- subset(m.c, name %in% tree$tip.label)
-
 qr <- read.csv(paste0(wd, "amr/qrdr_mut_presence.csv"), stringsAsFactors = F)
-
 rownames(qr) <- qr$sample
 rownames(m.c) <- m.c$name
 rownames(plasm) <- plasm$name
@@ -957,28 +953,20 @@ rownames(plasm) <- plasm$name
 sapply(m.c[,-1], as.character) -> m.c[2:ncol(m.c)]
 sapply(qr[,-1], as.character) -> qr[2:ncol(qr)]
 sapply(plasm[,-1], as.character) -> plasm[2:ncol(plasm)]
-
-
 qr[qr == "1"] <- "3"
 plasm[plasm == "1"] <- "2"
-
 hm <- merge(qr, m.c, by.x = "sample", by.y = "name")
 hm <- merge(hm, plasm, by.x = "sample", by.y = "name")
-
 hm <- subset(hm, sample %in% tree$tip.label)
 # get rid of 0 cols
 apply(sapply(hm[-1], as.numeric),2, sum) -> sums
 hm <- hm[c("sample", names(sums[sums != 0]))]
-
 hm <- select(hm, -AmpC1, -AmpC2, -AMPH, -MrdA)
-
 rownames(hm) <- hm$sample
 ggtree(tree) %>% gheatmap(hm[,-1], font.size = 2,
 colnames_position = "top", colnames_angle = 90, colnames_offset_y = 20,
 color = NA, width = 3, offset = 0.02)  + scale_fill_manual(values = c("white", cols[1],cols[12], cols[8])) +
   theme(legend.position = "none") -> p3
-
-
 ```
 
 
@@ -1016,14 +1004,9 @@ jpvals_sig <- subset(jpvals_long, pval < 0.05/nrow(jpvals_long))
 jtots2 <- subset(jtots, jacc > 0.5 & pval < 0.05/nrow(jpvals_long))
 apply(select(jpvals_sig, gene1, gene2), 1, 
       function(x) paste(sort(x), collapse = "")) -> jpvals_sig$key
-
 subset(jpvals_sig, !duplicated(key)) -> jpvals_sig_unique
-
 g1 <- graph_from_data_frame(jtots[1:3], directed = F)
 g2 <- graph_from_data_frame(jtots2[1:3], directed = F)
-#g3 <- graph_from_data_frame(jtots3[1:3], directed = F)
-
-
 n_genes <- apply(sapply(all[-1], as.numeric), 2, sum)
 
 
@@ -1044,8 +1027,10 @@ ggarrange(ggarrange(p2,
           p3, ncol = 1, nrow = 2, labels = c(NA, "C"), heights = c(0.8,1))
 
 ```
+
 ### Plasmid replicons
 
+Presence or absence of the identified plasmid repicons is shown mapped to the phylogeny in Figure \@ref(wgs-amr-cooccur-plot)C. IncFIb was most commonly identified (399/473 [84%] of isolates), followed by IncFII (383/473 [81%] of isolates) and IncF1a (324/373 [68%] of isolates). Col plasmids were also frequently identified, in 308/473 [65%] of isolates. In contrast to AMR genes, there was no apparent lineage association with plasmid replicon.
 
 ### Testing metadata associations: Sequence clusters and ESBL-clusters
 
