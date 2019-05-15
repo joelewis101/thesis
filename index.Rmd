@@ -7,7 +7,7 @@ subtitle:  |
   | 
   | August 2019
 output: bookdown::pdf_book
-fontsize: 12pt
+fontsize: 11pt
 geometry: margin = 1.2in
 lof: yes
 lot: yes
