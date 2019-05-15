@@ -1038,9 +1038,13 @@ Finally, in order to test hospital or community associations of bacterial lineag
 
 #### Hierachichal BAPS clustering of core gene pseudosequence
 
-The hieraechical BAPS algorithm clustered the core gene alignments into 15 level one (top level) clusters, denoted sequence clusters A-O, and a total of 48 level two (lower level) clusters, denoted sequence clusters 1-48 that were almost exclusivley monophyletic and commonly corresponded closely to the multilocus sequence types (Figure \@ref(fig:wgs-hierbaps-plot-tree)A). Intracluster pairwise SNP distance vaired (Figure \@ref(fig:wgs-hierbaps-plot-tree)B) but the clusters were often reasonably clonal: SC6, SC8 and SC23, for example (the three largest clusters) had median (IQR) intragroup pairwise SNP distance of 62 (34-97), 326 (18-378) and 18 (11-24) respectively.
+The hieraechical BAPS algorithm clustered the core gene alignments into 15 level one (top level) clusters, denoted sequence clusters A-O, and a total of 48 level two (lower level) clusters, denoted sequence clusters 1-48 that were almost exclusivley monophyletic and commonly corresponded closely to the multilocus sequence types (STs, Figure \@ref(fig:wgs-hierbaps-plot-tree)A). Intracluster pairwise SNP distance vaired (Figure \@ref(fig:wgs-hierbaps-plot-tree)B) but the clusters were often reasonably clonal: SC6, SC8 and SC23, for example (the three largest clusters) had median (IQR) intragroup pairwise SNP distance of 62 (34-97), 326 (18-378) and 18 (11-24) respectively.
 
-```{r wgs-hierbaps-plot-tree, echo = F, warning = F, message = F, fig.scap="Core gene hierBAPS clusters", out.extra='', fig.cap="A: Core gene hierarchical BAPS clusters mapped back to phylogeny. Heatmap shows level 2 (lower level) sequence clusters 1-48 as presence (coloured) or absence (grey); colour denotes level 1 (top level) sequence clusters membership. B: Intracluster pairwise SNP distance for level 2 (lower level) sequence clusters. Axis restricted to 0-1500 SNPs and as result SC17 (median 6881 SNPs), SC29 (median 2970 SNPs), SC31 (median 2970 SNPs) and SC44 (median 12322 SNPs) boxes are not shown. Boxplots show median and IQR, whiskers show 1.5 times IQR, and outliers are points falling beyond whiskers.", fig.width = 6, fig.height = 6}
+#### ESBL-clusters
+
+
+
+```{r wgs-hierbaps-plot-tree, echo = F, warning = F, message = F, fig.scap="Core gene hierBAPS clusters", out.extra='', fig.cap="A: Core gene hierarchical BAPS clusters mapped back to phylogeny. Heatmap shows level 2 (lower level) with colour denoting level 1 (top level) cluster membership. B: Intracluster pairwise SNP distance for level 2 sequence clusters. Axis restricted to 0-1500 SNPs and as result SC17 (median 6881 SNPs), SC29 (median 2970 SNPs), SC31 (median 2970 SNPs) and SC44 (median 12322 SNPs) boxes are not shown. Boxplots show median and IQR, whiskers show 1.5 times IQR, and outliers are points falling beyond whiskers.", fig.width = 6, fig.height = 6}
 
 readRDS(paste0(wd, "hierbaps/D2ESCO_core_snp_hbaps_clusts.rda")) -> hb.results
 
