@@ -757,6 +757,8 @@ orgs.cip %>% summarise(TP = sum(`Quinolone resistance` == 1 & gyra.parc.or.plasm
 #binom.test(summ2$TN, (summ2$TN + summ2$FP))
 
 orgs.cip <- orgs.cip[order(orgs.cip$`Quinolone resistance`, orgs.cip$GyrA83, orgs.cip$GyrA87, orgs.cip$ParC80, orgs.cip$ParE458, orgs.cip$Qnr, orgs.cip$Qep),]
+
+names(orgs.cip)[names(orgs.cip) == "Quinolone resistance"] <- "CIP resistance"
 #dev.off()
 grid.grabExpr(pheatmap(orgs.cip[c(3,8,9,10,11,12,13)], cluster_cols = FALSE, cluster_rows = FALSE, show_rownames = FALSE,
                        legend = FALSE)) -> hm
@@ -832,23 +834,27 @@ ag.sens$Gentamicin <- as.numeric(ag.sens$Gentamicin)
 ag.sens[order(ag.sens$Amikacin, ag.sens$Gentamicin, ag.sens$Aac_II, ag.sens$Aac6Ib_cr),] -> ag.sens 
 names(ag.sens)[c(3,4,8)] <- c("Amikacin resistance", "Gentamicin resistance", "Ap3")
 
+
+ag.sens %>% summarise(TP = sum(`Gentamicin resistance` == 1 & (Aac6Ib_cr == 1 | Aac_II == 1)),
+                       FP = sum(`Gentamicin resistance` == 0 & (Aac6Ib_cr == 1 | Aac_II == 1)),
+                       TN = sum(`Gentamicin resistance` == 0 & (Aac6Ib_cr == 0 & Aac_II == 0)),
+                       FN = sum(`Gentamicin resistance` == 1 & (Aac6Ib_cr == 0 & Aac_II == 0))) -> summ
+
+names(ag.sens)[c(3,4,8)] <- c("AMK resistance", "GEN resistance", "Ap3")
+
 ggplot(ag, aes(x= variable, y =n , fill = agent)) + geom_col() + theme_bw() + theme(axis.text.x = element_text(angle = -90), legend.title = element_blank(), legend.position = "bottom") + labs(x= "Aminoglycoside resistance gene") -> p1
 grid.grabExpr( pheatmap(ag.sens[c(3,4,6,5,7,8)], cluster_cols = F, cluster_rows = F, legend = F, show_rownames = F)) -> hm
 hm <- as_ggplot(hm)
 
 
 
-ag.sens %>% summarise(TP = sum(`Gentamicin resistance` == 1 & (Aac6Ib_cr == 1 | Aac_II == 1)),
-                       FP = sum(`Gentamicin resistance` == 0 & (Aac6Ib_cr == 1 | Aac_II == 1)),
-                       TN = sum(`Gentamicin resistance` == 0 & (Aac6Ib_cr == 0 & Aac_II == 0)),
-                       FN = sum(`Gentamicin resistance` == 1 & (Aac6Ib_cr == 0 & Aac_II == 0))) -> summ
  #sens
 #binom.test(summ$TP, (summ$TP + summ$FN))
 # spec
 #binom.test(summ$TN, (summ$TN + summ$FP))
 ggarrange(p1, NULL,hm,NULL, ncol= 4, nrow = 1, widths = c(1,0.2,0.6,0.2), labels  = c("A", "B", NA, NA)) -> parrange
 
-ggsave(paste0(wd,"aminoglycoside_plot.pdf"), plot = parrange, width = 20, height = 10, units = "cm")
+ggsave(paste0(wd,"aminoglycoside_plot.pdf"), plot = parrange, width = 20, height = 8, units = "cm")
 
 ```
 
@@ -875,9 +881,9 @@ cl.sens <- merge(cl.sens, cl.genes, by.x = "Lane", by.y= "name", all.x = T)
 cl.sens$Chloramphenicol[cl.sens$Chloramphenicol == "Sensitive"] <- 0
 cl.sens$Chloramphenicol[cl.sens$Chloramphenicol == "Resistant" | cl.sens$Chloramphenicol =="Intermediate"] <- 1
 cl.sens$Chloramphenicol <- as.numeric(cl.sens$Chloramphenicol)
-names(cl.sens)[names(cl.sens) == "Chloramphenicol"] <- "Chloramphenicol resistance"
+names(cl.sens)[names(cl.sens) == "Chloramphenicol"] <- "CHL resistance"
 
-cl.sens <- cl.sens[order(cl.sens$Chloramphenicol, cl.sens$CatB4, cl.sens$CatA1, cl.sens$CmlA1, cl.sens$CatB3),]
+cl.sens <- cl.sens[order(cl.sens$`CHL resistance`, cl.sens$CatB4, cl.sens$CatA1, cl.sens$CmlA1, cl.sens$CatB3),]
 grid.grabExpr( pheatmap(cl.sens[c(3,8,5,9,7,6,4,10)], cluster_cols = F,cluster_rows = F, legend = F, show_rownames = F)) -> hm1
 hm1<- as_ggplot(hm1)
 
@@ -898,17 +904,21 @@ cot.sens <- cot.sens[order(cot.sens$Cotrimoxazole, cot.sens$DfrA, cot.sens$SulII
 
 names(cot.sens)[names(cot.sens) == "Cotrimoxazole"] <- "Cotrimoxazole resistance"
 
-grid.grabExpr( pheatmap(cot.sens[c(3,17,15,14,16)], cluster_cols = F, cluster_rows = F,legend = F, show_rownames = F)) -> hm2
-hm2<- as_ggplot(hm2)
-
-
-
 cot.sens$any_gene <- apply(cot.sens[c(17,15,14,16)], 1, sum)
 cot.sens$any_gene[cot.sens$any_gene >1 ] <- 1
 cot.sens %>% summarise(TP = sum(`Cotrimoxazole resistance` == 1 & any_gene == 1),
                        FP = sum(`Cotrimoxazole resistance` == 0 & any_gene == 1),
                        TN = sum(`Cotrimoxazole resistance` == 0 & any_gene == 0),
                        FN = sum(`Cotrimoxazole resistance` == 1 & any_gene == 0)) -> summ
+
+names(cot.sens)[names(cot.sens) == "Cotrimoxazole resistance"] <- "SXT resistance"
+
+grid.grabExpr( pheatmap(cot.sens[c(3,17,15,14,16)], cluster_cols = F, cluster_rows = F,legend = F, show_rownames = F)) -> hm2
+hm2<- as_ggplot(hm2)
+
+
+
+
  #sens
 #binom.test(summ$TP, (summ$TP + summ$FN))
 # spec
@@ -916,7 +926,7 @@ cot.sens %>% summarise(TP = sum(`Cotrimoxazole resistance` == 1 & any_gene == 1)
 
 ggarrange(NULL,hm1,NULL,hm2,NULL, ncol = 5, nrow = 1, labels = c("A",NA,"B",NA,NA), widths = c(0.2,0.6,0.2,0.6,0.2)) -> parrange
 
-ggsave(paste0(wd,"chor_cotrim_plot.pdf"), plot = parrange, width = 20, height = 10, units = "cm")
+ggsave(paste0(wd,"chor_cotrim_plot.pdf"), plot = parrange, width = 20, height = 8, units = "cm")
 ```
 
 ```{r wgs-amr-chlor-cotrim, echo = F, warning = F, message = F, fig.scap="Chloramphenicol and cotrimoxazole resistance mutations and phenotypic resistance", out.extra='', fig.cap="Heatmap showning phenotypic chloramphenicol (A) and cotrimoxazole (B) resistance and identified resistance genes that could be expected to confer resistance to these agents. Each row is one sample, red = presence, blue = absence"}
@@ -1026,7 +1036,7 @@ g2 %>%
 
 ```
 
-```{r wgs-amr-cooccur-plot, echo = F, warning = F, message = F, fig.scap="Co-occurance and lineage asociation of AMR genes", out.extra='', fig.cap="A:  Row and column clustered heatmap of pairwise Jaccard index matrix, showing clustering of AMR genes to compare co-occurance of AMR genes". B: Networks of commonly occuring (jaccard index > 0.5) and significantly co-occuring (p < 0.05, Bonferroni corrected) AMR genes. C: AMR genes mapped back to midpoint rooted maximum likelihood phylogenetic tree, showing lineage associations of genes.", fig.width = 11, fig.height = 14}
+```{r wgs-amr-cooccur-plot, echo = F, warning = F, message = F, fig.scap="Co-occurance and lineage asociation of AMR genes", out.extra='', fig.cap="A:  Row and column clustered heatmap of pairwise Jaccard index matrix, showing clustering of AMR genes to compare co-occurance of AMR genes. B: Networks of commonly occuring (jaccard index > 0.5) and significantly co-occuring (p < 0.05, Bonferroni corrected) AMR genes. C: AMR genes mapped back to midpoint rooted maximum likelihood phylogenetic tree, showing lineage associations of genes.", fig.width = 11, fig.height = 14}
 
 ggarrange(ggarrange(p2,
                     ggarrange(NULL,p1,NULL, heights = c(0.1,1,0.1), ncol = 1, nrow =3, labels = c("B", NA,NA)),
