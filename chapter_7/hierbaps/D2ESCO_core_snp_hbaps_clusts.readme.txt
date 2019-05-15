@@ -1,0 +1,1 @@
+hb.results <- hierBAPS(snp.matrix, max.depth=2, n.pops=20)
