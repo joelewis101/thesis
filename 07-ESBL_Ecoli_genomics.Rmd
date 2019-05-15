@@ -63,13 +63,13 @@ Phylogroup and MLST were determined for these context genomes as described above
 
 ### Statistical analysis
 
-In order to explore clustering of AMR genes, the Jaccard index was calculated for a given AMR-gene pair using he Jaccard v0.1.0 package in R. The Jaccard index, a measure of the similarity of two sets of data, is defined as _intersection over union_; in this context, for a given pair of AMR genes $x$ and $y$, the Jaccard index $J(x,y)$ is the number of isolates that contain both gene $x$ and $y$ divided by the total number that contain either $x$ or $y$:
+Ability of presence or absence of resistance determinents to predict phenotypic resistance as determined by antimicrobial sensitivity testing was expressed as sensitivity and specifcity, with exact binomial confidence intervals. In order to explore clustering of AMR genes, the Jaccard index was calculated for a given AMR-gene pair using he _jaccard_ v0.1.0 package in R. The Jaccard index, a measure of the similarity of two sets of data, is defined as _intersection over union_; in this context, for a given pair of AMR genes $x$ and $y$, the Jaccard index $J(x,y)$ is the number of isolates that contain both gene $x$ and $y$ divided by the total number that contain either $x$ or $y$:
 
 $$J(x,y) = \displaystyle \frac{| x \cap y |}{| x \cup y| }$$
 
-By definition it lies between 0 ($x$ and $y$ never co-occur) and 1 ($x$ and $y$ always co-occur). Co-occurance matrices using the Jaccard index were plotted using the pheatmap v 1.0.12 package in R. The statistical significance of co-occurance of genes was assessed by generating 2x2 contingency tables for a given gene pair and p values generated using a Fisher's test with Bonferroni correction; a p value of less that 0.05 was considered statistically significant. Co-occurance networks of genes occuring commonly together (defined as Jaccard index > 0.5) at a rate greater than expected by chance (p < 0.05 following Bonferroni correction) and uncommonly occuring together (defined as Jaccard index < 0.1 and p < 0.05 following Bonferroni correction) were plotted using igraph v1.2.2 and ggraph v1.0.2 in R.
+By definition it lies between 0 ($x$ and $y$ never co-occur) and 1 ($x$ and $y$ always co-occur). Co-occurance matrices using the Jaccard index were plotted using the _pheatmap_ v1.0.12 package in R. The statistical significance of co-occurance of genes was assessed by generating 2x2 contingency tables for a given gene pair and p values generated using a Fisher's test with Bonferroni correction; a p value of less that 0.05 was considered statistically significant. Co-occurance networks of genes occuring commonly together (defined as Jaccard index > 0.5) at a rate greater than expected by chance (p < 0.05 following Bonferroni correction) were plotted using _igraph_ v1.2.2 and _ggraph_ v1.0.2 in R.
 
-To explore hospital or community associations of any given _E. coli_ clade, the location of isolation was first plotted against the phylogenetic tree; location of isolation was classified as hospital, community, or recent hospital discharge (defined as a date of isolation within 2 weeks of hospital discharge). This latter category was used because it is possible that a patient could acquire an ESBL-E clone in hospital but only be sampled once leaving hospital; using only hospital isolated and community isolted categories could therefore introduce bias. Hospital or community association of each sequence cluster was assessed using a Fisher's test of proportion of hospital associated samples (defined as sum of hospital isolated and recent hospital discharge) for the given sequence cluster as compared to proportion of hospital associated samples in the remainder of the samples, with a Bonferroni correction for multiple comparisons. p < 0.05 was again considered statistically significant.
+To explore hospital or community associations of any given _E. coli_ clade, the location of isolation was first plotted against the phylogenetic tree; location of isolation was classified as hospital, community, or recent hospital discharge (defined as a date of isolation within 2 weeks of hospital discharge). This latter category was used because it is possible that a patient could acquire an ESBL-E clone in hospital but only be sampled once leaving hospital; using only hospital isolated and community isolted categories could therefore introduce bias. Hospital or community association of each sequence cluster was assessed using a Fisher's exact test of proportion of hospital associated samples (defined as sum of hospital isolated and recent hospital discharge) for the given sequence cluster as compared to proportion of hospital associated samples in the remainder of the samples, with a Bonferroni correction for multiple comparisons. p < 0.05 was again considered statistically significant.
 
 To compare within-patient to between-patient conservation of bacteria (as represented by core genome alignment and sequence cluster) and ESBL-containing MGE (as represented by the ESBL-clusters) several approaches were taken. Firstly, I assessed whether either sequence cluster or ESBL-cluster were conserved within an individual at all. I hypothesised that any within-patient correlation is likely to be a function of time: samples closer together in time may be more likely to be similar. To assess if this was the case for bacteria, pairwise core genome pseudosequence SNP distance was was calculated using snp-dists v0.4 (https://github.com/tseemann/snp-dists) for all samples and plotted against the time difference (in days) between samples, within and between patients, and with a smoothed curve fitted using a general additive model with cubic splines. Because of significant overplotting, this was also plotted as a 2D density plot. Based on these plots, the within and between patient SNP distances were compared in two post-hoc defined groups binned by time distance between the samples (50 days or less vs. more than 50 days), and distributions compared with Kruskal-Wallace tests.
 
@@ -218,7 +218,7 @@ The commonset _E. coli_ phylogroup was phylogroup A: 204/473 (43%) samples belon
 
 The Roary pan-genome pipeline identified a core genome in the study isolates of 2966 genes, with a pan-genome of 26840 genes. The resultant core gene pseudosequence of length 1388742 bases contained 99693 variable sites, which were used to infer the maximum likelihood phylogenetic tree. The IQTREE ModelFinder module determined that a general time reversible (GTR) model with FreeRate site heterogeneity with 5 parameters provided the best fit to the data. The inferred tree is shown in Figure \@ref(fig:wgs-mlst) along with isolate phylogroup and sequence types; in general, as expected, sequence types were largely monophyletic and phylogroups tended to cluster together.
 
-```{r wgs-mlst, echo = F, warning = F, message = F, fig.cap="\\textit{E. coli} sequence type distribution", fig.height = 2, fig.width=6}
+```{r wgs-mlst, echo = F, warning = F, message = F, fig.cap="\\textit{E. coli} Multilocus sequence type distribution", fig.height = 2, fig.width=6}
 
 ggplot(mlst, aes(fct_infreq(ST))) + geom_bar()+
   xlab("E. coli sequence type") + ylab("Count") + theme(axis.text.x=element_text(size=5, angle = 90) )
@@ -937,7 +937,7 @@ knitr::include_graphics(paste0(wd,"chor_cotrim_plot.pdf"))
 
 #### Clustering and lineage association of AMR determinents
 
-Next, I explored associations of AMR determinents, both with bacterial lineages, and with other AMR determinents, in an attempt to identify putative clusters that could represent mobile genetic elements (MGE) that could be tracked within and between patients. There was clear clustering of AMR genes beyond what would be expected by chance (Figures \@ref(wgs-amr-cooccur-plot)A and B), including clustering of the ESBL gene $bla_{CTX-M-15}$ with penicillinases $bla_{OXA-1}$ and $bla_{TEM-95}$. Though some identified clusters correspond to known MGE (e.g. the _sulII-strA-strB_ cluster[@Anantham2012]), there was a clear lineage association of certain gene combinations on mapping the presence or absence of AMR determinents back to the phylogeny (Figure \@ref(wgs-amr-cooccur-plot)C), meaning that these AMR-gene associations likely represent a combination of colocation on MGE and confounding by association with lineage.
+Next, I explored associations of AMR determinents, both with bacterial lineages, and with other AMR determinents, in an attempt to identify putative clusters that could represent mobile genetic elements (MGE) that could be tracked within and between patients. There was clear clustering of AMR genes beyond what would be expected by chance (Figures \@ref(fig:wgs-amr-cooccur-plot)A and B), including clustering of the ESBL gene $bla_{CTX-M-15}$ with penicillinases $bla_{OXA-1}$ and $bla_{TEM-95}$. Though some identified clusters correspond to known MGE (e.g. the _sulII-strA-strB_ cluster[@Anantham2012]), there was a clear lineage association of certain gene combinations on mapping the presence or absence of AMR determinents back to the phylogeny (Figure \@ref(wgs-amr-cooccur-plot)C), meaning that these AMR-gene associations likely represent a combination of colocation on MGE and confounding by association with lineage.
 
 ```{r wgs-amr-maptotree,include = F}
 tree <- read.tree(paste0(wd, "core_genome_tree/core_alnD2ESCO_snp_sites.aln.treefile"))
@@ -1019,7 +1019,7 @@ g2 %>%
 
 ```
 
-```{r wgs-amr-cooccur-plot, echo = F, warning = F, message = F, fig.scap="Co-occurance and lineage asociation of AMR genes", out.extra='', fig.cap="A:  Row and column clustered heatmap of pairwise Jaccard index matrix, showing clustering of AMR genes to compare co-occurance of AMR genes. B: Networks of commonly occuring (jaccard index > 0.5) and significantly co-occuring (p < 0.05, Bonferroni corrected) AMR genes. C: AMR genes mapped back to midpoint rooted maximum likelihood phylogenetic tree, showing lineage associations of genes.", fig.width = 11, fig.height = 14}
+```{r wgs-amr-cooccur-plot, echo = F, warning = F, message = F, fig.scap="Co-occurance and lineage asociation of AMR genes", out.extra='', fig.cap="A:  Row and column clustered heatmap of pairwise Jaccard index matrix, showing clustering of AMR genes. B: Networks of commonly (jaccard index > 0.5) and significantly (p < 0.05, Bonferroni corrected) co-occuring AMR genes. C: AMR genes mapped back to midpoint rooted maximum likelihood phylogenetic tree, showing lineage associations of genes.", fig.width = 11, fig.height = 14}
 
 ggarrange(ggarrange(p2,
                     ggarrange(NULL,p1,NULL, heights = c(0.1,1,0.1), ncol = 1, nrow =3, labels = c("B", NA,NA)),
@@ -1030,10 +1030,85 @@ ggarrange(ggarrange(p2,
 
 ### Plasmid replicons
 
-Presence or absence of the identified plasmid repicons is shown mapped to the phylogeny in Figure \@ref(wgs-amr-cooccur-plot)C. IncFIb was most commonly identified (399/473 [84%] of isolates), followed by IncFII (383/473 [81%] of isolates) and IncF1a (324/373 [68%] of isolates). Col plasmids were also frequently identified, in 308/473 [65%] of isolates. In contrast to AMR genes, there was no apparent lineage association with plasmid replicon.
+Presence or absence of the identified plasmid repicons is shown mapped to the phylogeny in Figure \@ref(fig:wgs-amr-cooccur-plot)C. IncFIb was most commonly identified (399/473 [84%] of isolates), followed by IncFII (383/473 [81%] of isolates) and IncF1a (324/373 [68%] of isolates). Col plasmids were also frequently identified, in 308/473 [65%] of isolates. In contrast to AMR genes, there was no apparent lineage association with plasmid replicon.
 
-### Testing metadata associations: Sequence clusters and ESBL-clusters
+### Testing metadata associations: hierBAPS sequence clusters and ESBL-clusters
 
-Finally, 
+Finally, in order to test hospital or community associations of bacterial lineages or MGE, I clustered core gene pseudosequences and ESBL-containing contigs into mutually exclusive groups.
+
+#### Hierachichal BAPS clustering of core gene pseudosequence
+
+The hieraechical BAPS algorithm clustered the core gene alignments into 15 level one (top level) clusters, denoted sequence clusters A-O, and a total of 48 level two (lower level) clusters, denoted sequence clusters 1-48 that were almost exclusivley monophyletic and commonly corresponded closely to the multilocus sequence types (Figure \@ref(fig:wgs-hierbaps-plot-tree)A). Intracluster pairwise SNP distance vaired (Figure \@ref(fig:wgs-hierbaps-plot-tree)B) but the clusters were often reasonably clonal: SC6, SC8 and SC23, for example (the three largest clusters) had median (IQR) intragroup pairwise SNP distance of 62 (34-97), 326 (18-378) and 18 (11-24) respectively.
+
+```{r wgs-hierbaps-plot-tree, echo = F, warning = F, message = F, fig.scap="Core gene hierBAPS clusters", out.extra='', fig.cap="A: Core gene hierarchical BAPS clusters mapped back to phylogeny. Heatmap shows level 2 (lower level) sequence clusters 1-48 as presence (coloured) or absence (grey); colour denotes level 1 (top level) sequence clusters membership. B: Intracluster pairwise SNP distance for level 2 (lower level) sequence clusters. Axis restricted to 0-1500 SNPs and as result SC17 (median 6881 SNPs), SC29 (median 2970 SNPs), SC31 (median 2970 SNPs) and SC44 (median 12322 SNPs) boxes are not shown. Boxplots show median and IQR, whiskers show 1.5 times IQR, and outliers are points falling beyond whiskers.", fig.width = 6, fig.height = 6}
+
+readRDS(paste0(wd, "hierbaps/D2ESCO_core_snp_hbaps_clusts.rda")) -> hb.results
+
+hbdf <- hb.results$partition.df
+sub("_1#", "_1_",hbdf$Isolate) -> hbdf$Isolate
+sub("_2#", "_2_",hbdf$Isolate) -> hbdf$Isolate
+
+rownames(hbdf) <- hbdf$Isolate
+names(hbdf)[2:3] <- c("BAPS.l1", "BAPS.l2")
+
+hbdf$BAPS.l1 <- as.factor(hbdf$BAPS.l1)
+hbdf$BAPS.l1 <- LETTERS[hbdf$BAPS.l1]
+hbdf$BAPS.l2 <- as.factor(hbdf$BAPS.l2)
+
+dcast(hbdf, Isolate ~ BAPS.l2, value.var = "BAPS.l1") -> hbdf.cast
+hbdf %>% group_by(BAPS.l2) %>% summarise(n = n()) -> BAPSl2.freq
+
+hbdf.cast[c("Isolate", as.character(BAPSl2.freq$BAPS.l2[order(BAPSl2.freq$n, decreasing = T)])) ] -> hbdf.cast
+
+rownames(hbdf.cast) <- hbdf.cast$Isolate
+sapply(hbdf.cast[2:ncol(hbdf.cast)], as.factor) -> hbdf.cast[2:ncol(hbdf.cast)]
+hbdf.cast[is.na(hbdf.cast)] <- "Z"
+
+cols2 <- c(brewer.pal(n=5, "Dark2"), brewer.pal(n=10, "Set3") , "lightgrey")
+names(cols2) <- c(LETTERS[1:15], "Z")
+
+ggtree(tree) %>% gheatmap(select(hbdf.cast, -Isolate), width = 3, 
+                          colnames_position = "top", font.size = 2, colnames_angle = 90,
+                          color = NA, colnames_offset_y = 10) +
+  scale_fill_manual(breaks = LETTERS[1:15], values = cols2) + annotate("text", x= 0.4, y =510, label = "HierBAPS level 2 cluster") -> tr
+
+
+## 
+
+
+read_csv (paste0(wd, "core genome snp dist/snp-sites-snp-dist.csv") ) -> snp.dists
+
+names(snp.dists)[1] <- "lane"
+snpdists.df <- melt(snp.dists)
+names(snpdists.df)[1:2] <- c("Var1", "Var2") 
+
+snpdists.df$Var1 <- sub("_1#", "_1_", snpdists.df$Var1)
+snpdists.df$Var1 <- sub("_2#", "_2_", snpdists.df$Var1)
+snpdists.df$Var2 <- sub("_1#", "_1_", snpdists.df$Var2)
+snpdists.df$Var2 <- sub("_2#", "_2_", snpdists.df$Var2)
+snpdists.df$key <- apply(snpdists.df[1:2], 1, function(x)paste(sort(x), collapse='')) 
+subset(snpdists.df, !duplicated(snpdists.df$key))  -> snpdists.df
+subset(snpdists.df, Var1 != Var2) -> snpdists.df
+
+snpdists.df <- select(snpdists.df, -key) 
+
+merge(snpdists.df, hbdf, by.x = "Var1", by.y = "Isolate", all.x = T) -> snpdists.df
+names(snpdists.df)[c(4,5)] <- c("BAPS.l1.1", "BAPS.l2.1")
+
+merge(snpdists.df, hbdf, by.x = "Var2", by.y = "Isolate", all.x = T) -> snpdists.df
+names(snpdists.df)[c(6,7)] <- c("BAPS.l1.2", "BAPS.l2.2")
+
+within_l2_snpdist.df <- subset(snpdists.df, (BAPS.l2.1 == BAPS.l2.2))
+
+
+ggplot(within_l2_snpdist.df, aes(x= fct_infreq(BAPS.l2.1), y = value)) + 
+  geom_boxplot(alpha = 0.5, outlier.size = 0.1) + coord_cartesian(ylim = c(0,1500)) + theme_bw() + xlab("HierBAPS level 2 cluster") + ylab("No. SNPs")  + theme(axis.text.x = element_text(size = 6))  -> bp
+
+# geom_jitter(alpha = 0.3, size = 0.1) + 
+ggarrange(tr, NULL, bp, ncol = 1, nrow = 3, labels = c("A", "B", NA), heights = c(2,0.1, 0.8))
+```
+
+
+## Conclusions and discussion
 
 ## Appendix
