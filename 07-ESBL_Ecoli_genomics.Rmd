@@ -37,6 +37,7 @@ library(igraph)
 output = "latex"
 source("other_scripts/load_metadata.R")
 source("other_scripts/function_parse_cdhitest.R")
+source("other_scripts/parse_blast_op_IRranges.R")
 
 
 ```
@@ -52,9 +53,9 @@ These questions, phrased in this way, seem difficult or impossible to answer giv
 
 The basic bioinformatic pipeline used is described in detail in Chapter 2, methods. Briefly, one _E. coli_ colony from each patient sample was taken forward for DNA extraction and paired-end short-read whole genome sequencing using Illumina HiSeq X at the Wellcome Sanger Institute. Read quality control was undertaken with Kraken[@Wood2014] v0.10.6 to assign reads to species and WSI QC pipeline which maps a random 100 Mbases fron each sample to a reference and calculates depth of coverage, number of heterogeneous SNPs, GC content and insert size. Samples that contained > 80% non _E coli._ reads were discarded and _de novo_ assembly was undertaken with SPAdes[@Bankevich2012a] v3.11.0. Assembly statistics were calculated with QUAST[@Gurevich2013] v4.6.0 and completeness and contamination of the assemblies assessed by checkM[@Parks2015] v1.0.7. Contaminated assemblies (with checkM-defined contamination of > 25%) or poor assemblies (with less than 1Mb assembled length) were discarded. Annotation was carried out with Prokka[@Seemann2014a] v1.5 with a genus specific database from RefSeq and the Roary v1.007 pan-genome pipeline[@Page2015] was used to identify a core genome. A core gene multiple sequence alignment was generated using maaft[@Katoh2013] v7.205, SNP-sites identified using SNP-sites[@Page2016] v2.4.1 and the resultant SNP alignment used to build a maximum likelihood phylogenetic tree using IQ-TREE[@Nguyen2015] v1.6.3, using ascertainment bias correction to correct for the fact that the input pseudosequence contained only variable sites, and using the ModelFinder module used to find the best fitting nucleotide substition model. This calculates the likeliood of a number of different models and chooses the model with the lowest (best fitting) Bayesian Information Criterion, a statistic which penalises model parameters. Reliability of inferred branch partitions was assessed with 1000 bootstrap replicates. Trees were visualised in the ggtree v1.14.4 package[@Yu2017] in R. 
 
-Ariba[@Hunt2017a] v2.12.1 was used to identify AMR-associated genes using the SRST2[@Inouye2014] database, to identify plasmid replicons using the PlasmidFinder database[@Carattoli2014] and to perform _in silico_ muli-locus sequence typing (MLST) using the database from http://mlst.warwick.ac.uk/mlst/dbs/Ecoli accessed via www.pubmlst.org. The $\beta$-lactamase genes $ampC1$, $ampC2$ and $ampH$ were excluded from the analysis of AMR determinents as they do not usually cause a resistant phenotype in _E. coli_. Because quinolone resistance often results from SNPs in the chromasome in the quinolone resistance determining regions (QRDRs) of the _gyrA_, _gyrB_, _parE_ and _parC_ genes - rather than acquisition of whole AMR-determining genes, as is the case with the other genes sought by Ariba - these genes were downloaded from the comprehensive antimicrobial resistance database (CARD, https://card.mcmaster.ca/) and Ariba used to call SNPs in them, with default settings. _E. coli_ phylogrouping was performed with a quadruplex _in silico_ PCR using the Clermont scheme[@Clermont2013] and isPcr v33x2 (https://github.com/bowhan/kent/tree/master/src/isPcr) 
+ARIBA[@Hunt2017a] v2.12.1 was used to identify AMR-associated genes using the SRST2[@Inouye2014] database, to identify plasmid replicons using the PlasmidFinder database[@Carattoli2014] and to perform _in silico_ muli-locus sequence typing (MLST) using the database from http://mlst.warwick.ac.uk/mlst/dbs/Ecoli accessed via www.pubmlst.org. The $\beta$-lactamase genes $ampC1$, $ampC2$ and $ampH$ were excluded from the analysis of AMR determinents as they do not usually cause a resistant phenotype in _E. coli_. Because quinolone resistance often results from SNPs in the chromasome in the quinolone resistance determining regions (QRDRs) of the _gyrA_, _gyrB_, _parE_ and _parC_ genes - rather than acquisition of whole AMR-determining genes, as is the case with the other genes sought by Ariba - these genes were downloaded from the comprehensive antimicrobial resistance database (CARD, https://card.mcmaster.ca/) and Ariba used to call SNPs in them, with default settings. _E. coli_ phylogrouping was performed with a quadruplex _in silico_ PCR using the Clermont scheme[@Clermont2013] and isPcr v33x2 (https://github.com/bowhan/kent/tree/master/src/isPcr) 
 
-Rhierbaps package v1.1.0 in R[@Cheng2013] was used to cluster the core genome pseudosequence into sequence clusters (SCs). Two levels were used and these level 2 clusters used to test associations (see statistical analysis, below). To track putative mobile genetic elements ESBL-gene containing contigs were identified using BLASTn[@Altschul1990] v2.7.0 of all contigs against the SRST2 database and then contigs containing any given ESBL gene  were grouped by the ESBL gene they contained (for example, all $bla_{ctxm15}$ gene-containing clusters were grouped together), and each group clustered using cd-hit[@Li2006] v4.6 to produce mutually exclusive ESBL-gene-containing contig clusters for each identified ESBL gene. Henceforth, these clusters will be referred to as ESBL-clusters, for brevity. In order to attempt to determine the biological significance of the identified ESBL-clusters (i.e. what kind of MGE element they are likely to represent), basic statistics were plotted (number of samples contained withing each cluster, length of longest contig in cluster in kbases, length distribution of all contigs is cluster relative to longest contig and distribution of sequence identity compared to the longest contig in the cluster). Presence of compound trasposons, AMR determinents and plasmid replicons were identified by using BLAST with default settings of each ESBL-cluster representative sequence (as determined by cd-hit i.e one, the longest, for each ESBL-cluster) against the insertion sequence finder (ISfinder) database and the SRST2 database, taking the top hit (as determined by bitscore) for any given location, and visualising the results in gggenes v0.3.2. To assess lineage association, the ESBL-clusters were mapped back to the core genome SNP tree. 
+_Rhierbaps_ package v1.1.0 in R[@Cheng2013] was used to cluster the core genome pseudosequence into sequence clusters (SCs). Two levels were used and these level 2 clusters used to test associations (see statistical analysis, below). To track putative mobile genetic elements ESBL-gene containing contigs were identified using _BLASTn_[@Altschul1990] v2.7.0 of all contigs against the SRST2 database and then contigs containing any given ESBL gene  were grouped by the ESBL gene they contained (for example, all $bla_{ctxm15}$ gene-containing clusters were grouped together), and each group clustered using _cd-hit_[@Li2006] v4.6 to produce mutually exclusive ESBL-gene-containing contig clusters for each identified ESBL gene. Henceforth, these clusters will be referred to as ESBL-clusters, for brevity. In order to attempt to determine the biological significance of the identified ESBL-clusters (i.e. what kind of MGE element they are likely to represent), basic statistics were plotted (number of samples contained withing each cluster, length of longest contig in cluster in kbases, length distribution of all contigs is cluster relative to longest contig and distribution of sequence identity compared to the longest contig in the cluster). Presence of insertion sequences (i.e compound transposons), AMR determinents and plasmid replicons were identified by using BLAST with default settings of each ESBL-cluster representative sequence (as determined by cd-hit i.e one, the longest, for each ESBL-cluster) against the insertion sequence finder (ISfinder) database and the SRST2 database, filtering such that sequence identify was greater or equal to 95%, taking the top hit (as determined by bitscore) for any given location if there were two overlapping hits, and visualising the results in _gggenes_ v0.3.2. To assess lineage association, the ESBL-clusters were mapped back to the core genome phylogeny. 
 
 ### Global _E. coli_ collection
 
@@ -72,11 +73,11 @@ By definition it lies between 0 ($x$ and $y$ never co-occur) and 1 ($x$ and $y$ 
 
 To explore hospital or community associations of any given _E. coli_ clade, the location of isolation was first plotted against the phylogenetic tree; location of isolation was classified as hospital, community, or recent hospital discharge (defined as a date of isolation within 2 weeks of hospital discharge). This latter category was used because it is possible that a patient could acquire an ESBL-E clone in hospital but only be sampled once leaving hospital; using only hospital isolated and community isolted categories could therefore introduce bias. Hospital or community association of each sequence cluster was assessed using a Fisher's exact test of proportion of hospital associated samples (defined as sum of hospital isolated and recent hospital discharge) for the given sequence cluster as compared to proportion of hospital associated samples in the remainder of the samples, with a Bonferroni correction for multiple comparisons. p < 0.05 was again considered statistically significant.
 
-To compare within-patient to between-patient conservation of bacteria (as represented by core genome alignment and sequence cluster) and ESBL-containing MGE (as represented by the ESBL-clusters) several approaches were taken. Firstly, I assessed whether either sequence cluster or ESBL-cluster were conserved within an individual at all. I hypothesised that any within-patient correlation is likely to be a function of time: samples closer together in time may be more likely to be similar. To assess if this was the case for bacteria, pairwise core genome pseudosequence SNP distance was was calculated using snp-dists v0.4 (https://github.com/tseemann/snp-dists) for all samples and plotted against the time difference (in days) between samples, within and between patients, and with a smoothed curve fitted using a general additive model with cubic splines. Because of significant overplotting, this was also plotted as a 2D density plot. Based on these plots, the within and between patient SNP distances were compared in two post-hoc defined groups binned by time distance between the samples (50 days or less vs. more than 50 days), and distributions compared with Kruskal-Wallace tests.
+To compare within-patient to between-patient conservation of bacteria (as represented by core genome alignment and sequence cluster) and ESBL-containing MGE (as represented by the ESBL-clusters) several approaches were taken. Firstly, I assessed whether either sequence cluster or ESBL-cluster were conserved within an individual at all. I hypothesised that any within-patient correlation is likely to be a function of time: samples closer together in time may be more likely to be similar. To assess if this was the case for bacteria, pairwise core genome pseudosequence SNP distance was was calculated using _snp-dists_ v0.4 (https://github.com/tseemann/snp-dists) for all samples and plotted against the time difference (in days) between samples, within and between patients, and with a smoothed curve fitted using a general additive model with cubic splines. Because of significant overplotting, this was also plotted as a 2D density plot. Based on these plots, the within and between patient SNP distances were compared in two post-hoc defined groups binned by time distance between the samples (50 days or less vs. more than 50 days), and distributions compared with Kruskal-Wallace tests.
 
 I then compared the within patient temporal clustering of ESBL-clusters and sequence clusters, by estimating the proportion of within-patient samples that contain the same ESBL-cluster or sequence cluster, as a function of time; essentially a temporal autocorrelation function. To estimate this, I considered pairwise comparsion of all within-patient samples. For any given time between samples, $t$ I defined a window of +/-5 days and estimated the probabilities as the number of all within-patient sample pairs in the window $[t - 5, t+5]$ that contained the same sequence cluster or ESBL-cluster divided by the total number of all within-patient sample pairs within that time window. Exact binomial confidence intervals for these proportions were generated and probabilities plotted as a function of time. In order to estimate the probability of two samples containing the same sequence cluster of contig-cluster purely by chance, 1000 sample pairs were randomly drawn from all samples with replacement and the proportion of these samples that contained the same sequence cluster or ESBL-cluster calculated.
 
-Finally, to inform the question as to what the likely unit of transmission in this system is, I assessed what was most conserved within patients, in pairwise sample comparison: bacteria (as represented by core gene sequence cluster), ESBL-containing MGE (as represented by ESBL-cluster), or both. Simple proportions in all-against-all pairwise comparison - stratified by whether between-patient or within-patient - were calculated: the proportion of samples that contain the same core gene sequence cluster only, the proportion of samples contain the same ESBL-cluster only, and the proportion that contain both sequence cluster and ESBL-cluster. Proportions were compared between within and between-patient strat in these three groups using Fisher's exact test, with p < 0.05 considered statistically significant.
+Finally, to inform the question as to what the likely unit of transmission in this system is, I assessed what was most conserved within patients, in pairwise sample comparison: bacteria (as represented by core gene sequence cluster), ESBL-containing MGE (as represented by ESBL-cluster), or both. Simple proportions in all-against-all pairwise comparison - stratified by whether between-patient or within-patient - were calculated: the proportion of samples that contain the same core gene sequence cluster only, the proportion of samples contain the same ESBL-cluster only, and the proportion that contain both sequence cluster and ESBL-cluster. Proportions were compared between within and between-patient strata in these three groups using Fisher's exact test, with p < 0.05 considered statistically significant.
 
 ## Results
 
@@ -1113,6 +1114,10 @@ ggarrange(tr, NULL, bp, ncol = 1, nrow = 3, labels = c("A", "B", NA), heights = 
 
 The 473 samples contained 486 ESBL genes (Figure \@ref(fig:wgs-conig-sizes)A); 5 genes only occured once in the collection and so no attempt was made to cluster them. Of the remaining 481 gene-sample pairs, BLAST failed to identify the ESBL-gene containing contig in 2 samples (one in which _ariba_ had identified $bla-{ctxm15}$ one $bla_{ctxm27}$), but identified the remaining 479 ESBL genes on 478 contigs, with perfect agreement with _ariba_. Only one contig carried two ESBL genes: $bla_{ctxm3}$ and $bla_{ctxm15}$; the remaining 477 contigs contained one. _The _cd_hit_ algorithm grouped the 477 unique contigs into 99 clusters (Figure \@ref(fig:wgs-conig-sizes)B). In total, over 90% of the ESBL-genes (432/479 [90%]) were contained in the 52 largest contig clusters.
 
+The _cd-hit_ algorithm selects one member of a cluster (the longest) as the representative. The length of these reprentative clusters was very variable, ranging from 1.8kbp to 905.8kbp, with median (IQR) 46.1kbp (11.1-215.5kbp). The other cluster members were usually fragments of these representative contigs with varying sizes - a median (IQR) 60% (36-100%) of the representative contig length - but had high sequence identity, median (IQR) 100.0 (99.7 - 100.0) (Figure \@ref(fig:(wgs-contig-stats)).
+
+
+
 
 ```{r wgs-conig-sizes, echo = F, warning = F, message = F, fig.scap="ESBL-containing contig clusters", out.extra='', fig.cap="A: Frequency distribution of ESBL genes in clustered contigs B: Number of contigs per cluster, stratified by ESBL gene.", fig.width = 8, fig.height = 4}
 
@@ -1192,6 +1197,7 @@ ggplot(df.clust.rep,  aes(clust.id, as.numeric(length)/1000, fill = gene)) + geo
 
 ggplot(df,  aes(clust.id, prop_of_max_length, fill = gene)) +  geom_boxplot(outlier.size = 0.3)  +  theme_bw() + theme(axis.text.x = element_text(size = 4, angle = 90, vjust = 0.5), axis.title.x = element_blank(), legend.title = element_blank()) + labs(y = "Length (as % of max)")  -> p4
 
+df.clusts <- subset(df, identity == "*") 
 df$identity[df$identity == "*"] <- 100
 ggplot(df,  aes(clust.id, as.numeric(identity)/100, fill = gene)) +  geom_boxplot(outlier.size = 0.3)  +  theme_bw()+ theme(axis.text.x = element_text(size = 4, angle = 90, vjust = 0.5), axis.title.x = element_blank(), legend.title = element_blank()) + labs(y = "Sequence identity")  -> p5
 
@@ -1208,12 +1214,119 @@ ggplot(unique(select(df,clust.id,n_clust,max_clust_length, gene)),  aes(clust.id
 
 ```{r wgs-contig-stats, echo = F, warning = F, message = F, fig.scap="Summary statistics for ESBL-contig clusters", out.extra='', fig.cap="Summary statistics for 99 ESBL-containing contig clusters as deterined by \\textit{cd-hit}. A: Number of contigs per cluster. B: Length (kbp) of longest sample in each cluster. This is defined as the cluster representative sample by \\textit{cd-hit} to which all other samples are compared for the purposes of length and sequence identity. C: Distribution of contig lengths by cluster expressed as a proportion of longest contig length. D: Distribution of sequence identity of cluster members compared to representative member, by cluster.", fig.width = 6, fig.height = 7}
 
-
-
-
   ggarrange(
   ggarrange( NULL,NULL,NULL,NULL, labels = c("A","B","C","D"), ncol = 1, nrow = 4),     ggarrange(p6,p3,p4,p5, ncol = 1, nrow = 4 ,common.legend = TRUE, legend = "right")
   , ncol = 2, nrow = 1, widths = c(0.1, 1.5)) 
+
+```
+
+
+```{r wgs-contig-ggenes, echo = F, warning = F, message = F, fig.scap="Plots of ESBL-clusters", out.extra='', fig.cap="Plots of ESBL-clusters", fig.width = 13, fig.height = 10}
+
+df.is <- read.csv(paste0(wd, "contig_cluster/results/BLAST_contigs_to_n/allAMRcontigs.blast.IS.csv"),
+               stringsAsFactors = F, header = F)
+
+
+names(df.is) <-   c("qseqid", "sseqid","pident", "length", 
+                 "mismatch","gapopen", "qstart", "qend" , 
+                 "sstart","send", "evalue", "bitscore")
+ddply(df.is, "qseqid", parse_blast_op_one_contig) -> df2
+df2$type <- "IS"
+sapply(df2$sseqid, function(x) strsplit(x, "_")[[1]][[1]]) -> df2$sseqid
+df.amr <- read.csv(paste0(wd, "contig_cluster/results/BLAST_contigs_to_n/allAMRcontigs.blast.SRST2.csv"),
+                   stringsAsFactors = F, header = F)
+names(df.amr) <-   c("qseqid", "sseqid","pident", "length", 
+                 "mismatch","gapopen", "qstart", "qend" , 
+                 "sstart","send", "evalue", "bitscore")
+apply(df.amr, 1, function(x) strsplit(x[2], "__")[[1]][[3]]) -> df.amr$sseqid
+ddply(df.amr, "qseqid", parse_blast_op_one_contig) -> df.amr.2
+df.amr.2$type <- "AMR.gene"
+df.pl <- read.csv(paste0(wd, "contig_cluster/results/BLAST_contigs_to_n/allAMRcontigs.blast.pfinder.csv"),
+                  stringsAsFactors = F, header = F)
+names(df.pl) <-   c("qseqid", "sseqid","pident", "length", 
+                     "mismatch","gapopen", "qstart", "qend" , 
+                     "sstart","send", "evalue", "bitscore")
+ddply(df.pl, "qseqid", parse_blast_op_one_contig) -> df.pl.2
+df.pl.2$type <- "plasmid"
+
+df.f <- rbind(df2, df.amr.2, df.pl.2)
+
+
+
+#df.clusts <- subset(df, identity == "*") 
+
+sub("ctxm", "CTX-M-", df.clusts$gene) -> df.clusts$gene
+sub("shv", "SHV-", df.clusts$gene) -> df.clusts$gene
+sub("tem", "TEM-", df.clusts$gene) -> df.clusts$gene
+paste0(".", df.clusts$contig) ->df.clusts$contig
+
+merge(df.f, select(df.clusts, contig, gene, clust.id, n_clust), by.x = "qseqid", by.y = "contig", all.x =T ) -> df.f
+#sub("_unknown","", df.f$sseqid) -> df.f$sseqid
+
+## get ready to plot genes
+
+
+df.f$direc <- TRUE
+df.f$direc[df.f$sstart > df.f$send] <- FALSE
+
+
+df.f15 <- subset(df.f, gene == "CTX-M-15")
+
+# how many to plot
+
+(unique(df.f15 %>% select(clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+#print(contigs_n %>% dplyr::slice(1:20))
+
+# top 20 cover 78% of CTXM15
+# top 10 cover 62%
+
+ctxm15.1_10 <- df.sum %>% filter(gene == "ctxm15") %>% arrange(desc(n)) %>% dplyr::slice(1:20)
+c#txm15.11_20 <- df.sum %>% filter(gene == "ctxm15") %>% dplyr::slice(11:20)
+
+levels.df.f15 <- unique(select(df.f15, qseqid, n_clust))
+
+df.f15$clust.id <- factor(df.f15$clust.id, levels = unique(df.f15$clust.id[order(df.f15$n, decreasing = T)]))
+df.f15$qseqid <- factor(df.f15$qseqid, levels = levels.df.f15$qseqid[order(levels.df.f15$n_clust)])
+
+ddply(df.f15, "qseqid", flip_one_contig, df.clusts) -> df.f15
+ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
+
+df.f15.1 <- subset(df.f15, clust.id %in% ctxm15.1_10$clust.id )
+(unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+
+df.f15.1$clust.id <- as.character(df.f15.1$clust.id )
+df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
+
+subset(df.f15.1, pident >= 95) -> df.f15.1
+#subset(df.f15.1, !(pident != 100 & type == "AMR.gene") ) -> df.f15.1
+
+dummies1 <- make_alignment_dummies(
+  df.f15.1,
+  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
+  on = "CTX-M-15")
+
+dummies1$direc <- TRUE
+dummies1$type <- NA
+#levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
+#df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
+
+df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
+
+df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
+#names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
+
+
+
+ggplot(df.f15.1, aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
+  geom_gene_arrow() +
+    geom_blank(data = dummies1) +
+  facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
+  #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
+  geom_gene_label(align = "left") + theme_genes() +  theme(legend.position = "bottom")
+
+
 
 ```
 ## Conclusions and discussion
