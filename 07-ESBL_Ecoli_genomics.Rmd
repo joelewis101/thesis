@@ -36,6 +36,7 @@ library(igraph)
 
 output = "latex"
 source("other_scripts/load_metadata.R")
+source("other_scripts/function_parse_cdhitest.R")
 
 
 ```
@@ -233,7 +234,7 @@ tree <- read.tree(paste0(wd, "core_genome_tree/core_alnD2ESCO_snp_sites.aln.tree
 midpoint.root(tree) -> tree
 
 rownames(pgroups) <- pgroups$Lane
-dcast(mlst, lane ~ ST, fun.aggregate = length) -> mlst.onehot
+reshape2::dcast(mlst, lane ~ ST, fun.aggregate = base::length) -> mlst.onehot
 #mlst.onehot <- subset(mlst.onehot, lane %in% tree$tip.label)
 
 rownames(mlst.onehot) <- mlst.onehot$lane
@@ -371,7 +372,7 @@ mlst <- read.csv(paste0(wd, "global_tree/phylogroups_and_mlst/mlst_summary.csv")
 mlst <- select(mlst, lane, ST)
 
 mlst <- rbind(mlst.d, mlst)
-dcast(mlst, lane ~ ST, fun.aggregate = length) -> mlst.onehot
+dcast(mlst, lane ~ ST, fun.aggregate = base::length) -> mlst.onehot
 #mlst.onehot <- subset(mlst.onehot, lane %in% tree$tip.label)
 
 rownames(mlst.onehot) <- mlst.onehot$lane
@@ -630,8 +631,8 @@ subset(orgs, value != "Sensitive") -> orgs
 
 rbind(orgs, 
       data.frame(sample_number = unique(orgs$sample_number),
-                 organism = rep("Escherichia coli", length(unique(orgs$sample_number))),
-                 variable = rep("ESBL", length(unique(orgs$sample_number))),
+                 organism = rep("Escherichia coli", base::length(unique(orgs$sample_number))),
+                 variable = rep("ESBL", base::length(unique(orgs$sample_number))),
                  value = rep("Resistant", length(unique(orgs$sample_number)))
       )
       )-> orgs
@@ -717,7 +718,7 @@ q.df$key <- paste0(q.df$ref_name, q.df$codon_posn)
 
 q.df.new <- subset(q.df, key == "GyrA83" |  key == "GyrA87" | key == "ParC80" | key == "ParE458")
 
-dcast(q.df.new,sample ~ key, fun.aggregate = length) -> q.df.new
+dcast(q.df.new,sample ~ key, fun.aggregate = base::length) -> q.df.new
 
 orgs.cip <- merge(orgs.cip, q.df.new, by.x = "Lane", by.y = "sample", all.x = T)
 orgs.cip[is.na(orgs.cip)] <- 0
@@ -1030,19 +1031,15 @@ ggarrange(ggarrange(p2,
 
 ### Plasmid replicons
 
-Presence or absence of the identified plasmid repicons is shown mapped to the phylogeny in Figure \@ref(fig:wgs-amr-cooccur-plot)C. IncFIb was most commonly identified (399/473 [84%] of isolates), followed by IncFII (383/473 [81%] of isolates) and IncF1a (324/373 [68%] of isolates). Col plasmids were also frequently identified, in 308/473 [65%] of isolates. In contrast to AMR genes, there was no apparent lineage association with plasmid replicon.
+Presence or absence of the identified plasmid repicons is shown mapped to the phylogeny in Figure \@ref(fig:wgs-amr-cooccur-plot)C. IncFIb was most commonly identified (399/473 [84%] of isolates), followed by IncFII (383/473 [81%] of isolates) and IncF1a (324/373 [68%] of isolates). Col plasmids were also frequently identified, in 308/473 [65%] of isolates. Once again, there seems to be lineage associations of presence or absence of replicons.
 
-### Testing metadata associations: hierBAPS sequence clusters and ESBL-clusters
+### Testing metadata associations: SNP distance, hierBAPS sequence clusters and ESBL-clusters
 
-Finally, in order to test hospital or community associations of bacterial lineages or MGE, I clustered core gene pseudosequences and ESBL-containing contigs into mutually exclusive groups.
+Finally, in order to test metadata associations of bacterial lineages or MGE, I used several techniques: considering core gene SNP distance between isolates to infer continous carriage and/or transmission events, and clustering core gene pseudosequences and ESBL-containing contigs into mutually exclusive groups which can then be used to test associations. Below, I first describe the outcomes of the clustering algorithms used, before decribing tests of association with metadata. 
 
-#### Hierachichal BAPS clustering of core gene pseudosequence
+#### Hierachichal BAPS clustering of core gene pseudosequences
 
 The hieraechical BAPS algorithm clustered the core gene alignments into 15 level one (top level) clusters, denoted sequence clusters A-O, and a total of 48 level two (lower level) clusters, denoted sequence clusters 1-48 that were almost exclusivley monophyletic and commonly corresponded closely to the multilocus sequence types (STs, Figure \@ref(fig:wgs-hierbaps-plot-tree)A). Intracluster pairwise SNP distance vaired (Figure \@ref(fig:wgs-hierbaps-plot-tree)B) but the clusters were often reasonably clonal: SC6, SC8 and SC23, for example (the three largest clusters) had median (IQR) intragroup pairwise SNP distance of 62 (34-97), 326 (18-378) and 18 (11-24) respectively.
-
-#### ESBL-clusters
-
-
 
 ```{r wgs-hierbaps-plot-tree, echo = F, warning = F, message = F, fig.scap="Core gene hierBAPS clusters", out.extra='', fig.cap="A: Core gene hierarchical BAPS clusters mapped back to phylogeny. Heatmap shows level 2 (lower level) with colour denoting level 1 (top level) cluster membership. B: Intracluster pairwise SNP distance for level 2 sequence clusters. Axis restricted to 0-1500 SNPs and as result SC17 (median 6881 SNPs), SC29 (median 2970 SNPs), SC31 (median 2970 SNPs) and SC44 (median 12322 SNPs) boxes are not shown. Boxplots show median and IQR, whiskers show 1.5 times IQR, and outliers are points falling beyond whiskers.", fig.width = 6, fig.height = 6}
 
@@ -1112,7 +1109,113 @@ ggplot(within_l2_snpdist.df, aes(x= fct_infreq(BAPS.l2.1), y = value)) +
 ggarrange(tr, NULL, bp, ncol = 1, nrow = 3, labels = c("A", "B", NA), heights = c(2,0.1, 0.8))
 ```
 
+#### ESBL-clusters
 
+The 473 samples contained 486 ESBL genes (Figure \@ref(fig:wgs-conig-sizes)A); 5 genes only occured once in the collection and so no attempt was made to cluster them. Of the remaining 481 gene-sample pairs, BLAST failed to identify the ESBL-gene containing contig in 2 samples (one in which _ariba_ had identified $bla-{ctxm15}$ one $bla_{ctxm27}$), but identified the remaining 479 ESBL genes on 478 contigs, with perfect agreement with _ariba_. Only one contig carried two ESBL genes: $bla_{ctxm3}$ and $bla_{ctxm15}$; the remaining 477 contigs contained one. _The _cd_hit_ algorithm grouped the 477 unique contigs into 99 clusters (Figure \@ref(fig:wgs-conig-sizes)B). In total, over 90% of the ESBL-genes (432/479 [90%]) were contained in the 52 largest contig clusters.
+
+
+```{r wgs-conig-sizes, echo = F, warning = F, message = F, fig.scap="ESBL-containing contig clusters", out.extra='', fig.cap="A: Frequency distribution of ESBL genes in clustered contigs B: Number of contigs per cluster, stratified by ESBL gene.", fig.width = 8, fig.height = 4}
+
+
+fileses <- list.files(paste0(wd, "contig_cluster/results"))
+fileses <- grep(".clstr", fileses, value = T)
+
+out <- list()
+for (i in 1:length(fileses)) {
+  #strsplit(fileses[[i]], "\\.")[1][[1]][[1]]
+  #print(gene)
+  outtemp <- parse_cd_hit_est_output_to_df(
+    paste0(wd,"contig_cluster/results/",fileses[i])) 
+  outtemp$gene <- strsplit(fileses[[i]], "\\.")[1][[1]][[1]]
+  out[[i]] <- outtemp
+  
+}
+
+df <- do.call(rbind, out)
+
+df$clust.id <- paste0(df$gene, ".", df$cluster)
+
+
+df.sum <- df %>% group_by(gene,clust.id) %>% summarise(n= n()) %>% 
+  arrange(desc(n)) %>% mutate(cumsum = cumsum(n),
+                        max = max(cumsum))
+
+df.sum$prop <- df.sum$cumsum / df.sum$max
+
+df.sum$clust.id <- factor(df.sum$clust.id, levels = df.sum$clust.id[order(df.sum$cumsum)]) 
+df.sum$gene <- factor(df.sum$gene, levels = unique(df.sum$gene[order(df.sum$cumsum, decreasing = T)]))
+
+length(unique(df$clust.id))
+
+
+#cum prop by gene
+
+plotlablookup <- df %>% group_by(gene) %>% summarise(n_clust_bygene = max(cluster) + 1)
+
+
+plotlablookup$plotlab <- paste0(plotlablookup$gene, " (",plotlablookup$n_clust_bygene, " clusters)" )
+
+df.sum <- merge(df.sum, plotlablookup)
+
+df.sum$gene <- factor(df.sum$gene, levels = levels(fct_infreq(df$gene)))
+df.sum$plotlab <- factor(df.sum$plotlab, levels = unique(df.sum$plotlab[order(df.sum$gene) ]) )
+
+df.sum$gene <- factor(df.sum$gene, levels = unique(as.character(df$gene)[order(as.character(df$gene)) ]))
+
+
+ggplot(df.sum, aes(clust.id, n, fill = gene)) + geom_col() + facet_wrap(~plotlab, scales = "free", ncol = 4) +  theme_bw() +
+  theme(axis.text.x = element_blank() , panel.grid = element_blank(), legend.position = "none") + labs(x = "", y = "Contigs per cluster") -> p1
+
+ggplot(df, aes(fct_rev(fct_infreq(gene)), fill = gene)) + geom_bar() + coord_flip() + theme_bw() + theme(legend.position = "none", panel.grid = element_blank()) + labs(y= "Frequency", x = "") -> p2
+
+ggarrange(ggarrange(NULL,p2, NULL, heights = c(0.1, 1, 0.1), ncol =1, nrow = 3),p1, ncol = 2, nrow = 1, widths = c(0.6,2), labels = c("A", "B"))
+
+### contig stats
+
+df %>% group_by(clust.id) %>% mutate(n_clust = n(), max_clust_length = max(as.numeric(length))) -> df
+
+df$sample.id <- paste0(df$clust.id, ".", df$id)
+
+df$prop_of_max_length <- as.numeric(df$length) / df$max_clust_length
+#df$max_clust_length <- as.numeric(ma)
+df$clust.id <- factor(df$clust.id, levels = unique(df$clust.id[order(df$max_clust_length)]))
+
+df.clust.rep <- subset(df,identity == "*")
+
+df.clust.rep$clust.id <- factor(df.clust.rep$clust.id, levels = df.clust.rep$clust.id[rev(order(df.clust.rep$max_clust_length))] )
+
+df$clust.id <- factor(df$clust.id, levels = df.clust.rep$clust.id[rev(order(df.clust.rep$max_clust_length))] )
+
+ggplot(df.clust.rep,  aes(clust.id, as.numeric(length)/1000, fill = gene)) + geom_col()  + theme_bw() + theme(axis.text.x = element_text(size = 4, angle = 90, vjust = 0.5), axis.title.x = element_blank(), legend.title = element_blank()) + labs(y = "Max length (kbp)") -> p3
+
+#ggplot(df.clust.rep,  aes(fct_rev(fct_reorder(clust.id,max_clust_length)), fill = gene)) + geom_bar()  + theme_bw() + theme(axis.text.x = element_text(size = 4, angle = 90), legend.position = "none") + labs(x= "Cluster ID", y = "Length of representative member(bp)")
+
+ggplot(df,  aes(clust.id, prop_of_max_length, fill = gene)) +  geom_boxplot(outlier.size = 0.3)  +  theme_bw() + theme(axis.text.x = element_text(size = 4, angle = 90, vjust = 0.5), axis.title.x = element_blank(), legend.title = element_blank()) + labs(y = "Length (as % of max)")  -> p4
+
+df$identity[df$identity == "*"] <- 100
+ggplot(df,  aes(clust.id, as.numeric(identity)/100, fill = gene)) +  geom_boxplot(outlier.size = 0.3)  +  theme_bw()+ theme(axis.text.x = element_text(size = 4, angle = 90, vjust = 0.5), axis.title.x = element_blank(), legend.title = element_blank()) + labs(y = "Sequence identity")  -> p5
+
+
+ggplot(unique(select(df,clust.id,n_clust,max_clust_length, gene)),  aes(clust.id, n_clust, fill = gene)) +  geom_col() +  theme_bw()+ theme(axis.text.x = element_text(size = 4, angle = 90, vjust = 0.5), axis.title.x = element_blank(), legend.title = element_blank()) + labs(y = "Cluster size") -> p6
+
+#ggarrange(ggarrange(p2,p1, ncol = 2, nrow = 1, widths = c(0.5,2), labels = c("A", "B")),
+ #                 p6,p3,p4,p5, ncol = 1, nrow = 5, labels = c(NA,"C", "D","E", "F") )
+
+
+
+
+```
+
+```{r wgs-contig-stats, echo = F, warning = F, message = F, fig.scap="Summary statistics for ESBL-contig clusters", out.extra='', fig.cap="Summary statistics for 99 ESBL-containing contig clusters as deterined by \\textit{cd-hit}. A: Number of contigs per cluster. B: Length (kbp) of longest sample in each cluster. This is defined as the cluster representative sample by \\textit{cd-hit} to which all other samples are compared for the purposes of length and sequence identity. C: Distribution of contig lengths by cluster expressed as a proportion of longest contig length. D: Distribution of sequence identity of cluster members compared to representative member, by cluster.", fig.width = 6, fig.height = 7}
+
+
+
+
+  ggarrange(
+  ggarrange( NULL,NULL,NULL,NULL, labels = c("A","B","C","D"), ncol = 1, nrow = 4),     ggarrange(p6,p3,p4,p5, ncol = 1, nrow = 4 ,common.legend = TRUE, legend = "right")
+  , ncol = 2, nrow = 1, widths = c(0.1, 1.5)) 
+
+```
 ## Conclusions and discussion
 
 ## Appendix
