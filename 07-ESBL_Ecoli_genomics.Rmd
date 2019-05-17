@@ -1150,7 +1150,7 @@ df.sum$prop <- df.sum$cumsum / df.sum$max
 df.sum$clust.id <- factor(df.sum$clust.id, levels = df.sum$clust.id[order(df.sum$cumsum)]) 
 df.sum$gene <- factor(df.sum$gene, levels = unique(df.sum$gene[order(df.sum$cumsum, decreasing = T)]))
 
-length(unique(df$clust.id))
+#length(unique(df$clust.id))
 
 
 #cum prop by gene
@@ -1221,7 +1221,7 @@ ggplot(unique(select(df,clust.id,n_clust,max_clust_length, gene)),  aes(clust.id
 ```
 
 
-```{r wgs-contig-ggenes, echo = F, warning = F, message = F, fig.scap="Plots of ESBL-clusters", out.extra='', fig.cap="Plots of ESBL-clusters", fig.width = 13, fig.height = 10}
+```{r wgs-contig-ggenes-prep, echo = F, warning = F, message = F, fig.scap="Plots of ESBL-clusters", out.extra='', fig.cap="Plots of ESBL-clusters", fig.width = 13, fig.height = 15}
 
 df.is <- read.csv(paste0(wd, "contig_cluster/results/BLAST_contigs_to_n/allAMRcontigs.blast.IS.csv"),
                stringsAsFactors = F, header = F)
@@ -1248,6 +1248,10 @@ names(df.pl) <-   c("qseqid", "sseqid","pident", "length",
                      "sstart","send", "evalue", "bitscore")
 ddply(df.pl, "qseqid", parse_blast_op_one_contig) -> df.pl.2
 df.pl.2$type <- "plasmid"
+
+apply(df.pl.2[2],1, function(x) strsplit(x,"_1")[[1]][[1]] ) -> df.pl.2[2]
+apply(df.pl.2[2],1, function(x) strsplit(x,"\\(")[[1]][[1]] ) -> df.pl.2[2]
+apply(df.pl.2[2],1, function(x) strsplit(x,"_")[[1]][[1]] ) -> df.pl.2[2]
 
 df.f <- rbind(df2, df.amr.2, df.pl.2)
 
@@ -1302,13 +1306,7 @@ df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
 subset(df.f15.1, pident >= 95) -> df.f15.1
 #subset(df.f15.1, !(pident != 100 & type == "AMR.gene") ) -> df.f15.1
 
-dummies1 <- make_alignment_dummies(
-  df.f15.1,
-  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
-  on = "CTX-M-15")
 
-dummies1$direc <- TRUE
-dummies1$type <- NA
 #levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
 #df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
 
@@ -1317,18 +1315,502 @@ df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(cont
 df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
 #names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
 
+dummies1 <- make_alignment_dummies(
+  df.f15.1,
+  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
+  on = "CTX-M-15")
 
+dummies1$direc <- TRUE
+dummies1$type <- NA
 
-ggplot(df.f15.1, aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
-  geom_gene_arrow() +
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
+
+#df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
+
+#cols <- (hue_pal()(9)[c(1,2,4,6)])
+#cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
+
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
     geom_blank(data = dummies1) +
   facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
   #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
-  geom_gene_label(align = "left") + theme_genes() +  theme(legend.position = "bottom")
+  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_discrete(name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c15
 
 
+
+
+df.f15 <- subset(df.f, gene == "CTX-M-27")
+
+# how many to plot
+
+(unique(df.f15 %>% select(clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+#print(contigs_n %>% dplyr::slice(1:20))
+
+# top 20 cover 78% of CTXM15
+# top 10 cover 62%
+
+#ctxm15.1_10 <- df.sum %>% filter(gene == "ctxm15") %>% arrange(desc(n)) %>% dplyr::slice(1:20)
+#c#txm15.11_20 <- df.sum %>% filter(gene == "ctxm15") %>% dplyr::slice(11:20)
+
+levels.df.f15 <- unique(select(df.f15, qseqid, n_clust))
+
+df.f15$clust.id <- factor(df.f15$clust.id, levels = unique(df.f15$clust.id[order(df.f15$n, decreasing = T)]))
+df.f15$qseqid <- factor(df.f15$qseqid, levels = levels.df.f15$qseqid[order(levels.df.f15$n_clust)])
+
+ddply(df.f15, "qseqid", flip_one_contig, df.clusts) -> df.f15
+ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
+
+df.f15.1 <- subset(df.f15, gene == "CTX-M-27" )
+(unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+
+df.f15.1$clust.id <- as.character(df.f15.1$clust.id )
+df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
+
+subset(df.f15.1, pident >= 95) -> df.f15.1
+#subset(df.f15.1, !(pident != 100 & type == "AMR.gene") ) -> df.f15.1
+
+
+#levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
+#df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
+
+df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
+
+df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
+#names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
+
+dummies1 <- make_alignment_dummies(
+  df.f15.1,
+  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
+  on = "CTX-M-27")
+
+dummies1$direc <- TRUE
+dummies1$type <- NA
+
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
+
+#df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
+
+#cols <- (hue_pal()(9)[c(1,2,4,6)])
+#cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
+
+# fudge to stop overplotting
+
+df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
+
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+    geom_blank(data = dummies1) +
+  facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
+  #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
+  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3), name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c27
+
+######
+#####
+#####
+
+df.f15 <- subset(df.f, gene == "SHV-12")
+
+# how many to plot
+
+(unique(df.f15 %>% select(clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+#print(contigs_n %>% dplyr::slice(1:20))
+
+# top 20 cover 78% of CTXM15
+# top 10 cover 62%
+
+#ctxm15.1_10 <- df.sum %>% filter(gene == "ctxm15") %>% arrange(desc(n)) %>% dplyr::slice(1:20)
+#c#txm15.11_20 <- df.sum %>% filter(gene == "ctxm15") %>% dplyr::slice(11:20)
+
+levels.df.f15 <- unique(select(df.f15, qseqid, n_clust))
+
+df.f15$clust.id <- factor(df.f15$clust.id, levels = unique(df.f15$clust.id[order(df.f15$n, decreasing = T)]))
+df.f15$qseqid <- factor(df.f15$qseqid, levels = levels.df.f15$qseqid[order(levels.df.f15$n_clust)])
+
+ddply(df.f15, "qseqid", flip_one_contig, df.clusts) -> df.f15
+ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
+
+df.f15.1 <- subset(df.f15, gene == "SHV-12" )
+(unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+
+df.f15.1$clust.id <- as.character(df.f15.1$clust.id )
+df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
+
+subset(df.f15.1, pident >= 95) -> df.f15.1
+#subset(df.f15.1, !(pident != 100 & type == "AMR.gene") ) -> df.f15.1
+
+
+#levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
+#df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
+
+df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
+
+df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
+#names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
+
+dummies1 <- make_alignment_dummies(
+  df.f15.1,
+  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
+  on = "SHV-12")
+
+dummies1$direc <- TRUE
+dummies1$type <- NA
+
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
+
+#df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
+
+#cols <- (hue_pal()(9)[c(1,2,4,6)])
+#cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
+
+# fudge to stop overplotting
+
+#df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
+
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+    geom_blank(data = dummies1) +
+  facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
+  #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
+  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.s12
+
+#####
+######
+
+df.f15 <- subset(df.f, gene == "CTX-M-14")
+
+# how many to plot
+
+(unique(df.f15 %>% select(clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+#print(contigs_n %>% dplyr::slice(1:20))
+
+# top 20 cover 78% of CTXM15
+# top 10 cover 62%
+
+#ctxm15.1_10 <- df.sum %>% filter(gene == "ctxm15") %>% arrange(desc(n)) %>% dplyr::slice(1:20)
+#c#txm15.11_20 <- df.sum %>% filter(gene == "ctxm15") %>% dplyr::slice(11:20)
+
+levels.df.f15 <- unique(select(df.f15, qseqid, n_clust))
+
+df.f15$clust.id <- factor(df.f15$clust.id, levels = unique(df.f15$clust.id[order(df.f15$n, decreasing = T)]))
+df.f15$qseqid <- factor(df.f15$qseqid, levels = levels.df.f15$qseqid[order(levels.df.f15$n_clust)])
+
+ddply(df.f15, "qseqid", flip_one_contig, df.clusts) -> df.f15
+ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
+
+df.f15.1 <- subset(df.f15, gene == "CTX-M-14" )
+(unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+
+df.f15.1$clust.id <- as.character(df.f15.1$clust.id )
+df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
+
+subset(df.f15.1, pident >= 95) -> df.f15.1
+#subset(df.f15.1, !(pident != 100 & type == "AMR.gene") ) -> df.f15.1
+
+
+#levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
+#df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
+
+df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
+
+df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
+#names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
+
+dummies1 <- make_alignment_dummies(
+  df.f15.1,
+  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
+  on = "CTX-M-14")
+
+dummies1$direc <- TRUE
+dummies1$type <- NA
+
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
+
+#df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
+
+#cols <- (hue_pal()(9)[c(1,2,4,6)])
+#cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
+
+# fudge to stop overplotting
+
+#df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
+
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+    geom_blank(data = dummies1) +
+  facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
+  #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
+  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c14
+
+
+#### ctxm-9
+
+df.f15 <- subset(df.f, gene == "CTX-M-9")
+
+# how many to plot
+
+(unique(df.f15 %>% select(clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+levels.df.f15 <- unique(select(df.f15, qseqid, n_clust))
+
+df.f15$clust.id <- factor(df.f15$clust.id, levels = unique(df.f15$clust.id[order(df.f15$n, decreasing = T)]))
+df.f15$qseqid <- factor(df.f15$qseqid, levels = levels.df.f15$qseqid[order(levels.df.f15$n_clust)])
+
+ddply(df.f15, "qseqid", flip_one_contig, df.clusts) -> df.f15
+ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
+
+df.f15.1 <- subset(df.f15, gene == "CTX-M-9" )
+(unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+
+df.f15.1$clust.id <- as.character(df.f15.1$clust.id )
+df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
+
+subset(df.f15.1, pident >= 95) -> df.f15.1
+#subset(df.f15.1, !(pident != 100 & type == "AMR.gene") ) -> df.f15.1
+
+
+#levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
+#df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
+
+df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
+
+df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
+#names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
+
+dummies1 <- make_alignment_dummies(
+  df.f15.1,
+  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
+  on = "CTX-M-9")
+
+dummies1$direc <- TRUE
+dummies1$type <- NA
+
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
+
+#df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
+
+#cols <- (hue_pal()(9)[c(1,2,4,6)])
+#cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
+
+# fudge to stop overplotting
+
+df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
+
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+    geom_blank(data = dummies1) +
+  facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
+  #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
+  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c9
+
+####
+####
+
+# CTXM 3
+
+df.f15 <- subset(df.f, gene == "CTX-M-3")
+df.f15$sseqid[df.f15$sseqid == "CTX-M-15"] <- "CTX-M-3"
+
+# how many to plot
+
+(unique(df.f15 %>% select(clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+levels.df.f15 <- unique(select(df.f15, qseqid, n_clust))
+
+df.f15$clust.id <- factor(df.f15$clust.id, levels = unique(df.f15$clust.id[order(df.f15$n, decreasing = T)]))
+df.f15$qseqid <- factor(df.f15$qseqid, levels = levels.df.f15$qseqid[order(levels.df.f15$n_clust)])
+
+ddply(df.f15, "qseqid", flip_one_contig, df.clusts) -> df.f15
+ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
+
+df.f15.1 <- subset(df.f15, gene == "CTX-M-3" )
+(unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+
+df.f15.1$clust.id <- as.character(df.f15.1$clust.id )
+df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
+
+subset(df.f15.1, pident >= 95) -> df.f15.1
+#subset(df.f15.1, !(pident != 100 & type == "AMR.gene") ) -> df.f15.1
+
+
+#levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
+#df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
+
+df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
+
+df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
+#names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
+
+dummies1 <- make_alignment_dummies(
+  df.f15.1,
+  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
+  on = "CTX-M-3")
+
+dummies1$direc <- TRUE
+dummies1$type <- NA
+
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
+
+#df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
+
+#cols <- (hue_pal()(9)[c(1,2,4,6)])
+#cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
+
+# fudge to stop overplotting
+
+#df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
+
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+    geom_blank(data = dummies1) +
+  facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
+  #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
+  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c3
+
+####
+####
+
+# CTXM 16
+
+df.f15 <- subset(df.f, gene == "CTX-M-16")
+#df.f15$sseqid[df.f15$sseqid == "CTX-M-15"] <- "CTX-M-3"
+
+# how many to plot
+
+(unique(df.f15 %>% select(clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+levels.df.f15 <- unique(select(df.f15, qseqid, n_clust))
+
+df.f15$clust.id <- factor(df.f15$clust.id, levels = unique(df.f15$clust.id[order(df.f15$n, decreasing = T)]))
+df.f15$qseqid <- factor(df.f15$qseqid, levels = levels.df.f15$qseqid[order(levels.df.f15$n_clust)])
+
+ddply(df.f15, "qseqid", flip_one_contig, df.clusts) -> df.f15
+ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
+
+df.f15.1 <- subset(df.f15, gene == "CTX-M-16" )
+(unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+
+df.f15.1$clust.id <- as.character(df.f15.1$clust.id )
+df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
+
+subset(df.f15.1, pident >= 95) -> df.f15.1
+#subset(df.f15.1, !(pident != 100 & type == "AMR.gene") ) -> df.f15.1
+
+
+#levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
+#df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
+
+df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
+
+df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
+#names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
+
+dummies1 <- make_alignment_dummies(
+  df.f15.1,
+  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
+  on = "CTX-M-16")
+
+dummies1$direc <- TRUE
+dummies1$type <- NA
+
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
+
+#df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
+
+#cols <- (hue_pal()(9)[c(1,2,4,6)])
+#cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
+
+# fudge to stop overplotting
+
+#df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
+
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+    geom_blank(data = dummies1) +
+  facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
+  #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
+  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c16
+
+####
+####
+
+# CTXM 1
+
+df.f15 <- subset(df.f, gene == "CTX-M-1")
+#df.f15$sseqid[df.f15$sseqid == "CTX-M-15"] <- "CTX-M-3"
+
+# how many to plot
+
+(unique(df.f15 %>% select(clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+levels.df.f15 <- unique(select(df.f15, qseqid, n_clust))
+
+df.f15$clust.id <- factor(df.f15$clust.id, levels = unique(df.f15$clust.id[order(df.f15$n, decreasing = T)]))
+df.f15$qseqid <- factor(df.f15$qseqid, levels = levels.df.f15$qseqid[order(levels.df.f15$n_clust)])
+
+ddply(df.f15, "qseqid", flip_one_contig, df.clusts) -> df.f15
+ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
+
+df.f15.1 <- subset(df.f15, gene == "CTX-M-1" )
+(unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+
+df.f15.1$clust.id <- as.character(df.f15.1$clust.id )
+df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
+
+subset(df.f15.1, pident >= 95) -> df.f15.1
+#subset(df.f15.1, !(pident != 100 & type == "AMR.gene") ) -> df.f15.1
+
+
+#levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
+#df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
+
+df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
+
+df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
+#names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
+
+dummies1 <- make_alignment_dummies(
+  df.f15.1,
+  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
+  on = "CTX-M-1")
+
+dummies1$direc <- TRUE
+dummies1$type <- NA
+
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
+
+#df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
+
+#cols <- (hue_pal()(9)[c(1,2,4,6)])
+#cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
+
+# fudge to stop overplotting
+
+#df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
+
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+    geom_blank(data = dummies1) +
+  facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
+  #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
+  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("ESBL-cluster ID") -> p.c1
+
+ggarrange(p.c15, p.c27, p.s12, nrow = 3, ncol = 1, heights = c(2,1,0.5), labels = c("A", "B", "C")) 
 
 ```
+
+```{r wgs-contig-ggenes-plot2, echo = F, warning = F, message = F, fig.scap="Plots of ESBL-clusters2", out.extra='', fig.cap="Plots of ESBL-clusters2", fig.width = 12, fig.height = 15}
+
+ggarrange(p.c14, p.c9, p.c3 , p.c16, p.c1, nrow = 5, ncol = 1, heights = c(.5,.7,.2,.2,.2),labels = c("A", "B", "C", "D", "E")) 
+
+```
+
 ## Conclusions and discussion
 
 ## Appendix
