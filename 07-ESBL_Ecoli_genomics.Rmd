@@ -939,7 +939,7 @@ knitr::include_graphics(paste0(wd,"chor_cotrim_plot.pdf"))
 
 #### Clustering and lineage association of AMR determinents
 
-Next, I explored associations of AMR determinents, both with bacterial lineages, and with other AMR determinents, in an attempt to identify putative clusters that could represent mobile genetic elements (MGE) that could be tracked within and between patients. There was clear clustering of AMR genes beyond what would be expected by chance (Figures \@ref(fig:wgs-amr-cooccur-plot)A and B), including clustering of the ESBL gene $bla_{CTX-M-15}$ with penicillinases $bla_{OXA-1}$ and $bla_{TEM-95}$. Though some identified clusters correspond to known MGE (e.g. the _sulII-strA-strB_ cluster[@Anantham2012]), there was a clear lineage association of certain gene combinations on mapping the presence or absence of AMR determinents back to the phylogeny (Figure \@ref(wgs-amr-cooccur-plot)C), meaning that these AMR-gene associations likely represent a combination of colocation on MGE and confounding by association with lineage.
+Next, I explored associations of AMR determinents, both with each other in an attempt to identify putative clusters that could represent mobile genetic elements (MGE) that could be tracked within and between patients, and with lineages of the phylogeny. There was clear clustering of AMR genes beyond what would be expected by chance (Figures \@ref(fig:wgs-amr-cooccur-plot)A and B), including clustering of the ESBL gene $bla_{CTX-M-15}$ with penicillinases $bla_{OXA-1}$ and $bla_{TEM-95}$. Though some identified clusters correspond to known MGE (e.g. the _sulII-strA-strB_ cluster[@Anantham2012]), there was a clear lineage association of certain gene combinations on mapping the presence or absence of AMR determinents back to the phylogeny (Figure \@ref(wgs-amr-cooccur-plot)C), meaning that these AMR-gene associations likely represent a combination of colocation on MGE and confounding by association with lineage. 
 
 ```{r wgs-amr-maptotree,include = F}
 tree <- read.tree(paste0(wd, "core_genome_tree/core_alnD2ESCO_snp_sites.aln.treefile"))
@@ -1032,7 +1032,7 @@ ggarrange(ggarrange(p2,
 
 ### Plasmid replicons
 
-Presence or absence of the identified plasmid repicons is shown mapped to the phylogeny in Figure \@ref(fig:wgs-amr-cooccur-plot)C. IncFIb was most commonly identified (399/473 [84%] of isolates), followed by IncFII (383/473 [81%] of isolates) and IncF1a (324/373 [68%] of isolates). Col plasmids were also frequently identified, in 308/473 [65%] of isolates. Once again, there seems to be lineage associations of presence or absence of replicons.
+Presence or absence of the identified plasmid repicons is shown mapped to the phylogeny in Figure \@ref(fig:wgs-amr-cooccur-plot)C. IncFIb was most commonly identified (399/473 [84%] of isolates), followed by IncFII (383/473 [81%] of isolates) and IncF1a (324/373 [68%] of isolates). Col plasmids were also frequently identified, in 308/473 [65%] of isolates. Once again, there seems to be some lineage associations of presence or absence of replicons.
 
 ### Testing metadata associations: SNP distance, hierBAPS sequence clusters and ESBL-clusters
 
@@ -1040,7 +1040,7 @@ Finally, in order to test metadata associations of bacterial lineages or MGE, I 
 
 #### Hierachichal BAPS clustering of core gene pseudosequences
 
-The hieraechical BAPS algorithm clustered the core gene alignments into 15 level one (top level) clusters, denoted sequence clusters A-O, and a total of 48 level two (lower level) clusters, denoted sequence clusters 1-48 that were almost exclusivley monophyletic and commonly corresponded closely to the multilocus sequence types (STs, Figure \@ref(fig:wgs-hierbaps-plot-tree)A). Intracluster pairwise SNP distance vaired (Figure \@ref(fig:wgs-hierbaps-plot-tree)B) but the clusters were often reasonably clonal: SC6, SC8 and SC23, for example (the three largest clusters) had median (IQR) intragroup pairwise SNP distance of 62 (34-97), 326 (18-378) and 18 (11-24) respectively.
+The hieraechical BAPS algorithm clustered the core gene alignments into 15 level one (top level) clusters, denoted sequence clusters A-O, and a total of 48 level two (lower level) clusters, denoted sequence clusters 1-48 that were almost exclusivley monophyletic and often corresponded closely to the multilocus sequence types (STs, Figure \@ref(fig:wgs-hierbaps-plot-tree)A). Intracluster pairwise SNP distance varied (Figure \@ref(fig:wgs-hierbaps-plot-tree)B) but the clusters were often reasonably clonal: SC6, SC8 and SC23, for example (the three largest clusters) had median (IQR) intragroup pairwise SNP distance of 62 (34-97), 326 (18-378) and 18 (11-24) respectively.
 
 ```{r wgs-hierbaps-plot-tree, echo = F, warning = F, message = F, fig.scap="Core gene hierBAPS clusters", out.extra='', fig.cap="A: Core gene hierarchical BAPS clusters mapped back to phylogeny. Heatmap shows level 2 (lower level) with colour denoting level 1 (top level) cluster membership. B: Intracluster pairwise SNP distance for level 2 sequence clusters. Axis restricted to 0-1500 SNPs and as result SC17 (median 6881 SNPs), SC29 (median 2970 SNPs), SC31 (median 2970 SNPs) and SC44 (median 12322 SNPs) boxes are not shown. Boxplots show median and IQR, whiskers show 1.5 times IQR, and outliers are points falling beyond whiskers.", fig.width = 6, fig.height = 6}
 
@@ -1112,14 +1112,15 @@ ggarrange(tr, NULL, bp, ncol = 1, nrow = 3, labels = c("A", "B", NA), heights = 
 
 #### ESBL-clusters
 
-The 473 samples contained 486 ESBL genes (Figure \@ref(fig:wgs-conig-sizes)A); 5 genes only occured once in the collection and so no attempt was made to cluster them. Of the remaining 481 gene-sample pairs, BLAST failed to identify the ESBL-gene containing contig in 2 samples (one in which _ariba_ had identified $bla-{ctxm15}$ one $bla_{ctxm27}$), but identified the remaining 479 ESBL genes on 478 contigs, with perfect agreement with _ariba_. Only one contig carried two ESBL genes: $bla_{ctxm3}$ and $bla_{ctxm15}$; the remaining 477 contigs contained one. _The _cd_hit_ algorithm grouped the 477 unique contigs into 99 clusters (Figure \@ref(fig:wgs-conig-sizes)B). In total, over 90% of the ESBL-genes (432/479 [90%]) were contained in the 52 largest contig clusters.
+The 473 samples contained 486 ESBL genes (Figure \@ref(fig:wgs-conig-sizes)A); 5 genes only occured once in the collection and so no attempt was made to cluster them. Of the remaining 481 genes pairs, BLAST failed to identify the ESBL-gene containing contig in 2 samples (one in which _ARIBA_ had identified $bla-{ctxm15}$ one $bla_{ctxm27}$), but identified the remaining 479 ESBL genes on 478 contigs, with perfect agreement with _ARIBA_ as to which AMR gene was present in which sample. Only one contig carried two ESBL genes: $bla_{ctxm3}$ and $bla_{ctxm15}$; the remaining 477 contigs contained one. The _cd-hit_ algorithm grouped the 477 unique contigs into 99 clusters (Figure \@ref(fig:wgs-conig-sizes)B). In total, over 90% of the ESBL-genes (432/479 [90%]) were contained in the 52 largest contig clusters.
 
-The _cd-hit_ algorithm selects one member of a cluster (the longest) as the representative. The length of these reprentative clusters was very variable, ranging from 1.8kbp to 905.8kbp, with median (IQR) 46.1kbp (11.1-215.5kbp). The other cluster members were usually fragments of these representative contigs with varying sizes - a median (IQR) 60% (36-100%) of the representative contig length - but had high sequence identity, median (IQR) 100.0 (99.7 - 100.0) (Figure \@ref(fig:(wgs-contig-stats)).
+The _cd-hit_ algorithm selects one member of a cluster (the longest) as the representative. The structure of these representative contigs was explored in an attempt to understand type of MGE they were likely to represent. The length of the reprentative clusters was very variable, ranging from 1.8kbp to 905.8kbp, with median (IQR) 46.1kbp (11.1-215.5kbp). The other cluster members were usually fragments of these representative contigs with varying sizes - a median (IQR) 60% (36-100%) of the representative contig length - but had high sequence identity, median (IQR) 100.0 (99.7 - 100.0) (Figure \@ref(fig:(wgs-contig-stats)).
+
+I then explored the insertion sequence (IS), AMR gene and plasmid replicon content of the representative contig for each cluster using BLAST against the SRST2, ISfinder and Plasmidfinder databases (Figures  \@ref(fig:wgs-contig-ggenes-plot1) and \@ref(fig:wgs-contig-ggenes-plot2)). IS were universally associated with the ESBL genes, commonly ISEcp1, IS26 and IS903B. IS26 was frequently associated with an apparent 108bp frangment of a _catB4_ chloramphenicol resistance determinent. Some ESBL-genes were associated with particular IS; $bla_{CTXM15}$, $bla_{CTXM9}$ and $bla_{CTXM1}$, for example were very commonly associated with ISEcp1, wheras $bla_{SHV12}$ was associated with IS26. ESBL genes were not infrequently associated with other resistance determinents, including commonly $bla_{CTXM15}$ with $bla_{TEM95}$. Plasmid replicons were occasionaly identified, including an IncFIB plasmid carrying $bla_{CTXM15}$ and an IncQ1 plasmid carrying $bla_{CTXM27}$. It is clear that the same configuration of AMR genes and IS are seen across different contigs, despite a varying backbone, implying historical transposition events. Finally, to assess lineage associations of the identified ESBL-clusters, I mapped the clusters back to the tree, and found that there 
 
 
 
-
-```{r wgs-conig-sizes, echo = F, warning = F, message = F, fig.scap="ESBL-containing contig clusters", out.extra='', fig.cap="A: Frequency distribution of ESBL genes in clustered contigs B: Number of contigs per cluster, stratified by ESBL gene.", fig.width = 8, fig.height = 4}
+```{r wgs-conig-setup, echo = F, warning = F, message = F, fig.scap="ESBL-containing contig clusters", out.extra='', fig.cap="A: Frequency distribution of ESBL genes in clustered contigs B: Number of contigs per cluster, stratified by ESBL gene.", fig.width = 8, fig.height = 4}
 
 
 fileses <- list.files(paste0(wd, "contig_cluster/results"))
@@ -1221,7 +1222,7 @@ ggplot(unique(select(df,clust.id,n_clust,max_clust_length, gene)),  aes(clust.id
 ```
 
 
-```{r wgs-contig-ggenes-prep, echo = F, warning = F, message = F, fig.scap="Plots of ESBL-clusters", out.extra='', fig.cap="Plots of ESBL-clusters", fig.width = 13, fig.height = 15}
+```{r wgs-contig-ggenes-plot1, echo = F, warning = F, message = F, fig.scap="Structure of ESBL-clusters, part 1", out.extra='', fig.cap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster, stratified by by ESBL gene and ordered by size of cluster. IS26 is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS26 element. A: \\textit{blaCTXM15}, B: \\textit{blaCTXM27} , C: \\textit{blaSHV12}. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", fig.width = 13, fig.height = 15}
 
 df.is <- read.csv(paste0(wd, "contig_cluster/results/BLAST_contigs_to_n/allAMRcontigs.blast.IS.csv"),
                stringsAsFactors = F, header = F)
@@ -1799,17 +1800,27 @@ ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax 
     geom_blank(data = dummies1) +
   facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
   #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
-  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("ESBL-cluster ID") -> p.c1
+  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c1
 
 ggarrange(p.c15, p.c27, p.s12, nrow = 3, ncol = 1, heights = c(2,1,0.5), labels = c("A", "B", "C")) 
 
 ```
 
-```{r wgs-contig-ggenes-plot2, echo = F, warning = F, message = F, fig.scap="Plots of ESBL-clusters2", out.extra='', fig.cap="Plots of ESBL-clusters2", fig.width = 12, fig.height = 15}
+```{r wgs-contig-ggenes-plot2, echo = F, warning = F, message = F, fig.scap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster, stratified by by ESBL gene and ordered by size of cluster. IS26 is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS26 element. A: \\textit{blaCTXM14}, B: \\textit{blaCTXM9} , C: \\textit{blaCTXM3}, D: \\textit{blaCTXM16}, E: \\textit{blaCTXM1}. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", out.extra='', fig.cap="Plots of ESBL-clusters2", fig.width = 12, fig.height = 15}
 
 ggarrange(p.c14, p.c9, p.c3 , p.c16, p.c1, nrow = 5, ncol = 1, heights = c(.5,.7,.2,.2,.2),labels = c("A", "B", "C", "D", "E")) 
 
 ```
+
+```{r wgs-contig-map to tree, echo = F, warning = F, message = F, fig.scap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster, stratified by by ESBL gene and ordered by size of cluster. IS26 is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS26 element. A: \\textit{blaCTXM14}, B: \\textit{blaCTXM9} , C: \\textit{blaCTXM3}, D: \\textit{blaCTXM16}, E: \\textit{blaCTXM1}. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", out.extra='', fig.cap="Plots of ESBL-clusters2", fig.width = 12, fig.height = 15}
+
+ggarrange(p.c14, p.c9, p.c3 , p.c16, p.c1, nrow = 5, ncol = 1, heights = c(.5,.7,.2,.2,.2),labels = c("A", "B", "C", "D", "E")) 
+
+```
+
+#### Assessing for heathcare-associated lineages
+
+Having clustered bacteria and MGE using _hierBAPS_ and _cd-hit_ respectively, I then used the _hierBAPS_ SCs to assess for healthcare associated lineages.
 
 ## Conclusions and discussion
 
