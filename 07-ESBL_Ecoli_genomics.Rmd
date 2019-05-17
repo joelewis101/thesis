@@ -1847,13 +1847,13 @@ contig.stats.plot
 
 ```
 
-```{r wgs-contig-ggenes-plot1, echo = F, warning = F, message = F, fig.scap="AMR genes, IS and plasmid replicon content of ESBL-clusters, part 1", out.extra='', fig.cap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster, stratified by by ESBL gene and ordered by size of cluster. IS26 is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS26 element. A: \\textit{blaCTXM15}, B: \\textit{blaCTXM27} , C: \\textit{blaSHV12}. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", fig.width = 13, fig.height = 15}
+```{r wgs-contig-ggenes-plot1, echo = F, warning = F, message = F, fig.scap="AMR genes, IS and plasmid replicon content of ESBL-clusters, part 1", out.extra='', fig.cap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster, stratified by by ESBL gene and ordered by number of samples of cluster. IS26 is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS26 element. A: \\textit{blaCTXM15}, B: \\textit{blaCTXM27} , C: \\textit{blaSHV12}. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", fig.width = 13, fig.height = 15}
 
 contigs1.plot
 
 ```
 
-```{r wgs-contig-ggenes-plot2, echo = F, warning = F, message = F, fig.cap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster, stratified by by ESBL gene and ordered by size of cluster. IS26 is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS26 element. A: \\textit{blaCTXM14}, B: \\textit{blaCTXM9} , C: \\textit{blaCTXM3}, D: \\textit{blaCTXM16}, E: \\textit{blaCTXM1}. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", out.extra='', fig.scap="AMR genes, IS and plasmid replicon content of ESBL-clusters, part 2", fig.width = 12, fig.height = 15}
+```{r wgs-contig-ggenes-plot2, echo = F, warning = F, message = F, fig.cap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster, stratified by by ESBL gene and ordered by number of samples in cluster. IS26 is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS26 element. A: \\textit{blaCTXM14}, B: \\textit{blaCTXM9} , C: \\textit{blaCTXM3}, D: \\textit{blaCTXM16}, E: \\textit{blaCTXM1}. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", out.extra='', fig.scap="AMR genes, IS and plasmid replicon content of ESBL-clusters, part 2", fig.width = 12, fig.height = 15}
 
 contigs.plot2
 
