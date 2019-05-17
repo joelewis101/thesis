@@ -223,7 +223,7 @@ The Roary pan-genome pipeline identified a core genome in the study isolates of 
 ```{r wgs-mlst, echo = F, warning = F, message = F, fig.cap="\\textit{E. coli} Multilocus sequence type distribution", fig.height = 2, fig.width=6}
 
 ggplot(mlst, aes(fct_infreq(ST))) + geom_bar()+
-  xlab("E. coli sequence type") + ylab("Count") + theme(axis.text.x=element_text(size=5, angle = 90) )
+  xlab("E. coli sequence type") + ylab("Count") + theme_bw() + theme(axis.text.x=element_text(size=5, angle = 90) )
 
 ```
 
@@ -1112,15 +1112,13 @@ ggarrange(tr, NULL, bp, ncol = 1, nrow = 3, labels = c("A", "B", NA), heights = 
 
 #### ESBL-clusters
 
-The 473 samples contained 486 ESBL genes (Figure \@ref(fig:wgs-conig-sizes)A); 5 genes only occured once in the collection and so no attempt was made to cluster them. Of the remaining 481 genes pairs, BLAST failed to identify the ESBL-gene containing contig in 2 samples (one in which _ARIBA_ had identified $bla-{ctxm15}$ one $bla_{ctxm27}$), but identified the remaining 479 ESBL genes on 478 contigs, with perfect agreement with _ARIBA_ as to which AMR gene was present in which sample. Only one contig carried two ESBL genes: $bla_{ctxm3}$ and $bla_{ctxm15}$; the remaining 477 contigs contained one. The _cd-hit_ algorithm grouped the 477 unique contigs into 99 clusters (Figure \@ref(fig:wgs-conig-sizes)B). In total, over 90% of the ESBL-genes (432/479 [90%]) were contained in the 52 largest contig clusters.
+The 473 samples contained 486 ESBL genes (Figure \@ref(fig:wgs-contig-map-to-tree)A); 5 genes only occured once in the collection and so no attempt was made to cluster them. Of the remaining 481 genes pairs, BLAST failed to identify the ESBL-gene containing contig in 2 samples (one in which _ARIBA_ had identified $bla-{ctxm15}$ one $bla_{ctxm27}$), but identified the remaining 479 ESBL genes on 478 contigs, with perfect agreement with _ARIBA_ as to which AMR gene was present in which sample. Only one contig carried two ESBL genes: $bla_{ctxm3}$ and $bla_{ctxm15}$; the remaining 477 contigs contained one. The _cd-hit_ algorithm grouped the 477 unique contigs into 99 clusters (Figure \@ref(fig:wgs-contig-map-to-tree)B). In total, over 90% of the ESBL-genes (432/479 [90%]) were contained in the 52 largest contig clusters.
 
-The _cd-hit_ algorithm selects one member of a cluster (the longest) as the representative. The structure of these representative contigs was explored in an attempt to understand type of MGE they were likely to represent. The length of the reprentative clusters was very variable, ranging from 1.8kbp to 905.8kbp, with median (IQR) 46.1kbp (11.1-215.5kbp). The other cluster members were usually fragments of these representative contigs with varying sizes - a median (IQR) 60% (36-100%) of the representative contig length - but had high sequence identity, median (IQR) 100.0 (99.7 - 100.0) (Figure \@ref(fig:(wgs-contig-stats)).
+The _cd-hit_ algorithm selects one member of a cluster (the longest) as the representative. The structure of these representative contigs was explored in an attempt to understand type of MGE they were likely to represent. The length of the reprentative clusters was very variable, ranging from 1.8kbp to 905.8kbp, with median (IQR) 46.1kbp (11.1-215.5kbp). The other cluster members were usually fragments of these representative contigs with varying sizes - a median (IQR) 60% (36-100%) of the representative contig length - but had high sequence identity, median (IQR) 100.0% (99.7-100.0%) (Figure \@ref(fig:wgs-contig-stats-plot) in the appendix to this chapter).
 
-I then explored the insertion sequence (IS), AMR gene and plasmid replicon content of the representative contig for each cluster using BLAST against the SRST2, ISfinder and Plasmidfinder databases (Figures  \@ref(fig:wgs-contig-ggenes-plot1) and \@ref(fig:wgs-contig-ggenes-plot2)). IS were universally associated with the ESBL genes, commonly ISEcp1, IS26 and IS903B. IS26 was frequently associated with an apparent 108bp frangment of a _catB4_ chloramphenicol resistance determinent. Some ESBL-genes were associated with particular IS; $bla_{CTXM15}$, $bla_{CTXM9}$ and $bla_{CTXM1}$, for example were very commonly associated with ISEcp1, wheras $bla_{SHV12}$ was associated with IS26. ESBL genes were not infrequently associated with other resistance determinents, including commonly $bla_{CTXM15}$ with $bla_{TEM95}$. Plasmid replicons were occasionaly identified, including an IncFIB plasmid carrying $bla_{CTXM15}$ and an IncQ1 plasmid carrying $bla_{CTXM27}$. It is clear that the same configuration of AMR genes and IS are seen across different contigs, despite a varying backbone, implying historical transposition events. Finally, to assess lineage associations of the identified ESBL-clusters, I mapped the clusters back to the tree, and found that there 
+I then explored the insertion sequence (IS), AMR gene and plasmid replicon content of the representative contig for each cluster using BLAST against the SRST2, ISfinder and Plasmidfinder databases (Figures  \@ref(fig:wgs-contig-ggenes-plot1) and \@ref(fig:wgs-contig-ggenes-plot2) in the appendix to this chapter). IS were universally associated with the ESBL genes, commonly ISEcp1, IS26 and IS903B. IS26 was frequently associated with an apparent 108bp frangment of a _catB4_ chloramphenicol resistance determinent. Some ESBL-genes were associated with particular IS; $bla_{CTXM15}$, $bla_{CTXM9}$ and $bla_{CTXM1}$, for example were very commonly associated with ISEcp1, wheras $bla_{SHV12}$ was associated with IS26. ESBL genes were not infrequently associated with other resistance determinents, including commonly $bla_{CTXM15}$ with $bla_{TEM95}$. Plasmid replicons were occasionaly identified, including an IncFIB plasmid carrying $bla_{CTXM15}$ and an IncQ1 plasmid carrying $bla_{CTXM27}$. It is clear that the same configuration of AMR genes and IS are seen across different contigs, despite a varying backbone, implying historical transposition events. Finally, to assess lineage associations of the identified ESBL-clusters, I mapped the clusters back to the tree, and found that there was a strong lineage association (Figure \@ref(fig:wgs-contig-map-to-tree)C).
 
-
-
-```{r wgs-conig-setup, echo = F, warning = F, message = F, fig.scap="ESBL-containing contig clusters", out.extra='', fig.cap="A: Frequency distribution of ESBL genes in clustered contigs B: Number of contigs per cluster, stratified by ESBL gene.", fig.width = 8, fig.height = 4}
+```{r wgs-conig-setup, echo = F, warning = F, message = F}
 
 
 fileses <- list.files(paste0(wd, "contig_cluster/results"))
@@ -1174,7 +1172,7 @@ ggplot(df.sum, aes(clust.id, n, fill = gene)) + geom_col() + facet_wrap(~plotlab
 
 ggplot(df, aes(fct_rev(fct_infreq(gene)), fill = gene)) + geom_bar() + coord_flip() + theme_bw() + theme(legend.position = "none", panel.grid = element_blank()) + labs(y= "Frequency", x = "") -> p2
 
-ggarrange(ggarrange(NULL,p2, NULL, heights = c(0.1, 1, 0.1), ncol =1, nrow = 3),p1, ncol = 2, nrow = 1, widths = c(0.6,2), labels = c("A", "B"))
+ggarrange(ggarrange(NULL,p2, NULL, heights = c(0.1, 1, 0.1), ncol =1, nrow = 3),p1, ncol = 2, nrow = 1, widths = c(0.6,2), labels = c("A", "B")) -> cluster.sizes.plot
 
 ### contig stats
 
@@ -1210,19 +1208,18 @@ ggplot(unique(select(df,clust.id,n_clust,max_clust_length, gene)),  aes(clust.id
 
 
 
-
 ```
 
-```{r wgs-contig-stats, echo = F, warning = F, message = F, fig.scap="Summary statistics for ESBL-contig clusters", out.extra='', fig.cap="Summary statistics for 99 ESBL-containing contig clusters as deterined by \\textit{cd-hit}. A: Number of contigs per cluster. B: Length (kbp) of longest sample in each cluster. This is defined as the cluster representative sample by \\textit{cd-hit} to which all other samples are compared for the purposes of length and sequence identity. C: Distribution of contig lengths by cluster expressed as a proportion of longest contig length. D: Distribution of sequence identity of cluster members compared to representative member, by cluster.", fig.width = 6, fig.height = 7}
+```{r wgs-contig-stats-makeplot , echo = F, warning = F, message = F}
 
   ggarrange(
   ggarrange( NULL,NULL,NULL,NULL, labels = c("A","B","C","D"), ncol = 1, nrow = 4),     ggarrange(p6,p3,p4,p5, ncol = 1, nrow = 4 ,common.legend = TRUE, legend = "right")
-  , ncol = 2, nrow = 1, widths = c(0.1, 1.5)) 
+  , ncol = 2, nrow = 1, widths = c(0.1, 1.5)) -> contig.stats.plot
 
 ```
 
 
-```{r wgs-contig-ggenes-plot1, echo = F, warning = F, message = F, fig.scap="Structure of ESBL-clusters, part 1", out.extra='', fig.cap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster, stratified by by ESBL gene and ordered by size of cluster. IS26 is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS26 element. A: \\textit{blaCTXM15}, B: \\textit{blaCTXM27} , C: \\textit{blaSHV12}. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", fig.width = 13, fig.height = 15}
+```{r wgs-contig-ggenes-plot1-setup, echo = F, warning = F, message = F, include = F}
 
 df.is <- read.csv(paste0(wd, "contig_cluster/results/BLAST_contigs_to_n/allAMRcontigs.blast.IS.csv"),
                stringsAsFactors = F, header = F)
@@ -1330,7 +1327,7 @@ df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
 
 #cols <- (hue_pal()(9)[c(1,2,4,6)])
 #cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
-
+cat("meh1.02")
 ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
   geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
     geom_blank(data = dummies1) +
@@ -1433,7 +1430,7 @@ df.f15$qseqid <- factor(df.f15$qseqid, levels = levels.df.f15$qseqid[order(level
 
 ddply(df.f15, "qseqid", flip_one_contig, df.clusts) -> df.f15
 ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
-
+cat("meh1.05")
 df.f15.1 <- subset(df.f15, gene == "SHV-12" )
 (unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
 
@@ -1495,7 +1492,7 @@ df.f15 <- subset(df.f, gene == "CTX-M-14")
 
 #ctxm15.1_10 <- df.sum %>% filter(gene == "ctxm15") %>% arrange(desc(n)) %>% dplyr::slice(1:20)
 #c#txm15.11_20 <- df.sum %>% filter(gene == "ctxm15") %>% dplyr::slice(11:20)
-
+cat("meh1.1")
 levels.df.f15 <- unique(select(df.f15, qseqid, n_clust))
 
 df.f15$clust.id <- factor(df.f15$clust.id, levels = unique(df.f15$clust.id[order(df.f15$n, decreasing = T)]))
@@ -1549,7 +1546,7 @@ ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax 
   #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
   geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c14
 
-
+cat("meh1.4")
 #### ctxm-9
 
 df.f15 <- subset(df.f, gene == "CTX-M-9")
@@ -1696,7 +1693,7 @@ ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
 df.f15.1 <- subset(df.f15, gene == "CTX-M-16" )
 (unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
 
-
+cat("meh1.8")
 df.f15.1$clust.id <- as.character(df.f15.1$clust.id )
 df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
 
@@ -1802,20 +1799,19 @@ ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax 
   #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
   geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c1
 
-ggarrange(p.c15, p.c27, p.s12, nrow = 3, ncol = 1, heights = c(2,1,0.5), labels = c("A", "B", "C")) 
+ggarrange(p.c15, p.c27, p.s12, nrow = 3, ncol = 1, heights = c(2,1,0.5), labels = c("A", "B", "C")) -> contigs1.plot
+
+cat("meh2")
+```
+
+```{r wgs-contig-ggenes-plot2-setup, echo = F, warning = F, message = F}
+
+ggarrange(p.c14, p.c9, p.c3 , p.c16, p.c1, nrow = 5, ncol = 1, heights = c(.5,.7,.2,.2,.2),labels = c("A", "B", "C", "D", "E")) -> contigs.plot2
 
 ```
 
-```{r wgs-contig-ggenes-plot2, echo = F, warning = F, message = F, fig.scap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster, stratified by by ESBL gene and ordered by size of cluster. IS26 is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS26 element. A: \\textit{blaCTXM14}, B: \\textit{blaCTXM9} , C: \\textit{blaCTXM3}, D: \\textit{blaCTXM16}, E: \\textit{blaCTXM1}. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", out.extra='', fig.cap="Plots of ESBL-clusters2", fig.width = 12, fig.height = 15}
 
-ggarrange(p.c14, p.c9, p.c3 , p.c16, p.c1, nrow = 5, ncol = 1, heights = c(.5,.7,.2,.2,.2),labels = c("A", "B", "C", "D", "E")) 
-
-```
-
-```{r wgs-contig-map to tree, echo = F, warning = F, message = F, fig.scap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster, stratified by by ESBL gene and ordered by size of cluster. IS26 is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS26 element. A: \\textit{blaCTXM14}, B: \\textit{blaCTXM9} , C: \\textit{blaCTXM3}, D: \\textit{blaCTXM16}, E: \\textit{blaCTXM1}. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", out.extra='', fig.cap="Plots of ESBL-clusters2", fig.width = 12, fig.height = 15}
-
-
-
+```{r wgs-contig-map-to-tree, echo = F, warning = F, message = F, fig.cap="A: Frequency distribution of ESBL genes in included samples. B: Frequency distribution of samples per ESBL-cluster, stratified by gene. C: ESBL-cluster membership mapped back to phylogeny.", out.extra='', fig.scap="ESBL-clusters mapped back to phylogeny", fig.width = 8, fig.height = 8}
 
 df.onehot <- dcast(select(df, Lane, clust.id ), Lane ~ clust.id, fun.aggregate = base::length)
 
@@ -1827,9 +1823,12 @@ df.onehot[c("Lane", names(apply(df.onehot[-1],2, sum)[order(apply(df.onehot[-1],
 sapply(df.onehot[-1], as.character) -> df.onehot[-1]
 
 
-ggtree(tree) %>% gheatmap(df.onehot[-1],  font.size = 2,
-                          colnames_position = "top", colnames_angle = 90, colnames_offset_y = 20,
-                          width = 3, color = NA) + scale_fill_manual(values = c("lightgrey", "black", "white"))
+ggtree(tree) %>% gheatmap(df.onehot[-1],  font.size = 1.5,
+                          colnames_position = "top", colnames_angle = 90, colnames_offset_y = 30,
+                          width = 3, color = NA) + scale_fill_manual(values = c("lightgrey", "black", "white")) + theme(legend.position = "none") + annotate("text", x= 0.4, y =540, label = "ESBL contig cluster") -> cont.tree
+
+
+ggarrange(cluster.sizes.plot, cont.tree, ncol = 1, nrow =2 ,labels = c(NA, "C"), heights = c(1, 2))
 
 
 ```
@@ -1841,3 +1840,22 @@ Having clustered bacteria and MGE using _hierBAPS_ and _cd-hit_ respectively, I 
 ## Conclusions and discussion
 
 ## Appendix
+
+```{r wgs-contig-stats-plot, echo = F, warning = F, message = F, fig.scap="Summary statistics for ESBL-contig clusters", out.extra='', fig.cap="Summary statistics for 99 ESBL-containing contig clusters as deterined by \\textit{cd-hit}. A: Number of contigs per cluster. B: Length (kbp) of longest sample in each cluster. This is defined as the cluster representative sample by \\textit{cd-hit} to which all other samples are compared for the purposes of length and sequence identity. C: Distribution of contig lengths by cluster expressed as a proportion of longest contig length. D: Distribution of sequence identity of cluster members compared to representative member, by cluster.", fig.width = 6, fig.height = 7}
+
+contig.stats.plot
+
+```
+
+```{r wgs-contig-ggenes-plot1, echo = F, warning = F, message = F, fig.scap="AMR genes, IS and plasmid replicon content of ESBL-clusters, part 1", out.extra='', fig.cap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster, stratified by by ESBL gene and ordered by size of cluster. IS26 is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS26 element. A: \\textit{blaCTXM15}, B: \\textit{blaCTXM27} , C: \\textit{blaSHV12}. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", fig.width = 13, fig.height = 15}
+
+contigs1.plot
+
+```
+
+```{r wgs-contig-ggenes-plot2, echo = F, warning = F, message = F, fig.cap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster, stratified by by ESBL gene and ordered by size of cluster. IS26 is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS26 element. A: \\textit{blaCTXM14}, B: \\textit{blaCTXM9} , C: \\textit{blaCTXM3}, D: \\textit{blaCTXM16}, E: \\textit{blaCTXM1}. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", out.extra='', fig.scap="AMR genes, IS and plasmid replicon content of ESBL-clusters, part 2", fig.width = 12, fig.height = 15}
+
+contigs.plot2
+
+```
+
