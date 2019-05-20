@@ -1870,9 +1870,9 @@ ggarrange(p1,p2, ncol = 2, labels = c("A", "B"), widths = c(0.6, 1))
 
 #### Assessing for within-patient conservation of lineage or MGE
 
-To answer the question as to what elements (bacteria or MGE) are conserved within individuals across time I first compared all-against-all pairwise SNP distance between and within patients; first as a scatter plot, and then, because of significant overplotting, as a density plot (Figure \@ref(fig:wgs-within-vs-between-snpdist). This suggested that there are a cluster of points close to the origin in the within-patient plot that are not seen in the between-patient plot: before approxiimately 50 days, there are more similar within-patient isolates than seen in the between-patent isolates. Dichotomising time at 50 days (based on inspection of the density plots) and performing a Kruskal-Wallace test found a statistically significant difference between the before 50 day and after 50 day pairwsie SNP distance distribution in the within patient stratum (p = 0.008) but not in the between-patient stratum (p = 0.07). After 50 days, the distribution of between- and within- patent SNP distances are similar (p = 0.45). However it is clear form the plots that even at small $t$ and within-participant, there is significant diversity is the SNP distances, and that some isolates close together in time, within the same particpant, are only distantly related.
+To answer the question as to what elements (bacteria or MGE) are conserved within individuals across time I first compared all-against-all pairwise SNP distance between and within patients; first as a scatter plot, and then, because of significant overplotting, as a density plot (Figure \@ref(fig:wgs-within-vs-between-snpdist)). This suggested that there are a cluster of points close to the origin in the within-patient plot that are not seen in the between-patient plot: before approxiimately 50 days, there are more similar within-patient isolates than seen in the between-patent isolates. Dichotomising time at 50 days (based on inspection of the density plots) and performing a Kruskal-Wallace test found a statistically significant difference between the before 50 day and after 50 day pairwsie SNP distance distribution in the within patient stratum (p = 0.008) but not in the between-patient stratum (p = 0.07). After 50 days, the distribution of between- and within- patent SNP distances are similar (p = 0.45). However it is clear from the plots that even at small $t$ and within-participant, there is significant diversity is the SNP distances, and that some isolates close together in time, within the same particpant, are only distantly related.
 
-Having confirmed that there is a signal for within-participant temporal conservation of ESBL-E, I then sought to determine if the sequence clusters and ESBL-clusters were similarly conserved over time, and if so, which was the more conserved.
+Having confirmed that there is a signal for within-participant temporal conservation of ESBL-E, I then sought to determine if the sequence clusters and ESBL-clusters were similarly conserved over time, and if so, which was the more conserved. The proportion of pairwise within-patient samples that contained the same ESBL-cluster and sequence cluster were significantly greater than would be expected by chance when the time between the samples is less than 32 days (Figure \@ref(fig:wgs-rollprop)A). After 32 days, in both cases, the lower confidence interval of the sequence cluster and ESBL-cluster curve crossed the proportion of samples that would be expected to be the same by chance, suggesting that, after 32 days, the chance of any two within-patient samples having the same sequence cluster and/or ESBL-cluster is the same as if the two samples were randomly picked from the dataset without regard to patient. The two curves have a very similar appearance; to address the question of which element is most conserved within an individial - sequence cluster, ESBL-cluster, or both - I performed an all-against-all pairwise comparison of which elements were conserved (Figure (Figure \@ref(fig:wgs-rollprop)C), and found that only ESBL-cluster and sequence cluster together are conserved within patients at a significantly greater proportion than between patients (p = 1.1 x10^-12^).
 
 ```{r, wgs-within-vs-between-snpdist, echo = F, warning = F, message = F, fig.cap="Within and between participant pairwise SNP distances. A: Scatterplot of pairwise SNP distances as a function of time with GAM model fitted curve. B: Pairwise SNP distance as function of time as a 2D density plot, showing cluster of isolates close to origin that are close together in time and SNP-distance. C: Pairwsise SNP distance distribution before and after 50 days, within and between patients, showing statistically significant descreas ein pairwise SNP distance within patients before 50 days. After 50 days, between- and within- patient distributuions are similar.", out.extra='', fig.scap="Within- and between pairwise SNP distance of isolates", fig.width = 8, fig.height = 5}
 
@@ -1903,7 +1903,7 @@ snpdists.df$category[snpdists.df$pid.1 != snpdists.df$pid.2] <- "Between Patient
 
 snpdists.df$t <- abs(as.numeric(snpdists.df$data_date.1 - snpdists.df$data_date.2))
 
-ggplot(subset(snpdists.df,!is.na(pid.1) & !is.na(pid.2)), aes(t, value)) + geom_point(alpha = 0.05) + coord_cartesian(xlim = c(0,200)) + 
+ggplot(subset(snpdists.df,!is.na(pid.1) & !is.na(pid.2)), aes(t, value)) + geom_point(alpha = 0.2, size = 0.5) + coord_cartesian(xlim = c(0,200)) + 
   geom_smooth() + theme_bw() + scale_fill_viridis(option = "magma") + 
   xlab("Pairwise time difference (days)") +
   ylab("SNP distance") +   facet_grid(~ category) + ylim(c(0,30000)) -> q1
@@ -1917,7 +1917,7 @@ ggplot(subset(snpdists.df,!is.na(pid.1) & !is.na(pid.2)), aes(t, value)) + stat_
 snpdists.df$category2 <- "< 51 days"
 
 snpdists.df$category2[snpdists.df$t > 50] <- "51+ days"
-ggplot(subset(snpdists.df, !is.na(category)), aes(x=category2, y= value) ) +  geom_jitter(alpha = 0.2) + geom_boxplot(alpha = 0.8) +
+ggplot(subset(snpdists.df, !is.na(category)), aes(x=category2, y= value) ) +  geom_jitter(alpha = 0.2, size = 0.5) + geom_boxplot(alpha = 0.8) +
   facet_wrap(~ category) + theme_bw() + 
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + ylab("SNP distance") +
   xlab("") + stat_compare_means(method = "kruskal", size = 3, label.y = 31000, label.x = 1.2, aes(label = paste0("p = ", ..p.format..))) -> q3
@@ -1926,7 +1926,7 @@ ggarrange(ggarrange(q1,q2, ncol = 1, nrow = 2 , labels = c("A", "B")), ggarrange
 
 ```
 
-```{r, wgs-setup-rollprop, echo = F, message=F, warning=F, echo = F, warning = F, message = F, fig.cap="Probability of any two samples from within a given participant containing the same ESBL-cluster (A, left panel) or being a member of the same hierBAPS cluster (A, right panel). Time is windowed at +/- 5 days around the time indicated on the x axis. Dotted line is the probability that two samples would belong the the same group by chance, constructed by randomly sampling 1000 sample pairs. B: proportion of samples that contain the same herBAPS cluster alone, or ESBL-cluster alone, or both, demonstrating that the ESBL cluster-hierBAPS cluster pairing is the most conserved of the three. ", out.extra='', fig.scap="Within-patient ESBL-cluster and hierBAPS clustering as a function of time", fig.width = 7, fig.height = 5}
+```{r, wgs-rollprop, echo = F, message=F, warning=F, echo = F, warning = F, message = F, fig.cap="Probability of any two samples from within a given participant containing the same ESBL-cluster (A, left panel) or being a member of the same hierBAPS cluster (A, right panel). Time is windowed at +/- 5 days around the time indicated on the x axis. Dotted line is the probability that two samples would belong the the same group by chance, constructed by randomly sampling 1000 sample pairs. B: proportion of samples that contain the same herBAPS cluster alone, or ESBL-cluster alone, or both, demonstrating that the ESBL cluster-hierBAPS cluster pairing is the most conserved of the three. ", out.extra='', fig.scap="Within-patient ESBL-cluster and hierBAPS clustering as a function of time", fig.width = 7, fig.height = 5}
 
 # make the df for assessnig contig cluster.
 # we'll accept *any* conserved cluster (f ther are more than 1) as a match
@@ -1952,7 +1952,7 @@ sid_cross$same_contig <- NA
 for (i in 1:nrow(sid_cross)) {
   c1 <- sid_cross[i,5:7]
   c2 <- sid_cross[i,11:13]
-  sid_cross$same_contig[i] <- c1 %in% c2 & !is.na(c1) & !is.na(c2)
+  sid_cross$same_contig[i] <- any( (c1 %in% c2) & (!is.na(c1) & !is.na(c2)))
 }
 
 
@@ -1993,7 +1993,7 @@ null$same_contig <- NA
 for (i in 1:nrow(null)) {
   c1 <- null[i,4:6]
   c2 <- null[i,11:13]
-  null$same_contig[i] <- c1 %in% c2 & !is.na(c1) & !is.na(c2)
+  null$same_contig[i] <- any((c1 %in% c2) & (!is.na(c1) & !is.na(c2)))
 }
 
 null$t <- abs(as.numeric(null$data_date.y - null$data_date.x))
@@ -2045,7 +2045,7 @@ subset(crossall, !duplicated(key) ) -> crossall
 for (i in 1:nrow(crossall)) {
   c1 <- crossall[i,4:6]
   c2 <- crossall[i,11:13]
-  crossall$same_contig[i] <- c1 %in% c2 & !is.na(c1) & !is.na(c2)
+  crossall$same_contig[i] <- any((c1 %in% c2) & (!is.na(c1) & !is.na(c2)))
 }
 crossall$same_hierb <- crossall$BAPS.l2 == crossall$BAPS.l21
 
@@ -2101,7 +2101,7 @@ coord_flip() + guides(fill = guide_legend(reverse = TRUE)) +
     annotate(geom = "text", y = 0.11, x = 3.0, label = "p < 0.001", size = 3) + 
   annotate(geom = "text", y = 0.11, x = 2.0, label = "p = 1.0", size = 3) +
   annotate(geom = "text", y = 0.11, x = 1.0, label = "p = 0.38", size = 3) + 
-   ylim(c(0,0.12)) + theme_bw() -> p11
+   ylim(c(0,0.12)) + theme_bw() + scale_fill_manual(name = "", values = hue_pal()(2)) -> p11
 # so only smae both baps and gene cluster is increased in within-patient samples
 # + ylim(c(0,0.11))
   
