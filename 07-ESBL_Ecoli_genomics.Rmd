@@ -1324,8 +1324,7 @@ df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
 #cols <- (hue_pal()(9)[c(1,2,4,6)])
 #cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
 cat("meh1.02")
-ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
-  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) + geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
     geom_blank(data = dummies1) +
   facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
   #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
@@ -1400,10 +1399,6 @@ ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax 
   facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
   #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
   geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3), name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c27
-
-######
-#####
-#####
 
 df.f15 <- subset(df.f, gene == "SHV-12")
 
@@ -1832,7 +1827,7 @@ ggarrange(cluster.sizes.plot, cont.tree, ncol = 1, nrow =2 ,labels = c(NA, "C"),
 
 Having clustered bacteria and MGE using _hierBAPS_ and _cd-hit_ respectively, I then mapped the location of sample collection bact to the phylogeny and used the _hierBAPS_ SCs to assess for healthcare associated lineages (Figure \@ref(fig:wgs-hospvscommunity-map-to-tree). In general, healthcare-associated isolates were distributed throughout the tree and across all SCs, rather than there being a clear hospital-associated lineage. The exception to this was SC23, corresponding to MLST 410, which was slightly more likely to be healthcare associated. When comparing the proportion of healthcare associated samples within each SC to the remained of samples, SC23 had a statistically significantly increased proportion of healthcare associated samples (p = 6.3x10^-4^, threshold of significance following Bonferroni correction 1.0x10^-3^), though it was by no means health-facility restriced: 50% (21/42) of SC23 samples were isolated in the community.
 
-```{r wgs-hospvscommunity-map-to-tree, echo = F, warning = F, message = F, fig.cap="A: Location of sample isolation mapped back to phylogeny B: Distribution of location of sample isolation stratified by hierBAPS cluster. In each case, community isolates include those cultured from samples collected on the first day of hospital admissison, in-hospital isolates are from patients who have been hospitalised > 24 hrs and recent discharge isolates are from patients who have been discharged from hospital within the last 2 weeks. Sequence cluster 23, highlighted in red, showed a statistically sigificant association with hospitalisation (see text).", out.extra='', fig.scap="Healthcare association of cultures ESBL-E", fig.width = 8, fig.height = 5.5}
+```{r wgs-hospvscommunity-map-to-tree, echo = F, warning = F, message = F, fig.cap="A: Location of sample isolation mapped back to phylogeny B: Distribution of location of sample isolation stratified by hierBAPS cluster. In each case, community isolates include those cultured from samples collected on the first day of hospital admissison, in-hospital isolates are from patients who have been hospitalised > 24 hrs and recent discharge isolates are from patients who have been discharged from hospital within the last 2 weeks. Sequence cluster 23, highlighted in red, showed a statistically sigificant association with hospitalisation (see text).", out.extra='', fig.scap="Healthcare association of isolates mapped to phylogeny", fig.width = 8, fig.height = 5.5}
 
 
 sample_ids$isolated_in <- "Community"
@@ -1875,8 +1870,244 @@ ggarrange(p1,p2, ncol = 2, labels = c("A", "B"), widths = c(0.6, 1))
 
 #### Assessing for within-patient conservation of lineage or MGE
 
+To answer the question as to what elements (bacteria or MGE) are conserved within individuals across time I first compared all-against-all pairwise SNP distance between and within patients; first as a scatter plot, and then, because of significant overplotting, as a density plot (Figure \@ref(fig:wgs-within-vs-between-snpdist). This suggested that there are a cluster of points close to the origin in the within-patient plot that are not seen in the between-patient plot: before approxiimately 50 days, there are more similar within-patient isolates than seen in the between-patent isolates. Dichotomising time at 50 days (based on inspection of the density plots) and performing a Kruskal-Wallace test found a statistically significant difference between the before 50 day and after 50 day pairwsie SNP distance distribution in the within patient stratum (p = 0.008) but not in the between-patient stratum (p = 0.07). After 50 days, the distribution of between- and within- patent SNP distances are similar (p = 0.45). However it is clear form the plots that even at small $t$ and within-participant, there is significant diversity is the SNP distances, and that some isolates close together in time, within the same particpant, are only distantly related.
+
+Having confirmed that there is a signal for within-participant temporal conservation of ESBL-E, I then sought to determine if the sequence clusters and ESBL-clusters were similarly conserved over time, and if so, which was the more conserved.
+
+```{r, wgs-within-vs-between-snpdist, echo = F, warning = F, message = F, fig.cap="Within and between participant pairwise SNP distances. A: Scatterplot of pairwise SNP distances as a function of time with GAM model fitted curve. B: Pairwise SNP distance as function of time as a 2D density plot, showing cluster of isolates close to origin that are close together in time and SNP-distance. C: Pairwsise SNP distance distribution before and after 50 days, within and between patients, showing statistically significant descreas ein pairwise SNP distance within patients before 50 days. After 50 days, between- and within- patient distributuions are similar.", out.extra='', fig.scap="Within- and between pairwise SNP distance of isolates", fig.width = 8, fig.height = 5}
+
+subset(data.frame(table(sample_ids$Supplier.Name)), Freq > 1)$Var1 -> doubles
+select(subset(sample_ids, Supplier.Name %in% doubles), Lane, Supplier.Name) -> doubles.lanes
+
+doubles.lanes[order(as.character(doubles.lanes$Supplier.Name)),] -> doubles.lanes
+
+drop <- doubles.lanes[-seq(1, 14, 2),]$Lane
+
+sample_ids <- subset(sample_ids, !(Lane %in% drop))
+
+## add metadata to SNP dists
 
 
+snpdists.df <- merge(snpdists.df, select(sample_ids, Lane, pid, data_date), by.x = "Var1", by.y = "Lane")
+names(snpdists.df)[names(snpdists.df) == "pid"] <- "pid.1"
+names(snpdists.df)[names(snpdists.df) == "data_date"] <- "data_date.1"
+
+snpdists.df <- merge(snpdists.df, select(sample_ids, Lane, pid, data_date), by.x = "Var2", by.y = "Lane")
+names(snpdists.df)[names(snpdists.df) == "pid"] <- "pid.2"
+names(snpdists.df)[names(snpdists.df) == "data_date"] <- "data_date.2"
+
+snpdists.df$category <- NA
+
+snpdists.df$category[snpdists.df$pid.1 == snpdists.df$pid.2] <- "Within Patient"
+snpdists.df$category[snpdists.df$pid.1 != snpdists.df$pid.2] <- "Between Patient"
+
+snpdists.df$t <- abs(as.numeric(snpdists.df$data_date.1 - snpdists.df$data_date.2))
+
+ggplot(subset(snpdists.df,!is.na(pid.1) & !is.na(pid.2)), aes(t, value)) + geom_point(alpha = 0.05) + coord_cartesian(xlim = c(0,200)) + 
+  geom_smooth() + theme_bw() + scale_fill_viridis(option = "magma") + 
+  xlab("Pairwise time difference (days)") +
+  ylab("SNP distance") +   facet_grid(~ category) + ylim(c(0,30000)) -> q1
+
+ggplot(subset(snpdists.df,!is.na(pid.1) & !is.na(pid.2)), aes(t, value)) + stat_density_2d(aes(fill = ..density..), contour = FALSE, geom= "tile") + coord_cartesian(xlim = c(0,200)) +  
+  facet_grid(~ category) +theme_bw() + scale_fill_viridis(option = "plasma") + 
+  xlab("Pairwise time difference (days)") +
+  ylab("SNP distance") + theme(legend.position = 'none') + ylim(c(0,30000)) -> q2
+
+
+snpdists.df$category2 <- "< 51 days"
+
+snpdists.df$category2[snpdists.df$t > 50] <- "51+ days"
+ggplot(subset(snpdists.df, !is.na(category)), aes(x=category2, y= value) ) +  geom_jitter(alpha = 0.2) + geom_boxplot(alpha = 0.8) +
+  facet_wrap(~ category) + theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + ylab("SNP distance") +
+  xlab("") + stat_compare_means(method = "kruskal", size = 3, label.y = 31000, label.x = 1.2, aes(label = paste0("p = ", ..p.format..))) -> q3
+
+ggarrange(ggarrange(q1,q2, ncol = 1, nrow = 2 , labels = c("A", "B")), ggarrange(NULL, q3, NULL, ncol = 1, nrow = 3, heights = c(0.2,3,1,0.2),labels = c(NA , "C", NA)) , ncol = 2, nrow = 1, widths = c(1.3,1))
+
+```
+
+```{r, wgs-setup-rollprop, echo = F, message=F, warning=F, echo = F, warning = F, message = F, fig.cap="Probability of any two samples from within a given participant containing the same ESBL-cluster (A, left panel) or being a member of the same hierBAPS cluster (A, right panel). Time is windowed at +/- 5 days around the time indicated on the x axis. Dotted line is the probability that two samples would belong the the same group by chance, constructed by randomly sampling 1000 sample pairs. B: proportion of samples that contain the same herBAPS cluster alone, or ESBL-cluster alone, or both, demonstrating that the ESBL cluster-hierBAPS cluster pairing is the most conserved of the three. ", out.extra='', fig.scap="Within-patient ESBL-cluster and hierBAPS clustering as a function of time", fig.width = 7, fig.height = 5}
+
+# make the df for assessnig contig cluster.
+# we'll accept *any* conserved cluster (f ther are more than 1) as a match
+
+contigs <- melt(select(df, Lane, clust.id))
+contigs %>% group_by(Lane) %>% mutate(id = paste0("contig", row_number())) -> contigs
+dcast(contigs, Lane ~ id, value.var = "clust.id") -> contigs
+sample_ids <- merge(sample_ids, contigs, all.x = T)
+
+# make crossed df
+
+
+sid_cross <- merge(dplyr::select(sample_ids, pid, Lane, data_date, BAPS.l2, contig1, contig2, contig3), 
+                   dplyr::select(sample_ids, pid, Lane, data_date, BAPS.l2,  contig1, contig2, contig3), by = "pid")
+sid_cross <- subset(sid_cross, Lane.x != Lane.y)
+apply(select(sid_cross, Lane.x, Lane.y), 1, function(x) paste(sort(x), collapse = "")) -> sid_cross$key
+subset(sid_cross, !duplicated(key) ) -> sid_cross
+sid_cross$t <- abs(as.numeric(sid_cross$data_date.y - sid_cross$data_date.x))
+
+sid_cross$same_BAPscl <- sid_cross$BAPS.l2.x == sid_cross$BAPS.l2.y
+
+sid_cross$same_contig <- NA
+for (i in 1:nrow(sid_cross)) {
+  c1 <- sid_cross[i,5:7]
+  c2 <- sid_cross[i,11:13]
+  sid_cross$same_contig[i] <- c1 %in% c2 & !is.na(c1) & !is.na(c2)
+}
+
+
+
+prop.baps <- data.frame( t = seq(0,220,1))
+prop.baps$e <- NA
+prop.baps$n <- NA
+prop.cont <- prop.baps
+wind <- 10
+
+for (i in 1:nrow(prop.baps)) {
+  temp <- subset(sid_cross, t > (prop.baps$t[i] - wind) & t < (prop.baps$t[i] + wind  ))
+  prop.baps$e[i] <- sum(temp$same_BAPscl)
+  prop.baps$n[i] <- length(temp$same_BAPscl)
+  prop.cont$e[i] <- sum(temp$same_contig)
+  prop.cont$n[i] <- length(temp$same_contig)
+}
+prop.baps$type <- "hierBAPS cluster"
+prop.cont$type <- "ESBL-cluster"
+
+  
+rollprop$prop <- apply(rollprop[1:3], 1, function(x) binom.test(x[2], x[3])$estimate)
+rollprop$lci <- apply(rollprop[1:3], 1, function(x) binom.test(x[2], x[3])$conf.int[1])
+rollprop$uci <- apply(rollprop[1:3], 1, function(x) binom.test(x[2], x[3])$conf.int[2])
+
+
+# null line
+
+null1 <- sample_n(select(sample_ids, pid, t, BAPS.l2, contig1, contig2,contig3, data_date), 1000 , replace = T)
+names(null1) <- paste0(names(null1), ".x")
+null2 <- sample_n(select(sample_ids, pid, t, BAPS.l2, contig1, contig2,contig3, data_date), 1000 , replace = T)
+names(null2) <- paste0(names(null2), ".y")
+null <- cbind(null1, null2)
+
+null$same_BAPscl <- null$BAPS.l2.x == null$BAPS.l2.y
+
+null$same_contig <- NA
+for (i in 1:nrow(null)) {
+  c1 <- null[i,4:6]
+  c2 <- null[i,11:13]
+  null$same_contig[i] <- c1 %in% c2 & !is.na(c1) & !is.na(c2)
+}
+
+null$t <- abs(as.numeric(null$data_date.y - null$data_date.x))
+
+#prop.baps <- data.frame( t = seq(0,220,1))
+#prop.baps$e <- NA
+#prop.baps$n <- NA
+
+#prop.cont <- prop.baps
+#for (i in 1:nrow(prop.baps)) {
+#  prop.baps$e[i] <- sum(temp$same_BAPscl)
+# prop.baps$n[i] <- length(temp$same_BAPscl)
+#  prop.cont$e[i] <- sum(temp$same_contig)
+#  prop.cont$n[i] <- length(temp$same_contig)
+#}
+
+nullprop <- data.frame(type = c("hierBAPS cluster","ESBL-cluster"),
+                       e =  c(sum(null$same_BAPscl), sum(null$same_contig)),
+                       n = c(length(null$same_BAPscl), length(null$same_contig)))
+
+#  prop.cont$e[i] <- sum(temp$same_contig)
+#  prop.cont$n[i] <- length(temp$same_contig)
+
+
+
+nullprop$prop <- apply(nullprop[2:3], 1, function(x) binom.test(x[1], x[2])$estimate)
+nullprop$lci <- apply(nullprop[2:3], 1, function(x) binom.test(x[1], x[2])$conf.int[1])
+nullprop$uci <- apply(nullprop[2:3], 1, function(x) binom.test(x[1], x[2])$conf.int[2])
+
+
+
+ggplot(rollprop, aes(t, prop, group = type)) + geom_line() + 
+    geom_ribbon(aes(ymin = lci, ymax = uci), alpha = 0.3, color = NA) + 
+    coord_cartesian(xlim = c(0,100), ylim  = c(0,0.4)) + 
+    geom_hline(data = nullprop, aes(yintercept = prop,group = type), linetype = "dashed") + 
+  theme_bw() + facet_wrap(~ type) + theme(legend.position = "none") + xlab("Time (days)") + ylab("Proportion") -> p10
+
+# for bar chart need to cross all
+
+
+tidyr::crossing(dplyr::select(sample_ids, pid, Lane, data_date, contig1,contig2, contig3, BAPS.l2),
+         dplyr::select(sample_ids, pid, Lane, data_date, contig1,contig2, contig3, BAPS.l2)) -> crossall
+
+crossall <- subset(crossall, Lane != Lane1)
+apply(select(crossall, Lane, Lane1), 1, function(x) paste(sort(x), collapse = "")) -> crossall$key
+subset(crossall, !duplicated(key) ) -> crossall
+
+
+for (i in 1:nrow(crossall)) {
+  c1 <- crossall[i,4:6]
+  c2 <- crossall[i,11:13]
+  crossall$same_contig[i] <- c1 %in% c2 & !is.na(c1) & !is.na(c2)
+}
+crossall$same_hierb <- crossall$BAPS.l2 == crossall$BAPS.l21
+
+crossall$same_pt <- crossall$pid == crossall$pid1
+
+
+crossall %>% group_by(same_pt) %>% dplyr::summarise(same_hierb.only = sum(same_hierb == TRUE & same_contig == FALSE),
+                                             same.clu.only = sum(same_hierb == FALSE & same_contig == TRUE),
+                                             same.both = sum(same_hierb == TRUE & same_contig == TRUE),
+                                             neither = sum(same_hierb == FALSE & same_contig == FALSE),
+                                             tots = n()) %>% filter(!is.na(same_pt)) -> crossall.sum
+melt(crossall.sum) -> df.m
+
+df.m$same_pt[df.m$same_pt == "FALSE"] <- "Between patient"
+df.m$same_pt[df.m$same_pt == "TRUE"] <- "Within patient"
+
+df.m$value_norm <- df.m$value
+df.m$value_norm[df.m$same_pt == "Within patient"] <- df.m$value_norm[df.m$same_pt == "Within patient"] / max(subset(df.m, same_pt == "Within patient")$value)
+df.m$value_norm[df.m$same_pt == "Between patient"] <- df.m$value_norm[df.m$same_pt == "Between patient"] / max(subset(df.m, same_pt == "Between patient")$value)
+
+df.m$variable <- as.character(df.m$variable)
+df.m$variable[df.m$variable == "same_hierb.only"] <- "Same hierBAPS-clusetr only"
+df.m$variable[df.m$variable == "same.clu.only"] <- "Same ESBL-cluster only"
+df.m$variable[df.m$variable == "same.both"] <- "Same ESBL and hierBAPS cluster"
+
+df.m$variable <- factor(df.m$variable, levels = rev(c("Same ESBL and hierBAPS cluster","Same ESBL-cluster only" ,"Same hierBAPS-clusetr only", "neither"  )))
+
+#Calculate fishers
+
+mat.both <- matrix(c(1978, 33,107488 - 1978 ,392 - 33), nrow = 2,
+                      dimnames =
+                          list(c("Between pt", "Within pt"),
+                               c("Same", "Not")))
+
+
+mat.bug <- matrix(c(3305, 15,107488 - 3305 ,392 - 15), nrow = 2,
+                      dimnames =
+                          list(c("Between pt", "Within pt"),
+                               c("Same", "Not")))
+
+mat.mge <- matrix(c(1711, 6,107488 - 1711 ,392 - 6), nrow = 2,
+                      dimnames =
+                          list(c("Between pt", "Within pt"),
+                               c("Same", "Not")))
+
+
+ggplot(subset(df.m,variable != "tots" & variable != "neither"), aes(variable, value_norm, fill = same_pt)) + geom_col(position = "dodge")  +
+coord_flip() + guides(fill = guide_legend(reverse = TRUE)) +
+  theme(legend.title = element_blank()) + ylab("Proportion") + xlab("") +
+  annotate(geom = "segment", y = 0.09, yend = 0.09, x = 2.7, xend = 3.3) + 
+  annotate(geom = "segment", y = 0.09, yend = 0.09, x = 1.7, xend = 2.3) +
+  annotate(geom = "segment", y = 0.09, yend = 0.09, x = 0.7, xend = 1.3) +
+    annotate(geom = "text", y = 0.11, x = 3.0, label = "p < 0.001", size = 3) + 
+  annotate(geom = "text", y = 0.11, x = 2.0, label = "p = 1.0", size = 3) +
+  annotate(geom = "text", y = 0.11, x = 1.0, label = "p = 0.38", size = 3) + 
+   ylim(c(0,0.12)) + theme_bw() -> p11
+# so only smae both baps and gene cluster is increased in within-patient samples
+# + ylim(c(0,0.11))
+  
+ggarrange(p10, p11, ncol = 1, nrow = 2, labels = c("A", "B"), heights = c(1.2,1))
+
+```
 
 ## Conclusions and discussion
 
