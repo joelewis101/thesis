@@ -89,6 +89,33 @@ names(edates)[2] <- "enroll_date"
 sample_ids <- merge(sample_ids, edates, all.x= T) 
 sample_ids$t <- as.numeric(sample_ids$data_date - sample_ids$enroll_date)
 
+# add hospoutcome dates
+
+
+outcome <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/dassim_outcome_raw.csv", stringsAsFactors = F)
+
+outcome$hospoutcomedate <- as.Date(outcome$hospoutcomedate, "%d%b%Y")
+outcome$data_date <- as.Date(outcome$data_date, "%d%b%Y")
+# take earliest
+
+take_earliest_outcome <- function(df) {
+  df[order(df$hospoutcomedate, decreasing = T),] -> df
+  return(df[1,])
+}
+
+outcome <- ddply(outcome, "pid", take_earliest_outcome)
+
+# if missing arm 1 hospoytcomedate take data date
+
+outcome$hospoutcomedate[is.na(outcome$hospoutcomedate)] <- outcome$data_date[is.na(outcome$hospoutcomedate)]
+
+
+#nrow(sample_ids)
+
+sample_ids <- merge(sample_ids, select(outcome, pid, hospoutcomedate), all.x= T)
+
+
+
 cat("\n E. coli WGS Metadata is now in a dataframe called sample_ids.")
 cat("\n Share and enjoy!")
 
