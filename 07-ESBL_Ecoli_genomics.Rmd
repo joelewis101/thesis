@@ -227,8 +227,6 @@ ggplot(mlst, aes(fct_infreq(ST))) + geom_bar()+
 
 ```
 
-
-
 ```{r wgs-tree, echo = F, warning = F, message = F, fig.scap="ML phylogenetic tree of study \\textit{E. coli}", out.extra='', fig.cap="Maximum likelihood phylogenetic tree of included study \\textit{E. coli} isolates showing phylogroups and sequence types. Bootstrap support of less than 90\\% is indicated by a black circle at a given node. Scale bar indicates 0.01 SNPs/site.", fig.height = 10, fig.width=8}
 
 tree <- read.tree(paste0(wd, "core_genome_tree/core_alnD2ESCO_snp_sites.aln.treefile"))
@@ -280,7 +278,6 @@ plot_grid(p, leg1, ncol = 2, rel_widths = c(1,0.1))
 
 
 ```
-
 
 ### Study isolates in a global context
 
@@ -784,7 +781,6 @@ Aminoglycoside resistance genes were very common in the sequenced isolates, with
 
 The predictive value of presence of _aac(3)-IIa_, _aac(3)-IId_ or _aac(6')-Ib-cr_ for phenotypic gentamicin resistance was moderate at best with sensitivity 77% (95% CI 71-83%) and specificity 73% (95% CI 67-79%). Of 6 phenotypically amikacin resistant or intermediate isolates, all had recognised streptomycin resistance determinents (_strA_, _strB_ or _aadA_) but 4/6 had no other aminoglycoside determinent identified. Of the remaining two, one isolate contained _aac(6')-Ib-cr_ and one both _aac(3)-IIa_, _aac(3)-IId_. 
 
-
 ```{r wgs-amr-aminogly-setup, include = F}
 
 amr.melt %>% filter(class == "Aminoglycosides") %>% group_by(variable) %>% summarise(n= n()) -> ag
@@ -864,6 +860,7 @@ ggsave(paste0(wd,"aminoglycoside_plot.pdf"), plot = parrange, width = 20, height
 
 knitr::include_graphics(paste0(wd,"aminoglycoside_plot.pdf"))
 ```
+
 #### Chloramphenicol, co-trimoxazole, tetracycline and other resistance determinents
 
 248/473 (52%) of isolates contained at least one chloramphenicol resistance gene (Figure \@ref(fig:wgs-amr-sum)), usually 1 (210/248 [85%]), less commonly 2 (37/248 [15%]) or 3 (1/248 [<1%]). _catB4_ was the most commonly identified gene but once again phenotypic chloramphenicol resistance correlated poorly with presence of chloramphenicol resistnce genes (\@ref(fig:wgs-amr-chlor-cotrim)A)) with presence of any chloramphenicol resistance gene predicting phenotypic resistance with a sensitivity of 70% (95% 62-78%) and specificity of 55% (95% CI 49-60%).
@@ -1116,7 +1113,7 @@ The 473 samples contained 486 ESBL genes (Figure \@ref(fig:wgs-contig-map-to-tre
 
 The _cd-hit_ algorithm selects one member of a cluster (the longest) as the representative. The structure of these representative contigs was explored in an attempt to understand type of MGE they were likely to represent. The length of the reprentative clusters was very variable, ranging from 1.8kbp to 905.8kbp, with median (IQR) 46.1kbp (11.1-215.5kbp). The other cluster members were usually fragments of these representative contigs with varying sizes - a median (IQR) 60% (36-100%) of the representative contig length - but had high sequence identity, median (IQR) 100.0% (99.7-100.0%) (Figure \@ref(fig:wgs-contig-stats-plot) in the appendix to this chapter).
 
-I then explored the insertion sequence (IS), AMR gene and plasmid replicon content of the representative contig for each cluster using BLAST against the SRST2, ISfinder and Plasmidfinder databases (Figures  \@ref(fig:wgs-contig-ggenes-plot1) and \@ref(fig:wgs-contig-ggenes-plot2) in the appendix to this chapter). IS were universally associated with the ESBL genes, commonly ISEcp1, IS26 and IS903B. IS26 was frequently associated with an apparent 108bp frangment of a _catB4_ chloramphenicol resistance determinent. Some ESBL-genes were associated with particular IS; $bla_{CTXM15}$, $bla_{CTXM9}$ and $bla_{CTXM1}$, for example were very commonly associated with ISEcp1, wheras $bla_{SHV12}$ was associated with IS26. ESBL genes were not infrequently associated with other resistance determinents, including commonly $bla_{CTXM15}$ with $bla_{TEM95}$. Plasmid replicons were occasionaly identified, including an IncFIB plasmid carrying $bla_{CTXM15}$ and an IncQ1 plasmid carrying $bla_{CTXM27}$. It is clear that the same configuration of AMR genes and IS are seen across different contigs, despite a varying backbone, implying historical transposition events. Finally, to assess lineage associations of the identified ESBL-clusters, I mapped the clusters back to the tree, and found that there was a strong lineage association (Figure \@ref(fig:wgs-contig-map-to-tree)C).
+I then explored the insertion sequence (IS), AMR gene and plasmid replicon content of the representative contig for each cluster using BLAST against the SRST2, ISfinder and Plasmidfinder databases (Figures  \@ref(fig:wgs-contig-ggenes-plot1) and \@ref(fig:wgs-contig-ggenes-plot2) in the appendix to this chapter). Every ESBL gene was closely asssociates with at least one IS, commonly ISEcp1, IS26 and IS903B. IS26 was frequently associated with an apparent 108bp frangment of a _catB4_ chloramphenicol resistance determinent. Some ESBL-genes were associated with particular IS; $bla_{CTXM15}$, $bla_{CTXM9}$ and $bla_{CTXM1}$, for example were very commonly associated with ISEcp1, wheras $bla_{SHV12}$ was associated with IS26. ESBL genes were not infrequently associated with other resistance determinents, including commonly $bla_{CTXM15}$ with $bla_{TEM95}$. Plasmid replicons were occasionaly identified, including an IncFIB plasmid carrying $bla_{CTXM15}$ and an IncQ1 plasmid carrying $bla_{CTXM27}$. It is clear that the same configuration of AMR genes and IS are seen across different contigs, despite a varying backbone, implying historical transposition events. Finally, to assess lineage associations of the identified ESBL-clusters, I mapped the clusters back to the tree, and found that there was a strong lineage association (Figure \@ref(fig:wgs-contig-map-to-tree)C).
 
 ```{r wgs-conig-setup, echo = F, warning = F, message = F}
 
@@ -1217,7 +1214,6 @@ ggplot(unique(select(df,clust.id,n_clust,max_clust_length, gene)),  aes(clust.id
   , ncol = 2, nrow = 1, widths = c(0.1, 1.5)) -> contig.stats.plot
 
 ```
-
 
 ```{r wgs-contig-ggenes-plot1-setup, echo = F, warning = F, message = F, include = F}
 
@@ -1810,7 +1806,6 @@ ggarrange(p.c14, p.c9, p.c3 , p.c16, p.c1, nrow = 5, ncol = 1, heights = c(.5,.7
 
 ```
 
-
 ```{r wgs-contig-map-to-tree, echo = F, warning = F, message = F, fig.cap="A: Frequency distribution of ESBL genes in included samples. B: Frequency distribution of samples per ESBL-cluster, stratified by gene. C: ESBL-cluster membership mapped back to phylogeny.", out.extra='', fig.scap="ESBL-clusters mapped back to phylogeny", fig.width = 8, fig.height = 8}
 
 df.onehot <- dcast(select(df, Lane, clust.id ), Lane ~ clust.id, fun.aggregate = base::length)
@@ -1835,7 +1830,53 @@ ggarrange(cluster.sizes.plot, cont.tree, ncol = 1, nrow =2 ,labels = c(NA, "C"),
 
 #### Assessing for heathcare-associated lineages
 
-Having clustered bacteria and MGE using _hierBAPS_ and _cd-hit_ respectively, I then used the _hierBAPS_ SCs to assess for healthcare associated lineages.
+Having clustered bacteria and MGE using _hierBAPS_ and _cd-hit_ respectively, I then mapped the location of sample collection bact to the phylogeny and used the _hierBAPS_ SCs to assess for healthcare associated lineages (Figure \@ref(fig:wgs-hospvscommunity-map-to-tree). In general, healthcare-associated isolates were distributed throughout the tree and across all SCs, rather than there being a clear hospital-associated lineage. The exception to this was SC23, corresponding to MLST 410, which was slightly more likely to be healthcare associated. When comparing the proportion of healthcare associated samples within each SC to the remained of samples, SC23 had a statistically significantly increased proportion of healthcare associated samples (p = 6.3x10^-4^, threshold of significance following Bonferroni correction 1.0x10^-3^), though it was by no means health-facility restriced: 50% (21/42) of SC23 samples were isolated in the community.
+
+```{r wgs-hospvscommunity-map-to-tree, echo = F, warning = F, message = F, fig.cap="A: Location of sample isolation mapped back to phylogeny B: Distribution of location of sample isolation stratified by hierBAPS cluster. In each case, community isolates include those cultured from samples collected on the first day of hospital admissison, in-hospital isolates are from patients who have been hospitalised > 24 hrs and recent discharge isolates are from patients who have been discharged from hospital within the last 2 weeks. Sequence cluster 23, highlighted in red, showed a statistically sigificant association with hospitalisation (see text).", out.extra='', fig.scap="Healthcare association of cultures ESBL-E", fig.width = 8, fig.height = 5.5}
+
+
+sample_ids$isolated_in <- "Community"
+
+sample_ids$isolated_in[(sample_ids$data_date < (sample_ids$hospoutcomedate + 14)) & sample_ids$arm !=3] <- "Hospital - recent dc"
+sample_ids$isolated_in[(sample_ids$data_date < (sample_ids$hospoutcomedate)) & sample_ids$arm !=3] <- "In-Hospital"
+
+sample_ids$isolated_in[sample_ids$visit ==0] <- "Community"
+
+sample_ids$Lane <- sub("#","_",sample_ids$Lane)
+
+rownames(sample_ids) <- sample_ids$Lane
+
+col <- c(hue_pal()(3), "white", "lightgrey","black", "white")
+names(col) <- c("1","2","3","Community","Hospital - recent dc", "In-Hospital",  "NA")
+
+
+col <- c(hue_pal()(3), "grey86", "grey45", "black", "white")
+names(col) <- c("1","2","3","Community","Hospital - recent dc", "In-Hospital",  "NA")
+
+ggtree(tree) %>%
+  gheatmap(select(sample_ids, isolated_in), width = 0.2, color = NA, colnames = F) +
+  scale_fill_manual(values = col,labels = c( "Community","Hospital - recent dc", "In-Hospital","")) +
+  geom_hilight(node = 727, fill = "red") + theme(legend.position = "none") -> p1
+
+
+subset(sample_ids, Lane %in% tree$tip.label) -> sample_ids
+sample_ids <- merge(sample_ids, hbdf, by.x = "Lane", by.y = "Isolate", all.x = T)
+
+fudgedat <- data.frame( BAPS.l2 = as.character(23), count = nrow(subset(sample_ids, BAPS.l2 == 23)), isolated_in = "fudge")
+
+ggplot(sample_ids, aes(fct_rev(fct_infreq(BAPS.l2)), fill = isolated_in)) + 
+    geom_bar(colour = "black") + coord_flip() + xlab("level 2 BAPS clusters") + ylab("Count") +
+    theme_bw() + 
+  theme(legend.position = "right") + scale_fill_manual(values = col, name = element_blank()) +
+  geom_col(data = fudgedat, aes(BAPS.l2, count), fill = "red", alpha = 0.3) -> p2
+
+ggarrange(p1,p2, ncol = 2, labels = c("A", "B"), widths = c(0.6, 1))
+```
+
+#### Assessing for within-patient conservation of lineage or MGE
+
+
+
 
 ## Conclusions and discussion
 
