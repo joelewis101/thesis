@@ -285,9 +285,9 @@ The global collection of _E. coli_ comprised 1273 samples, including the 473 fro
 
 The Roary pan-genome pipeline identified 2872 core genes in a pan genome of 44840 genes; this large pan-genome is consistent with the open _E. coli_ pan genome that will continue to increase in size as isolates are added. The core gene alignment contained 604817 bases with 77194 variable sites, which were used to infer the maximum likelihood phylogenetic tree, using same nucleotide substitution model as previously.
 
-The inferred tree is shown in Figure \@ref(fig:wgs-global-tree)). Isolates from this study are distributed throughout the tree, and there is widespread mixing of isolates from diverse geographic regions. Though invasive isolates are spread throughout the tree, there is a tendance for them to cluster together, particularly in phylogroup B2, a phylogroup with has a recognised association with ExPEC (needs ref). The Malawian ST410 isolates clusterd tightly together, though are most closely related to clinical ESBL-procucing ST410 isolates from Thailand. By comparison, ST131 isolates from this study were distributed amongst ST131 isolates from other studies, both in Malawi and elsewhere.
+The inferred tree is shown in Figure \@ref(fig:wgs-global-tree)). Isolates from this study are distributed throughout the tree, and there is widespread mixing of isolates from diverse geographic regions. Though invasive isolates are spread throughout the tree, there is a tendance for them to cluster together, particularly in phylogroup B2, a phylogroup with has a recognised association with ExPEC (needs ref). The Malawian ST410 isolates clusterd tightly together, though are most closely related to clinical ESBL-procucing ST410 isolates from Thailand. By comparison, ST131 isolates from this study were distributed amongst ST131 isolates from other studies, both in Malawi and elsewhere (Figure \@ref(fig:wgs-131vs410-tree)).
 
-```{r wgs-global-tree, echo = F, warning = F, message = F, fig.scap="ML phylogenetic tree of study \\textit{E. coli} in global context", out.extra='', fig.cap="Midpoint rooted maximum likelihood phylogenetic tree of included study \\textit{E. coli} isolates along with global context isolates, showing phylogroups, source sample type and continent of isolation (coloured bars). Dark grey bars indicate isolates from this study or isolates with ESBL gene presence, as labelled (this study or ESBL, respectively). Two most frequently isolated STs (131 and 410) labelled.  Bootstrap support of less than 90\\% is indicated by a black circle at a given node. Scale bar indicates 0.009 SNPs/site.", fig.height = 10, fig.width=8}
+```{r wgs-global-tree, echo = F, warning = F, message = F, fig.scap="Phylogenetic tree of study \\textit{E. coli} in global context", out.extra='', fig.cap="Midpoint rooted maximum likelihood phylogenetic tree of included study \\textit{E. coli} isolates along with global context isolates, showing phylogroups, source sample type and continent of isolation (coloured bars). Dark grey bars indicate isolates from this study or isolates with ESBL gene presence, as labelled (this study or ESBL, respectively). Two most frequently isolated STs (131 and 410) labelled.  Bootstrap support of less than 90\\% is indicated by a black circle at a given node. Scale bar indicates 0.009 SNPs/site.", fig.height = 10, fig.width=8}
 
 
 tree <- read.tree(paste0(wd, "global_tree/all_ESCO_core_snps.aln.treefile"))
@@ -437,7 +437,7 @@ ggtree(tree, size = 0.3) %>%
   geom_treescale(x =0.02, y = 1100, offset = 5)  +   
   geom_point2(aes(subset = as.numeric(label) < 90 & !isTip), size = 0.3)+ 
   geom_cladelabel(node = 1351, label = "ST131", fontsize = 2.5) + 
-  geom_cladelabel(node = 1866, label = "ST410", fontsize = 2.5) -> p #, labels = c("0", "1","A","B1","B2","C","Clade I or II", "D","F", 
+  geom_cladelabel(node = 1864, label = "ST410", fontsize = 2.5) -> p #, labels = c("0", "1","A","B1","B2","C","Clade I or II", "D","F", 
     
 ggtree(tree) %>% 
 
@@ -470,6 +470,56 @@ ggarrange(p,
 
 ```
 
+```{r wgs-131vs410-tree, echo = F, warning = F, message = F, fig.scap="Phylogeny of ST131 and ST410 \\textit{E. coli}.", out.extra='', fig.cap="Subtree of ST410 (A, left) and ST131 (B, right), showing multiple introductions of ST131 into Malawi, in comparison to a single introduction of a clonal ST410 clade. Colour of tree tip label indicates isolation from this study (red) or other studies (black), and coloured heatmap indicates country of isolation. Scale bar indicates 0.0003 SNPs/site.", fig.height = 4, fig.width=6}
+
+treeio::tree_subset(tree2, 1864, levels_back = 0) -> st410tree
+
+select(metadata, Lane.Name, `This study`) -> this.study
+this.study$`This study` <- as.character(this.study$`This study`)
+this.study$`This study`[this.study$`This study` == 1] <- "Yes"
+this.study$`This study`[this.study$`This study` == 0] <- "No"
+
+#colz <- c( "grey11", "grey89", brewer.pal(name= "Set3", n = 7)[1:5] )
+
+metadata$Country[metadata$Country == "thailand"] <- "Thailand"
+
+colz <- c( "grey11", "grey89", hue_pal()(5))
+names(colz) <- c( "1","0","Malawi", "Guatemala",  "Thailand" , "Mexico", "Bolivia")
+ggtree(st410tree) %<+% this.study   %>%
+  #gheatmap(select(esbl.cat, ESBL), width = 0.05, color = NA, font.size = 4, colnames_angle = 90,
+   #        colnames_position = "top", offset =  0.0003) %>%
+  gheatmap(select(metadata, Country), width = 0.05, color = NA, colnames = F,font.size = 4, colnames_angle = 90,
+           colnames_position = "top", offset = 0.0003 , colnames_offset_y = 2) + 
+  geom_tiplab(size = 1, align = T, aes(color = `This study`)) + 
+  geom_treescale(x = 0.0005, y = 30, width = 0.0003) + scale_fill_manual(values = colz) +
+  scale_color_manual(values = c("black", hue_pal()(1))) + theme(legend.position = "none") -> a
+
+
+data.frame(country = c("Malawi", "Guatemala",  "Thailand" , "Mexico", "Bolivia"), n = c(1,2,3,4,5)) -> fudge
+fudge$country <- factor(fudge$country, levels = c("Malawi", "Thailand", "Guatemala", "Mexico", "Bolivia"))
+ggplot(fudge, aes(country, n, fill = country)) + geom_col()+ scale_fill_manual(values = colz) + 
+  theme_bw() + theme(legend.title = element_blank(), legend.position = "bottom")-> fudgeplot
+
+leg <- get_legend(fudgeplot)
+
+## ST131 is node 1351
+
+treeio::tree_subset(tree2, 1351, levels_back = 0) -> st131tree
+
+ggtree(st131tree) %<+% select(metadata, Lane.Name, `This study`)   %>%
+ # gheatmap(select(esbl.cat, ESBL), width = 0.05, color = NA, font.size = 4, colnames_angle = 90,
+  #         colnames_position = "top", offset =  0.0002) %>%
+  gheatmap(select(metadata, Country), width = 0.05, color = NA, colnames = F,font.size = 4, colnames_angle = 90,
+           colnames_position = "top", offset = 0.0004, colnames_offset_y = 5) + 
+  geom_tiplab(size = 1, align = T, aes(color = `This study`)) + geom_treescale(x = 0.0005, y = 57,offset = 1 )+ scale_fill_manual(values = colz) +
+  scale_color_manual(values = c("black", hue_pal()(1)))  + theme(legend.position = "none") -> b
+
+ggarrange(ggarrange(a,b, ncol = 2, nrow =1, labels = c("A: ST410", "B: ST131") ),
+          ggarrange(NULL,leg,NULL, widths = c(1,0.5,1), ncol = 3),
+          heights = c(1,0.1), ncol = 1, nrow = 2)
+
+
+```
 ### Antimicrobial resistance determinents
 
 All identified AMR genes are shown in Figure \@ref(fig:wgs-amr-sum)A, alongside a summary of number of isolates with resistnce mutations to given antimicrobial classes (Figure \@ref(fig:wgs-amr-sum)B) and the phenotypic resistance of the isolates for which phenotypic antimicrobial resistance testing was carried out (449/473 [95%]). A description of resistance gene by class, along with a consdideration of concordance (or otherwise) of phenotypic resistance and predicted resistance from genotype, are given in turn below.
