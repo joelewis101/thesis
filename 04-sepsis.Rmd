@@ -13,6 +13,8 @@ output = "latex"
 
 # generate figures
 source("chapter_4/generate_consort_diagram.R")
+source("final_cleaning_scripts/load_and_clean_followup_and_enroll.R")
+source("other_scripts/summary_strings.R")
 
 ```
 
@@ -24,8 +26,11 @@ blah blah
 
 
 
-## Study population
+## Results
 
+### Study population
+
+Figure \@ref(fig:consort-diag) shows flow through the study. 225 patients were recruited in under 20 month, between 19th February 2017 and 2nd October 2018. In total, 4 patients (2%) were lost to follow up over the 180-day study period; 5 patients (2%) withdrew; and 7 patients (3%) transferred out of the study area before 180 days. Four of the five patients who withdrew gave a reason for their wish to withdraw, all that they no longer wished the inconvenience of bing involved in the study. 15/225 (7%) patients had their final study visit before 180 days, and so were not included in the 180-day outcome analysis.
 
 ```{r consort-diag, echo = F, fig.cap = "Study recruitment and follow up."}
 
@@ -33,7 +38,14 @@ knitr::include_graphics(paste0(wd, "/figures/consort_diagram.pdf"))
 
 ```
 
-Figure - Consort diagram
+```{r sep-t1-demog, echo = F, fig.cap = "Study recruitment and follow up."}
+
+e1 <- subset(enroll, arm == 1)
+
+
+
+```
+
 
 Table - demographics
 
@@ -41,20 +53,20 @@ Table - presentation
 
 Table - health seeking behaviour
 
-## Aetiology
+### Aetiology
 
 Table
 
 Figure to show crossover
 
-## Treatment
+### Treatment
 
 Table:
 Time to antimicrobials
 Time to fluid
 Amount of fluid
 
-## Outcome
+### Outcome
 
 Table - 28 and 90 day mortality
 
@@ -62,3 +74,4 @@ Figure - KM survival curve
 
 Logistic regression - determinants of 28 day mortality
 
+Morbidity - 
