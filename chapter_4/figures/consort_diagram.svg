@@ -14,124 +14,124 @@
 <title>Screened</title>
 <polygon fill="none" stroke="#000000" points="168.0021,-880.6019 11.3751,-880.6019 11.3751,-839.3981 168.0021,-839.3981 168.0021,-880.6019"/>
 <text text-anchor="middle" x="89.6886" y="-864.2" font-family="Arial" font-size="14.00" fill="#000000">Participants Screened </text>
-<text text-anchor="middle" x="89.6886" y="-847.4" font-family="Arial" font-size="14.00" fill="#000000"> n = xxx</text>
+<text text-anchor="middle" x="89.6886" y="-847.4" font-family="Arial" font-size="14.00" fill="#000000"> n = 347</text>
 </g>
 <!-- A -->
 <g id="node2" class="node">
 <title>A</title>
-<ellipse fill="#000000" stroke="#000000" cx="89.6886" cy="-774" rx=".036" ry=".036"/>
+<ellipse fill="#000000" stroke="#000000" cx="89.6886" cy="-757.2" rx=".036" ry=".036"/>
 </g>
 <!-- Screened&#45;&gt;A -->
 <g id="edge1" class="edge">
 <title>Screened&#45;&gt;A</title>
-<path fill="none" stroke="#000000" d="M89.6886,-839.1818C89.6886,-814.5252 89.6886,-776.4692 89.6886,-774.1147"/>
+<path fill="none" stroke="#000000" d="M89.6886,-839.1969C89.6886,-810.0971 89.6886,-760.426 89.6886,-757.35"/>
 </g>
 <!-- Enrolled -->
 <g id="node3" class="node">
 <title>Enrolled</title>
-<polygon fill="none" stroke="#000000" points="161.6886,-708.6019 17.6886,-708.6019 17.6886,-667.3981 161.6886,-667.3981 161.6886,-708.6019"/>
-<text text-anchor="middle" x="89.6886" y="-692.2" font-family="Arial" font-size="14.00" fill="#000000">Enrolled </text>
-<text text-anchor="middle" x="89.6886" y="-675.4" font-family="Arial" font-size="14.00" fill="#000000"> n = 225</text>
+<polygon fill="none" stroke="#000000" points="161.6886,-675.0019 17.6886,-675.0019 17.6886,-633.7981 161.6886,-633.7981 161.6886,-675.0019"/>
+<text text-anchor="middle" x="89.6886" y="-658.6" font-family="Arial" font-size="14.00" fill="#000000">Enrolled </text>
+<text text-anchor="middle" x="89.6886" y="-641.8" font-family="Arial" font-size="14.00" fill="#000000"> n = 225</text>
 </g>
 <!-- A&#45;&gt;Enrolled -->
 <g id="edge2" class="edge">
 <title>A&#45;&gt;Enrolled</title>
-<path fill="none" stroke="#000000" d="M89.6886,-773.9377C89.6886,-772.4047 89.6886,-742.8965 89.6886,-718.8805"/>
-<polygon fill="#000000" stroke="#000000" points="93.1887,-718.688 89.6886,-708.688 86.1887,-718.6881 93.1887,-718.688"/>
+<path fill="none" stroke="#000000" d="M89.6886,-757.1255C89.6886,-755.1653 89.6886,-714.9409 89.6886,-685.4194"/>
+<polygon fill="#000000" stroke="#000000" points="93.1887,-685.118 89.6886,-675.1181 86.1887,-685.1181 93.1887,-685.118"/>
 </g>
 <!-- Excl -->
 <g id="node11" class="node">
 <title>Excl</title>
-<polygon fill="none" stroke="#000000" points="383.6886,-803.4014 239.6886,-803.4014 239.6886,-744.5986 383.6886,-744.5986 383.6886,-803.4014"/>
-<text text-anchor="middle" x="311.6886" y="-786.6" font-family="Arial" font-size="14.00" fill="#000000">Excluded n = xxx </text>
-<text text-anchor="middle" x="311.6886" y="-769.8" font-family="Arial" font-size="14.00" fill="#000000"> reason 1 xxx </text>
-<text text-anchor="middle" x="311.6886" y="-753" font-family="Arial" font-size="14.00" fill="#000000"> reason 2 xxx</text>
+<polygon fill="none" stroke="#000000" points="415.5577,-803.2 207.8195,-803.2 207.8195,-711.2 415.5577,-711.2 415.5577,-803.2"/>
+<text text-anchor="middle" x="311.6886" y="-786.6" font-family="Arial" font-size="14.00" fill="#000000">Excluded n = 122 </text>
+<text text-anchor="middle" x="311.6886" y="-769.8" font-family="Arial" font-size="14.00" fill="#000000"> Physiology criteria not met 64 </text>
+<text text-anchor="middle" x="311.6886" y="-753" font-family="Arial" font-size="14.00" fill="#000000"> Outside Blantyre 51 </text>
+<text text-anchor="middle" x="311.6886" y="-736.2" font-family="Arial" font-size="14.00" fill="#000000"> Confused, no guardian 4 </text>
+<text text-anchor="middle" x="311.6886" y="-719.4" font-family="Arial" font-size="14.00" fill="#000000"> Age 3</text>
 </g>
 <!-- A&#45;&gt;Excl -->
 <g id="edge17" class="edge">
 <title>A&#45;&gt;Excl</title>
-<path fill="none" stroke="#000000" d="M90.1222,-774C136.4861,-774 182.85,-774 229.214,-774"/>
-<polygon fill="#000000" stroke="#000000" points="229.4199,-777.5001 239.4199,-774 229.4198,-770.5001 229.4199,-777.5001"/>
+<path fill="none" stroke="#000000" d="M90.1222,-757.2C125.9861,-757.2 161.85,-757.2 197.7139,-757.2"/>
+<polygon fill="#000000" stroke="#000000" points="197.8294,-760.7001 207.8293,-757.2 197.8293,-753.7001 197.8294,-760.7001"/>
 </g>
 <!-- B -->
 <g id="node4" class="node">
 <title>B</title>
-<ellipse fill="#000000" stroke="#000000" cx="89.6886" cy="-576.8" rx=".036" ry=".036"/>
+<ellipse fill="#000000" stroke="#000000" cx="89.6886" cy="-551.6" rx=".036" ry=".036"/>
 </g>
 <!-- Enrolled&#45;&gt;B -->
 <g id="edge3" class="edge">
 <title>Enrolled&#45;&gt;B</title>
-<path fill="none" stroke="#000000" d="M89.6886,-667.3447C89.6886,-636.1915 89.6886,-580.4235 89.6886,-576.9685"/>
+<path fill="none" stroke="#000000" d="M89.6886,-633.5969C89.6886,-604.4971 89.6886,-554.826 89.6886,-551.75"/>
 </g>
 <!-- D28 -->
 <g id="node5" class="node">
 <title>D28</title>
-<polygon fill="none" stroke="#000000" points="175.2837,-486.2019 4.0935,-486.2019 4.0935,-444.9981 175.2837,-444.9981 175.2837,-486.2019"/>
-<text text-anchor="middle" x="89.6886" y="-469.8" font-family="Arial" font-size="14.00" fill="#000000">Included in D28 analysis </text>
-<text text-anchor="middle" x="89.6886" y="-453" font-family="Arial" font-size="14.00" fill="#000000"> &#160;n = 221</text>
+<polygon fill="none" stroke="#000000" points="175.2837,-469.4019 4.0935,-469.4019 4.0935,-428.1981 175.2837,-428.1981 175.2837,-469.4019"/>
+<text text-anchor="middle" x="89.6886" y="-453" font-family="Arial" font-size="14.00" fill="#000000">Included in D28 analysis </text>
+<text text-anchor="middle" x="89.6886" y="-436.2" font-family="Arial" font-size="14.00" fill="#000000"> &#160;n = 222</text>
 </g>
 <!-- B&#45;&gt;D28 -->
 <g id="edge4" class="edge">
 <title>B&#45;&gt;D28</title>
-<path fill="none" stroke="#000000" d="M89.6886,-576.7194C89.6886,-574.545 89.6886,-528.8425 89.6886,-496.7354"/>
-<polygon fill="#000000" stroke="#000000" points="93.1887,-496.4506 89.6886,-486.4506 86.1887,-496.4506 93.1887,-496.4506"/>
+<path fill="none" stroke="#000000" d="M89.6886,-551.5255C89.6886,-549.5653 89.6886,-509.3409 89.6886,-479.8194"/>
+<polygon fill="#000000" stroke="#000000" points="93.1887,-479.518 89.6886,-469.5181 86.1887,-479.5181 93.1887,-479.518"/>
 </g>
 <!-- LTFU_B4_D28 -->
 <g id="node13" class="node">
 <title>LTFU_B4_D28</title>
-<polygon fill="none" stroke="#000000" points="383.6886,-631.1002 239.6886,-631.1002 239.6886,-522.4998 383.6886,-522.4998 383.6886,-631.1002"/>
-<text text-anchor="middle" x="311.6886" y="-614.6" font-family="Arial" font-size="14.00" fill="#000000">Excluded n = 4 </text>
-<text text-anchor="middle" x="311.6886" y="-597.8" font-family="Arial" font-size="14.00" fill="#000000"> &#160;</text>
-<text text-anchor="middle" x="311.6886" y="-581" font-family="Arial" font-size="14.00" fill="#000000"> &#160;Withdrawn = 0 </text>
-<text text-anchor="middle" x="311.6886" y="-564.2" font-family="Arial" font-size="14.00" fill="#000000"> Transfer out = 0 </text>
-<text text-anchor="middle" x="311.6886" y="-547.4" font-family="Arial" font-size="14.00" fill="#000000"> LTFU = 3 </text>
-<text text-anchor="middle" x="311.6886" y="-530.6" font-family="Arial" font-size="14.00" fill="#000000"> Ongoing fu = 1</text>
+<polygon fill="none" stroke="#000000" points="383.6886,-597.6 239.6886,-597.6 239.6886,-505.6 383.6886,-505.6 383.6886,-597.6"/>
+<text text-anchor="middle" x="311.6886" y="-581" font-family="Arial" font-size="14.00" fill="#000000">Excluded n = 3 </text>
+<text text-anchor="middle" x="311.6886" y="-564.2" font-family="Arial" font-size="14.00" fill="#000000"> &#160;</text>
+<text text-anchor="middle" x="311.6886" y="-547.4" font-family="Arial" font-size="14.00" fill="#000000"> &#160;Withdrawn = 0 </text>
+<text text-anchor="middle" x="311.6886" y="-530.6" font-family="Arial" font-size="14.00" fill="#000000"> Transfer out = 0 </text>
+<text text-anchor="middle" x="311.6886" y="-513.8" font-family="Arial" font-size="14.00" fill="#000000"> LTFU = 3</text>
 </g>
 <!-- B&#45;&gt;LTFU_B4_D28 -->
 <g id="edge18" class="edge">
 <title>B&#45;&gt;LTFU_B4_D28</title>
-<path fill="none" stroke="#000000" d="M90.1222,-576.8C136.4861,-576.8 182.85,-576.8 229.214,-576.8"/>
-<polygon fill="#000000" stroke="#000000" points="229.4199,-580.3001 239.4199,-576.8 229.4198,-573.3001 229.4199,-580.3001"/>
+<path fill="none" stroke="#000000" d="M90.1222,-551.6C136.4861,-551.6 182.85,-551.6 229.214,-551.6"/>
+<polygon fill="#000000" stroke="#000000" points="229.4199,-555.1001 239.4199,-551.6 229.4198,-548.1001 229.4199,-555.1001"/>
 </g>
 <!-- C -->
 <g id="node6" class="node">
 <title>C</title>
-<ellipse fill="#000000" stroke="#000000" cx="89.6886" cy="-354.4" rx=".036" ry=".036"/>
+<ellipse fill="#000000" stroke="#000000" cx="89.6886" cy="-346" rx=".036" ry=".036"/>
 </g>
 <!-- D28&#45;&gt;C -->
 <g id="edge5" class="edge">
 <title>D28&#45;&gt;C</title>
-<path fill="none" stroke="#000000" d="M89.6886,-444.9447C89.6886,-413.7915 89.6886,-358.0235 89.6886,-354.5685"/>
+<path fill="none" stroke="#000000" d="M89.6886,-427.9969C89.6886,-398.8971 89.6886,-349.226 89.6886,-346.15"/>
 </g>
 <!-- D90 -->
 <g id="node7" class="node">
 <title>D90</title>
 <polygon fill="none" stroke="#000000" points="175.2837,-263.8019 4.0935,-263.8019 4.0935,-222.5981 175.2837,-222.5981 175.2837,-263.8019"/>
 <text text-anchor="middle" x="89.6886" y="-247.4" font-family="Arial" font-size="14.00" fill="#000000">Included in D90 analysis </text>
-<text text-anchor="middle" x="89.6886" y="-230.6" font-family="Arial" font-size="14.00" fill="#000000"> &#160;n = 213</text>
+<text text-anchor="middle" x="89.6886" y="-230.6" font-family="Arial" font-size="14.00" fill="#000000"> &#160;n = 215</text>
 </g>
 <!-- C&#45;&gt;D90 -->
 <g id="edge6" class="edge">
 <title>C&#45;&gt;D90</title>
-<path fill="none" stroke="#000000" d="M89.6886,-354.3194C89.6886,-352.145 89.6886,-306.4425 89.6886,-274.3354"/>
-<polygon fill="#000000" stroke="#000000" points="93.1887,-274.0506 89.6886,-264.0506 86.1887,-274.0506 93.1887,-274.0506"/>
+<path fill="none" stroke="#000000" d="M89.6886,-345.9255C89.6886,-343.9653 89.6886,-303.7409 89.6886,-274.2194"/>
+<polygon fill="#000000" stroke="#000000" points="93.1887,-273.918 89.6886,-263.9181 86.1887,-273.9181 93.1887,-273.918"/>
 </g>
 <!-- LTFU_B4_D90 -->
 <g id="node15" class="node">
 <title>LTFU_B4_D90</title>
-<polygon fill="none" stroke="#000000" points="383.6886,-408.7002 239.6886,-408.7002 239.6886,-300.0998 383.6886,-300.0998 383.6886,-408.7002"/>
-<text text-anchor="middle" x="311.6886" y="-392.2" font-family="Arial" font-size="14.00" fill="#000000">Excluded n = 8 </text>
-<text text-anchor="middle" x="311.6886" y="-375.4" font-family="Arial" font-size="14.00" fill="#000000"> &#160;</text>
-<text text-anchor="middle" x="311.6886" y="-358.6" font-family="Arial" font-size="14.00" fill="#000000"> &#160;Withdrawn = 5 </text>
-<text text-anchor="middle" x="311.6886" y="-341.8" font-family="Arial" font-size="14.00" fill="#000000"> Transfer out = 1 </text>
-<text text-anchor="middle" x="311.6886" y="-325" font-family="Arial" font-size="14.00" fill="#000000"> LTFU = 0 </text>
-<text text-anchor="middle" x="311.6886" y="-308.2" font-family="Arial" font-size="14.00" fill="#000000"> Ongoing fu = 2</text>
+<polygon fill="none" stroke="#000000" points="383.6886,-392 239.6886,-392 239.6886,-300 383.6886,-300 383.6886,-392"/>
+<text text-anchor="middle" x="311.6886" y="-375.4" font-family="Arial" font-size="14.00" fill="#000000">Excluded n = 7 </text>
+<text text-anchor="middle" x="311.6886" y="-358.6" font-family="Arial" font-size="14.00" fill="#000000"> &#160;</text>
+<text text-anchor="middle" x="311.6886" y="-341.8" font-family="Arial" font-size="14.00" fill="#000000"> &#160;Withdrawn = 5 </text>
+<text text-anchor="middle" x="311.6886" y="-325" font-family="Arial" font-size="14.00" fill="#000000"> Transfer out = 2 </text>
+<text text-anchor="middle" x="311.6886" y="-308.2" font-family="Arial" font-size="14.00" fill="#000000"> LTFU = 0</text>
 </g>
 <!-- C&#45;&gt;LTFU_B4_D90 -->
 <g id="edge19" class="edge">
 <title>C&#45;&gt;LTFU_B4_D90</title>
-<path fill="none" stroke="#000000" d="M90.1222,-354.4C136.4861,-354.4 182.85,-354.4 229.214,-354.4"/>
-<polygon fill="#000000" stroke="#000000" points="229.4199,-357.9001 239.4199,-354.4 229.4198,-350.9001 229.4199,-357.9001"/>
+<path fill="none" stroke="#000000" d="M90.1222,-346C136.4861,-346 182.85,-346 229.214,-346"/>
+<polygon fill="#000000" stroke="#000000" points="229.4199,-349.5001 239.4199,-346 229.4198,-342.5001 229.4199,-349.5001"/>
 </g>
 <!-- D -->
 <g id="node8" class="node">
@@ -147,8 +147,8 @@
 <g id="node9" class="node">
 <title>D180</title>
 <polygon fill="none" stroke="#000000" points="179.5662,-41.4019 -.189,-41.4019 -.189,-.1981 179.5662,-.1981 179.5662,-41.4019"/>
-<text text-anchor="middle" x="89.6886" y="-25" font-family="Arial" font-size="14.00" fill="#000000">Included in D160 analysis </text>
-<text text-anchor="middle" x="89.6886" y="-8.2" font-family="Arial" font-size="14.00" fill="#000000"> &#160;n = 201</text>
+<text text-anchor="middle" x="89.6886" y="-25" font-family="Arial" font-size="14.00" fill="#000000">Included in D180 analysis </text>
+<text text-anchor="middle" x="89.6886" y="-8.2" font-family="Arial" font-size="14.00" fill="#000000"> &#160;n = 193</text>
 </g>
 <!-- D&#45;&gt;D180 -->
 <g id="edge8" class="edge">
@@ -160,12 +160,12 @@
 <g id="node17" class="node">
 <title>LTFU_B4_D180</title>
 <polygon fill="none" stroke="#000000" points="383.6886,-186.3002 239.6886,-186.3002 239.6886,-77.6998 383.6886,-77.6998 383.6886,-186.3002"/>
-<text text-anchor="middle" x="311.6886" y="-169.8" font-family="Arial" font-size="14.00" fill="#000000">Excluded n = 12 </text>
+<text text-anchor="middle" x="311.6886" y="-169.8" font-family="Arial" font-size="14.00" fill="#000000">Excluded n = 22 </text>
 <text text-anchor="middle" x="311.6886" y="-153" font-family="Arial" font-size="14.00" fill="#000000"> &#160;</text>
 <text text-anchor="middle" x="311.6886" y="-136.2" font-family="Arial" font-size="14.00" fill="#000000"> &#160;Withdrawn = 0 </text>
-<text text-anchor="middle" x="311.6886" y="-119.4" font-family="Arial" font-size="14.00" fill="#000000"> Transfer out = 9 </text>
+<text text-anchor="middle" x="311.6886" y="-119.4" font-family="Arial" font-size="14.00" fill="#000000"> Transfer out = 6 </text>
 <text text-anchor="middle" x="311.6886" y="-102.6" font-family="Arial" font-size="14.00" fill="#000000"> LTFU = 1 </text>
-<text text-anchor="middle" x="311.6886" y="-85.8" font-family="Arial" font-size="14.00" fill="#000000"> Ongoing fu = 2</text>
+<text text-anchor="middle" x="311.6886" y="-85.8" font-family="Arial" font-size="14.00" fill="#000000"> Completed = 15</text>
 </g>
 <!-- D&#45;&gt;LTFU_B4_D180 -->
 <g id="edge20" class="edge">

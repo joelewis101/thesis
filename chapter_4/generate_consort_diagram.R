@@ -122,6 +122,7 @@ withd$outcome[withd$withd] <- "Withdrew"
 withd$outcome[withd$transfer_out] <- "Transfer out"
 withd <- select(withd, pid, outcome, withdrawal_date)
 names(withd) <- c("pid","outcome","outcome_date")
+withd$outcome_date <- as.Date(withd$outcome_date, "%d/%m/%Y")
 
 died <- rbind(died, withd)
 died <- unique(died)
@@ -153,17 +154,14 @@ enrolled <- paste0("Enrolled \n n = ", nrow(fu.matrix))
 b4_d28_excluded.lab <- paste0('Excluded n = ', 
     sum((fu.matrix$outcome == "LTFU" |
           fu.matrix$outcome == "Transfer out" |
-          fu.matrix$outcome == "Withdrew" |
-          fu.matrix$outcome == "followup ongoing") & 
+          fu.matrix$outcome == "Withdrew" ) & 
           fu.matrix$fu_days <28), " \n  \n  ",
            "Withdrawn = ", sum(fu.matrix$outcome == "Withdrew" & 
                                 fu.matrix$fu_days <28),
             " \n Transfer out = ", sum(fu.matrix$outcome == "Transfer out" & 
                                  fu.matrix$fu_days <28),
             " \n LTFU = ", sum(fu.matrix$outcome == "LTFU" & 
-                               fu.matrix$fu_days <28),
-             " \n Ongoing fu = ", sum(fu.matrix$outcome == "followup ongoing" & 
-                             fu.matrix$fu_days <28)
+                               fu.matrix$fu_days <28)
     )
 
 inc.d28.lab <- paste0("Included in D28 analysis \n  n = ", 
@@ -179,17 +177,14 @@ d28.died <- paste0("Died \n  n = ",
 d28_d90_excluded.lab <- paste0('Excluded n = ', 
                               sum((fu.matrix$outcome == "LTFU" |
                                      fu.matrix$outcome == "Transfer out" |
-                                     fu.matrix$outcome == "Withdrew" |
-                                     fu.matrix$outcome == "followup ongoing") & 
+                                     fu.matrix$outcome == "Withdrew" ) & 
                                     fu.matrix$fu_days <90 & fu.matrix$fu_days >= 28), " \n  \n  ",
                               "Withdrawn = ", sum(fu.matrix$outcome == "Withdrew" & 
                                                     fu.matrix$fu_days <90 & fu.matrix$fu_days >= 28),
                               " \n Transfer out = ", sum(fu.matrix$outcome == "Transfer out" & 
                                                            fu.matrix$fu_days <90 & fu.matrix$fu_days >= 28),
                               " \n LTFU = ", sum(fu.matrix$outcome == "LTFU" & 
-                                                   fu.matrix$fu_days <90 & fu.matrix$fu_days >= 28),
-                              " \n Ongoing fu = ", sum(fu.matrix$outcome == "followup ongoing" & 
-                                                         fu.matrix$fu_days <90 & fu.matrix$fu_days >= 28)
+                                                   fu.matrix$fu_days <90 & fu.matrix$fu_days >= 28)
 )
 
 d90.died <- paste0("Died \n  n = ", 
@@ -202,15 +197,17 @@ inc.d90.lab <- paste0("Included in D90 analysis \n  n = ",
                               fu.matrix$fu_days <= 90) |
                              fu.matrix$fu_days >= 90))
 
-final.tpoint <- 160
+final.tpoint <- 180
+write.csv(fu.matrix, "/Users/joelewis/Documents/PhD/Thesis/bookdown/chapter_4/fu_matrix.csv", row.names = F)
 
-fu.matrix$outcome[fu.matrix$fu_days < final.tpoint & fu.matrix$outcome == "completed" ] <- "Transfer out"
+
+#fu.matrix$outcome[fu.matrix$fu_days < final.tpoint & fu.matrix$outcome == "completed" ] <- "Transfer out"
 
 d90_d180_excluded.lab <- paste0('Excluded n = ', 
                                sum((fu.matrix$outcome == "LTFU" |
                                       fu.matrix$outcome == "Transfer out" |
                                       fu.matrix$outcome == "Withdrew" |
-                                      fu.matrix$outcome == "followup ongoing") & 
+                                      fu.matrix$outcome == "completed") & 
                                      fu.matrix$fu_days <final.tpoint & fu.matrix$fu_days >= 90), " \n  \n  ",
                                "Withdrawn = ", sum(fu.matrix$outcome == "Withdrew" & 
                                                      fu.matrix$fu_days <final.tpoint & fu.matrix$fu_days >= 90),
@@ -218,8 +215,8 @@ d90_d180_excluded.lab <- paste0('Excluded n = ',
                                                             fu.matrix$fu_days <final.tpoint & fu.matrix$fu_days >= 90),
                                " \n LTFU = ", sum(fu.matrix$outcome == "LTFU" & 
                                                     fu.matrix$fu_days <final.tpoint & fu.matrix$fu_days >= 90),
-                               " \n Ongoing fu = ", sum(fu.matrix$outcome == "followup ongoing" & 
-                                                          fu.matrix$fu_days <final.tpoint & fu.matrix$fu_days >= 90)
+                               " \n Completed = ", sum(fu.matrix$outcome == "completed" & 
+                                                    fu.matrix$fu_days <final.tpoint & fu.matrix$fu_days >= 90)
 )
 
 
@@ -234,13 +231,12 @@ d180.died <- paste0("Died \n  n = ",
 
 
 
-  
 
 
 export_svg(grViz(diagram =" digraph {
   graph [fontsize=12]
       node [shape=box, width = 2, fontname = Arial] 
-  Screened[pos='1,1',pin=true,label = 'Participants Screened \n n = xxx']
+  Screened[pos='1,1',pin=true,label = 'Participants Screened \n n = 347']
   Screened -> A[arrowhead='none']
   A -> Enrolled[length = 1]
   Enrolled -> B[arrowhead='none'] 
@@ -277,7 +273,7 @@ D -> LTFU_B4_D180
 
 
 
- Excl[label = 'Excluded n = xxx \n reason 1 xxx \n reason 2 xxx']
+ Excl[label = 'Excluded n = 122 \n Physiology criteria not met 64 \n Outside Blantyre 51 \n Confused, no guardian 4 \n Age 3']
   Enrolled[label = '@@1']
   LTFU_B4_D28[label = '@@2']
   D28[label = '@@3']
