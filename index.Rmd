@@ -19,7 +19,7 @@ link-citations: yes
 description: "Joe's thesis. Yikes!"
 header-includes:
    \usepackage{array}
-   \usepackage{threeparttable}
+   \usepackage{threeparttablex}
    \usepackage{longtable}
    \usepackage{float}
    \usepackage{booktabs}
