@@ -17,6 +17,8 @@ output = "latex"
 #source("chapter_4/generate_consort_diagram.R")
 source("final_cleaning_scripts/load_and_clean_followup_and_enroll_labelled.R")
 source("other_scripts/summary_table_functions.R")
+source("final_cleaning_scripts/make_composite_hivstatus_variable.R")
+
 
 ```
 
@@ -32,7 +34,9 @@ blah blah
 
 ### Study population
 
-Figure \@ref(fig:consort-diag) shows flow through the study. 225 patients were recruited in under 20 month, between 19th February 2017 and 2nd October 2018. In total, 4 patients (2%) were lost to follow up over the 180-day study period; 5 patients (2%) withdrew; and 7 patients (3%) transferred out of the study area before 180 days. Four of the five patients who withdrew gave a reason for their wish to withdraw, all that they no longer wished the inconvenience of bing involved in the study. 15/225 (7%) patients had their final study visit before 180 days, and so were not included in the 180-day outcome analysis.
+Figure \@ref(fig:consort-diag) shows flow through the study. 225 patients were recruited in just under 20 months, between 19th February 2017 and 2nd October 2018. In total, 4 patients (2%) were lost to follow up over the 180-day study period; 5 patients (2%) withdrew; and 7 patients (3%) transferred out of the study area before 180 days. Four of the five patients who withdrew gave a reason for their wish to withdraw, all that they no longer wished the inconvenience of bing involved in the study. 15/225 (7%) patients had their final study visit before 180 days, and so were not included in the 180-day outcome analysis.
+
+Table \@ref(tab:sep-t1-demog) shows the baseline characteristics of the recruited participants. They were young (median [IQR] age 36 [28-44]) and predominantly HIV-infected. Of those who were HIV-infected, the majority (117/143 [82%]) were on ART, almost exclusively the Malawian first-line regimen of efavirenz, lamivudine and tenofovir.
 
 ```{r consort-diag, echo = F, fig.cap = "Study recruitment and follow up."}
 
@@ -68,8 +72,8 @@ e1.sum$variable[e1.sum$variable %in% c("calc_age", "ptsex")] <- "Demographics"
 e1.sum$levels[e1.sum$levels %in% c("Reactive", "Non reactive", "Unknown")] <- 
   paste0("HIV ", str_to_title(e1.sum$levels[e1.sum$levels %in% c("Reactive", "Non reactive", "Unknown")]))
 e1.sum$levels[e1.sum$variable == "hivonart"] <- "Current ART"
-e1.sum$levels[e1.sum$variable == "hivcpt"] <- "Current CPT"
-e1.sum$levels[e1.sum$levels == "5A"] <- "ART regimen: 5A"
+e1.sum$levels[e1.sum$variable == "hivcpt"] <- "Current CPT*"
+e1.sum$levels[e1.sum$levels == "5A"] <- "ART regimen: EFV/3TC/TDF"
 e1.sum$levels[e1.sum$variable == "art.time"] <- "Months on ART"
 e1.sum$variable[e1.sum$variable == "hivstatus"] <- "HIV status"
 e1.sum$variable[grepl("art", e1.sum$variable)] <- "ART status"
@@ -127,11 +131,17 @@ e1.sum$levels[e1.sum$levels== "Yes" | e1.sum$levels== "Median (IQR)" ] <-
 #rownames(e1.sum) <- e1.sum$`levels`
 #rownames(e1.sum)[!(rownames(e1.sum) %in% kstring)]
 
-kable(select(e1.sum,`levels`,value), "latex", booktabs =T, row.names = F, longtable = T, caption = "Demographics" ) %>%
+kable(select(e1.sum,`levels`,value), "latex", booktabs =T, 
+      row.names = F, longtable = T, col.names = c("Variable","Value"), caption = "Participant Characteristics" ) %>%
   kable_styling("striped", full_width = F,latex_options = c("repeat_header")) %>%
-  group_rows(index = kstring) 
+  group_rows(index = kstring) %>%
+  footnote(general = "ART = Antiretroviral therapy, CPT = Co-trimoxazole preventative therapy, EFV: Efavirenz, 3TC: Lamivudine, TDF: Tenofovir", symbol = "Missing CPT data for two participants." ,threeparttable = T)
 ```
 
+```{r sep-t1-present, echo = F, warning = F, message = F}
+
+
+```
 
 Table - demographics
 
