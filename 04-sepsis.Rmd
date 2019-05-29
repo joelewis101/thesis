@@ -9,6 +9,8 @@ library(tmap)
 library(ggmap)
 library(knitr)
 library(kableExtra)
+library(grid)
+library(ggpubr)
 
 wd <- "chapter_4/"
 output = "latex"
@@ -18,6 +20,9 @@ output = "latex"
 source("final_cleaning_scripts/load_and_clean_followup_and_enroll_labelled.R")
 source("other_scripts/summary_table_functions.R")
 source("final_cleaning_scripts/make_composite_hivstatus_variable.R")
+
+e1$datefirstunwell[e1$unwelfreq == "Weeks"] <- e1$datefirstunwell[e1$unwelfreq == "Weeks"] * 7
+e1$datefirstunwell[e1$unwelfreq == "Months"] <- e1$datefirstunwell[e1$unwelfreq == "Months"] * 30
 
 
 ```
@@ -34,11 +39,11 @@ blah blah
 
 ### Study population
 
-Figure \@ref(fig:consort-diag) shows flow through the study. 225 patients were recruited in just under 20 months, between 19th February 2017 and 2nd October 2018. In total, 4 patients (2%) were lost to follow up over the 180-day study period; 5 patients (2%) withdrew; and 7 patients (3%) transferred out of the study area before 180 days. Four of the five patients who withdrew gave a reason for their wish to withdraw, all that they no longer wished the inconvenience of bing involved in the study. 15/225 (7%) patients had their final study visit before 180 days, and so were not included in the 180-day outcome analysis.
+Figure \@ref(fig:consort-diag) shows flow through the study. 225 patients were recruited in just under 20 months, between 19th February 2017 and 2nd October 2018. In total, 4 patients (2%) were lost to follow up over the 180-day study period; 5 patients (2%) withdrew; and 7 patients (3%) transferred out of the study area before 180 days. Four of the five patients who withdrew gave a reason for their wish to withdraw, all that they no longer wished the inconvenience of being involved in the study. 15/225 (7%) patients had their final study visit before 180 days, and so were not included in the 180-day outcome analysis.
 
-Table \@ref(tab:sep-t1-demog) shows the baseline characteristics of the recruited participants. They were young (median [IQR] age 36 [28-44]) and predominantly HIV-infected. Of those who were HIV-infected, the majority (117/143 [82%]) were on ART, almost exclusively the Malawian first-line regimen of efavirenz, lamivudine and tenofovir.
+Table \@ref(tab:sep-t1-demog) shows the baseline characteristics of the recruited participants. They were young (median [IQR] age 36 [28-44]) and predominantly HIV-infected. Of those who were HIV-infected, the majority (117/143 [82%]) were on ART, almost exclusively the Malawian first-line regimen of efavirenz, lamivudine and tenofovir. Figure \@ref(fig:sep-t1-present) shows the presenting symptoms of the participants. Almost all (221/225 [98%] of participants) experienced subjective fever. Participants had been unwell for some time, a median (IQR) of `r median_iqr_str(e1$datefirstunwell)` days; 32/225 (14%) of participants had been unwell for more than 4 weeks.
 
-```{r consort-diag, echo = F, fig.cap = "Study recruitment and follow up."}
+```{r consort-diag, echo = F, fig.cap = "Study recruitment and follow up.",  out.height = '12cm', fig.align = 'center'}
 
 knitr::include_graphics(paste0(wd, "/figures/consort_diagram.pdf"))
 
@@ -136,16 +141,33 @@ kable(select(e1.sum,`levels`,value), "latex", booktabs =T,
   kable_styling("striped", full_width = F,latex_options = c("repeat_header")) %>%
   group_rows(index = kstring) %>%
   footnote(general = "ART = Antiretroviral therapy, CPT = Co-trimoxazole preventative therapy, EFV: Efavirenz, 3TC: Lamivudine, TDF: Tenofovir", symbol = "Missing CPT data for two participants." ,threeparttable = T)
-```
 
-```{r sep-t1-present, echo = F, warning = F, message = F}
 
 
 ```
 
-Table - demographics
+```{r sep-t1-present, echo = F, warning = F, message = F, fig.scap="Symptoms of recruited participants", out.extra='', fig.cap="Symptoms of recruited participants. A: Row and column clustered heatmap of participant symptoms. Each row represents a patient. Red = presence, blue = absence. B: Frequency of occurence of symptoms", fig.width = 8, fig.height = 5, out.height= '50%'}
 
-Table - presentation
+sympt <- e1[names(e1) %in% names(enroll.names)[grepl("symp",enroll.names)]]
+
+sympt[sympt == "No"] <- 0
+sympt[sympt == "Yes"] <- 1
+(sapply(sympt, as.numeric)) -> sympt
+
+sympt.melt <- melt(sympt) %>% filter(value > 0)
+gsub("\\.", " ", sympt.melt$Var2) -> sympt.melt$Var2
+str_to_title(sympt.melt$Var2) -> sympt.melt$Var2
+ggplot(sympt.melt, aes(fct_rev(fct_infreq(Var2)))) +
+  geom_bar() + coord_flip() + theme_bw() +
+  labs(x= "", y = "Count") -> p1
+
+gsub("\\.", " ", dimnames(sympt)[[2]]) -> dimnames(sympt)[[2]]
+str_to_title(dimnames(sympt)[[2]]) -> dimnames(sympt)[[2]]
+grid.grabExpr(pheatmap(sympt[1:225,1:25], legend = F, fontsize = 7)) -> p2
+as_ggplot(p2) ->p2
+ggarrange(p2,p1, labels = c("A", "B"), widths = c(1, 1)) 
+```
+
 
 Table - health seeking behaviour
 
