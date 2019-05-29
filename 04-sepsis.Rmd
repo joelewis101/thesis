@@ -7,14 +7,16 @@ library(dplyr)
 library(ggplot2)
 library(tmap)
 library(ggmap)
+library(knitr)
+library(kableExtra)
 
 wd <- "chapter_4/"
 output = "latex"
 
 # generate figures
-source("chapter_4/generate_consort_diagram.R")
-source("final_cleaning_scripts/load_and_clean_followup_and_enroll.R")
-source("other_scripts/summary_strings.R")
+#source("chapter_4/generate_consort_diagram.R")
+source("final_cleaning_scripts/load_and_clean_followup_and_enroll_labelled.R")
+source("other_scripts/summary_table_functions.R")
 
 ```
 
@@ -38,12 +40,96 @@ knitr::include_graphics(paste0(wd, "/figures/consort_diagram.pdf"))
 
 ```
 
-```{r sep-t1-demog, echo = F, fig.cap = "Study recruitment and follow up."}
+\renewcommand{\arraystretch}{0.8}
+```{r sep-t1-demog, echo = F, warning = F, message = F}
 
 e1 <- subset(enroll, arm == 1)
+e1$art.time <- as.numeric((e1$data_date - e1$hivartstart) /(365.25/12))
+e1$hivart[e1$hivart != "5A" & !is.na(e1$hivart)] <- "ART regimen: other"
+e1$animalskept[e1$animalskept == "Other"] <- "Elsewhere"
+e1$keep.other[e1$keep.cattle == "Yes" | e1$keep.sheep == "Yes" | e1$keep.mules == "Yes"] <- "Yes"
+e1.sum <- select(e1, calc_age, ptsex, hivstatus, hivonart, hivart, art.time, hivcpt, 
+                 tbstatus, tbongoing, tobaccoyn, alcoholyn,  highestedu,
+                 job,  toilet , watersource,
+                 electricityyn, fuel, 
+                 keepanim, keep.poultry,  keep.goats,
+                 keep.dogs, keep.other)
 
+pretty_tbl_df(e1.sum) -> e1.sum
+## tweeaky tweaky
+e1.sum <- subset(e1.sum, `levels` != "No")
+e1.sum <- subset(e1.sum, `levels` != "Female")
 
+e1.sum$levels[e1.sum$variable == "calc_age"] <- "Age (years)"
+e1.sum$levels[e1.sum$variable == "ptsex"] <- "Male sex"
+e1.sum$variable[e1.sum$variable %in% c("calc_age", "ptsex")] <- "Demographics"
 
+# art variables
+e1.sum$levels[e1.sum$levels %in% c("Reactive", "Non reactive", "Unknown")] <- 
+  paste0("HIV ", str_to_title(e1.sum$levels[e1.sum$levels %in% c("Reactive", "Non reactive", "Unknown")]))
+e1.sum$levels[e1.sum$variable == "hivonart"] <- "Current ART"
+e1.sum$levels[e1.sum$variable == "hivcpt"] <- "Current CPT"
+e1.sum$levels[e1.sum$levels == "5A"] <- "ART regimen: 5A"
+e1.sum$levels[e1.sum$variable == "art.time"] <- "Months on ART"
+e1.sum$variable[e1.sum$variable == "hivstatus"] <- "HIV status"
+e1.sum$variable[grepl("art", e1.sum$variable)] <- "ART status"
+e1.sum$variable[grepl("cpt", e1.sum$variable)] <- "CPT status"
+e1.sum <- e1.sum[c(1:5, 6,9,7,8,10:nrow(e1.sum)),]
+
+# tb variables
+e1.sum$levels[e1.sum$variable == "tbstatus"] <- "Ever treated for TB"
+e1.sum$levels[e1.sum$variable == "tbongoing"] <- "Of those, current TB treatment"
+e1.sum$variable[grepl("tb", e1.sum$variable)] <- "TB status"
+
+# tobacco use
+
+e1.sum$variable[grepl("tobacco", e1.sum$variable)] <- "Tobacco use"
+
+# alcohol use
+e1.sum$levels[e1.sum$variable == "alcoholyn"] <- "Current"
+e1.sum$variable[grepl("alcohol", e1.sum$variable)] <- "Alcohol use"
+
+# education
+e1.sum$variable[grepl("highestedu", e1.sum$variable)] <- "Education"
+
+# employment 
+e1.sum$variable[grepl("job", e1.sum$variable)] <- "Employment"
+
+# toilet
+
+e1.sum$variable[grepl("toilet", e1.sum$variable)] <- "Toilet facilities"
+
+# toilet
+
+e1.sum$variable[grepl("water", e1.sum$variable)] <- "Main water source"
+
+# electricity
+e1.sum$levels[e1.sum$variable == "electricityyn"] <- "Electricity available in house"
+e1.sum$variable[grepl("electric", e1.sum$variable)] <- "Electricty"
+
+e1.sum$variable[grepl("fuel", e1.sum$variable)] <- "Main cooking fuel"
+
+# animals
+
+e1.sum$levels[grepl("keep", e1.sum$variable)] <- e1.sum$variable[grepl("keep", e1.sum$variable)]
+
+sub("keep.", "",e1.sum$levels) -> e1.sum$levels
+str_to_title(e1.sum$levels[grepl("keep", e1.sum$variable)] ) -> e1.sum$levels[grepl("keep", e1.sum$variable)]
+e1.sum$levels[e1.sum$levels == "Nim"] <- "Any animal"
+
+e1.sum$variable[grepl("keep", e1.sum$variable)] <- "Animals at home?"
+
+e1.sum <- e1.sum[c(1:45, 47,46,48:nrow(e1.sum)),]
+
+kstring <- make_kable_rowgroup_string(e1.sum)
+e1.sum$levels[e1.sum$levels== "Yes" | e1.sum$levels== "Median (IQR)" ] <- 
+  e1.sum$variable[e1.sum$levels== "Yes" | e1.sum$levels== "Median (IQR)" ]
+#rownames(e1.sum) <- e1.sum$`levels`
+#rownames(e1.sum)[!(rownames(e1.sum) %in% kstring)]
+
+kable(select(e1.sum,`levels`,value), "latex", booktabs =T, row.names = F, longtable = T, caption = "Demographics" ) %>%
+  kable_styling("striped", full_width = F,latex_options = c("repeat_header")) %>%
+  group_rows(index = kstring) 
 ```
 
 
