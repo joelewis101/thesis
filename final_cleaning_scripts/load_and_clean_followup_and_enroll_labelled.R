@@ -12,6 +12,7 @@ enroll[enroll == ""] <- NA
 
 enroll$data_date <- as.Date(enroll$data_date, "%d%b%Y")
 enroll$hivartstart <- as.Date(enroll$hivartstart, "%d%b%Y")
+enroll$hivsatusdate <- as.Date(enroll$hivsatusdate, "%d%b%Y")
 followup$data_date <- as.Date(followup$data_date, "%d%b%Y")
 
 enroll.names <- c("hhitem1","hhitem2", "hhitem3", "hhitem4", "hhitem5", "hhitem6",
@@ -50,6 +51,8 @@ source(paste0(wd.clean.script, "/correct_mislabelled_fu.R"))
 
 cat("Enrollment df now in enroll.  \n  ")
 cat("Followup df now in followup.  \n  ")
+cat("If you wanna merge in HIV tests for composite HIV variable  \n  ")
+cat("Run final_cleaning_scripts/make_composite_hivstatus_variable.R  \n  ")
 cat("Share and enjoy! \n  ")
 
     
