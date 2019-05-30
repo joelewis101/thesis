@@ -75,7 +75,7 @@ enroll$prehosrxname[enroll$prehosrxname == "Sp" |
 enroll$recieved_prehosp_ab <- enroll$prehosrxname %in% c("Amoxicillin", "Azithromycin","Co-trimoxazole",
                                                          "Ceftriaxone", "Ciprofloxacin", "Erythromycin", 
                                                          "Metronidazole", "Benzylpenicillin", "Gentamicin",
-                                                         "LA", "SP", "Fluconazole", "Flucloxacillin" )
+                                                         "LA", "SP", "Fluconazole", "Flucloxacillin", "Artesunate" )
 
 
 enroll$recieved_prehosp_ab[enroll$recieved_prehosp_ab == TRUE] <- "Yes"
