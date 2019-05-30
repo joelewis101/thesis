@@ -3,14 +3,14 @@
 ```{r ch4-setup, include = F}
 
 library(plyr)
-library(dplyr)
-library(ggplot2)
-library(tmap)
-library(ggmap)
+library(reshape2)
+library(tidyverse)
+
 library(knitr)
 library(kableExtra)
 library(grid)
 library(ggpubr)
+library(pheatmap)
 
 wd <- "chapter_4/"
 output = "latex"
@@ -39,9 +39,9 @@ blah blah
 
 ### Study population
 
-Figure \@ref(fig:consort-diag) shows flow through the study. 225 patients were recruited in just under 20 months, between 19th February 2017 and 2nd October 2018. In total, 4 patients (2%) were lost to follow up over the 180-day study period; 5 patients (2%) withdrew; and 7 patients (3%) transferred out of the study area before 180 days. Four of the five patients who withdrew gave a reason for their wish to withdraw, all that they no longer wished the inconvenience of being involved in the study. 15/225 (7%) patients had their final study visit before 180 days, and so were not included in the 180-day outcome analysis.
+Figure \@ref(fig:consort-diag) shows flow through the study. 225 patients were recruited in 20 months between 19th February 2017 and 2nd October 2018. In total, 4 patients (2%) were lost to follow up over the 180-day study period; 5 patients (2%) withdrew; and 7 patients (3%) transferred out of the study area before 180 days. Four of the five patients who withdrew gave a reason for their wish to withdraw, all that they no longer wished the inconvenience of being involved in the study. 15/225 (7%) patients had their final study visit before 180 days, and so were not included in the 180-day outcome analysis.
 
-Table \@ref(tab:sep-t1-demog) shows the baseline characteristics of the recruited participants. They were young (median [IQR] age 36 [28-44]) and predominantly HIV-infected. Of those who were HIV-infected, the majority (117/143 [82%]) were on ART, almost exclusively the Malawian first-line regimen of efavirenz, lamivudine and tenofovir. Figure \@ref(fig:sep-t1-present) shows the presenting symptoms of the participants. Almost all (221/225 [98%] of participants) experienced subjective fever. Participants had been unwell for some time, a median (IQR) of `r median_iqr_str(e1$datefirstunwell)` days; 32/225 (14%) of participants had been unwell for more than 4 weeks.
+Table \@ref(tab:sep-t1-demog) shows the baseline characteristics of the recruited participants. They were young (median [IQR] age 36 [28-44]) and predominantly HIV-infected. Of those who were HIV-infected, the majority (117/143 [82%]) were on ART, almost exclusively the Malawian first-line regimen of efavirenz, lamivudine and tenofovir. Figure \@ref(fig:sep-present) shows the presenting symptoms of the participants. Almost all (221/225 [98%] of participants) experienced subjective fever. Participants had been unwell for some time, a median (IQR) of `r median_iqr_str(e1$datefirstunwell)` days; 32/225 (14%) of participants had been unwell for more than 4 weeks.
 
 ```{r consort-diag, echo = F, fig.cap = "Study recruitment and follow up.",  out.height = '12cm', fig.align = 'center'}
 
@@ -57,8 +57,8 @@ e1$art.time <- as.numeric((e1$data_date - e1$hivartstart) /(365.25/12))
 e1$hivart[e1$hivart != "5A" & !is.na(e1$hivart)] <- "ART regimen: other"
 e1$animalskept[e1$animalskept == "Other"] <- "Elsewhere"
 e1$keep.other[e1$keep.cattle == "Yes" | e1$keep.sheep == "Yes" | e1$keep.mules == "Yes"] <- "Yes"
-e1.sum <- select(e1, calc_age, ptsex, hivstatus, hivonart, hivart, art.time, hivcpt, 
-                 tbstatus, tbongoing, tobaccoyn, alcoholyn,  highestedu,
+e1.sum <- select(e1, calc_age, ptsex, hivstatus,tbstatus, tbongoing, hivonart, hivart, art.time, hivcpt, 
+                  tobaccoyn, alcoholyn,  highestedu,
                  job,  toilet , watersource,
                  electricityyn, fuel, 
                  keepanim, keep.poultry,  keep.goats,
@@ -80,23 +80,26 @@ e1.sum$levels[e1.sum$variable == "hivonart"] <- "Current ART"
 e1.sum$levels[e1.sum$variable == "hivcpt"] <- "Current CPT*"
 e1.sum$levels[e1.sum$levels == "5A"] <- "ART regimen: EFV/3TC/TDF"
 e1.sum$levels[e1.sum$variable == "art.time"] <- "Months on ART"
-e1.sum$variable[e1.sum$variable == "hivstatus"] <- "HIV status"
+e1.sum$variable[e1.sum$variable == "hivstatus"] <- "HIV/TB status"
 e1.sum$variable[grepl("art", e1.sum$variable)] <- "ART status"
-e1.sum$variable[grepl("cpt", e1.sum$variable)] <- "CPT status"
-e1.sum <- e1.sum[c(1:5, 6,9,7,8,10:nrow(e1.sum)),]
-
+e1.sum$variable[grepl("cpt", e1.sum$variable)] <- "ART status"
 # tb variables
 e1.sum$levels[e1.sum$variable == "tbstatus"] <- "Ever treated for TB"
 e1.sum$levels[e1.sum$variable == "tbongoing"] <- "Of those, current TB treatment"
-e1.sum$variable[grepl("tb", e1.sum$variable)] <- "TB status"
+e1.sum$variable[grepl("tb", e1.sum$variable)] <- "HIV/TB status"
+
+
+e1.sum <- e1.sum[c(1:8,11,9,10,12:nrow(e1.sum)),]
+
+
 
 # tobacco use
-
-e1.sum$variable[grepl("tobacco", e1.sum$variable)] <- "Tobacco use"
+e1.sum$levels[grepl("tobacco", e1.sum$variable)] <- paste0(e1.sum$levels[grepl("tobacco", e1.sum$variable)], " tobacco" )
+e1.sum$variable[grepl("tobacco", e1.sum$variable)] <- "Tobacco/alcohol use"
 
 # alcohol use
-e1.sum$levels[e1.sum$variable == "alcoholyn"] <- "Current"
-e1.sum$variable[grepl("alcohol", e1.sum$variable)] <- "Alcohol use"
+e1.sum$levels[e1.sum$variable == "alcoholyn"] <- "Current alcohol"
+e1.sum$variable[grepl("alcohol", e1.sum$variable)] <- "Tobacco/alcohol use"
 
 # education
 e1.sum$variable[grepl("highestedu", e1.sum$variable)] <- "Education"
@@ -140,13 +143,13 @@ kable(select(e1.sum,`levels`,value), "latex", booktabs =T,
       row.names = F, longtable = T, col.names = c("Variable","Value"), caption = "Participant Characteristics" ) %>%
   kable_styling("striped", full_width = F,latex_options = c("repeat_header")) %>%
   group_rows(index = kstring) %>%
-  footnote(general = "ART = Antiretroviral therapy, CPT = Co-trimoxazole preventative therapy, EFV: Efavirenz, 3TC: Lamivudine, TDF: Tenofovir", symbol = "Missing CPT data for two participants." ,threeparttable = T)
+  footnote(general = "ART = Antiretroviral therapy, CPT = Co-trimoxazole preventative therapy, EFV: Efavirenz, 3TC: Lamivudine, TDF: Tenofovir", symbol = "Missing CPT data for two participants. Numeric values are median (IQR) unless otherwise stated." ,threeparttable = T)
 
 
 
 ```
 
-```{r sep-t1-present, echo = F, warning = F, message = F, fig.scap="Symptoms of recruited participants", out.extra='', fig.cap="Symptoms of recruited participants. A: Row and column clustered heatmap of participant symptoms. Each row represents a patient. Red = presence, blue = absence. B: Frequency of occurence of symptoms", fig.width = 8, fig.height = 5, out.height= '50%'}
+```{r sep-present, echo = F, warning = F, message = F, fig.scap="Symptoms of recruited participants", out.extra='', fig.cap="Symptoms of recruited participants. A: Row and column clustered heatmap of participant symptoms. Each row represents a patient. Red = presence, blue = absence. B: Frequency of occurence of symptoms", fig.width = 8, fig.height = 5, out.height= '50%'}
 
 sympt <- e1[names(e1) %in% names(enroll.names)[grepl("symp",enroll.names)]]
 
@@ -168,6 +171,57 @@ as_ggplot(p2) ->p2
 ggarrange(p2,p1, labels = c("A", "B"), widths = c(1, 1)) 
 ```
 
+```{r sep-healthseek, echo = F, warning = F, message = F, fig.scap="Symptoms of recruited participants", out.extra='', fig.cap="Symptoms of recruited participants. A: Row and column clustered heatmap of participant symptoms. Each row represents a patient. Red = presence, blue = absence. B: Frequency of occurence of symptoms", fig.width = 8, fig.height = 5, out.height= '50%'}
+
+e1$phxstartdate_n[grepl("Weeks", e1$prehfreq)] <- e1$phxstartdate_n[grepl("Weeks", e1$prehfreq)] * 7
+e1$phxstartdate_n[grepl("Months", e1$prehfreq)] <- e1$phxstartdate_n[grepl("Months", e1$prehfreq)] * 30
+
+
+e1$prehospcaredur[grepl("Weeks", e1$prehospcarefr)] <- e1$prehospcaredur[grepl("Weeks", e1$prehospcarefr)] * 7
+e1$prehospcaredur[grepl("Months", e1$prehospcarefr)] <- e1$prehospcaredur[grepl("Months", e1$prehospcarefr)] * 30
+
+
+e1$ab_startdays[e1$recieved_prehosp_ab == "Yes"] <- e1$phxstartdate_n[e1$recieved_prehosp_ab == "Yes"]
+e1$prehosp_ab[e1$recieved_prehosp_ab == "Yes"] <- e1$prehosrxname [e1$recieved_prehosp_ab == "Yes"]
+e1$prehospcaretransp[grepl("Min", e1$prehospcaretranspother)] <- "Minibus"
+
+
+e1.sum.2 <- select(e1, prehospcareyn,soughtcare.other.hospital,soughtcare.other.clinic,soughtcare.pharmacy,soughtcare.private.doctor, soughtcare.other.health.worker ,soughtcare.traditional.practicioner,soughtcare.friend.or.family,soughtcare.other,prehospcaredur, recieved_prehosp_ab,  prehosp_ab,ab_startdays, prehospcaretransp, prehospcaretranspcost)
+
+pretty_tbl_df(e1.sum.2) -> e1.sum.2
+subset(e1.sum.2, levels != "No") -> e1.sum.2
+
+e1.sum.2$levels[e1.sum.2$variable == "prehospcareyn"] <- "Sought care prior to attendance at hospital"
+e1.sum.2$levels[e1.sum.2$variable == "prehospcaredur"] <- "Days prior to today that participant sought care"
+e1.sum.2$levels[e1.sum.2$variable == "soughtcare.other.hospital"] <- "Sought care at hospital"
+e1.sum.2$levels[e1.sum.2$variable == "soughtcare.other.clinic"] <- "Sought care at health centre"
+e1.sum.2$levels[e1.sum.2$variable == "soughtcare.private.doctor"] <- "Sought care at private doctor"
+e1.sum.2$levels[e1.sum.2$variable == "soughtcare.other"] <- "Sought care somewhere else "
+
+e1.sum.2$variable[e1.sum.2$variable == "prehospcareyn" |
+                    e1.sum.2$variable == "prehospcaredur" |
+                    grepl("soughtcare" ,e1.sum.2$variable) ] <-  "Pre-hospital healthcare seeking"
+e1.sum.2$levels[e1.sum.2$variable == "recieved_prehosp_ab"] <- "Recieved any antimicrobial prior to attendance at hospital"
+#e1.sum.2$levels[e1.sum.2$variable == "prehosp_ab"] <- paste0("Recieved ", e1.sum.2$levels[e1.sum.2$variable == "prehosp_ab"])
+
+
+e1.sum.2$levels[e1.sum.2$variable == "ab_startdays"] <- "Days prior to today that antimicrobials started" 
+e1.sum.2$variable[ grepl("prehosp_ab" ,e1.sum.2$variable) | grepl("ab_startdays" ,e1.sum.2$variable) ] <- "Prehospital antimicrobial exposure"
+
+e1.sum.2$levels[e1.sum.2$variable == "prehospcaretranspcost"] <- "Cost (MWK) of transport to hospital"
+e1.sum.2$variable[ grepl("prehospcaretransp" ,e1.sum.2$variable) ] <- "Method of transport to hospital"
+
+
+kstring2 <- make_kable_rowgroup_string(e1.sum.2)
+
+
+kable(select(e1.sum.2,`levels`,value), "latex", booktabs =T, 
+      row.names = F, longtable = F, col.names = c("Variable","Value"), caption = "Prehospital heathcare seeking and antimicrobial exposure" ) %>%
+  kable_styling("striped", full_width = F, latex_options = c("repeat_header")) %>%
+  group_rows(index = kstring2) %>%
+  footnote(general = "LA = Lumefantrine-artemether, SP = Sulfamethoxazole-pyrimethamine, MWK = Malawian Kwacha" ,threeparttable = T)
+
+```
 
 Table - health seeking behaviour
 
