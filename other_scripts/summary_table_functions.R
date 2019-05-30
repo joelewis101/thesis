@@ -4,11 +4,11 @@ median_iqr_str <- function(x, r= 0) {
   # r is digits to round to
   if (!is.numeric(x)) {stop("Nonnumeric value in median_iqr_str.")}
   out_str <- paste0(
-    round(median(x, na.rm =T), r), 
+    format(round(median(x, na.rm =T), r), nsmall = r),
     " (",
-    round(quantile(x, 0.25, na.rm = T)[[1]], r),
+    format(round(quantile(x, 0.25, na.rm = T)[[1]], r), nsmall = r),
     "-",
-    round(quantile(x, 0.75, na.rm = T)[[1]], r),
+    format(round(quantile(x, 0.75, na.rm = T)[[1]], r), nsmall = r),
     ")"
   )
   return(out_str)
@@ -31,7 +31,7 @@ prop_str <- function(x, r= 0) {
                          "/",
                          N,
                          " (",
-                         round((n*100/N), r), 
+                         format(round((n*100/N), r), nsmall = r),
                          "%)"
     )
       sortvar[[l]] <- n/N
