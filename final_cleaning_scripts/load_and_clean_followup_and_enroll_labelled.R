@@ -49,6 +49,38 @@ cat(paste0("Running cleaning script at ", wd.clean.script, "/correct_mislabelled
 
 source(paste0(wd.clean.script, "/correct_mislabelled_fu.R"))
 
+enroll$prehosrxname[enroll$prehosrxname == "Amoxyl" |
+                      enroll$prehosrxname == "Am oxyl"] <- "Amoxicillin"
+enroll$prehosrxname[enroll$prehosrxname == "Azythromicine" ] <- "Azithromycin"
+enroll$prehosrxname[grepl("Bactri", enroll$prehosrxname) |
+                      grepl("Cotrim", enroll$prehosrxname) ] <- "Co-trimoxazole"
+enroll$prehosrxname[enroll$prehosrxname == "Ceftriaxzone"] <- "Ceftriaxone"
+enroll$prehosrxname[grepl("Cipro", enroll$prehosrxname) |
+                      grepl("Ciplo", enroll$prehosrxname)] <- "Ciprofloxacin"
+enroll$prehosrxname[grepl("Erythro", enroll$prehosrxname) ] <- "Erythromycin"
+enroll$prehosrxname[grepl("Flagyl", enroll$prehosrxname) |
+                      grepl("Fragyl", enroll$prehosrxname)] <- "Metronidazole"
+enroll$prehosrxname[grepl("pen", enroll$prehosrxname) |
+                      grepl("pain", enroll$prehosrxname)] <- "Benzylpenicillin"
+
+
+
+enroll$prehosrxname[grepl("Gent", enroll$prehosrxname)] <- "Gentamicin"
+
+enroll$prehosrxname[grepl("Atemether", enroll$prehosrxname)] <- "LA"
+
+enroll$prehosrxname[enroll$prehosrxname == "Sp" |
+                      enroll$prehosrxname == "Nobody sp"] <- "SP"
+
+enroll$recieved_prehosp_ab <- enroll$prehosrxname %in% c("Amoxicillin", "Azithromycin","Co-trimoxazole",
+                                                         "Ceftriaxone", "Ciprofloxacin", "Erythromycin", 
+                                                         "Metronidazole", "Benzylpenicillin", "Gentamicin",
+                                                         "LA", "SP", "Fluconazole", "Flucloxacillin" )
+
+
+enroll$recieved_prehosp_ab[enroll$recieved_prehosp_ab == TRUE] <- "Yes"
+enroll$recieved_prehosp_ab[enroll$recieved_prehosp_ab == FALSE] <- "No"
+
 cat("Enrollment df now in enroll.  \n  ")
 cat("Followup df now in followup.  \n  ")
 cat("If you wanna merge in HIV tests for composite HIV variable  \n  ")
