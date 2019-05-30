@@ -1,7 +1,8 @@
 ![Alt text](misc/logo_bw.png)
 
-# thesis
-Joe's thesis. Yikes.
+# Thesis
+
+Joe's PhD thesis. Eeeeeesh.
 
 ## Plan
 
