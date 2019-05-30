@@ -1,3 +1,5 @@
+![Alt text](misc/logo_bw.png)
+
 # thesis
 Joe's thesis. Yikes.
 
