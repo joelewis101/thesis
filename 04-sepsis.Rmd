@@ -20,6 +20,10 @@ output = "latex"
 source("final_cleaning_scripts/load_and_clean_followup_and_enroll_labelled.R")
 source("other_scripts/summary_table_functions.R")
 source("final_cleaning_scripts/make_composite_hivstatus_variable.R")
+#source("final_cleaning_scripts/load_and_clean_hourly.R")
+source("final_cleaning_scripts/load_and_clean_bloods.R")
+
+h1.ustand <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/other_datasets/h1_ustand.csv")
 
 e1$datefirstunwell[e1$unwelfreq == "Weeks"] <- e1$datefirstunwell[e1$unwelfreq == "Weeks"] * 7
 e1$datefirstunwell[e1$unwelfreq == "Months"] <- e1$datefirstunwell[e1$unwelfreq == "Months"] * 30
@@ -41,7 +45,9 @@ blah blah
 
 Figure \@ref(fig:consort-diag) shows flow through the study. 225 patients were recruited in 20 months between 19th February 2017 and 2nd October 2018. In total, 4 patients (2%) were lost to follow up over the 180-day study period; 5 patients (2%) withdrew; and 7 patients (3%) transferred out of the study area before 180 days. Four of the five patients who withdrew gave a reason for their wish to withdraw, all that they no longer wished the inconvenience of being involved in the study. 15/225 (7%) patients had their final study visit before 180 days, and so were not included in the 180-day outcome analysis.
 
-Table \@ref(tab:sep-t1-demog) shows the baseline characteristics of the recruited participants. They were young (median [IQR] age 36 [28-44]) and predominantly HIV-infected. Of those who were HIV-infected, the majority (117/143 [82%]) were on ART, almost exclusively the Malawian first-line regimen of efavirenz, lamivudine and tenofovir. Figure \@ref(fig:sep-present) shows the presenting symptoms of the participants. Almost all (221/225 [98%] of participants) experienced subjective fever. Participants had been unwell for some time, a median (IQR) of `r median_iqr_str(e1$datefirstunwell)` days; 32/225 (14%) of participants had been unwell for more than 4 weeks.
+### Symptoms and health-seeking behaviour
+
+Table \@ref(tab:sep-t1-demog) shows the baseline characteristics of the recruited participants. They were young (median [IQR] age 36 [28-44]) and predominantly HIV-infected. Of those who were HIV-infected, the majority (117/143 [82%]) were on ART, almost exclusively the Malawian first-line regimen of efavirenz, lamivudine and tenofovir. Figure \@ref(fig:sep-present) shows the presenting symptoms of the participants. Almost all (221/225 [98%] of participants) experienced subjective fever. Participants had been unwell for some time, a median (IQR) of `r median_iqr_str(e1$datefirstunwell)` days; 32/225 (14%) of participants had been unwell for more than 4 weeks. 18/225 (8%) of participants had been admitted to hospital within the last 4 weeks. Over half (123/225 [55%]) of participants had sought care for their current ilness (Table \@ref(tab:sep-healthseek)), most commonly (101/123 [82%] of participants) at a government health centre, a median (IQR) or 2 (1-6) days previously. 60/225 (27%) of all participants had recieved an antimicrobial for their current illness: 7/60 (12%) of all prehospital antimicrobials were antimalarials, the remainder anitbacterial, most commonly co-trimoxazole or ciprofloxacin. Prehopsital intravenous or intramuscular antimirobials were administered in 16/60 (27%) participants recieving antimicrobials: ceftriaxone (n=6), benzylpenicillin (n=4), gentamicin (n=3) and artesunate (n=3).
 
 ```{r consort-diag, echo = F, fig.cap = "Study recruitment and follow up.",  out.height = '12cm', fig.align = 'center'}
 
@@ -77,12 +83,12 @@ e1.sum$variable[e1.sum$variable %in% c("calc_age", "ptsex")] <- "Demographics"
 e1.sum$levels[e1.sum$levels %in% c("Reactive", "Non reactive", "Unknown")] <- 
   paste0("HIV ", str_to_title(e1.sum$levels[e1.sum$levels %in% c("Reactive", "Non reactive", "Unknown")]))
 e1.sum$levels[e1.sum$variable == "hivonart"] <- "Current ART"
-e1.sum$levels[e1.sum$variable == "hivcpt"] <- "Current CPT*"
+e1.sum$levels[e1.sum$variable == "hivcpt"] <- "Current CPT\\textsuperscript{\\dag}"
 e1.sum$levels[e1.sum$levels == "5A"] <- "ART regimen: EFV/3TC/TDF"
 e1.sum$levels[e1.sum$variable == "art.time"] <- "Months on ART"
 e1.sum$variable[e1.sum$variable == "hivstatus"] <- "HIV/TB status"
-e1.sum$variable[grepl("art", e1.sum$variable)] <- "ART status"
-e1.sum$variable[grepl("cpt", e1.sum$variable)] <- "ART status"
+e1.sum$variable[grepl("art", e1.sum$variable)] <- "ART status*"
+e1.sum$variable[grepl("cpt", e1.sum$variable)] <- "ART status*"
 # tb variables
 e1.sum$levels[e1.sum$variable == "tbstatus"] <- "Ever treated for TB"
 e1.sum$levels[e1.sum$variable == "tbongoing"] <- "Of those, current TB treatment"
@@ -139,11 +145,13 @@ e1.sum$levels[e1.sum$levels== "Yes" | e1.sum$levels== "Median (IQR)" ] <-
 #rownames(e1.sum) <- e1.sum$`levels`
 #rownames(e1.sum)[!(rownames(e1.sum) %in% kstring)]
 
+sub("%", "\\\\%", e1.sum$value) -> e1.sum$value
+
 kable(select(e1.sum,`levels`,value), "latex", booktabs =T, 
-      row.names = F, longtable = T, col.names = c("Variable","Value"), caption = "Participant Characteristics" ) %>%
+      row.names = F, longtable = T, escape = F, col.names = c("Variable","Value"), caption = "Participant Characteristics" ) %>%
   kable_styling("striped", full_width = F,latex_options = c("repeat_header")) %>%
   group_rows(index = kstring) %>%
-  footnote(general = "ART = Antiretroviral therapy, CPT = Co-trimoxazole preventative therapy, EFV: Efavirenz, 3TC: Lamivudine, TDF: Tenofovir", symbol = "Missing CPT data for two participants. Numeric values are median (IQR) unless otherwise stated." ,threeparttable = T)
+  footnote(general = "ART = Antiretroviral therapy, CPT = Co-trimoxazole preventative therapy, EFV: Efavirenz, 3TC: Lamivudine, TDF: Tenofovir. Numeric values are median (IQR)) unless otherwise stated.", symbol = c("ART status includes HIV reactive only as denominator", "Missing CPT data for two participants. ") ,threeparttable = T)
 
 
 
@@ -171,7 +179,7 @@ as_ggplot(p2) ->p2
 ggarrange(p2,p1, labels = c("A", "B"), widths = c(1, 1)) 
 ```
 
-```{r sep-healthseek, echo = F, warning = F, message = F, fig.scap="Symptoms of recruited participants", out.extra='', fig.cap="Symptoms of recruited participants. A: Row and column clustered heatmap of participant symptoms. Each row represents a patient. Red = presence, blue = absence. B: Frequency of occurence of symptoms", fig.width = 8, fig.height = 5, out.height= '50%'}
+```{r sep-healthseek, echo = F, warning = F, message = F}
 
 e1$phxstartdate_n[grepl("Weeks", e1$prehfreq)] <- e1$phxstartdate_n[grepl("Weeks", e1$prehfreq)] * 7
 e1$phxstartdate_n[grepl("Months", e1$prehfreq)] <- e1$phxstartdate_n[grepl("Months", e1$prehfreq)] * 30
@@ -193,10 +201,10 @@ subset(e1.sum.2, levels != "No") -> e1.sum.2
 
 e1.sum.2$levels[e1.sum.2$variable == "prehospcareyn"] <- "Sought care prior to attendance at hospital"
 e1.sum.2$levels[e1.sum.2$variable == "prehospcaredur"] <- "Days prior to today that participant sought care"
-e1.sum.2$levels[e1.sum.2$variable == "soughtcare.other.hospital"] <- "Sought care at hospital"
-e1.sum.2$levels[e1.sum.2$variable == "soughtcare.other.clinic"] <- "Sought care at health centre"
-e1.sum.2$levels[e1.sum.2$variable == "soughtcare.private.doctor"] <- "Sought care at private doctor"
-e1.sum.2$levels[e1.sum.2$variable == "soughtcare.other"] <- "Sought care somewhere else "
+e1.sum.2$levels[e1.sum.2$variable == "soughtcare.other.hospital"] <- "At hospital"
+e1.sum.2$levels[e1.sum.2$variable == "soughtcare.other.clinic"] <- "At health centre"
+e1.sum.2$levels[e1.sum.2$variable == "soughtcare.private.doctor"] <- "At private doctor"
+e1.sum.2$levels[e1.sum.2$variable == "soughtcare.other"] <- "Somewhere else "
 
 e1.sum.2$variable[e1.sum.2$variable == "prehospcareyn" |
                     e1.sum.2$variable == "prehospcaredur" |
@@ -211,25 +219,105 @@ e1.sum.2$variable[ grepl("prehosp_ab" ,e1.sum.2$variable) | grepl("ab_startdays"
 e1.sum.2$levels[e1.sum.2$variable == "prehospcaretranspcost"] <- "Cost (MWK) of transport to hospital"
 e1.sum.2$variable[ grepl("prehospcaretransp" ,e1.sum.2$variable) ] <- "Method of transport to hospital"
 
+e1.sum.2 <- e1.sum.2[c(1,3,2,4:nrow(e1.sum.2)),]
 
 kstring2 <- make_kable_rowgroup_string(e1.sum.2)
 
+e1.sum.2$value[c(2,3,4,5,6, 8:21)] <- paste0("\\hspace{1em}", e1.sum.2$value[c(2,3,4,5,6, 8:21)] )
+
+sub("%", "\\\\%", e1.sum.2$value) -> e1.sum.2$value
 
 kable(select(e1.sum.2,`levels`,value), "latex", booktabs =T, 
-      row.names = F, longtable = F, col.names = c("Variable","Value"), caption = "Prehospital heathcare seeking and antimicrobial exposure" ) %>%
+      row.names = F, longtable = F, escape = F, col.names = c("Variable","Value"), caption = "Prehospital heathcare seeking and antimicrobial exposure" ) %>%
   kable_styling("striped", full_width = F, latex_options = c("repeat_header")) %>%
   group_rows(index = kstring2) %>%
-  footnote(general = "LA = Lumefantrine-artemether, SP = Sulfamethoxazole-pyrimethamine, MWK = Malawian Kwacha" ,threeparttable = T)
+  add_indent(c(2,3,4,5,6, 8:21)) %>%
+  footnote(general = "LA = Lumefantrine-artemether, SP = Sulfamethoxazole-pyrimethamine, MWK = Malawian Kwacha. Numeric values are median (IQR)) unless otherwise stated." ,threeparttable = T)
 
 ```
 
-Table - health seeking behaviour
 
-### Aetiology
+### Admission physiology and laboratory investigations
 
-Table
+```{r sep-physiol, echo = F, warning = F, message = F}
+
+# merge in bloods
+e1[e1 == 999] <- NA
+e1 <- merge(e1,bloods)
+e1 <- merge(e1, h1.ustand)
+e1$gcs <- e1$t0gcse + e1$t0gcsv + e1$t0gcsm
+e1$gcs.cat <- NA
+e1$gcs.cat[e1$gcs == 15] <- "15"
+e1$gcs.cat[e1$gcs > 10 & e1$gcs < 15] <- "11-14"
+e1$gcs.cat[e1$gcs < 11] <- "10 or below"
+
+
+
+e1$CD4_hiv_pos <- NA
+e1$CD4_hiv_pos[e1$hivstatus == "Reactive"] <- e1$CD4_Absolute[e1$hivstatus == "Reactive"] 
+e1$Neutrophils_count <- as.numeric(e1$Neutrophils_count )
+
+rbind(
+  pretty_tbl_df(
+    select(e1, t0hr, t0sbp, t0dbp, t0rr, t0spo2, gcs.cat, CD4_hiv_pos)
+    ),
+  
+  pretty_tbl_df(
+    select(e1, screentemp, Haemoglobin, WCC, Neutrophils_count,  Potassium, Urea)
+    ,r = 1),
+  pretty_tbl_df( 
+    select(e1, Platelets, Chloride, CO2, Creatinine )
+    )
+  ) -> e1.sum.3
+
+e1.sum.3$levels[e1.sum.3$variable == "screentemp"] <- "Temperature (\\textdegree C)"
+e1.sum.3$levels[e1.sum.3$variable == "t0hr"] <- "Heart rate (min\\textsuperscript{-1}))"
+e1.sum.3$levels[e1.sum.3$variable == "t0sbp"] <- "Systolic blood pressure (mmHg)"
+e1.sum.3$levels[e1.sum.3$variable == "t0dbp"] <- "Diatsolic blood pressure (mmHg)"
+e1.sum.3$levels[e1.sum.3$variable == "t0rr"] <- "Respiratory rate (min\\textsuperscript{-1})"
+e1.sum.3$levels[e1.sum.3$variable == "t0spo2"] <- "Oxygen saturation (%)"
+e1.sum.3$levels[e1.sum.3$levels == "15"] <- "15"
+e1.sum.3$levels[e1.sum.3$levels == "11-14"] <- "11-14"
+e1.sum.3$levels[e1.sum.3$levels == "10 or below"] <- "< 11"
+e1.sum.3$levels[e1.sum.3$variable == "CD4_hiv_pos"] <- "CD4 count* ($\\mu$L\\textsuperscript{-1})"
+
+e1.sum.3$levels[e1.sum.3$variable == "Haemoglobin"] <- "Haemoglobin (x10\\textsuperscript{9} g dL\\textsuperscript{-1})"
+e1.sum.3$levels[e1.sum.3$variable == "WCC"] <- "White cell count (x10\\textsuperscript{9} L\\textsuperscript{-1})"
+e1.sum.3$levels[e1.sum.3$variable == "Neutrophils_count"] <- "Neutrophil count (x10\\textsuperscript{9} L\\textsuperscript{-1})"
+e1.sum.3$levels[e1.sum.3$variable == "Platelets"] <- "Platelet count count (x10\\textsuperscript{9} L\\textsuperscript{-1})"
+
+e1.sum.3$levels[e1.sum.3$variable == "Potassium"] <- "Potassium (mmol L\\textsuperscript{-1})"
+e1.sum.3$levels[e1.sum.3$variable == "Urea"] <- "Urea (mmol L\\textsuperscript{-1})"
+e1.sum.3$levels[e1.sum.3$variable == "Chloride"] <- "Chloride (mmol L\\textsuperscript{-1})"
+e1.sum.3$levels[e1.sum.3$variable == "Chloride"] <- "Chloride (mmol L\\textsuperscript{-1})"
+e1.sum.3$levels[e1.sum.3$variable == "CO2"] <- "Bicarbonate (mmol L\\textsuperscript{-1})"
+e1.sum.3$levels[e1.sum.3$variable == "Creatinine"] <- "Creatinine (mmol L\\textsuperscript{-1})"
+
+
+sub("%", "\\\\%", e1.sum.3$value) -> e1.sum.3$value
+sub("%", "\\\\%", e1.sum.3$levels) -> e1.sum.3$levels
+rbind(e1.sum.3, data.frame(variable = "Admission physiology", `levels` = "GCS", value = " ")) -> e1.sum.3
+
+e1.sum.3 <- e1.sum.3[c(10,1:5,20,6:8, 9,11,12,13,16,14,18,17,15,19),]
+e1.sum.3$variable[1:10] <- "Admission physiology"
+e1.sum.3$variable[11] <- "Admission CD4 count"
+e1.sum.3$variable[12:15] <- "Admission haematology"
+e1.sum.3$variable[16:nrow(e1.sum.3)] <- "Admission biochemistry"
+kstring3 <- make_kable_rowgroup_string(e1.sum.3)
+
+kable(select(e1.sum.3,`levels`,value), "latex", booktabs =T, 
+      row.names = F, longtable = F, col.names = c("Variable","Value") ,escape = F,caption = "Admission physiology, haematology and biochemistry" ) %>%
+  kable_styling("striped", full_width = F, latex_options = c("repeat_header")) %>%
+  group_rows(index = kstring3) %>%
+  add_indent(c(8:10)) %>%
+  footnote(general = "GCS = Glasgow coma scale. Numeric values are median (IQR)) unless otherwise stated." , symbol = "CD4 count includes only HIV-infected participants.", threeparttable = T)
+
+```
+
 
 Figure to show crossover
+
+### Aetiology
 
 ### Treatment
 
