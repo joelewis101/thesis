@@ -44,7 +44,7 @@ prop_str <- function(x, r= 0) {
 }
 
 prop_str_df <- function(x, r = 0, varname = "Var") {
-  out <- as.data.frame(do.call(rbind, prop_str(x)), stringsAsFactors = F)
+  out <- as.data.frame(do.call(rbind, prop_str(x, r=r)), stringsAsFactors = F)
   out$V2 <- rownames(out)
   out$V3 <- varname
   out <- out[,c(3,2,1)]
@@ -54,7 +54,7 @@ prop_str_df <- function(x, r = 0, varname = "Var") {
 }
 
 median_iqr_str_df <- function(x, r = 0, varname = "Var") {
-  out <- data.frame(variable = varname, levels = "Median (IQR)", value = median_iqr_str(x), stringsAsFactors = F)
+  out <- data.frame(variable = varname, levels = "Median (IQR)", value = median_iqr_str(x, r=r), stringsAsFactors = F)
   rownames(out) <- NULL
   return(out)
 }
