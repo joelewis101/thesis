@@ -29,7 +29,7 @@ orgsbc$contam_only <- 0
 orgsbc$contam_only[(orgsbc$n_contam == orgsbc$n_orgs) & orgsbc$n_contam > 0] <- 1
 orgsbc$pathogen <- orgsbc$bcult
 orgsbc$pathogen[orgsbc$contam_only == 1] <- FALSE
-orgsbc %>% group_by(pid) %>% summarise(pathogen = sum(pathogen), type = "bc") -> bc
+orgsbc %>% dplyr::group_by(pid) %>% dplyr::summarise(pathogen = sum(pathogen), type = "bc") -> bc
 bc$pathogen[bc$pathogen > 1] <- 1
 bc.full <- orgsbc
 rm(orgs)
@@ -46,7 +46,7 @@ csf$contam_only[(csf$n_contam == csf$n_orgs) & csf$n_contam > 0] <- 1
 csf$pathogen <- csf$csf
 csf$pathogen[csf$contam_only == 1 & csf$CrAg_LFA != "POSITIVE"] <- FALSE
 csf.full <- csf
-csf  %>% group_by(pid) %>% summarise(pathogen = sum(pathogen), type = "csf") -> csf
+csf  %>% group_by(pid) %>% dplyr::summarise(pathogen = sum(pathogen), type = "csf") -> csf
 csf$pathogen[csf$pathogen > 1] <- 1
 
 
@@ -58,7 +58,7 @@ malaria$any_malaria[malaria$mal_micr >0 & !is.na(malaria$mal_micr)] <- 1
 malaria$any_malaria[malaria$mal_micr ==0 & !is.na(malaria$mal_micr)] <- 0
 malaria <- subset(malaria, pid %in% subset(enroll, arm == 1)$pid)
 malaria.full <- malaria
-malaria %>% group_by(pid) %>% summarise(pathogen = sum(any_malaria), type = "malaria") -> malaria
+malaria %>% group_by(pid) %>% dplyr::summarise(pathogen = sum(any_malaria), type = "malaria") -> malaria
 malaria$pathogen[malaria$pathogen > 1] <- 1
 
 # mtb  bsi
@@ -101,7 +101,7 @@ tbbsi.full <- tbbsi
 tbbsi <- subset(tbbsi, Result != "Contam")
 tbbsi$Result[tbbsi$Result == "MTB"] <- 1
 tbbsi$Result[tbbsi$Result == "Negative"] <- 0
-tbbsi %>% group_by(pid) %>% summarise(pathogen = sum(as.numeric(Result)), type = "mtb bsi") -> tbbsi
+tbbsi %>% group_by(pid) %>% dplyr::summarise(pathogen = sum(as.numeric(Result)), type = "mtb bsi") -> tbbsi
 
 # sputum
 
@@ -112,7 +112,7 @@ xpert$sputx_result[is.na(xpert$sputx_result)] <- 1
 xpert$sputx_result[xpert$sputx_result == 1] <- 0
 xpert$sputx_result[xpert$sputx_result > 0] <- 1
 xpert.full <- xpert
-xpert %>% group_by(pid) %>% summarise(pathogen = sum(as.numeric(sputx_result)), type = "Xpert") -> xpert
+xpert %>% group_by(pid) %>% dplyr::summarise(pathogen = sum(as.numeric(sputx_result)), type = "Xpert") -> xpert
 xpert$pathogen[xpert$pathogen > 0] <- 1
 
 
@@ -125,7 +125,7 @@ ulam$RESULT[ulam$RESULT != 0] <- 1
 ulam$result2 <- !(grepl("NEG", ulam$JOE) | grepl("NEG", ulam$MADA) | grepl("NEG", ulam$CHRIS) | grepl("NEG", ulam$AJISA))
 ulam <- subset(ulam, pid %in% subset(enroll, hivstatus != "Non reactive")$pid)
 ulam.full <- ulam
-ulam %>% group_by(pid) %>% summarise(pathogen = sum(as.numeric(result2)), type = "uLAM") -> ulam
+ulam %>% group_by(pid) %>% dplyr::summarise(pathogen = sum(as.numeric(result2)), type = "uLAM") -> ulam
 
 aetiol <- rbind(bc,
                 csf,

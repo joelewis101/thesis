@@ -19,7 +19,7 @@ hiv$hiv_result[hiv$hiv_result == 1] <- 0
 hiv$hiv_result[hiv$hiv_result == 3] <- 1
 hiv$hiv_date <- as.Date(hiv$hiv_date, "%d%b%Y")
 
-hiv %>% group_by(pid) %>% summarise(hiv_r = sum(hiv_result),
+hiv %>% group_by(pid) %>% dplyr::summarise(hiv_r = sum(hiv_result),
                                     hiv_r_date = max(hiv_date)) -> hiv
 hiv <- dplyr::ungroup(hiv)
 hiv <- dplyr::ungroup(hiv)
@@ -56,5 +56,6 @@ enroll$hivartstart[!is.na(enroll$art_start)] <- enroll$art_start[!is.na(enroll$a
 
 enroll <- dplyr::select(enroll, -hiv_r, -hiv_r_date,-hiv_status,
                         -hiv_status_date, -on_art, -art_regimen, -art_start  )
+
 
 

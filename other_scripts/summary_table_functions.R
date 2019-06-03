@@ -85,7 +85,7 @@ pretty_tbl_df <- function(df, vars_to_char = NULL, r = 0) {
 
 make_kable_rowgroup_string <- function(df) {
   require(dplyr)
-  df %>% dplyr::group_by(variable) %>% dplyr::mutate(n_var = dplyr::n()) -> df
+  df %>% dplyr::group_by(variable, .drop = TRUE) %>% dplyr::mutate(n_var = dplyr::n()) -> df
   df <- unique(dplyr::select(df, variable, n_var))
  # df$row_end <- cumsum(df$n_var)
 #  df$row_start <- NA
