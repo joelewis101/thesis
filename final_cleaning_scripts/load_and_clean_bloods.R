@@ -120,6 +120,10 @@ art <-
 
 cat("Bloods df now in bloods.  \n  ")
 
+
+extras <- subset(bloods, lab_id == "CAB13D")[c("pid","Calcium","Potassium","NA.", "Chloride", "CO2", "Creatinine","Urea")]
+bloods <- subset(bloods, lab_id != "CAB13D")
+bloods[bloods$pid %in% extras$pid,][c("pid","Calcium","Potassium","NA.", "Chloride", "CO2", "Creatinine","Urea")] <- extras
 cat(art, sep = "\n")
 
 
