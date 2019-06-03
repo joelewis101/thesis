@@ -5,12 +5,14 @@
 library(plyr)
 library(reshape2)
 library(tidyverse)
-
 library(knitr)
 library(kableExtra)
 library(grid)
 library(ggpubr)
 library(pheatmap)
+library(UpSetR)
+library(eulerr)
+library(RColorBrewer)
 
 wd <- "chapter_4/"
 output = "latex"
@@ -22,6 +24,7 @@ source("other_scripts/summary_table_functions.R")
 source("final_cleaning_scripts/make_composite_hivstatus_variable.R")
 #source("final_cleaning_scripts/load_and_clean_hourly.R")
 source("final_cleaning_scripts/load_and_clean_bloods.R")
+source("final_cleaning_scripts/load_and_clean_aetiol.R")
 
 h1.ustand <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/other_datasets/h1_ustand.csv")
 
@@ -47,7 +50,7 @@ Figure \@ref(fig:consort-diag) shows flow through the study. 225 patients were r
 
 ### Symptoms and health-seeking behaviour
 
-Table \@ref(tab:sep-t1-demog) shows the baseline characteristics of the recruited participants. They were young (median [IQR] age 36 [28-44]) and predominantly HIV-infected. Of those who were HIV-infected, the majority (117/143 [82%]) were on ART, almost exclusively the Malawian first-line regimen of efavirenz, lamivudine and tenofovir. Figure \@ref(fig:sep-present) shows the presenting symptoms of the participants. Almost all (221/225 [98%] of participants) experienced subjective fever. Participants had been unwell for some time, a median (IQR) of `r median_iqr_str(e1$datefirstunwell)` days; 32/225 (14%) of participants had been unwell for more than 4 weeks. 18/225 (8%) of participants had been admitted to hospital within the last 4 weeks. Over half (123/225 [55%]) of participants had sought care for their current ilness (Table \@ref(tab:sep-healthseek)), most commonly (101/123 [82%] of participants) at a government health centre, a median (IQR) or 2 (1-6) days previously. 60/225 (27%) of all participants had recieved an antimicrobial for their current illness: 7/60 (12%) of all prehospital antimicrobials were antimalarials, the remainder anitbacterial, most commonly co-trimoxazole or ciprofloxacin. Prehopsital intravenous or intramuscular antimirobials were administered in 16/60 (27%) participants recieving antimicrobials: ceftriaxone (n=6), benzylpenicillin (n=4), gentamicin (n=3) and artesunate (n=3).
+Table \@ref(tab:sep-t1-demog) shows the baseline characteristics of the recruited participants. They were young (median [IQR] age 36 [28-44]) and predominantly HIV-infected. Of those who were HIV-infected, the majority (117/143 [82%]) were on ART, almost exclusively the Malawian first-line regimen of efavirenz, lamivudine and tenofovir, and 88/117 (75%) had been taking ART for more than three months. Figure \@ref(fig:sep-present) shows the presenting symptoms of the participants. Almost all (221/225 [98%] of participants) experienced subjective fever. Participants had been unwell for some time, a median (IQR) of `r median_iqr_str(e1$datefirstunwell)` days; 32/225 (14%) of participants had been unwell for more than 4 weeks. 18/225 (8%) of participants had been admitted to hospital within the last 4 weeks. Over half (123/225 [55%]) of participants had sought care for their current ilness (Table \@ref(tab:sep-healthseek)), most commonly (101/123 [82%] of participants) at a government health centre, a median (IQR) or 2 (1-6) days previously. 60/225 (27%) of all participants had recieved an antimicrobial for their current illness: 7/60 (12%) of all prehospital antimicrobials were antimalarials, the remainder anitbacterial, most commonly co-trimoxazole or ciprofloxacin. Prehopsital intravenous or intramuscular antimirobials were administered in 16/60 (27%) participants recieving antimicrobials: ceftriaxone (n=6), benzylpenicillin (n=4), gentamicin (n=3) and artesunate (n=3).
 
 ```{r consort-diag, echo = F, fig.cap = "Study recruitment and follow up.",  out.height = '12cm', fig.align = 'center'}
 
@@ -137,7 +140,7 @@ e1.sum$levels[e1.sum$levels == "Nim"] <- "Any animal"
 
 e1.sum$variable[grepl("keep", e1.sum$variable)] <- "Animals at home?"
 
-e1.sum <- e1.sum[c(1:45, 47,46,48:nrow(e1.sum)),]
+e1.sum <- e1.sum[c(1:45, 47,46,47:nrow(e1.sum)),]
 
 kstring <- make_kable_rowgroup_string(e1.sum)
 e1.sum$levels[e1.sum$levels== "Yes" | e1.sum$levels== "Median (IQR)" ] <- 
@@ -236,15 +239,16 @@ kable(select(e1.sum.2,`levels`,value), "latex", booktabs =T,
 
 ```
 
-
 ### Admission physiology and laboratory investigations
+
+Admission vital signs and laboratory investigations are shown in \@ref(tab:sep-physiol). Despite high ART coverage (117/143 [82%]) amongst HIV-infected participantsfor a median of 29 months, the median (IQR) CD4 count was low at 98 (31-236) cells $\mu$L\textsuperscript{-1}. 108/141 (70%) of participants had a CD4 count below 200 cells $\mu$L\textsuperscript{-1}. CD4 count was similar in participants who had started ART more than 6 months ago as compared to less than three months ago (median [IQR] 99 [27-260] vs 93 [39-137] cells $\mu$L\textsuperscript{-1} respectively) and 42/83 (51%) of participants who had been taking ART for more than 6 months had a CD4 count of less than 100 cells $\mu$L\textsuperscript{-1}, and would fulfil a WHO definition of immunological failure.
 
 ```{r sep-physiol, echo = F, warning = F, message = F}
 
 # merge in bloods
 e1[e1 == 999] <- NA
-e1 <- merge(e1,bloods)
-e1 <- merge(e1, h1.ustand)
+e1 <- merge(e1,bloods, all.x = T)
+e1 <- merge(e1, h1.ustand, all.x= T)
 e1$gcs <- e1$t0gcse + e1$t0gcsv + e1$t0gcsm
 e1$gcs.cat <- NA
 e1$gcs.cat[e1$gcs == 15] <- "15"
@@ -263,10 +267,10 @@ rbind(
     ),
   
   pretty_tbl_df(
-    select(e1, screentemp, Haemoglobin, WCC, Neutrophils_count,  Potassium, Urea)
+    select(e1, screentemp, Haemoglobin, WCC, Neutrophils_count,  Potassium, Urea, lactate_value)
     ,r = 1),
   pretty_tbl_df( 
-    select(e1, Platelets, Chloride, CO2, Creatinine )
+    select(e1, Platelets, Chloride, CO2, Creatinine, NA. )
     )
   ) -> e1.sum.3
 
@@ -286,19 +290,20 @@ e1.sum.3$levels[e1.sum.3$variable == "WCC"] <- "White cell count (x10\\textsuper
 e1.sum.3$levels[e1.sum.3$variable == "Neutrophils_count"] <- "Neutrophil count (x10\\textsuperscript{9} L\\textsuperscript{-1})"
 e1.sum.3$levels[e1.sum.3$variable == "Platelets"] <- "Platelet count count (x10\\textsuperscript{9} L\\textsuperscript{-1})"
 
+e1.sum.3$levels[e1.sum.3$variable == "NA."] <- "Sodium (mmol L\\textsuperscript{-1})"
 e1.sum.3$levels[e1.sum.3$variable == "Potassium"] <- "Potassium (mmol L\\textsuperscript{-1})"
 e1.sum.3$levels[e1.sum.3$variable == "Urea"] <- "Urea (mmol L\\textsuperscript{-1})"
 e1.sum.3$levels[e1.sum.3$variable == "Chloride"] <- "Chloride (mmol L\\textsuperscript{-1})"
 e1.sum.3$levels[e1.sum.3$variable == "Chloride"] <- "Chloride (mmol L\\textsuperscript{-1})"
 e1.sum.3$levels[e1.sum.3$variable == "CO2"] <- "Bicarbonate (mmol L\\textsuperscript{-1})"
 e1.sum.3$levels[e1.sum.3$variable == "Creatinine"] <- "Creatinine (mmol L\\textsuperscript{-1})"
-
+e1.sum.3$levels[e1.sum.3$variable == "lactate_value"] <- "Lactate (mmol L\\textsuperscript{-1})"
 
 sub("%", "\\\\%", e1.sum.3$value) -> e1.sum.3$value
 sub("%", "\\\\%", e1.sum.3$levels) -> e1.sum.3$levels
 rbind(e1.sum.3, data.frame(variable = "Admission physiology", `levels` = "GCS", value = " ")) -> e1.sum.3
 
-e1.sum.3 <- e1.sum.3[c(10,1:5,20,6:8, 9,11,12,13,16,14,18,17,15,19),]
+e1.sum.3 <- e1.sum.3[c(10,1:5,22,6:8, 9,11,12,13,17,21,14,19,18,15,20,16),]
 e1.sum.3$variable[1:10] <- "Admission physiology"
 e1.sum.3$variable[11] <- "Admission CD4 count"
 e1.sum.3$variable[12:15] <- "Admission haematology"
@@ -310,15 +315,122 @@ kable(select(e1.sum.3,`levels`,value), "latex", booktabs =T,
   kable_styling("striped", full_width = F, latex_options = c("repeat_header")) %>%
   group_rows(index = kstring3) %>%
   add_indent(c(8:10)) %>%
-  footnote(general = "GCS = Glasgow coma scale. Numeric values are median (IQR)) unless otherwise stated." , symbol = "CD4 count includes only HIV-infected participants.", threeparttable = T)
+  footnote(general = "GCS = Glasgow coma scale. Numeric values are median (IQR)) unless otherwise stated." , symbol = "CD4 count includes only HIV-infected participants; 2 values were missing.", threeparttable = T)
 
 ```
 
-
-Figure to show crossover
-
 ### Aetiology
 
+```{r sep-diag, echo = F, warning = F, message = F}
+
+aetiol.m <- dcast(aetiol, pid + hivstatus ~ type, value.var = "pathogen")
+aetiol.m$tb <- aetiol.m$`mtb bsi`== 1 | aetiol.m$uLAM == 1 | aetiol.m$Xpert == 1
+aetiol.m -> a
+a[is.na(a)] <- 0
+a$no_diagnosis <- as.numeric(apply(a[3:8], 1,sum) == 0)
+
+melt(select(a, pid, hivstatus, tb, bc, malaria, csf, no_diagnosis), id.vars = c("pid", "hivstatus")) %>% dplyr::group_by(variable) %>% dplyr::summarise(n = dplyr::n(), positive = sum(value == 1)) -> t
+
+t$prop <-  paste0(t$positive, "/",  t$n, " (",
+                         format(round((t$positive*100/t$n), 0), nsmall = 0),
+                         "%)"
+)
+
+t$variable <- c("Tuberculosis", "Bloodstream infection", "Malaria", "Meningitis", "No diagnosis")
+
+kable(select(t, variable, prop), "latex", booktabs =T, 
+      row.names = F, longtable = F, col.names = c("Diagnosis","Proportion of participants") ,escape = T,caption = "Final diagnosis of all participants" ) %>%
+  kable_styling("striped", full_width = F) %>%
+  footnote(general = "Tuberculsosis includes and positive tuberculosis diagnostic test; bloodstream infection includes any patient with at least one positive blood culture, excluding contaminants; meningitis includes any positive CSF culture, excluding contaminents, or positive cryptococcal antigen test in CSF ", threeparttable = T)
+
+
+
+```
+
+```{r sep-tests, echo = F, warning = F, message = F}
+
+
+aetiol$type <- as.factor(aetiol$type)
+
+aetiol %>% dplyr::group_by(hivstatus, type, .drop = FALSE) %>% dplyr::summarise(positive = sum(pathogen == 1), n = dplyr::n()) -> t2
+
+t2$prop <-  paste0(t2$positive, "/",  t2$n, " (",
+                         format(round((t2$positive*100/t2$n), 0), nsmall = 0),
+                         "%)"
+)
+
+bind_cols(subset(t2, hivstatus == "Reactive"), 
+          subset(t2, hivstatus == "Non reactive"),
+          subset(t2, hivstatus == "Unknown")) -> t2
+
+round(apply(t2[c(3,8,13,4,9,14)], 1, function(x) chisq.test( matrix(x, ncol = 2))$p.value),3) -> t2$p
+
+t2$prop1[grepl("NaN", t2$prop1)] <- "-"
+t2$p[grepl("NaN", t2$p)] <- "-"
+
+t2$type <- as.character(t2$type)
+
+t2 <- t2[c(5,6,4,1,2,3),]
+t2$type <- c("Urinary LAM", "Sputum Xpert", "TB blood culture", "Aerobic blood culture", "CSF culture or CRAG", "Malaria RDT")
+
+t2[c(2,5,10,15,16)] -> t2
+names(t2) <- c("Test", "HIV Positive", "HIV Negative", "HIV Unknown", "p")
+
+kable(t2, "latex", booktabs =T, 
+      row.names = F, longtable = F,escape = T,caption = "Positive diagnostic tests for all participants, stratified by HIV status."  ) %>%
+  kable_styling("striped", full_width = F) %>%
+group_rows(index=c( "TB diagnostics" = 3, "Other diagnostics" = 3)) %>%
+  footnote(general = "LAM = Lipoarabinomannan, CSF = Cerebrospinal fluid, CRAG = Cryptococcal antigen, RDT = Rapid diagnostic test. P-values are chi-squared test across three HIV status strata. Urinary LAM and TB blood culture were not carried out in HIV negative participants.", threeparttable = T)
+
+
+
+
+
+```
+
+```{r sep-upset-plot, echo = F, warning = F, message = F, fig.scap="Symptoms of recruited participants", out.extra='', fig.cap="Symptoms of recruited participants. A: Row and column clustered heatmap of participant symptoms. Each row represents a patient. Red = presence, blue = absence. B: Frequency of occurence of symptoms", fig.width = 6, fig.height = 5}
+
+ set.seed (99)
+euler(as.data.frame(sapply(a[c(3:8, 10)], as.logical)), shape = "circle") -> eul
+
+
+names(a) <- c("pid", "hivstatus", "BSI", "CSF culture/CRAG +", "mRDT", "MTB BSI", "uLAM+", "Sputum Xpert+",
+              "tb", "No Diagnosis")
+
+upset(a[-9], nsets = 6,order = "freq", queries = list(list(query = elements, params = list("hivstatus", "Reactive") , active = T))) 
+
+
+```
+
+```{r sep-euler-bc-plot, echo = F, warning = F, message = F, fig.scap="Symptoms of recruited participants", out.extra='', fig.cap="Symptoms of recruited participants. A: Row and column clustered heatmap of participant symptoms. Each row represents a patient. Red = presence, blue = absence. B: Frequency of occurence of symptoms", fig.width = 5, fig.height = 6}
+
+
+#plot(eul, edges = list(col = "grey80"), labels = list(labels = c("BSI","CSF","Malaria","MTB BSI","uLAM","Xpert","No diagnosis"), fontsize = 12), fills = list(fill = c(pal_lancet()(1),  "lightblue1", pal_lancet()(2)[2], "palegreen1", pal_lancet()(3)[3], "palegreen1", pal_lancet()(9)[8]), alpha =0.5)) -> p1
+
+plot(eul, edges = NA, labels = list(labels = c("BSI","CSF","Malaria","MTB BSI","uLAM","Xpert","No diagnosis"), fontsize = 12), fills = list(fill =brewer.pal(7, name = "Set3"), alpha = 0.9)) -> p1
+
+
+apply(bc.full[4:(ncol(bc.full)-5)],2, sum) -> bctots
+data.frame(organism = rownames(data.frame(bctots)), n=bctots) -> bctots
+bctots$organism <- factor(bctots$organism, levels = bctots$organism[order(bctots$n)])
+
+ggplot(bctots, aes(organism,n)) + geom_col() + coord_flip() + ylim(0,10) + theme_bw() -> p2
+
+csf.full$CrAg_LFA[csf.full$CrAg_LFA == "POSITIVE"] <- 1
+csf.full$CrAg_LFA[csf.full$CrAg_LFA != 1] <- 0
+csf.full$CrAg_LFA <- as.numeric(csf.full$CrAg_LFA)
+
+apply(csf.full[4:(ncol(csf.full)-4)],2, sum, na.rm = T) -> csftots
+
+data.frame(organism = rownames(data.frame(csftots)), n=csftots) -> csftots
+csftots$organism <- factor(csftots$organism, levels = csftots$organism[order(csftots$n)])
+
+ggplot(csftots, aes(organism,n)) + geom_col() + coord_flip() + ylim(0,10) + theme_bw() -> p3
+
+ggarrange(p1, NULL, ggarrange(NULL,p2,NULL, ncol = 3, nrow = 1, widths = c(0.1,1,0.1)), nrow = 3, ncol = 1, heights = c(1,0.2, 0.8), labels = c("A", NA, "B"))
+
+
+```
 ### Treatment
 
 Table:
