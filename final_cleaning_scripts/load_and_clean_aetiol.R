@@ -4,6 +4,7 @@ require(tidyverse)
 wd.data <- "/Users/joelewis/Documents/PhD/Data/Current/portal_downloads" 
 orgs <- read.csv(paste0(wd.data,"/other_datasets/lims_scrape.csv"), stringsAsFactors = F)
 csf_biochem<- read.csv(paste0(wd.data,"/other_datasets/csf_micro_biochem.csv"), stringsAsFactors = F)
+orgs$acba[orgs$lims_fe =="BHAQNZ"] <- TRUE # correct an error
 sens <- orgs[c(7,9, 34:43)]
 csf <- orgs[,c(7,9,14,15:32)]
 orgs <- orgs[,c(7,9,13,15:32)]
@@ -26,7 +27,7 @@ orgsbc <- subset(orgs, !is.na(bcult))
 orgsbc[is.na(orgsbc)] <- 0
 orgsbc$anycontam <- 0
 orgsbc$n_contam <- orgsbc$dip + orgsbc$ahaemstrep + orgsbc$bacillus +orgsbc$micr + orgsbc$cons 
-orgsbc$n_orgs <- apply(orgsbc[4:20], 1, sum)
+orgsbc$n_orgs <- apply(orgsbc[4:21], 1, sum)
 orgsbc$contam_only <- 0
 orgsbc$contam_only[(orgsbc$n_contam == orgsbc$n_orgs) & orgsbc$n_contam > 0] <- 1
 orgsbc$pathogen <- orgsbc$bcult
