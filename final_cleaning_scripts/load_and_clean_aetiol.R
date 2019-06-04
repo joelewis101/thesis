@@ -4,9 +4,11 @@ require(tidyverse)
 wd.data <- "/Users/joelewis/Documents/PhD/Data/Current/portal_downloads" 
 orgs <- read.csv(paste0(wd.data,"/other_datasets/lims_scrape.csv"), stringsAsFactors = F)
 csf_biochem<- read.csv(paste0(wd.data,"/other_datasets/csf_micro_biochem.csv"), stringsAsFactors = F)
-
+sens <- orgs[c(7,9, 34:43)]
 csf <- orgs[,c(7,9,14,15:32)]
 orgs <- orgs[,c(7,9,13,15:32)]
+
+
 
 orgs <- subset(orgs, pid %in% subset(enroll, arm == 1)$pid)
 csf <- subset(csf, pid %in% subset(enroll, arm == 1)$pid)
@@ -29,11 +31,14 @@ orgsbc$contam_only <- 0
 orgsbc$contam_only[(orgsbc$n_contam == orgsbc$n_orgs) & orgsbc$n_contam > 0] <- 1
 orgsbc$pathogen <- orgsbc$bcult
 orgsbc$pathogen[orgsbc$contam_only == 1] <- FALSE
+orgsbc$pathogen[orgsbc$n_orgs == 0] <- FALSE
 orgsbc %>% dplyr::group_by(pid) %>% dplyr::summarise(pathogen = sum(pathogen), type = "bc") -> bc
 bc$pathogen[bc$pathogen > 1] <- 1
 bc.full <- orgsbc
 rm(orgs)
 rm(orgsbc)
+
+sens <- subset(sens, lims_fe %in% subset(bc.full, pathogen == TRUE)$lims_fe)
 
 ### csf
 
