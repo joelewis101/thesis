@@ -968,6 +968,8 @@ hourly$hrh[hourly$hr_pslr == 999] <- NA
 hourly[hourly == ":    "] <- NA
 hourly[hourly == ":1   "] <- NA
 
+hourly$assess_date[hourly$pid == "DAS1246Y" & hourly$assess_type == 6] <- "26-JAN-2018"
+
 write.csv(hourly, "/Users/joelewis/Documents/PhD/datasets/6hr/hourly_clean.csv")
 
 
