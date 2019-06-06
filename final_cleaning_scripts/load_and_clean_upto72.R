@@ -58,7 +58,7 @@ upto72$assess_type[upto72$row_id == 358] <- 3
 # DAS1462I has two assess_type 1 - the initials MA are for DA14598 - so change
 
 upto72$pid[upto72$pid == "DAS1462I" & upto72$pid_ini == "MA "] <- "DAS14598"
-
+upto72$assess_date[upto72$pid == "DAS1336U" & upto72$assess_type == 2] <- "02-NOV-2017"
 
 
 two_assess_type <- dcast(upto72, pid ~ assess_type, fun.aggregate = base::length)
@@ -139,7 +139,11 @@ upto72$amicro3[upto72$row_id %in% c("318", "385", "402", "262", "85")] <- NA
 upto72$amicro3[grepl("COTRIM", upto72$amicro3)] <- "COTRIMOXAZOLE"
 upto72$amicro3[grepl("DOXY", upto72$amicro3) | grepl("DCN", upto72$amicro3)] <- "DOXYCYCLINE"
 upto72$amicro3[upto72$row_id == "83"] <- "LA"
-upto72$amicro2[grepl("TB", upto72$amicro2)] <- "TB TREATMENT"
+upto72$amicro3[grepl("TB", upto72$amicro3)] <- "TB TREATMENT"
 
 upto72$amicro4[upto72$row_id %in% c("155", "179","269", "273", "348", "325")] <- NA
-upto72$amicro2[grepl("FLUCOX", upto72$amicro2)] <- "FLUCLOXACILLIN"
+upto72$amicro4[grepl("FLUCOX", upto72$amicro4)] <- "FLUCLOXACILLIN"
+
+## others
+
+upto72$assess_date[upto72$pid == "DAS12441" & upto72$assess_type == 3] <- "01-FEB-2018"
