@@ -13,6 +13,7 @@ library(pheatmap)
 library(UpSetR)
 library(eulerr)
 library(RColorBrewer)
+library(scales)
 
 wd <- "chapter_4/"
 output = "latex"
@@ -50,7 +51,7 @@ Figure \@ref(fig:consort-diag) shows flow through the study. 225 patients were r
 
 ### Symptoms and health-seeking behaviour
 
-Table \@ref(tab:sep-t1-demog) shows the baseline characteristics of the recruited participants. They were young (median [IQR] age 36 [28-44]) and predominantly HIV-infected. Of those who were HIV-infected, the majority (117/143 [82%]) were on ART, almost exclusively the Malawian first-line regimen of efavirenz, lamivudine and tenofovir, and 88/117 (75%) had been taking ART for more than three months. Figure \@ref(fig:sep-present) shows the presenting symptoms of the participants. Almost all (221/225 [98%] of participants) experienced subjective fever. Participants had been unwell for some time, a median (IQR) of `r median_iqr_str(e1$datefirstunwell)` days; 32/225 (14%) of participants had been unwell for more than 4 weeks. 18/225 (8%) of participants had been admitted to hospital within the last 4 weeks. Over half (123/225 [55%]) of participants had sought care for their current ilness (Table \@ref(tab:sep-healthseek)), most commonly (101/123 [82%] of participants) at a government health centre, a median (IQR) or 2 (1-6) days previously. 60/225 (27%) of all participants had recieved an antimicrobial for their current illness: 7/60 (12%) of all prehospital antimicrobials were antimalarials, the remainder anitbacterial, most commonly co-trimoxazole or ciprofloxacin. Prehopsital intravenous or intramuscular antimirobials were administered in 16/60 (27%) participants recieving antimicrobials: ceftriaxone (n=6), benzylpenicillin (n=4), gentamicin (n=3) and artesunate (n=3).
+Table \@ref(tab:sep-t1-demog) shows the baseline characteristics of the recruited participants. They were young (median [IQR] age 36 [28-44]) and predominantly HIV-infected. Of those who were HIV-infected, the majority (117/143 [82%]) were on ART, almost exclusively the Malawian first-line regimen of efavirenz, lamivudine and tenofovir, and 88/117 (75%) had been taking ART for more than three months. Figure \@ref(fig:sep-present) shows the presenting symptoms of the participants. Almost all (221/225 [98%] of participants) experienced subjective fever. Participants had been unwell for some time, a median (IQR) of `r median_iqr_str(e1$datefirstunwell)` days; 32/225 (14%) of participants had been unwell for more than 4 weeks. 18/225 (8%) of participants had been admitted to hospital within the last 4 weeks. Over half (123/225 [55%]) of participants had sought care for their current ilness (Table \@ref(tab:sep-healthseek)), most commonly (101/123 [82%] of participants) at a government health centre, a median (IQR) of 2 (1-6) days previously. 60/225 (27%) of all participants had recieved an antimicrobial for their current illness: 7/60 (12%) of all prehospital antimicrobials were antimalarials, the remainder anitbacterial, most commonly co-trimoxazole or ciprofloxacin. Prehopsital intravenous or intramuscular antimirobials were administered in 16/60 (27%) participants recieving antimicrobials: ceftriaxone (n=6), benzylpenicillin (n=4), gentamicin (n=3) and artesunate (n=3).
 
 ```{r consort-diag, echo = F, fig.cap = "Study recruitment and follow up.",  out.height = '12cm', fig.align = 'center'}
 
@@ -218,8 +219,8 @@ kable(select(e1.sum.2,`levels`,value), "latex", booktabs =T,
 
 ```
 
+```{r sep-present-setup, include = F}
 
-```{r sep-present, echo = F, warning = F, message = F, fig.scap="Symptoms of recruited participants", out.extra='', fig.cap="Symptoms of recruited participants. A: Row and column clustered heatmap of participant symptoms. Each row represents a patient. Red = presence, blue = absence. B: Frequency of occurence of symptoms", fig.width = 8, fig.height = 5, out.height= '40%'}
 
 sympt <- e1[names(e1) %in% names(enroll.names)[grepl("symp",enroll.names)]]
 
@@ -238,9 +239,13 @@ gsub("\\.", " ", dimnames(sympt)[[2]]) -> dimnames(sympt)[[2]]
 str_to_title(dimnames(sympt)[[2]]) -> dimnames(sympt)[[2]]
 grid.grabExpr(pheatmap(sympt[1:225,1:25], legend = F, fontsize = 7)) -> p2
 as_ggplot(p2) ->p2
-ggarrange(p2,p1, labels = c("A", "B"), widths = c(1, 1)) 
+
 ```
 
+```{r sep-present, echo = F, warning = F, message = F, fig.scap="Symptoms of recruited participants", out.extra='', fig.cap="Symptoms of recruited participants. A: Row and column clustered heatmap of participant symptoms. Each row represents a patient. Red = presence, blue = absence. B: Frequency of occurence of symptoms", fig.width = 8, fig.height = 5, out.height= '40%'}
+
+ggarrange(p2,p1, labels = c("A", "B"), widths = c(1, 1)) 
+```
 
 
 ### Admission physiology and laboratory investigations
@@ -327,13 +332,13 @@ kable(select(e1.sum.3,`levels`,value), "latex", booktabs =T,
 
 ### Aetiology
 
-In total, 51% (114/225) of the 225 participants had at least one infectious agent identified (Table \@ref(tab:sep-diag)), most commonly tuberculosis (76/225 [34%]) followed by bloodstream infection (24/225 [11%]) and malaria (21/225 [9%]). Table \@ref(tab:sep-tests) shows the availability of test and proportion of positive tests across the cohort, stratified by HIV status. 2/225 patients (1%) had a missing aerobic blood culture; the remaining 223 patients had a total of 259 blood cultures performed. 15/259 (6%) blood cultures grew at least one contaminant, but 26 blood cultures from 24 patients were positive for a total of 28 pathogenic bacteria (Figure \@ref(fig:sep-bc-plot)): _Salmonella_ Typhi was the most commonly isolated pathogenic bacterium, and seemed to show an association with HIV-negative participants: all (8/8) of the participants from whom _S._ Typhi was isolated and whose HIV status was known were HIV noninfected. Of the 18 Gram negative bacteria isolated, 3/18 (17%) were cefpodoxime resistant on AST via disc diffusion testing, and likely ESBL producers: one _K. pneumoniae_ and one _E. coli_ (both from the same blood culture and same patient) and one _Acinetobacter baumannii_. Both _Staphyloccus aureus_ isolates were oxacillin sensitive. The one _Streptococcus pneumoniae_ cultured was penicillin intermediate.
+In total, 51% (114/225) of the 225 participants had at least one infectious agent identified (Table \@ref(tab:sep-diag)), most commonly tuberculosis (76/225 [34%]) followed by bloodstream infection (24/225 [11%]) and malaria (21/225 [9%]). Table \@ref(tab:sep-tests) shows the availability of test and proportion of positive tests across the cohort, stratified by HIV status. 2/225 patients (1%) had a missing aerobic blood culture; the remaining 223 patients had a total of 259 blood cultures performed. 15/259 (6%) blood cultures grew at least one contaminant, but 26 blood cultures from 24 patients were positive for a total of 28 pathogenic bacteria (Figure \@ref(fig:sep-bc-plot)): _Salmonella_ Typhi was the most commonly isolated pathogenic bacterium, and seemed to show an association with HIV-negative participants: all (8/8) of the participants from whom _S._ Typhi was isolated and whose HIV status was known were HIV noninfected. Of the 18 Gram negative bacteria isolated, 3/18 (17%) were cefpodoxime resistant on AST via disc diffusion testing, and likely ESBL producers: one _K. pneumoniae_ and one _E. coli_ (both from the same blood culture and same patient) and one _Acinetobacter baumannii_. Both _Staphyloccus aureus_ isolates were oxacillin sensitive. The one _Streptococcus pneumoniae_ cultured was penicillin intermediate on AST.
 
 Lumbar puncture and CSF culture was carried out in 44 participants: 5/44 (11%) of samples grew a contaminent and no pathogenic bacteria were recovered from any sample. 4/44 (9%) had a detectable cryptococcal antigen (CRAG) in CSF. Malaria testing was missing for 6/225 (3%) of participants, but of the remainder, a positive malaria test was more likely in the HIV-uninfected (12/69 [17%] vs 6/138 [4%], p = 0.01 on pairwise Fisher's exact test). Positive aerobic blood culture showed no statistically significant association with HIV, nor did positive CSF testing, though in the latter case numbers were small and all positive tests (all positive CRAG) were in fact in the HIV-infected (Table \@ref(tab:sep-tests)).
 
 Testing for TB, with the exception of sputum Xpert testing, was restricted to HIV-infected participants. Sputum Xpert was carried out in 44/225 (20%) of participants, and was more commonly carried out in the HIV-infected: 35/143 [24%] of HIV-infected participants had sputum testing performed vs 8/70 (11%) of HIV uninifected (p = 0.07 by Fisher's exact test). 53 sputum samples were sent in total from the 44 patients, and 8/44 (18%) diagnoses of TB made, all except one in HIV-infected participants. One sample identified a rifampicin resistance gene; the remainder of infections were rifampcin-sensitive. 
 
-155 participants were eligible for urinary lipoarabinomannan (uLAM) and mycobacterial blood culture testing, being either HIV-infected (n=143) or of unknown HIV status (n=12). Urine was available for 145/155 (94%) of those eligible, and 74/145 (51%) of samples were positive for uLAM. 154/155 (99%) eligible participants had blood samples collected and cultured for mycobacteria. 12/154 (8%) grew contaminents and are excluded from the denominators in Table \@ref(tab:sep-tests); of the remainder 8/138 (6%) grew mycobacteria, all _M. tuberculosis_.
+155 participants were eligible for urinary lipoarabinomannan (uLAM) and mycobacterial blood culture testing, being either HIV-infected (n=143) or of unknown HIV status (n=12). Urine was available for 145/155 (94%) of those eligible, and 74/145 (51%) of samples were positive for uLAM. 150/155 (97%) of eligible participants had blood samples collected and cultured for mycobacteria. 12/150 (8%) grew contaminents and are excluded from the denominators in Table \@ref(tab:sep-tests); of the remainder 8/138 (6%) grew mycobacteria, all _M. tuberculosis_.
 
 Figures \@ref(fig:sep-upset-plot) and \@ref(fig:sep-euler-plot) show the overlap of positive tests form the different diagnostic modalities. Of the 114 patients with at least one positive diagnosic test, 90/114 (79%) had only one positive diagnostic test. The exceptions to this were mycobacterial blood culture and sputum Xpert: patients who had TB diagnosed by these tests tended to also have a positive uLAM. 2/4 (50%) of patients with positive CSF testing (all of whom had detectible CRAG) had also grew _Cryptococcus neoformans_ in aerobic blood culture. 111/225 (49%) of patients remained with no diagnosis.
 
@@ -422,7 +427,7 @@ group_rows(index=c(" " = 1, "TB diagnostics" = 3, "Other diagnostics" = 3)) %>%
 
 ```
 
-```{r sep-bc-plot, echo = F, warning = F, message = F, fig.scap="Pathogenic isolates recovered from aerobic blood culture.", out.extra='', fig.cap="Pathogenic isolates recovered from aerobic blood culture. 25 blood cultures in 24 participants  were positive for 27 pathogens in total", fig.width = 7, fig.height = 2.3, out.height= "70%"}
+```{r sep-bc-plot, echo = F, warning = F, message = F, fig.scap="Pathogenic isolates recovered from aerobic blood culture.", out.extra='', fig.cap="Pathogenic isolates recovered from aerobic blood culture. 26 blood cultures in 24 participants  were positive for 28 pathogens in total", fig.width = 7, fig.height = 2.3, out.height= "70%"}
 
 melt(bc.full[c("pid", "typhi", "saen", "saty", "esco","klpn", "hib", "stpn", "crne", "acba", "enfam", "enfas", "stau", "prot")]) %>% filter (value > 0) -> bc.full.melt
 
@@ -476,6 +481,7 @@ upset(a[-9], nsets = 7,order = "freq", query.legend = "bottom",
 
 
 ### Treatment
+
 
 Table:
 Time to antimicrobials
