@@ -59,7 +59,8 @@ upto72$assess_type[upto72$row_id == 358] <- 3
 
 upto72$pid[upto72$pid == "DAS1462I" & upto72$pid_ini == "MA "] <- "DAS14598"
 upto72$assess_date[upto72$pid == "DAS1336U" & upto72$assess_type == 2] <- "02-NOV-2017"
-
+upto72$assess_date[upto72$pid == "DAS1336U" & upto72$assess_type == 2] <- "02-NOV-2017"
+upto72$assess_date[upto72$pid == "DAS1246Y" & upto72$assess_type == 3] <- "29-JAN-2018"
 
 two_assess_type <- dcast(upto72, pid ~ assess_type, fun.aggregate = base::length)
 
