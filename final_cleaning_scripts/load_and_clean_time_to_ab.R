@@ -424,9 +424,9 @@ df.tb$arrivehosp_datetime[df.tb$pid == "DAS13990"] <- update(df.tb$arrivehosp_da
 
 df.tb$earliest_arr_time <- apply(df.tb[3:5], 1, min)
 df.tb$earliest_arr_time <- parse_datetime(df.tb$earliest_arr_time)
-
-df.tb$time_to_tb_rx <- difftime(df.tb$time_of_first_tb_rx, df.tb$earliest_arr_time, units = "hours")
 df.tb$time_of_first_tb_rx[df.tb$pid == "DAS1230D"] <- update(df.tb$time_of_first_tb_rx[df.tb$pid == "DAS1230D"], hour = 17 )
+df.tb$time_to_tb_rx <- difftime(df.tb$time_of_first_tb_rx, df.tb$earliest_arr_time, units = "hours")
+
 
 
 subset(df.tb, time_to_tb_rx < 0)
