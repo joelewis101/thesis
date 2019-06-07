@@ -3,30 +3,15 @@
 # mung the data
 # mung mung the data
 # muuuuuuuuuuung the data
-# get hourly data into a wide df with ABs and fluids 
+# get hourly data into a wide df with ABs 
 
-print.tbl_df <- function(x, ...) {
-  print.data.frame(x, ...)
-  invisible(x)
-}
+# This code is a bit of a mess but, life's too short, you know?
+require(tidyverse)
+require(lubridate)
 
-source("final_cleaning_scripts/load_and_clean_hourly.R")
-source("final_cleaning_scripts/load_and_clean_upto72.R")
-source("final_cleaning_scripts/load_and_clean_post72.R")
+# needs to have hourly, upto72 and post 72 loaded
 
 # correct errors - missing assume happened halfway through previous hour
-
-hourly$amicro_time1[hourly$pid == "DAS1140H" & hourly$amicro_time1 == "13:80"] <- "13:50"
-hourly$amicro_time1[hourly$pid == "DAS1288E" & hourly$assess_type == 2] <- "16:30"
-
-
-hourly$date_time_str <- paste0(hourly$assess_date, " ", hourly$assess_time) 
-hourly$date_time <- parse_datetime(hourly$date_time_st, format = "%d-%b-%Y %H:%M")
-hourly$amicro1_datetime_str <- paste0(hourly$assess_date, " ", hourly$amicro_time1)
-hourly$amicro1_datetime <- parse_datetime(hourly$amicro1_datetime_str, format = "%d-%b-%Y %H:%M")
-hourly$amicro2_datetime_str <- paste0(hourly$assess_date, " ", hourly$amicro_time2)
-hourly$amicro2_datetime <- parse_datetime(hourly$amicro2_datetime_str, format = "%d-%b-%Y %H:%M")
-
 
 # get it to long
 
@@ -190,7 +175,7 @@ subset(oc.m.ab , !(pid == "DAS1300H" & variable == "erythro")) -> oc.m.ab
 
 # add back in those who died and what not
 #
-subset(df.abs, is.na(amicro1) & is.na(earliest_assess72) & !(date(t0obs_datetime) ==  hospoutcomedate))
+#subset(df.abs, is.na(amicro1) & is.na(earliest_assess72) & !(date(t0obs_datetime) ==  hospoutcomedate))
 
 bind_rows(
   select(oc, pid,abtto_given) %>% filter(abtto_given != 1),
@@ -365,23 +350,22 @@ subset(df.abs, time_to_abx < 0)
 
 
 # yey
-
-median(df.abs$time_to_abx, na.rm = T)
+#
+#median(df.abs$time_to_abx, na.rm = T)
 
 # plot a cuulative incidence curve
 
-df.abs$event <- as.numeric(!df.abs$first_ab == "none")
-df.abs$hoc.datetime[df.abs$pid =="DAS1295G"] <-update(df.abs$hoc.datetime [df.abs$pid =="DAS1295G"] , hour = 18)
-df.abs$hoc.datetime[df.abs$pid =="DAS1296E"] <-update(df.abs$hoc.datetime [df.abs$pid =="DAS1296E"] , hour = 16, minutes = 30)
+#df.abs$hoc.datetime[df.abs$pid =="DAS1295G"] <-update(df.abs$hoc.datetime [df.abs$pid =="DAS1295G"] , hour = 18)
+#df.abs$hoc.datetime[df.abs$pid =="DAS1296E"] <-update(df.abs$hoc.datetime [df.abs$pid =="DAS1296E"] , hour = 16, minutes = 30)
 
-df.abs$time_to_abx[df.abs$event == 0] <- difftime(df.abs$hoc.datetime[df.abs$event == 0], df.abs$earliest_arr_time[df.abs$event == 0], units = "hours")
+#df.abs$time_to_abx[df.abs$event == 0] <- difftime(df.abs$hoc.datetime[df.abs$event == 0], df.abs$earliest_arr_time[df.abs$event == 0], units = "hours")
 
-subset(df.abs, time_to_abx < 0)
-df.abs$t <- df.abs$time_to_abx
-df.abs$t[df.abs$event == 0] <- 1000
+#subset(df.abs, time_to_abx < 0)
+#df.abs$t <- df.abs$time_to_abx
+#df.abs$t[df.abs$event == 0] <- 1000
 
 
-library(survival)
+#library(survival)
 
 
 # nice
@@ -423,7 +407,7 @@ df.tb$first_tb_72_val[df.tb$first_tb_72_val == "TB TREATMENT"] <- 1
 
 df.tb$any_tb_rx <- "none"
 df.tb$any_tb_rx[df.tb$first_tb_72_val == 1| df.tb$first_tb_val_post_72 == 1 | df.tb$otherantib == 1] <- "yes"
-df.tb$any_tb_rx[df.tb$tbongoing == 1] <- "on admission"
+df.tb$any_tb_rx[df.tb$tbongoing == "Yes"] <- "on admission"
 
 df.tb$first_tb_date_72[!is.na(df.tb$first_tb_date_72)] <- update(df.tb$first_tb_date_72[!is.na(df.tb$first_tb_date_72)], hour = 9, minutes = 0 )
 
@@ -450,35 +434,29 @@ subset(df.tb, time_to_tb_rx < 0)
 # DAS1230D dc date is wrong - assume 1700 following hourly
 
 df.tb %>% filter(any_tb_rx == "yes") %>% summarise(median(time_to_tb_rx)) 
+df.tb$time_to_tb_rx[df.tb$any_tb_rx == "on admission"] <- 0
 
-df.tb$t <- df.tb$time_to_tb_rx
-df.tb$t[df.tb$any_tb_rx == "on admission"] <- 0
+#df.tb$t <- df.tb$time_to_tb_rx
+#df.tb$t[df.tb$any_tb_rx == "on admission"] <- 0
 
 # add censor times
 
-df.tb <- merge(df.tb, select(oc, pid, hoc.datetime), by = "pid", all.x = T)
+#df.tb <- merge(df.tb, select(oc, pid, hoc.datetime), by = "pid", all.x = T)
 
 
-df.tb$t[df.tb$any_tb_rx == "none"] <- difftime(df.tb$hoc.datetime.y[df.tb$any_tb_rx == "none"], 
-                                               df.tb$earliest_arr_time[df.tb$any_tb_rx == "none"], units = "hours")
+#df.tb$t[df.tb$any_tb_rx == "none"] <- difftime(df.tb$hoc.datetime.y[df.tb$any_tb_rx == "none"], 
+    #                                           df.tb$earliest_arr_time[df.tb$any_tb_rx == "none"], units = "hours")
 
-subset(df.tb, t < 0)
+#subset(df.tb, t < 0)
 
-df.tb$hoc.datetime.y[df.tb$pid =="DAS12177"] <-update(df.tb$hoc.datetime.y [df.tb$pid =="DAS12177"] , hour = 13, minutes = 30)
-df.tb$hoc.datetime.y[df.tb$pid =="DAS1249S"] <-update(df.tb$hoc.datetime.y [df.tb$pid =="DAS1249S"] , hour = 17, minutes = 00)
+#df.tb$hoc.datetime.y[df.tb$pid =="DAS12177"] <-update(df.tb$hoc.datetime.y [df.tb$pid =="DAS12177"] , hour = 13, minutes = 30)
+#df.tb$hoc.datetime.y[df.tb$pid =="DAS1249S"] <-update(df.tb$hoc.datetime.y [df.tb$pid =="DAS1249S"] , hour = 17, minutes = 00)
 
-df.tb$hoc.datetime.y[df.tb$pid =="DAS1295G"] <-update(df.tb$hoc.datetime.y [df.tb$pid =="DAS1295G"] , hour = 18)
-df.tb$hoc.datetime.y[df.tb$pid =="DAS1296E"] <-update(df.tb$hoc.datetime.y [df.tb$pid =="DAS1296E"] , hour = 16, minutes = 30)
-df.tb$hoc.datetime.y[df.tb$pid =="DAS13241"] <-update(df.tb$hoc.datetime.y [df.tb$pid =="DAS13241"] , hour = 19, minutes = 0)
-
-df.tb$event <- as.numeric(df.tb$any_tb_rx == "yes" | df.tb$any_tb_rx == "on admission")
-
-df.tb$t[df.tb$any_tb_rx == "none"] <- 1000
+#df.tb$hoc.datetime.y[df.tb$pid =="DAS1295G"] <-update(df.tb$hoc.datetime.y [df.tb$pid =="DAS1295G"] , hour = 18)
+#df.tb$hoc.datetime.y[df.tb$pid =="DAS1296E"] <-update(df.tb$hoc.datetime.y [df.tb$pid =="DAS1296E"] , hour = 16, minutes = 30)
+#df.tb$hoc.datetime.y[df.tb$pid =="DAS13241"] <-update(df.tb$hoc.datetime.y [df.tb$pid =="DAS13241"] , hour = 19, minutes = 0)
 
 
-#as_ggplot(p1)
-
-arrange_ggsurvplots(list(p1,p2), ncol = 2, nrow = 1)
 
 ### antimalarials
 
@@ -536,11 +514,8 @@ df.mal$earliest_arr_time <- parse_datetime(df.mal$earliest_arr_time )
 
 df.mal$time_to_mal_rx <- difftime(df.mal$first_ab_time, df.mal$earliest_arr_time, units = "hours")
 
-median(df.mal$time_to_mal_rx, na.rm= T)
+#median(df.mal$time_to_mal_rx, na.rm= T)
 
-df.mal$event <- as.numeric((!is.na(df.mal$time_to_mal_rx)))
-df.mal$t <- df.mal$time_to_mal_rx
-df.mal$t[df.mal$event == 0] <- 1000
 
 
 
@@ -606,48 +581,20 @@ subset(df.fung, time_to_fung_rx > 100 )
 
 # fine keep as is!
 
-median(df.fung$time_to_fung_rx, na.rm= T)
+#median(df.fung$time_to_fung_rx, na.rm= T)
 
-df.fung$event <- as.numeric((!is.na(df.fung$time_to_fung_rx)))
-df.fung$t <- df.fung$time_to_fung_rx
-df.fung$t[df.fung$event == 0] <- 1000
+cat("\n")
+cat("Done! \n")
+cat("Time to abs now in df.abs \n  ")
+cat("time to tb now in df.tb \n  ")
+cat("time to antifungals now in df.fung \n  ")
+cat("time to antimalarials now in df.mal \n  ")
+cat("Share and enjoy! \n  ")
 
-#
 
-survfit(Surv(t, event) ~ 1, data = df.fung) -> fit.fung
-ggsurvplot(fit.fung, , fun = "event", xlim = c(0,96), break.time.by = 6)
 
-survfit(Surv(t, event) ~ 1, data = df.mal) -> fit.mal
-ggsurvplot(fit.mal, , fun = "event", xlim = c(0,96), break.time.by = 6)
 
-survfit(Surv(t, event) ~ 1, data = df.tb) -> fit.tb
-ggsurvplot(fit.tb, , fun = "event", xlim = c(0,100), ylim = c(0,1))
-ggsurvplot(fit.tb, , fun = "event", xlim = c(0,96),  break.time.by = 24) + ggtitle("TB treatment")-> p1
-ggsurvplot(fit, xlim = c(0 ,96), fun = "event", break.time.by = 24) + ggtitle("Antibiotics") -> p2
 
-survfit(Surv(t, event) ~ 1, data = df.abs) -> fit
-ggsurvplot(fit, xlim = c(0,200), fun = "event", break.time.by = 24)
-
-fit$am.type <- "abs"
-fit.tb$am.type <-"tb"
-fit.mal$am.type <-"malaria"
-fit.fung$am.type <-"antifucngals"
-
-fit.all <- bind_rows(
-  data.frame(time = fit$time, surv = fit$surv, 
-              lower= fit$lower, upper = fit$upper,
-              type = "abs", stringsAsFactors = F),
-  data.frame(time = fit.tb$time, surv = fit.tb$surv, 
-             lower= fit.tb$lower, upper = fit.tb$upper,
-             type = "tb", stringsAsFactors = F),
-  data.frame(time = fit.mal$time, surv = fit.mal$surv, 
-             lower= fit.mal$lower, upper = fit.mal$upper,
-             type = "malaria", stringsAsFactors = F),
-  data.frame(time = fit.fung$time, surv = fit.fung$surv, 
-             lower= fit.fung$lower, upper = fit.fung$upper,
-             type = "antifungal", stringsAsFactors = F),
-  
-)
 
 
 
