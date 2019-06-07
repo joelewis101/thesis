@@ -32,10 +32,10 @@ find_double_scanned(upto72)
 print("checking for forms with no PID...")
 
 print(subset(upto72, !(grepl("DAS", upto72$pid))))
+print("deleting any that are there")
+#cont <- readline("Continue and delete these?")
 
-cont <- readline("Continue and delete these?")
-
-if (cont == "N") {stop()}
+#if (cont == "N") {stop()}
 
 upto72 <- subset(upto72, (grepl("DAS", upto72$pid)))
 
@@ -105,8 +105,8 @@ if (length(missing_assess_type) == 0) {
 subset(upto72, !(pid %in% enroll$pid))
 # fine
 
-cont <- readline("Continue?")
-if (cont == "N") {stop()}
+#cont <- readline("Continue?")
+#if (cont == "N") {stop()}
 
 upto72[upto72 == ""] <- NA
 upto72$amicro1[upto72$row_id == "385"] <- "CEFTRIAXONE"
@@ -148,3 +148,8 @@ upto72$amicro4[grepl("FLUCOX", upto72$amicro4)] <- "FLUCLOXACILLIN"
 ## others
 
 upto72$assess_date[upto72$pid == "DAS12441" & upto72$assess_type == 3] <- "01-FEB-2018"
+
+cat("\n")
+cat("Done! \n")
+cat("Up to 72hr forms now in upto72 df.  \n  ")
+cat("Share and enjoy! \n  ")

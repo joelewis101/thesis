@@ -2,10 +2,10 @@
 
 print("cleaning post72hr ......")
 
-library(RMySQL)
+#library(RMySQL)
 #library(plyr)
-library(dplyr)
-library(reshape2)
+require(dplyr)
+require(reshape2)
 
 
 post72 <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/assessment_post72hrs_raw.csv", stringsAsFactors = F)
@@ -28,8 +28,8 @@ print("checking for forms with no PID...")
 
 print(subset(post72, !(grepl("DAS", post72$pid))))
 
-cont <- readline("Continue and delete these?")
-if (cont == "N") {stop()}
+#cont <- readline("Continue and delete these?")
+#if (cont == "N") {stop()}
 
 hourly <- subset(hourly, (grepl("DAS", post72$pid)))
 
@@ -84,7 +84,9 @@ tf <- subset(post72, pid %in% two.forms.one.day)
 print("forms with two on one day follow")
 print(two.forms.one.day)
 
-cont <- readline("Continue?")
-if (cont == "N") {stop()}
 
+cat("\n")
+cat("Done! \n")
+cat("Up to 72hr forms now in upto72 df.  \n  ")
+cat("Share and enjoy! \n  ")
 

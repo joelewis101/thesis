@@ -20,11 +20,12 @@
 
 # extract from sql server and put into csvs
 
-library(RMySQL)
-library(plyr)
-library(dplyr)
+#library(RMySQL)
+#library(plyr)
+#library(dplyr)
 #source("/Users/joelewis/Documents/PhD/R/PhD/db_extraction/extract_mssql.R")
-
+require(plyr)
+require(dplyr)
 # get data into csv
 
 #hourly<- read.csv("/Users/joelewis/Documents/PhD/Data/teleform_extraction/hourly.csv", stringsAsFactors = F)
@@ -69,8 +70,8 @@ print("checking for forms with no PID...")
 
 print(subset(hourly, !(grepl("DAS", hourly$pid))))
 
-cont <- readline("Continue and delete these?")
-if (cont == "N") {stop()}
+#cont <- readline("Continue and delete these?")
+#if (cont == "N") {stop()}
 
 hourly <- subset(hourly, (grepl("DAS", hourly$pid)))
 
@@ -211,10 +212,10 @@ n_forms.not.6$comments[n_forms.not.6$Var1 == "DAS1509K"] <- "Extra hr6 -> hr 7 -
 print("number of forms for each pid. SHould be 6. If not, go and do something about it ...")
 
 print(n_forms.not.6)
-write.csv(n_forms.not.6, "/Users/joelewis/Documents/PhD/datasets/6hr/missing6hr_forms.csv")
+#write.csv(n_forms.not.6, "/Users/joelewis/Documents/PhD/datasets/6hr/missing6hr_forms.csv")
 
-cont <- readline("Continue?")
-if (cont == "N") {stop()}
+#cont <- readline("Continue?")
+#if (cont == "N") {stop()}
 
 # what pids are missing entirely?
 
@@ -227,7 +228,7 @@ if (cont == "N") {stop()}
 #dbClearResult(rs)
 #dbDisconnect(mydb)
 
-enroll <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/dassim_enrolment_raw.csv", stringsAsFactors = F)
+#enroll <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/dassim_enrolment_raw.csv", stringsAsFactors = F)
 
 
 pids <- select(enroll, pid, arm, data_date)
@@ -238,8 +239,8 @@ print("PIDs completely missing hourly forms")
 print(pids)
 #write.csv(pids, "/Users/joelewis/Documents/PhD/datasets/6hr/missing6hr_patients.csv")
 
-cont <- readline("Continue?")
-if (cont == "N") {stop()}
+#cont <- readline("Continue?")
+#if (cont == "N") {stop()}
 
 # now clean up individual fields
 
@@ -322,8 +323,8 @@ hourly$assess_type[hourly$pid == "DAS12505" & hourly$assess_time == "11:00"] <- 
 print("checking for missing assess_type...")
 print("should be none!")
 print(subset(hourly, is.na(assess_type)))
-cont <- readline("Continue?")
-if (cont == "N") {stop()}
+#cont <- readline("Continue?")
+#if (cont == "N") {stop()}
 
 
 # clean up errors
@@ -466,8 +467,8 @@ hourly$amicro6[hourly$pid == "DAS1293K" & hourly$assess_type == "2"] <- NA
 print("amicro6")
 print(table(hourly$amicro6))
 
-cont <- readline("Continue?")
-if (cont == "N") {stop()}
+#cont <- readline("Continue?")
+#if (cont == "N") {stop()}
 
 # NEXT CHECK ALL TIMES HAVE ABX and ALL ABX have times - amicro1 and 2 only
 
@@ -482,7 +483,7 @@ print("forms lacking abx but having time - amicro1")
 print(subset(hourly, is.na(hourly$amicro1) & !is.na(hourly$amicro_time1)))
 
 ### check all of these with the data team
-write.csv(subset(hourly, is.na(hourly$amicro1) & !is.na(hourly$amicro_time1)), "/Users/joelewis/Documents/PhD/R/PhD/cleaning_script/data_queries/hourly_missing_amicro1.csv")
+#write.csv(subset(hourly, is.na(hourly$amicro1) & !is.na(hourly$amicro_time1)), "/Users/joelewis/Documents/PhD/R/PhD/cleaning_script/data_queries/hourly_missing_amicro1.csv")
 
 print("forms lacking time but having abx- amicro1")
 print(subset(hourly, !is.na(hourly$amicro1) & is.na(hourly$amicro1)))
@@ -493,9 +494,10 @@ print(subset(hourly, is.na(hourly$amicro2) & !is.na(hourly$amicro_time2)))
 print("forms lacking time but having abx- amicro2")
 print(subset(hourly, !is.na(hourly$amicro2) & is.na(hourly$amicro2)))
 
-cont <- readline("Continue and make all of these ceftriaxone?")
-if (cont == "N") {stop()}
+#cont <- readline("Continue and make all of these ceftriaxone?")
+#if (cont == "N") {stop()}
 
+print("Making all these ceftriaxone")
 hourly$amicro1[is.na(hourly$amicro1) & !is.na(hourly$amicro_time1)] <-  "CEFTRIAXONE"
 
 
@@ -524,8 +526,8 @@ print("fluid6 - all of this will be set to NA - check that is what you want")
 print(table(hourly$fluid6))
 hourly$fluid5[!is.na(hourly$fluid6)] <- NA
 
-cont <- readline("Continue?")
-if (cont == "N") {stop()}
+#cont <- readline("Continue?")
+#if (cont == "N") {stop()}
 
 print("fluid_vol1")
 print(table(hourly$fluid_vol1))
@@ -547,8 +549,8 @@ print(table(hourly$fluid_vol5))
 print("fluid_vol6")
 print(table(hourly$fluid_vol6))
 
-cont <- readline("Continue?")
-if (cont == "N") {stop()}
+#cont <- readline("Continue?")
+#if (cont == "N") {stop()}
 
 ###############################################################
 ###### CLEAN UP PHYSIOLOGY VARS ####################################
@@ -970,7 +972,25 @@ hourly[hourly == ":1   "] <- NA
 
 hourly$assess_date[hourly$pid == "DAS1246Y" & hourly$assess_type == 6] <- "26-JAN-2018"
 
-write.csv(hourly, "/Users/joelewis/Documents/PhD/datasets/6hr/hourly_clean.csv")
+
+hourly$amicro_time1[hourly$pid == "DAS1140H" & hourly$amicro_time1 == "13:80"] <- "13:50"
+hourly$amicro_time1[hourly$pid == "DAS1288E" & hourly$assess_type == 2] <- "16:30"
+
+
+hourly$date_time_str <- paste0(hourly$assess_date, " ", hourly$assess_time) 
+hourly$date_time <- parse_datetime(hourly$date_time_st, format = "%d-%b-%Y %H:%M")
+hourly$amicro1_datetime_str <- paste0(hourly$assess_date, " ", hourly$amicro_time1)
+hourly$amicro1_datetime <- parse_datetime(hourly$amicro1_datetime_str, format = "%d-%b-%Y %H:%M")
+hourly$amicro2_datetime_str <- paste0(hourly$assess_date, " ", hourly$amicro_time2)
+hourly$amicro2_datetime <- parse_datetime(hourly$amicro2_datetime_str, format = "%d-%b-%Y %H:%M")
+
+
+
+cat("Done!")
+cat("First 6hr forms now in hourly.  \n  ")
+cat("Share and enjoy! \n  ")
+
+#write.csv(hourly, "/Users/joelewis/Documents/PhD/datasets/6hr/hourly_clean.csv")
 
 
 
