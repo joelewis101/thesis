@@ -27,6 +27,10 @@ source("final_cleaning_scripts/make_composite_hivstatus_variable.R")
 source("final_cleaning_scripts/load_and_clean_bloods.R")
 source("final_cleaning_scripts/load_and_clean_aetiol.R")
 
+source("final_cleaning_scripts/load_and_clean_hourly.R")
+source("final_cleaning_scripts/load_and_clean_upto72.R")
+
+
 h1.ustand <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/other_datasets/h1_ustand.csv")
 
 e1$datefirstunwell[e1$unwelfreq == "Weeks"] <- e1$datefirstunwell[e1$unwelfreq == "Weeks"] * 7
