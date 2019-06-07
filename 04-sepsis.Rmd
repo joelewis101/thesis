@@ -57,7 +57,7 @@ Figure \@ref(fig:consort-diag) shows flow through the study. 225 patients were r
 
 ### Symptoms and health-seeking behaviour
 
-Table \@ref(tab:sep-t1-demog) shows the baseline characteristics of the recruited participants. They were young (median [IQR] age 36 [28-44]) and predominantly HIV-infected. Of those who were HIV-infected, the majority (117/143 [82%]) were on ART, almost exclusively the Malawian first-line regimen of efavirenz, lamivudine and tenofovir, and 88/117 (75%) had been taking ART for more than three months. Figure \@ref(fig:sep-present) shows the presenting symptoms of the participants. Almost all (221/225 [98%] of participants) experienced subjective fever. Participants had been unwell for some time, a median (IQR) of `r median_iqr_str(e1$datefirstunwell)` days; 32/225 (14%) of participants had been unwell for more than 4 weeks. 18/225 (8%) of participants had been admitted to hospital within the last 4 weeks. Over half (123/225 [55%]) of participants had sought care for their current ilness (Table \@ref(tab:sep-healthseek)), most commonly (101/123 [82%] of participants) at a government health centre, a median (IQR) of 2 (1-6) days previously. 60/225 (27%) of all participants had recieved an antimicrobial for their current illness: 7/60 (12%) of all prehospital antimicrobials were antimalarials, the remainder anitbacterial, most commonly co-trimoxazole or ciprofloxacin. Prehopsital intravenous or intramuscular antimirobials were administered in 16/60 (27%) participants recieving antimicrobials: ceftriaxone (n=6), benzylpenicillin (n=4), gentamicin (n=3) and artesunate (n=3).
+Table \@ref(tab:sep-t1-demog-dassim) shows the baseline characteristics of the recruited participants. They were young (median [IQR] age 36 [28-44]) and predominantly HIV-infected. Of those who were HIV-infected, the majority (117/143 [82%]) were on ART, almost exclusively the Malawian first-line regimen of efavirenz, lamivudine and tenofovir, and 88/117 (75%) had been taking ART for more than three months. Figure \@ref(fig:sep-present) shows the presenting symptoms of the participants. Almost all (221/225 [98%] of participants) experienced subjective fever. Participants had been unwell for some time, a median (IQR) of `r median_iqr_str(e1$datefirstunwell)` days; 32/225 (14%) of participants had been unwell for more than 4 weeks. 18/225 (8%) of participants had been admitted to hospital within the last 4 weeks. Over half (123/225 [55%]) of participants had sought care for their current ilness (Table \@ref(tab:sep-healthseek)), most commonly (101/123 [82%] of participants) at a government health centre, a median (IQR) of 2 (1-6) days previously. 60/225 (27%) of all participants had recieved an antimicrobial for their current illness: 7/60 (12%) of all prehospital antimicrobials were antimalarials, the remainder anitbacterial, most commonly co-trimoxazole or ciprofloxacin. Prehopsital intravenous or intramuscular antimirobials were administered in 16/60 (27%) participants recieving antimicrobials: ceftriaxone (n=6), benzylpenicillin (n=4), gentamicin (n=3) and artesunate (n=3).
 
 ```{r consort-diag, echo = F, fig.cap = "Study recruitment and follow up.",  out.height = '12cm', fig.align = 'center'}
 
@@ -66,7 +66,7 @@ knitr::include_graphics(paste0(wd, "/figures/consort_diagram.pdf"))
 ```
 
 \renewcommand{\arraystretch}{0.8}
-```{r sep-t1-demog, echo = F, warning = F, message = F}
+```{r sep-t1-demog-dassim, echo = F, warning = F, message = F}
 
 e1 <- subset(enroll, arm == 1)
 e1$art.time <- as.numeric((e1$data_date - e1$hivartstart) /(365.25/12))
@@ -166,7 +166,6 @@ kable(select(e1.sum,`levels`,value), "latex", booktabs =T,
 
 
 ```
-
 
 ```{r sep-healthseek, echo = F, warning = F, message = F}
 
@@ -488,6 +487,10 @@ upset(a[-9], nsets = 7,order = "freq", query.legend = "bottom",
 
 ### Treatment
 
+95% (214/225) of the cohort recieved at least on antimicrobial during their admission (Table \@ref:(time-to-ab-table)), most commonly an antibacterial (207/225 [92%]), but also a significant minority recieved antitubercular therapy (63/225 [28%]). Of those receiving antitubercular therapy, 16% (10/63) were taking the medication prior to admission, and the remainder were initiated on therapy during admission. The first antibacterial agent administered was most often ceftriaxone, in 87% (181/207) of cases but ciprofloxacin (18/207 [9%] of participants), amoxicillin (6/207 [3%]) and metronidazole (2/207 [1%]) were also used. Median (IQR) door to antimicrobial time was 5.3 (3.7-10.8) hours for antibacterials and 4.5 (3.1-21.7) hours for antimalarials but longer for antifungals at 47.7 (27.9-73.9) hours and longer still for antitubercular therapy at 120.9 (63.7-171.0). Cumulative incidence curves for administration of the different antimicrobial classess are shown in figure
+
+85% (192/225) of participants received any intravenous fluid in the first 6 hours of enrollment to the study; of these, most received 0.9% saline (160/190 [83%] of those recieving fluid) but 5% dextrose (91/160 [57%]) were also used; Ringer's lactate (6/192 [6%]) and blood (2/192 [1%]) were rarely administered. 
+
 ```{r treatment-setup, include = F}
 
 
@@ -495,9 +498,11 @@ source("final_cleaning_scripts/load_and_clean_time_to_ab.R")
 
 df.abs$event <- as.numeric(!df.abs$first_ab == "none")
 df.abs$t <- df.abs$time_to_abx
-
+df.abs$t[df.abs$event == 0] <- 1000
 
 df.tb$event <- as.numeric(df.tb$any_tb_rx == "yes" | df.tb$any_tb_rx == "on admission")
+df.tb$t <- df.tb$time_to_tb_rx
+df.tb$t[df.tb$any_tb_rx == "on admission"] <- 0
 df.tb$t[df.tb$any_tb_rx == "none"] <- 1000
 
 
@@ -563,15 +568,64 @@ kable(ab_sum_tbl, "latex", booktabs =T,
 #subset(e1, !(pid %in% subset(df.abs, first_ab != "none")$pid | pid %in% subset(df.mal, !is.na(first_ab))$pid  | 
  # pid %in% subset(df.fung, !is.na(first_ab))$pid   | pid %in%  subset(df.tb,any_tb_rx != "none")$pid ))
 
-#subset(e1, !(pid %in% subset(df.abs, first_ab != "none")$pid | pid %in% subset(df.mal, !is.na(first_ab))$pid  | 
-#               pid %in% subset(df.fung, !is.na(first_ab))$pid   | pid %in%  subset(df.tb,any_tb_rx != "none")$pid ))$pid -> a
-
-
-
+subset(e1, !(pid %in% subset(df.abs, first_ab != "none")$pid | pid %in% subset(df.mal, !is.na(first_ab))$pid  | 
+               pid %in% subset(df.fung, !is.na(first_ab))$pid   | pid %in%  subset(df.tb,any_tb_rx != "none")$pid ))$pid -> a
 
 ```
 
+```{r treatment-plot-setup, include = F}
 
+source("final_cleaning_scripts/load_and_clean_fluid_hr1_to_6.R")
+
+brk <-  seq(0,192, 24)
+
+p.abs <- ggplot(filter(fit.all, type == "abs"), aes(time, (1-surv))) + 
+  geom_line() + 
+  coord_cartesian(ylim = c(0,1), xlim = c(0,192)) + 
+  geom_ribbon(aes(ymin = 1-upper, ymax= 1-lower), color = NA, alpha = 0.3 ) +
+  labs(x = "Time (hours)", y = "Proportion") +
+  theme_bw()+ scale_x_continuous(breaks =brk)
+
+p.tb <- ggplot(filter(fit.all, type == "tb"), aes(time, (1-surv))) + 
+  geom_line() + 
+  coord_cartesian(ylim = c(0,0.3), xlim = c(0,192)) + 
+  geom_ribbon(aes(ymin = 1-upper, ymax= 1-lower), color = NA, alpha = 0.3 ) +
+  labs(x = "Time (hours)", y = "Proportion") +
+  theme_bw()  + scale_x_continuous(breaks =brk)
+
+p.mal <- ggplot(filter(fit.all, type == "malaria"), aes(time, (1-surv))) + 
+  geom_line() + 
+  coord_cartesian(ylim = c(0,0.15), xlim = c(0,192)) + 
+  geom_ribbon(aes(ymin = 1-upper, ymax= 1-lower), color = NA, alpha = 0.3 ) +
+  labs(x = "Time (hours)", y = "Proportion") +
+  theme_bw() + scale_x_continuous(breaks =brk)
+
+p.fung <- ggplot(filter(fit.all, type == "antifungal"), aes(time, (1-surv))) + 
+  geom_line() + 
+  coord_cartesian(ylim = c(0,0.15), xlim = c(0,192)) + 
+  geom_ribbon(aes(ymin = 1-upper, ymax= 1-lower), color = NA, alpha = 0.3 ) +
+  labs(x = "Time (hours)", y = "Proportion") +
+  theme_bw() + scale_x_continuous(breaks =brk)
+
+ggplot(fluid %>% pivot_longer(-pid), aes(name, value)) + geom_jitter(size = 0.5, color = "darkgrey") + geom_boxplot(alpha = 0.6, width = 0.5, outlier.shape = NA) + theme_bw() + labs(x= "Time (hours)", y = "Volumme (ml)") -> p.fluid
+
+
+            
+  
+##pp <- ggdraw() +
+##  draw_plot(p.abs) +
+##  draw_plot(plt.inset, x = 0.3, y = 0.1, width = 0.5, height = 0.5)
+
+```
+```{r sep-abtime-fluid-plot, echo = F, warning = F, message = F, fig.scap="Antimicrobial and fluid administration as a function of time.", out.extra='', fig.cap="Timing of antimicrobial and fluid administration. A-D: Cumulative incidence of administration of antibacterial (A), antitubercular (B), antifungal (C) and antimalarial (D) agents as a function of time since arrival at hospital in hours. E: Total volumne of administered intavenous fluid as a function of time since enrollment to study in hours. Boxplots show median, quartiles box and 1.5 times interquartile range as whiskers. Points are jittered around the hour at which they were measured. ", fig.width = 6, fig.height = 8, out.width= "80%", fig.align= "center"}
+
+ggarrange(
+  ggarrange(p.abs, p.tb, ncol = 2, nrow = 1, labels = c("A", "B")), 
+  ggarrange(p.fung, p.mal, ncol = 2, nrow = 1, labels = c("C", "D")),
+  ggarrange(NULL, p.fluid, NULL, ncol = 3, nrow = 1, widths = c(0.5,1,0.5), labels = c(NA, "E", NA)),
+            ncol = 1,nrow = 3)
+
+```
 Table:
 Time to antimicrobials
 Time to fluid
