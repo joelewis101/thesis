@@ -137,16 +137,6 @@ require(lubridate)
  
  # get oc
  
-oc <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/dassim_outcome_raw.csv", stringsAsFactors = F)
- # take ealiest dates
-sub("00:00:00", "17:00:00", oc$hospoutcometime) -> oc$hospoutcometime
-oc$hoc.datetime <- parse_datetime(paste0(sub(" 00:00:00", "", oc$hospoutcomedate), " ", oc$hospoutcometime), "%d%b%Y %H:%M:%S")
-
-oc %>% group_by(pid) %>% tally() %>% filter(n > 1)
-
-# get earliest
-
-oc %>% group_by(pid) %>% slice(which.min(hoc.datetime)) -> oc
 
 df.abs <- merge(df.abs, select(oc,pid, hoc.datetime, hospoutcome), all.x = T) 
 #df.abs
