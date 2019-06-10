@@ -15,6 +15,8 @@ enroll$hivartstart <- as.Date(enroll$hivartstart, "%d%b%Y")
 enroll$hivsatusdate <- as.Date(enroll$hivsatusdate, "%d%b%Y")
 followup$data_date <- as.Date(followup$data_date, "%d%b%Y")
 
+followup$foutcome[is.na(followup$foutcome) ] <- followup$foutcomearm4[is.na(followup$foutcome)]
+
 enroll.names <- c("hhitem1","hhitem2", "hhitem3", "hhitem4", "hhitem5", "hhitem6",
                   "animal1", "animal2", "animal3" , "animal4", "animal5", "animal6", "animal9",
                   "symp1", "symp2", "symp3", "symp4", "symp5",
