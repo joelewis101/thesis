@@ -22,6 +22,7 @@ output = "latex"
 
 # generate figures
 #source("chapter_4/generate_consort_diagram.R")
+source("final_cleaning_scripts/generate_visits_df.R")
 source("final_cleaning_scripts/load_and_clean_followup_and_enroll_labelled.R")
 source("other_scripts/summary_table_functions.R")
 source("final_cleaning_scripts/make_composite_hivstatus_variable.R")
@@ -31,12 +32,28 @@ source("final_cleaning_scripts/load_and_clean_aetiol.R")
 source("final_cleaning_scripts/load_and_clean_hourly.R")
 source("final_cleaning_scripts/load_and_clean_upto72.R")
 source("final_cleaning_scripts/load_and_clean_post72.R")
+source("final_cleaning_scripts/load_and_clean_hosp_oc.R")
+source("final_cleaning_scripts/load_and_clean_time_to_ab.R")
+source("final_cleaning_scripts/load_and_clean_fluid_hr1_to_6.R")
+
 
 
 h1.ustand <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/other_datasets/h1_ustand.csv")
 
 e1$datefirstunwell[e1$unwelfreq == "Weeks"] <- e1$datefirstunwell[e1$unwelfreq == "Weeks"] * 7
 e1$datefirstunwell[e1$unwelfreq == "Months"] <- e1$datefirstunwell[e1$unwelfreq == "Months"] * 30
+
+# calc time to recruitment
+
+hourly %>% group_by(pid) %>% summarise(first_ax = min(date_time, na.rm= T)) -> fa
+
+merge(select(df.abs, pid, earliest_arr_time), fa, all.x = T) -> fa
+difftime(fa$first_ax, fa$earliest_arr_time, units = "hours") -> fa$dt
+fa$dt2 <- fa$dt
+fa$dt2[fa$dt2 > 1] <- fa$dt2[fa$dt2 > 1] -1
+
+time_to_rec_str <- median_iqr_str(as.numeric(fa$dt2),1)
+
 
 
 ```
@@ -53,7 +70,7 @@ blah blah
 
 ### Study population
 
-Figure \@ref(fig:consort-diag) shows flow through the study. 225 patients were recruited in 20 months between 19th February 2017 and 2nd October 2018. In total, 4 patients (2%) were lost to follow up over the 180-day study period; 5 patients (2%) withdrew; and 7 patients (3%) transferred out of the study area before 180 days. Four of the five patients who withdrew gave a reason for their wish to withdraw, all that they no longer wished the inconvenience of being involved in the study. 15/225 (7%) patients had their final study visit before 180 days, and so were not included in the 180-day outcome analysis.
+Figure \@ref(fig:consort-diag) shows flow through the study. 225 participants were recruited in 20 months between 19th February 2017 and 2nd October 2018. Participants were recuited, in general, soon after arrival in hospital, a median (IQR) of `r time_to_rec_str ` hours after fist attendance. In total, 4 participants (2%) were lost to follow up over the 180-day study period; 5 participants (2%) withdrew; and 7 participants (3%) transferred out of the study area before 180 days. Four of the five participants who withdrew gave a reason for their wish to withdraw, all that they no longer wished the inconvenience of being involved in the study. 15/225 (7%) participants had their final study visit before 180 days, and so were not included in the 180-day outcome analysis.
 
 ### Symptoms and health-seeking behaviour
 
@@ -449,7 +466,7 @@ ggplot(bc.full.melt, aes(fct_rev(fct_infreq(variable)), fill = hivstatus)) + geo
 
 ```
 
-```{r sep-euler-plot, echo = F, warning = F, message = F, fig.scap="Symptoms of recruited participants", out.extra='', fig.cap="Venn diagram showing overlap of diagnostic tests; culture of blood and CSF shown in red, malaria in green and TB diagnostics in blue. The CSF variable in includes either a positive culture for a pathogenic bacteria or positive cryptococcal antigen, BSI a positive aerobic culture of pathogenic bacteria from blood and MTB BSI a positive mycobacterial culture of tuberculosis from blood. BSI: Bloodstream infection, CSF: Cerebrospinal fluid, CRAG: Cryptococcal antigen, mRDT: Malaria rapid diagnostic test, MTB BSI: Mycobacterium tuberculosis bloodstream infection, uLAM: urinary lipoarabinomannan.", fig.width = 5, fig.height = 6, out.height = "70%"}
+```{r sep-euler-plot, echo = F, warning = F, message = F, fig.scap="Venn diagram of positive diagnostic tests", out.extra='', fig.cap="Venn diagram showing overlap of positive diagnostic tests; culture of blood and CSF shown in red, malaria in green and TB diagnostics in blue. The CSF variable in includes either a positive culture for a pathogenic bacteria or positive cryptococcal antigen, BSI a positive aerobic culture of pathogenic bacteria from blood and MTB BSI a positive mycobacterial culture of tuberculosis from blood. BSI: Bloodstream infection, CSF: Cerebrospinal fluid, CRAG: Cryptococcal antigen, mRDT: Malaria rapid diagnostic test, MTB BSI: Mycobacterium tuberculosis bloodstream infection, uLAM: urinary lipoarabinomannan.", fig.width = 5, fig.height = 6, out.height = "70%"}
 
  set.seed (99)
 euler(as.data.frame(sapply(a[c(3:8, 10)], as.logical)), shape = "circle") -> eul
@@ -462,7 +479,7 @@ plot(eul, edges = "grey30", labels = list(labels = c("BSI","CSF","Malaria","MTB 
 ```
 
 
-```{r sep-upset-plot, echo = F, warning = F, message = F, fig.scap="UpSet plot of diagnostic testing", out.extra='', fig.cap="UpSet plot of overlap of positive diagnostic tests, showing that for the majority of participants, one test alone is positive. Red colour indicates HIV-infected; black is a composite of HIV-negative and unknown. The CSF variable in includes either a positive culture for a pathogenic bacteria or positive cryptococcal antigen, BSI a positive aerobic culture of pathogenic bacteria from blood and MTB BSI a positive mycobacterial culture of tuberculosis from blood. BSI: Bloodstream infection, CSF: Cerebrospinal fluid, CRAG: Cryptococcal antigen, mRDT: Malaria rapid diagnostic test, MTB BSI: Mycobacterium tuberculosis bloodstream infection, uLAM: urinary lipoarabinomannan.", fig.width = 6, fig.height = 5, out.height = "50%"}
+```{r sep-upset-plot, echo = F, warning = F, message = F, fig.scap="UpSet plot of positive diagnostic tests", out.extra='', fig.cap="UpSet plot of overlap of positive diagnostic tests, showing that for the majority of participants, one test alone is positive. Red colour indicates HIV-infected; black is a composite of HIV-negative and unknown. The CSF variable in includes either a positive culture for a pathogenic bacteria or positive cryptococcal antigen, BSI a positive aerobic culture of pathogenic bacteria from blood and MTB BSI a positive mycobacterial culture of tuberculosis from blood. BSI: Bloodstream infection, CSF: Cerebrospinal fluid, CRAG: Cryptococcal antigen, mRDT: Malaria rapid diagnostic test, MTB BSI: Mycobacterium tuberculosis bloodstream infection, uLAM: urinary lipoarabinomannan.", fig.width = 6, fig.height = 5, out.height = "50%"}
 
 
 
@@ -487,14 +504,11 @@ upset(a[-9], nsets = 7,order = "freq", query.legend = "bottom",
 
 ### Treatment
 
-95% (214/225) of the cohort recieved at least on antimicrobial during their admission (Table \@ref:(time-to-ab-table)), most commonly an antibacterial (207/225 [92%]), but also a significant minority recieved antitubercular therapy (63/225 [28%]). Of those receiving antitubercular therapy, 16% (10/63) were taking the medication prior to admission, and the remainder were initiated on therapy during admission. The first antibacterial agent administered was most often ceftriaxone, in 87% (181/207) of cases but ciprofloxacin (18/207 [9%] of participants), amoxicillin (6/207 [3%]) and metronidazole (2/207 [1%]) were also used. Median (IQR) door to antimicrobial time was 5.3 (3.7-10.8) hours for antibacterials and 4.5 (3.1-21.7) hours for antimalarials but longer for antifungals at 47.7 (27.9-73.9) hours and longer still for antitubercular therapy at 120.9 (63.7-171.0). Cumulative incidence curves for administration of the different antimicrobial classess are shown in figure
+At least one antimicrobial drug was recieved by 95% (214/225) of the cohort during their admission (Table \@ref:(time-to-ab-table)), most commonly an antibacterial (207/225 [92%]), but also a significant minority recieved antitubercular therapy (63/225 [28%]). Of those receiving antitubercular therapy, 16% (10/63) were taking the medication prior to admission, and the remainder were initiated on therapy during admission. The first antibacterial agent administered was most often ceftriaxone, in 87% (181/207) of cases but ciprofloxacin (18/207 [9%] of participants), amoxicillin (6/207 [3%]) and metronidazole (2/207 [1%]) were also used. Median door to antimicrobial time was 5.3 (IQR 3.7-10.8) hours for antibacterials and 4.5 (IQR 3.1-21.7) hours for antimalarials but longer for antifungals at 47.7 (IQR 27.9-73.9) hours and longer still for antitubercular therapy at 120.9 (IQR 63.7-171.0). Cumulative incidence curves for administration of the different antimicrobial classess are shown in Figure \@ref(fig:sep-abtime-fluid-plot)A-D.
 
-85% (192/225) of participants received any intravenous fluid in the first 6 hours of enrollment to the study; of these, most received 0.9% saline (160/190 [83%] of those recieving fluid) but 5% dextrose (91/160 [57%]) were also used; Ringer's lactate (6/192 [6%]) and blood (2/192 [1%]) were rarely administered. 
+Of all participants, 85% (192/225) received any intravenous fluid in the first 6 hours of enrollment to the study; of these, most received 0.9% saline (160/192 [83%] of those recieving fluid) but 5% dextrose (91/192 [57%]) were also used; Ringer's lactate (6/192 [6%]) and blood (2/192 [1%]) were rarely administered. Of the 192 patients who were administered any fluid, a median of 1.5L (IQR 1-2L) was administered over the 6hr study period; fluid administration as a function of time is shown in Figure \@ref(fig:sep-abtime-fluid-plot)E.
 
 ```{r treatment-setup, include = F}
-
-
-source("final_cleaning_scripts/load_and_clean_time_to_ab.R")
 
 df.abs$event <- as.numeric(!df.abs$first_ab == "none")
 df.abs$t <- df.abs$time_to_abx
@@ -575,7 +589,6 @@ subset(e1, !(pid %in% subset(df.abs, first_ab != "none")$pid | pid %in% subset(d
 
 ```{r treatment-plot-setup, include = F}
 
-source("final_cleaning_scripts/load_and_clean_fluid_hr1_to_6.R")
 
 brk <-  seq(0,192, 24)
 
@@ -617,7 +630,7 @@ ggplot(fluid %>% pivot_longer(-pid), aes(name, value)) + geom_jitter(size = 0.5,
 ##  draw_plot(plt.inset, x = 0.3, y = 0.1, width = 0.5, height = 0.5)
 
 ```
-```{r sep-abtime-fluid-plot, echo = F, warning = F, message = F, fig.scap="Antimicrobial and fluid administration as a function of time.", out.extra='', fig.cap="Timing of antimicrobial and fluid administration. A-D: Cumulative incidence of administration of antibacterial (A), antitubercular (B), antifungal (C) and antimalarial (D) agents as a function of time since arrival at hospital in hours. E: Total volumne of administered intavenous fluid as a function of time since enrollment to study in hours. Boxplots show median, quartiles box and 1.5 times interquartile range as whiskers. Points are jittered around the hour at which they were measured. ", fig.width = 6, fig.height = 8, out.width= "80%", fig.align= "center"}
+```{r sep-abtime-fluid-plot, echo = F, warning = F, message = F, fig.scap="Antimicrobial and fluid administration as a function of time.", out.extra='', fig.cap="Timing of antimicrobial and fluid administration. A-D: Cumulative incidence of administration of antibacterial (A), antitubercular (B), antifungal (C) and antimalarial (D) agents as a function of time since arrival at hospital in hours. E: Total volumne of administered intavenous fluid as a function of time since enrollment to study in hours. Boxplots show median, quartiles box and 1.5 times interquartile range as whiskers. Points are jittered around the hour at which they were measured to show distribution. ", fig.width = 6, fig.height = 8, out.width= "80%", fig.align= "center"}
 
 ggarrange(
   ggarrange(p.abs, p.tb, ncol = 2, nrow = 1, labels = c("A", "B")), 
@@ -626,12 +639,132 @@ ggarrange(
             ncol = 1,nrow = 3)
 
 ```
-Table:
-Time to antimicrobials
-Time to fluid
-Amount of fluid
 
 ### Outcome
+
+bleh
+
+```{r outcome-table, echo =F, warning=F, message=F}
+
+v1 <- visits %>% filter(arm == 1) 
+
+v1$t <- apply(v1[7:10], 1,max, na.rm= T )
+
+v1$t[!is.na(v1$died_date)] <- v1$died_date[!is.na(v1$died_date)]
+
+#v1$t <- v1$t * 7
+v1$died <- v1$status
+v1$died[v1$died == 2] <- 0
+
+v1 <- select(v1, pid, enrolled, arm, t, died)
+
+#v1$d28_death
+
+v1$d28_death <- NA
+
+v1$d28_death[(v1$t <= 28) & (v1$died == 1)] <- 1
+v1$d28_death[(v1$t >= 28)] <- 0
+
+v1$d90_death[(v1$t <= 90) & (v1$died == 1)] <- 1
+v1$d90_death[(v1$t >= 90)] <- 0
+
+v1$d180_death[(v1$t <= 180) & (v1$died == 1)] <- 1
+v1$d180_death[(v1$t >= 180)] <- 0
+
+merge(v1, select(enroll, pid, hivstatus)) -> v1
+
+v1$died <- as.numeric(v1$died)
+
+#bind_rows(
+#v1 %>% group_by(hivstatus) %>% 
+#  summarise(d28_n = sum(!is.na(d28_death)), 
+ #   d28mort = prop_confint_str(d28_death), 
+#            d90_n = sum(!is.na(d90_death)), 
+#            d90mort = prop_confint_str(d90_death),
+#            d180_n = sum(!is.na(d180_death)),
+#            d180mort = prop_confint_str(d180_death)),
+# v1 %>% ungroup %>% 
+#  summarise(d28_n = sum(!is.na(d28_death)), 
+#    d28mort = prop_confint_str(d28_death),
+##               d90_n = sum(!is.na(d90_death)), 
+#            d90mort = prop_confint_str(d90_death),
+#            d180_n = sum(!is.na(d180_death)),
+#            d180mort = prop_confint_str(d180_death)),
+#) -> mort
+
+#mort[4,1] <- "Total"
+#mort[c(2,1,3,4),] -> mort
+#data.frame(t(mort[,c(1,2,4,6)])) -> mort1
+
+#data.frame(t(mort[,c(2,2,4,6)])) -> mort1
+
+#names(mort) <- c("HIV+", "HIV-", "HIV Unknown", "Total")
+#mort <- mort[-1,]
+
+#mort$cats <- c("n", "Mortality", "n", "Mortality", "n", "Mortality")
+#mort <- mort[,c(5,1,2,3,4)]
+
+#kable(mort, "latex", booktabs = T, row.names = F,
+#      caption = "Day 28, 90 and 180 mortality stratified by HIV status",
+#       col.names = c("", names(mort)[2:5])) %>%
+##        kable_styling( full_width = F) %>%
+#        group_rows("Day 28", 1,2) %>%
+#        group_rows("Day 90", 3,4) %>%
+#        group_rows("Day 180", 5,6) %>%
+#        column_spec(5, bold = T)
+
+
+
+#  footnote(symbol = "10/63 participants who received antitubercular agents during admission were taking them prior to admission; they #are excluded from the calculation of median door-to-antimicrobial time for this class. ", threeparttable = T, fixed_small_size = T)
+
+merge(
+v1 %>% 
+  dplyr::select(pid, hivstatus, d28_death, d90_death, d180_death) %>% 
+  pivot_longer(-c(pid, hivstatus)) %>% group_by(name, hivstatus) %>%
+  summarise(n = sum(!is.na(value)), mort =  prop_confint_str(value)) %>%
+  pivot_wider(id_cols = c(name), names_from = hivstatus, values_from = c(n,mort)),
+
+v1 %>% 
+    dplyr::select(pid, hivstatus, d28_death, d90_death, d180_death) %>% 
+    pivot_longer(-c(pid, hivstatus)) %>% group_by(name) %>%
+    summarise(n = sum(!is.na(value)), mort =  prop_confint_str(value)),
+by = "name") -> mort
+
+mort[,c(1,3,6,2,5,4,7, 8, 9)] -> mort
+mort[c(2,3,1),] -> mort
+mort$name <- c("Day 28", "Day 90", "Day 180")
+
+#(gsub("%", "\\\\%", mort[c(3,5,7,9)])) -> mort[c(3,5,7,9)]
+
+kable(mort, "latex", booktabs =T,  row.names = F, longtable = F,escape = TRUE,
+      caption = "Day 28, 90 and 180 mortality stratified by HIV status",
+      col.names = c(" ", "n", "Mortality" , "n", "Mortality", "n", "Mortality","n", "Mortality" )) %>%
+        add_header_above(c(" " = 1, "HIV+" = 2, "HIV-" = 2, "HIV Unknown" = 2, "Total" = 2)) %>%
+  kable_styling( full_width = F) %>%
+    column_spec(8, bold = T) %>% 
+  column_spec(9, bold = T)
+
+
+```
+
+```{r outcome-km-plots, echo =F, warning=F, message=F,fig.scap="Kaplan-Meier survival curves.", out.extra='', fig.cap="Kaplan-Meier survival curves of all included participants (A) and stratified by HIV status (B). Crosses indicate censoring. p value from log-rank test comparing survival of HIV-infected to HIV-noninfected participants shown (p = 0.03).", fig.width= 8, fig.height =4, }
+
+psurv1 <- ggsurvplot(survfit(Surv(t,died) ~ 1, data = v1), conf.int = T, xlim = c(0, 190), ylim = (c(0.6,1)), ggtheme = theme_bw(), palette = "black", size = 0.5,legend = "none", break.time.by = 30)
+
+psurv1 <- psurv1$plot
+
+psurv2 <- ggsurvplot(survfit(Surv(t,died) ~ hivstatus, data = subset(v1, hivstatus != "Unknown")), conf.int = T, xlim = c(0, 190), ylim = (c(0.6,1)), ggtheme = theme_bw(), size = 0.5, break.time.by = 30, pval = TRUE, pval.coord = c(15,0.65), pval.size = 4)
+
+psurv2 <- psurv2$plot
+
+psurv2 + theme(legend.position = "right", legend.title = element_blank()) + scale_fill_discrete(labels = c("HIV-", "HIV+")) + scale_color_discrete(labels = c("HIV-", "HIV+")) -> psurv2
+
+ggarrange(psurv1, psurv2, labels = c("A", "B"), widths = c(0.8,1))
+```
+
+
+```{r outcome-morbidity, echo =F, warning=F, message=F,fig.scap="Kaplan-Meier survival curves.", out.extra='', fig.cap="Kaplan-Meier survival curves of all included participants (A) and stratified by HIV status (B). Crosses indicate censoring. p value from log-rank test comparing survival of HIV-infected to HIV-noninfected participants shown (p = 0.03).", fig.width= 8, fig.height =4, }
+
 
 Table - 28 and 90 day mortality
 
