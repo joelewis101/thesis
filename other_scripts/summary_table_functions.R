@@ -59,6 +59,28 @@ median_iqr_str_df <- function(x, r = 0, varname = "Var") {
   return(out)
 }
 
+prop_confint_str <- function(x, r= 0) {
+  # x is binary vector
+  # r is digits to round to
+ # if (!is.numeric(x)) {stop("Nonnumeric value in median_iqr_str.")}
+  n = sum(x == 1, na.rm = T)
+  N = sum(!is.na(x))
+  out_str <- paste0(
+    format(round((n*100/N), r), nsmall = r),
+    "% ",
+    " (",
+    format(round(binom.test(n,N)$conf.int[[1]] * 100, r), nsmall = r),
+    "-",
+    format(round(binom.test(n,N)$conf.int[[2]] * 100, r), nsmall = r),
+    ")"
+  )
+  return(out_str)
+  
+}
+
+
+
+
 pretty_tbl_df <- function(df, vars_to_char = NULL, r = 0) {
   if (!is.null(vars_to_char)) {
     df[vars_to_char] <- as.data.frame(lapply(df[vars_to_char], as.character), stringsAsFactors = F)
