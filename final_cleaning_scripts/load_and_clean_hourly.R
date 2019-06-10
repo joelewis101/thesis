@@ -977,14 +977,27 @@ hourly$amicro_time1[hourly$pid == "DAS1140H" & hourly$amicro_time1 == "13:80"] <
 hourly$amicro_time1[hourly$pid == "DAS1288E" & hourly$assess_type == 2] <- "16:30"
 
 
+hourly$assess_date[hourly$pid == "DAS1120P" & hourly$assess_type == 4] <- "18-APR-2017"
+hourly$assess_date[hourly$pid == "DAS11801" & hourly$assess_type == 1] <- "27-MAR-2018"
+hourly$assess_date[hourly$pid == "DAS1182Y" & hourly$assess_type == 1] <- "26-MAR-2018"
+hourly$assess_time[hourly$pid == "DAS1185S" & hourly$assess_type == 1] <- "11:00"
+hourly$assess_time[hourly$pid == "DAS1185S" & hourly$assess_type == 2] <- "12:00"
+hourly$assess_time[hourly$pid == "DAS1185S" & hourly$assess_type == 3] <- "13:00"
+hourly$assess_time[hourly$pid == "DAS1185S" & hourly$assess_type == 4] <- "14:00"
+hourly$assess_time[hourly$pid == "DAS1185S" & hourly$assess_type == 5] <- "15:00"
+hourly$assess_time[hourly$pid == "DAS1185S" & hourly$assess_type == 6] <- "16:00"
+hourly$assess_date[hourly$pid == "DAS1194Q" & hourly$assess_type == 6] <- "18-MAR-2018"
+
+hourly$assess_date[hourly$pid == "DAS1267O" & hourly$assess_type == 1] <- "10-JAN-2018"
+hourly$assess_date[hourly$pid == "DAS13241" & hourly$assess_type == 6] <- "13-NOV-2017"
+hourly$assess_date[hourly$pid == "DAS1510Y" & hourly$assess_type == 6] <- "09-JUL-2018"
+
 hourly$date_time_str <- paste0(hourly$assess_date, " ", hourly$assess_time) 
 hourly$date_time <- parse_datetime(hourly$date_time_st, format = "%d-%b-%Y %H:%M")
 hourly$amicro1_datetime_str <- paste0(hourly$assess_date, " ", hourly$amicro_time1)
 hourly$amicro1_datetime <- parse_datetime(hourly$amicro1_datetime_str, format = "%d-%b-%Y %H:%M")
 hourly$amicro2_datetime_str <- paste0(hourly$assess_date, " ", hourly$amicro_time2)
 hourly$amicro2_datetime <- parse_datetime(hourly$amicro2_datetime_str, format = "%d-%b-%Y %H:%M")
-
-
 
 cat("Done!")
 cat("First 6hr forms now in hourly.  \n  ")

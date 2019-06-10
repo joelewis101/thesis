@@ -81,6 +81,9 @@ enroll$recieved_prehosp_ab <- enroll$prehosrxname %in% c("Amoxicillin", "Azithro
 enroll$recieved_prehosp_ab[enroll$recieved_prehosp_ab == TRUE] <- "Yes"
 enroll$recieved_prehosp_ab[enroll$recieved_prehosp_ab == FALSE] <- "No"
 
+enroll$timeaarrievhosp[enroll$pid == "DAS1205F"] <- "09:30:00"
+enroll$t0obstime[enroll$pid == "DAS1205F"] <- "09:30:00"
+
 cat("Enrollment df now in enroll.  \n  ")
 cat("Followup df now in followup.  \n  ")
 cat("If you wanna merge in HIV tests for composite HIV variable  \n  ")
