@@ -16,6 +16,7 @@ library(RColorBrewer)
 library(scales)
 library(lubridate)
 library(survival)
+library(eq5d)
 
 wd <- "chapter_4/"
 output = "latex"
@@ -572,7 +573,7 @@ ab_sum_tbl[c(1,4,3,2),] -> ab_sum_tbl
 
 kable(ab_sum_tbl, "latex", booktabs =T, 
       row.names = F, longtable = F,escape = T,
-      caption = "Door-to-antimicrobial times and number of patients receiving each class of antimicrobial",
+      caption = "Door-to-antimicrobial times.",
       col.names = c("Antimicrobial class", "No. participants", "Median [IQR] time (hours)")) %>%
   kable_styling( full_width = F) %>%
   footnote(symbol = "10/63 participants who received antitubercular agents during admission were taking them prior to admission; they are excluded from the calculation of median door-to-antimicrobial time for this class. ", threeparttable = T, fixed_small_size = T)
@@ -763,7 +764,7 @@ ggarrange(psurv1, psurv2, labels = c("A", "B"), widths = c(0.8,1))
 ```
 
 
-```{r outcome-morbidity, echo =F, warning=F, message=F,fig.scap="Health-related QoL following admission with sepsis.", out.extra='', fig.cap="Health-related quality of life following sepsis admission, compared to non-sepsis admissions, showing a return to usual QoL by 12 weeks in both sepsis and non-sepsis admissions. A: proportion of participants across each of the five domains of the EQ-5D questionnaire who report at least moderate impariment. B: Boxplots of visual analogue scale (VAS) score as a function of time. Dotted line marks median VAS score from community participants. To score on the VAS scale, participants are asked to mark their current global health status on a visual scale, which is converted into a 0-100 scale.", fig.width= 9, fig.height =5, }
+```{r outcome-morbidity, echo =F, warning=F, message=F,fig.scap="Health-related QoL following admission with sepsis.", out.extra='', fig.cap="Health-related quality of life following sepsis admission, compared to community controls, showing a return to usual quality of life by 12 weeks following admission. A: proportion of participants across each of the five domains of the EQ-5D questionnaire who report at least moderate impariment. B: EQ-5D utility score derived using the Zimbabwean tariff set. The utility score is interpreted as the weight attached to a health state compared to perfect health, which is assigned a value of 1. By 12 weeks there is no statistically significant difference between sepsis and baseline community participant utility scores (p = 0.90 by t-test).", fig.width= 9, fig.height =5, }
 
 eq <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/dassim_eq05_raw.csv", stringsAsFactors = F)
 
@@ -787,7 +788,7 @@ eq <- merge(eq, select(enroll,pid, arm, hivstatus), all.x = T)
 
 eq %>% select(arm, visit_type, walk, self, usual, pain, anxiety) %>% 
   pivot_longer(-c(arm, visit_type)) %>% filter(!is.na(arm) & !is.na(value) & !is.na(visit_type)) %>% 
-  group_by(arm, visit_type, name) %>% summarise(x = sum(value >= 3), 
+  group_by(arm, visit_type, name) %>% summarise(x = sum(value >= 2), 
                                                 n = n(), 
                                                 prop = x / n,
                                                 lci = binom.test(x,n)$conf.int[[1]],
@@ -806,10 +807,10 @@ eq.1$visit_type[eq.1$visit_type == 3] <- 4
 
 eq.1$visit_type[eq.1$visit_type == 5] <- 24
 
-eq.1 <- subset(eq.1, arm %in% c(1,2))
+eq.1 <- subset(eq.1, arm %in% c(1,3))
 eq.1$arm[eq.1$arm == 1] <- "Sepsis"
-eq.1$arm[eq.1$arm == 2] <- "Non-Sepsis"
-eq.1$arm <- factor(eq.1$arm, levels = c("Sepsis", "Non-Sepsis"))
+eq.1$arm[eq.1$arm == 3] <- "Community"
+eq.1$arm <- factor(eq.1$arm, levels = c("Sepsis", "Community"))
 
 ggplot(eq.1, aes(visit_type,prop, color = arm, group = arm) ) + 
   geom_point( aes(shape = arm)) + 
@@ -819,11 +820,11 @@ ggplot(eq.1, aes(visit_type,prop, color = arm, group = arm) ) +
   geom_line(data = subset(eq.1, arm == "Sepsis")) +
   facet_wrap(~name, nrow = 1) + 
   theme_bw() + labs(x = "Week post enrollment", y = "Proportion") +
-  theme(legend.title = element_blank()) + coord_cartesian(ylim = c(0,0.5)) -> p1 #+
+  theme(legend.title = element_blank())  -> p1 #+
  # scale_color_manual(values = c("black", "darkgrey")) 
 
 eq$arm[eq$arm == 1] <- "Sepsis"
-eq$arm[eq$arm == 2] <- "Non-Sepsis"
+eq$arm[eq$arm == 3] <- "Community"
 
 eq$visit_type[eq$visit_type == 1] <- 0
 eq$visit_type[eq$visit_type == 2] <- 1
@@ -832,19 +833,29 @@ eq$visit_type[eq$visit_type == 3] <- 4
 
 eq$visit_type[eq$visit_type == 5] <- 24
 
-eq$arm <- factor(eq$arm, levels = c("Sepsis", "Non-Sepsis", 3, 4))
+eq$arm <- factor(eq$arm, levels = c("Sepsis", "Community", 2, 4))
 
-  ggplot(subset(eq, arm != 3 & arm != 4 & !is.na(visit_type) ), 
-         aes(as.factor(visit_type), vas_score, fill = arm)) +
-geom_boxplot(outlier.size = 0.5, alpha = 0.3, width = 0.5) +
+  names(eq)[names(eq) == "walk"] <- "MO"
+  names(eq)[names(eq) == "self"] <- "SC"
+  names(eq)[names(eq) == "usual"] <- "UA"
+  names(eq)[names(eq) == "pain"] <- "PD"
+  names(eq)[names(eq) == "anxiety"] <- "AD"
+  
+  eq$utility_score <- NA
+  eq$utility_score[complete.cases(eq[8:12])] <-  eq5d(eq[8:12][complete.cases(eq[8:12]),],version = "3L", type = "TTO", country = "Zimbabwe") 
+  
+  ggplot(subset(eq, arm != 2 & arm != 4 & !is.na(visit_type) ), 
+         aes(as.factor(visit_type), utility_score, fill = arm, color = arm)) +
+geom_boxplot(outlier.size = 0.5, alpha = 0.3, width = 0.5, position = position_dodge2(preserve = "single"), outlier.alpha = 1) +
 theme_bw() +
-geom_hline(linetype = "dashed", yintercept = median(subset(eq, arm == 3)$vas_score )) +
+#geom_hline(linetype = "dashed", yintercept = median(subset(eq, arm == 3)$vas_score )) +
     theme(legend.title = element_blank()) +
-    labs(y = "VAS score", x= "Week post enrollment") -> p2
+    labs(y = "Utility score", x= "Week post enrollment") -> p2
 
   ggarrange(p1, ggarrange(NULL,p2,NULL, ncol = 3, nrow = 1,
                           widths = c(0.15,1,0.15), labels = c(NA, "B", NA)),
             ncol = 1, nrow = 2, labels = c("A", NA))
+
 
 ```
 Table - 28 and 90 day mortality
