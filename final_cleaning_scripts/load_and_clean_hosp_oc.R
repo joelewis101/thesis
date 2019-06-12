@@ -2,6 +2,16 @@
 
 
 oc <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/dassim_outcome_raw.csv", stringsAsFactors = F)
+
+# add in missing from other forms
+
+oc[nrow(oc) + 1,] <- c(rep(NA, 7), "DAS1169S", rep(NA, ncol(oc) -8))
+oc$hospoutcomedate[oc$pid == "DAS1169S"] <- "06apr2018"
+oc[nrow(oc) + 1,] <- c(rep(NA, 7), "DAS1353S", rep(NA, ncol(oc) -8))
+oc$hospoutcomedate[oc$pid == "DAS1353S"] <- "24oct2017"
+oc[nrow(oc) + 1,] <- c(rep(NA, 7), "DAS14790", rep(NA, ncol(oc) -8))
+oc$hospoutcomedate[oc$pid == "DAS14790"] <- "29may2018"
+
 # take ealiest dates
 
 oc$hospoutcomedate[(oc$hospoutcomedate) == ""] <- NA
@@ -12,6 +22,10 @@ oc$hospoutcometime[is.na(oc$hospoutcometime)] <- "12:00:00"
 
 sub("00:00:00", "17:00:00", oc$hospoutcometime) -> oc$hospoutcometime
 
+
+
+
+#
 oc$hoc.datetime <- parse_datetime(paste0(sub(" 00:00:00", "", oc$hospoutcomedate), " ", oc$hospoutcometime), "%d%b%Y %H:%M:%S")
 extra_deaths <- subset(oc, hospoutcome == 3)
 
@@ -20,6 +34,10 @@ extra_deaths %>% group_by(pid) %>% slice(which.min(hoc.datetime)) -> extra_death
 oc %>% group_by(pid) %>% slice(which.min(hoc.datetime)) -> oc
 
 subset(extra_deaths, !(pid %in% subset(oc, hospoutcome == 3)$pid)) -> extra_deaths
+
+
+                     
+
 
 cat("\n")
 cat("Done! \n")
@@ -30,7 +48,7 @@ cat("Share and enjoy! \n  ")
 
 
 
-oc %>% group_by(pid) %>% tally() %>% filter(n > 1)
+#oc %>% group_by(pid) %>% tally() %>% filter(n > 1)
 
 
 
