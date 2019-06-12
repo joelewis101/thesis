@@ -1,5 +1,17 @@
 # what fluids did people get
 
+does_cum_fl_decrease <- function(inrow) {
+  # give this a 
+  errorflag <- FALSE
+  for (j in length(inrow):2) {
+    if (max(inrow[1:j]) == inrow[j]) {
+      
+    } else  if (which.max(inrow[1:j]) != j) {
+      errorflag <- TRUE
+    }
+  }
+  return(errorflag)
+} 
 # only fluid 1-4 have owt
 
 
@@ -21,18 +33,7 @@ f1 %>%
 
 apply(select(f1, -pid), 1, does_cum_fl_decrease) -> f1$error
 
-does_cum_fl_decrease <- function(inrow) {
-  # give this a 
-  errorflag <- FALSE
-  for (j in length(inrow):2) {
-     if (max(inrow[1:j]) == inrow[j]) {
-       
-     } else  if (which.max(inrow[1:j]) != j) {
-      errorflag <- TRUE
-    }
-  }
-  return(errorflag)
-} 
+
 
 f1$`6`[f1$pid == "DAS1014T"] <- 1000
 f1$`3`[f1$pid == "DAS1023R"] <-  500
