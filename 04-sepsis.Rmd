@@ -461,7 +461,7 @@ merge(bc.full.melt, select(enroll, pid, hivstatus)) -> bc.full.melt
 bc.full.melt$hivstatus <- factor(bc.full.melt$hivstatus, levels = c("Reactive", "Non reactive", "Unknown"))
 
 
-ggplot(bc.full.melt, aes(fct_rev(fct_infreq(variable)), fill = hivstatus)) + geom_bar() + coord_flip() + scale_fill_manual(values = c(brewer.pal( 4, "Set2")[c(2,1)], "darkgrey"), labels = c("HIV+", "HIV-", "Unknown"), name = "HIV status") + theme_bw() +
+ggplot(bc.full.melt, aes(fct_rev(fct_infreq(variable)), fill = hivstatus)) + geom_bar(alpha = 0.8) + coord_flip() + scale_fill_manual(values = c(pal_lancet()(2)[c(2,1)], "darkgrey"), labels = c("HIV+", "HIV-", "Unknown"), name = "HIV status") + theme_bw() +
   scale_x_discrete("", labels = expression(italic("Proteus mirabilis"),italic("Enterococcus faecium"),italic("Acinetobacter baumannii"), italic("Streptococcus pneumoniae"),italic("Haemophilus influenzae"),italic("Klebsiella pneumoniae"),italic("Stapylococcus aureus"),italic("Cryptococcus neoformans"),paste(italic("Salmonella"), "Typhimurium"),italic("Escherichia coli"),paste(italic("Salmonella"), "Typhi"))) + scale_y_continuous(name = "n", breaks = c(0,2,4,6,8,10)) 
 
 
@@ -492,7 +492,7 @@ names(a) <- c("pid", "hivstatus", "BSI", "CSF culture/CRAG +", "mRDT", "MTB BSI"
 #pdf(file = paste0(wd, "figures/upset.pdf"), width = 6, height = 5)
 upset(a[-9], nsets = 7,order = "freq", query.legend = "bottom",
       queries = list(
-        list(query = elements, params = list("hivstatus", "Reactive"), color = "#FC8D62" , active = T, 
+        list(query = elements, params = list("hivstatus", "Reactive"), color = pal_lancet()(2)[2] , active = T, 
              query.name = "HIV+")
       )
 )
@@ -578,13 +578,9 @@ kable(ab_sum_tbl, "latex", booktabs =T,
   kable_styling( full_width = F) %>%
   footnote(symbol = "10/63 participants who received antitubercular agents during admission were taking them prior to admission; they are excluded from the calculation of median door-to-antimicrobial time for this class. ", threeparttable = T, fixed_small_size = T)
 
-#ggplot(fit.all, aes(time, (1-surv), group = type)) + geom_line() + xlim(c(0,240))
-
-#subset(e1, !(pid %in% subset(df.abs, first_ab != "none")$pid | pid %in% subset(df.mal, !is.na(first_ab))$pid  | 
- # pid %in% subset(df.fung, !is.na(first_ab))$pid   | pid %in%  subset(df.tb,any_tb_rx != "none")$pid ))
-
 subset(e1, !(pid %in% subset(df.abs, first_ab != "none")$pid | pid %in% subset(df.mal, !is.na(first_ab))$pid  | 
                pid %in% subset(df.fung, !is.na(first_ab))$pid   | pid %in%  subset(df.tb,any_tb_rx != "none")$pid ))$pid -> a
+
 
 ```
 
@@ -643,7 +639,21 @@ ggarrange(
 
 ### Outcome
 
-bleh
+```{r los-setup, include = F}
+
+los <- merge(select(e1, pid, data_date), select(oc, pid, hospoutcome, hoc.datetime ), all.x = T)
+los$hoc.datetime <- date(los$hoc.datetime)
+los$los <- difftime(los$hoc.datetime, los$data_date, units = "days")
+
+los_str <- median_iqr_str(as.numeric(subset(los, hospoutcome ==1)$los))
+
+
+```
+
+Median hospital stay was 4 (IQR 1-9) days. Mortality of the cohort was 18% (95% CI 13-23%) at 28 days, 24% (95% CI 18-30%) at 90 days and 31% (95% CI 25-38) at 180 days, and higher in HIV-infected participants at each time point (Table \@ref(tab:outcome-table)), though not statistically significant on pairwise Fisher's exact test (HIV-infected vs noninfected 19% vs 13%, [p = 0.14] at 28 days, 27% vs 17%, [p = 0.44] at 90 days and 36% vs 21% [p = 0.29] at 180 days). Kaplan-meier estimation of the survival function (Figure \@ref(fig:outcome-km-plots)) showed a precipitous decline in survivorship to around day 30 but also continuous mortality therafter, to the end of the study period. Stratifying the analysis by HIV status revealed that early deaths (within the first 1-2 weeks) occur at similar rates in the two groups before the curves diverge; log-rank test suggested a significant difference in survival function between the two groups (p = 0.03).
+
+Health related quality of life measures, as assessed by EQ-5D-3L, are shown in Figure \@ref(fig:outcome-morbidity) for participants with sepsis and the community cohort as a comparator. Acutely, participants with sepsis reported were significantly disabled, reporting at least moderate impairment across all domains in the majority of cases, and over 90% of participants reporting at least moderate impairment in activities of daily living and experienceing at least moderate pain or discomfort. However, recovery following treatment in survivors was rapid. The mean EQ-5Q utility score (a measure of the weight compared to a health state compared to 1, perfect health) of healthy community controls was 0.910 (SD 0.102) at enrollment, significantly higher than participants with sepsis at enrollment (utility score 0.496 (SD 0.251), p = < 0.0001 versus community scores by t-test), but comparable to participants with sepsis at their 12 week assessment (0.913 (SD 0.147), p = 0.903 versus community enrollment scores).
+
 
 ```{r outcome-table, echo =F, warning=F, message=F}
 
@@ -676,47 +686,6 @@ merge(v1, select(enroll, pid, hivstatus)) -> v1
 
 v1$died <- as.numeric(v1$died)
 
-#bind_rows(
-#v1 %>% group_by(hivstatus) %>% 
-#  summarise(d28_n = sum(!is.na(d28_death)), 
- #   d28mort = prop_confint_str(d28_death), 
-#            d90_n = sum(!is.na(d90_death)), 
-#            d90mort = prop_confint_str(d90_death),
-#            d180_n = sum(!is.na(d180_death)),
-#            d180mort = prop_confint_str(d180_death)),
-# v1 %>% ungroup %>% 
-#  summarise(d28_n = sum(!is.na(d28_death)), 
-#    d28mort = prop_confint_str(d28_death),
-##               d90_n = sum(!is.na(d90_death)), 
-#            d90mort = prop_confint_str(d90_death),
-#            d180_n = sum(!is.na(d180_death)),
-#            d180mort = prop_confint_str(d180_death)),
-#) -> mort
-
-#mort[4,1] <- "Total"
-#mort[c(2,1,3,4),] -> mort
-#data.frame(t(mort[,c(1,2,4,6)])) -> mort1
-
-#data.frame(t(mort[,c(2,2,4,6)])) -> mort1
-
-#names(mort) <- c("HIV+", "HIV-", "HIV Unknown", "Total")
-#mort <- mort[-1,]
-
-#mort$cats <- c("n", "Mortality", "n", "Mortality", "n", "Mortality")
-#mort <- mort[,c(5,1,2,3,4)]
-
-#kable(mort, "latex", booktabs = T, row.names = F,
-#      caption = "Day 28, 90 and 180 mortality stratified by HIV status",
-#       col.names = c("", names(mort)[2:5])) %>%
-##        kable_styling( full_width = F) %>%
-#        group_rows("Day 28", 1,2) %>%
-#        group_rows("Day 90", 3,4) %>%
-#        group_rows("Day 180", 5,6) %>%
-#        column_spec(5, bold = T)
-
-
-
-#  footnote(symbol = "10/63 participants who received antitubercular agents during admission were taking them prior to admission; they #are excluded from the calculation of median door-to-antimicrobial time for this class. ", threeparttable = T, fixed_small_size = T)
 
 merge(
 v1 %>% 
@@ -745,7 +714,13 @@ kable(mort, "latex", booktabs =T,  row.names = F, longtable = F,escape = TRUE,
     column_spec(8, bold = T) %>% 
   column_spec(9, bold = T)
 
+# calc p values
 
+v1 %>% dplyr::select(pid, hivstatus, d28_death, d90_death, d180_death) %>% 
+  pivot_longer(-c(pid, hivstatus)) %>% group_by(name, hivstatus) %>%
+  summarise(n = (sum(!is.na(value))), dead = sum(sum(value == 1, na.rm = T))) ->ft
+
+#fisher.test(ft[1:2,3:4])
 ```
 
 ```{r outcome-km-plots, echo =F, warning=F, message=F,fig.scap="Kaplan-Meier survival curves.", out.extra='', fig.cap="Kaplan-Meier survival curves of all included participants (A) and stratified by HIV status (B). Crosses indicate censoring. p value from log-rank test comparing survival of HIV-infected to HIV-noninfected participants shown (p = 0.03).", fig.width= 8, fig.height =4, }
@@ -758,7 +733,7 @@ psurv2 <- ggsurvplot(survfit(Surv(t,died) ~ hivstatus, data = subset(v1, hivstat
 
 psurv2 <- psurv2$plot
 
-psurv2 + theme(legend.position = "right", legend.title = element_blank()) + scale_fill_discrete(labels = c("HIV-", "HIV+")) + scale_color_discrete(labels = c("HIV-", "HIV+")) -> psurv2
+psurv2 + theme(legend.position = "right", legend.title = element_blank()) + scale_fill_manual(labels = c("HIV-", "HIV+"), values = pal_lancet()(2)[c(1,2)]) + scale_color_manual(labels = c("HIV-", "HIV+"), values = pal_lancet()(2)[c(1,2)]) -> psurv2
 
 ggarrange(psurv1, psurv2, labels = c("A", "B"), widths = c(0.8,1))
 ```
@@ -858,10 +833,7 @@ theme_bw() +
 
 
 ```
-Table - 28 and 90 day mortality
-
-Figure - KM survival curve
 
 Logistic regression - determinants of 28 day mortality
 
-Morbidity - 
+
