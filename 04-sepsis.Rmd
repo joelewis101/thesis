@@ -22,6 +22,7 @@ library(survminer)
 
 wd <- "chapter_4/"
 output = "latex"
+T <- TRUE
 
 # generate figures
 #source("chapter_4/generate_consort_diagram.R")
@@ -913,13 +914,21 @@ theme_bw() +
 
 ```
 
-## Logistic regression - determinants of 28 day mortality
+#### Associations of mortality
+
+```{r causal-structure, echo = F, fig.scap="Hypothesised causal structre of mortality in sepsis", out.extra='', fig.cap="Hypothesised causal structre of death in sepsis. Host factors would theoretcially include variables quantifying age, sex, immune status; infection would theoretcially include causative agents, site, and variables quantifying pathogen burden; severity would include includes measures of disease severity such as shock or respiratory failure; therapy would include which antimicrobials were administered and rapidity of administration of antimicrobials. Dotted edges from host and infection to outcome are because it is not clear \textit{a priori} whether the effect of infection and host factors are entirely mediated by disease severity: see text for details. ",  out.height = '50%', fig.align = 'center'}
+
+knitr::include_graphics(paste0(wd, "figures/causal_dag_mortality.pdf"))
+
+```
 
 ```{r bivariate-mort-assoc, echo =F, warning=F, message=F}
 
 df.temp <- dplyr::select(df, d28_death, hivstatus,calc_age,ptsex,screentemp, t0sbp, t0dbp, t0map, t0hr, t0rr, t0spo2, gcs, lactate_value,
                          WCC, CD4_Absolute, Haemoglobin, Platelets, NA.,Potassium, Urea, Creatinine, CO2, Chloride
 ) 
+
+df.temp[df.temp == 999] <- NA
 
 df.temp$CD4_Absolute[df.temp$hivstatus != "Reactive"] <- NA
 df.temp$hivstatus[df.temp$hivstatus == "Reactive"] <- 1
@@ -994,7 +1003,7 @@ p$Variable[p$Variable == "calc_age"] <- "Age (years)"
 p$Variable[p$Variable == "ptsex"] <- "Male sex"
 p$Variable[p$Variable == "hivstatus"] <- "HIV Infected"
 p$Variable[p$Variable == "Haemoglobin"] <- "Haemoglobin (x10\\textsuperscript{9} g dL\\textsuperscript{-1})"
-p$Variable[p$Variable == "CD4_Absolute"] <- "CD4 count ($\\mu$L\\textsuperscript{-1})"
+p$Variable[p$Variable == "CD4_Absolute"] <- "CD4 count ($\\mu$L\\textsuperscript{-1})*"
 p$Variable[p$Variable == "screentemp"] <- "Temperature (\\textdegree C)"
 p$Variable[p$Variable == "t0hr"] <- "Heart rate (min\\textsuperscript{-1}))"
 p$Variable[p$Variable == "t0sbp"] <- "Systolic BP (mmHg)"
@@ -1022,7 +1031,8 @@ kable(select(p,-boldcol), "latex", booktabs =T,
  kable_styling("striped", full_width = F, latex_options = c("repeat_header")) %>%
   row_spec(boldrows, bold = T) %>%
   pack_rows("Host Variables", 1,5, bold = F) %>% 
-   pack_rows("Severity Variables", 6, 22, bold = F)
+   pack_rows("Severity Variables", 6, 22, bold = F)  %>%
+  footnote(general = "BP = Blood pressure, GCS = Glasgow coma scale. Numeric variables are presented as median (IQR) and categoric variables as proportions. P-values are from Kruskal-Wallace test for continuous variables and Fisher's exact test for categorical variables" , symbol = "CD4 count variable includes only HIV-infected participants", threeparttable = T, fixed_small_size = T)
 
 
 
