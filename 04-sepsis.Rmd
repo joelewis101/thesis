@@ -1051,7 +1051,7 @@ df.temp2 <- dplyr::select(df, d28_death, hivstatus,calc_age,ptsex,screentemp, t0
 ) 
 apply(df.temp2[24:26], 1, sum) -> df.temp2$n_diagnoses
 
-df.temp2$CD4_Absolute[df.temp2$hivstatus != "Reactive"] <- NA
+#df.temp2$CD4_Absolute[df.temp2$hivstatus != "Reactive"] <- NA
 
 df.temp2 <- subset(df.temp2, n_diagnoses < 2)
 
