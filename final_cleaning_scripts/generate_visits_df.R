@@ -153,7 +153,7 @@ choose_earlier_death <- function(dfin) {
   }
   
   
-  dfin[order(dfin$hospoutcomedate, decreasing = T),] -> dfin
+  dfin[base::order(dfin$hospoutcomedate, decreasing = TRUE),] -> dfin
   dfin[1,] -> dfin
   return(dfin)
 }
