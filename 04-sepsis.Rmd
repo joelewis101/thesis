@@ -17,6 +17,8 @@ library(scales)
 library(lubridate)
 library(survival)
 library(eq5d)
+library(ggsci)
+library(survminer)
 
 wd <- "chapter_4/"
 output = "latex"
@@ -54,6 +56,83 @@ fa$dt2 <- fa$dt
 fa$dt2[fa$dt2 > 1] <- fa$dt2[fa$dt2 > 1] -1
 
 time_to_rec_str <- median_iqr_str(as.numeric(fa$dt2),1)
+
+df <- subset(enroll, arm == 1)
+df$gcs <- df$t0gcse + df$t0gcsv + df$t0gcsm
+df <- merge(df, bloods, all.x = T)
+
+aetiol.m <- dcast(aetiol, pid + hivstatus ~ type, value.var = "pathogen")
+aetiol.m$tb <- aetiol.m$`mtb bsi`== 1 | aetiol.m$uLAM == 1 | aetiol.m$Xpert == 1
+
+df <- merge(df, select(aetiol.m, - hivstatus), all.x = T)
+
+df <- merge(df, select(df.abs, pid, first_ab, time_to_abx))
+
+df <- merge(df, select(df.tb, pid, any_tb_rx, time_to_tb_rx))
+
+df <- merge(df, select(fluid, pid, `6`))
+names(df)[names(df) == "6"] <- "fluid_6hr"
+
+
+
+#aetiol.m -> a
+#a[is.na(a)] <- 0
+#a$no_diagnosis <- as.numeric(apply(a[3:8], 1,sum) == 0)
+
+
+
+v1 <- visits %>% filter(arm == 1) 
+
+v1$t <- apply(v1[7:10], 1,max, na.rm= T )
+
+v1$t[!is.na(v1$died_date)] <- v1$died_date[!is.na(v1$died_date)]
+
+#v1$t <- v1$t * 7
+v1$died <- v1$status
+v1$died[v1$died == 2] <- 0
+
+v1 <- select(v1, pid, enrolled, arm, t, died)
+
+#v1$d28_death
+
+v1$d28_death <- NA
+
+v1$d28_death[(v1$t <= 28) & (v1$died == 1)] <- 1
+v1$d28_death[(v1$t >= 28)] <- 0
+
+v1$d90_death[(v1$t <= 90) & (v1$died == 1)] <- 1
+v1$d90_death[(v1$t >= 90)] <- 0
+
+v1$d180_death[(v1$t <= 180) & (v1$died == 1)] <- 1
+v1$d180_death[(v1$t >= 180)] <- 0
+
+df <- merge(df, v1, all.x = T)
+
+df$sbp.dic <- (df$t0sbp <= 90)
+df$t.dic <- NA
+df$t.dic[df$screentemp < 36] <- "<36"
+df$t.dic[df$screentemp >= 36 & df$screentemp < 38] <- "36-38"
+df$t.dic[df$screentemp >= 38] <- ">38"
+
+df$hr.dic <-  (df$t0hr > 100)
+df$rr.dic <-  (df$t0rr > 30)
+df$cd4.dic <- (df$CD4_Absolute <= 200)
+df$spo2.dic <- (df$t0spo2 < 90)
+df$gcs.dic <- (df$gcs < 15)
+df$lact.dic <- (df$lactate_value > 3)
+as.numeric(df$WCC) > 11 -> df$WCC.dict
+df$CO2.dic <- as.numeric(df$CO2 < 23)
+
+# assess bivariate distributions
+df$t0map <- (df$t0sbp + (df$t0dbp * 2))/3 
+
+df$tb[df$tb] <- 1
+df$tb[df$tb == FALSE | is.na(df$tb) ] <- 0
+
+df$malaria[is.na(df$malaria)] <- 0
+df$bc[is.na(df$bc)] <- 0
+df$csf[is.na(df$csf)] <- 0
+
 
 
 
@@ -834,6 +913,118 @@ theme_bw() +
 
 ```
 
-Logistic regression - determinants of 28 day mortality
+## Logistic regression - determinants of 28 day mortality
+
+```{r bivariate-mort-assoc, echo =F, warning=F, message=F}
+
+df.temp <- dplyr::select(df, d28_death, hivstatus,calc_age,ptsex,screentemp, t0sbp, t0dbp, t0map, t0hr, t0rr, t0spo2, gcs, lactate_value,
+                         WCC, CD4_Absolute, Haemoglobin, Platelets, NA.,Potassium, Urea, Creatinine, CO2, Chloride
+) 
+
+df.temp$CD4_Absolute[df.temp$hivstatus != "Reactive"] <- NA
+df.temp$hivstatus[df.temp$hivstatus == "Reactive"] <- 1
+df.temp$hivstatus[df.temp$hivstatus == "Non reactive"] <- 0
+df.temp$hivstatus[df.temp$hivstatus == "Unknown"] <- NA
+
+df.temp$ptsex[df.temp$ptsex == "Male"] <- 1
+df.temp$ptsex[df.temp$ptsex == "Female"] <- 0
 
 
+df.temp %>% select(-c(hivstatus, ptsex)) %>% pivot_longer(-d28_death) %>% filter(!is.na(d28_death)) %>%
+  dplyr::group_by(name) %>% dplyr::summarise(pval = kruskal.test(value ~ d28_death)$p.value) -> pvals
+
+df.temp %>% select(-c(hivstatus, ptsex)) %>% pivot_longer(-d28_death) %>% filter(!is.na(d28_death)) %>%
+  dplyr::group_by(name, d28_death) %>% dplyr::summarise( median = median(value, na.rm = T),
+                                                             LQ = quantile(value, 0.25, na.rm = T),
+                                                              UQ = quantile(value, 0.75, na.rm = T)) -> p
+
+
+
+paste0(
+  specify_decimal(p$median, 1), " (",
+  specify_decimal(p$LQ, 1), "-",
+  specify_decimal(p$UQ, 1) ,")"
+) -> p$med_str
+
+p %>% select(name, d28_death, med_str) %>% pivot_wider(names_from = d28_death, values_from = med_str) -> p
+
+p <- merge(p, pvals)
+
+
+df.temp %>% select(d28_death, hivstatus, ptsex) %>% pivot_longer(-d28_death) %>% filter(!is.na(d28_death)) %>%
+  dplyr::group_by(name, value) %>%
+  dplyr::summarise(died = sum(d28_death == 1, na.rm = T), alive = sum(d28_death == 0, na.rm = T)) %>% filter(!is.na(value)) %>% group_by(name) %>%
+   group_by(name) %>% dplyr::summarise(pval = fisher.test(matrix(c(died, alive), ncol =2))$p.value) -> p.catpvals
+
+df.temp %>% select(d28_death, hivstatus, ptsex) %>% pivot_longer(-d28_death) %>% filter(!is.na(d28_death)) %>%
+  dplyr::group_by(name, d28_death) %>% dplyr::summarise(`1` = sum(value == 1, na.rm = T), 
+                                                        total = sum(!is.na(value)),
+                                                        prop = `1`/total) -> p.cat
+
+p.cat$str <- paste0(
+  p.cat$`1`, "/", p.cat$total,
+  " (", signif(p.cat$prop *100,2), "%)"
+)
+
+
+p.cat %>% select(name, d28_death, str) %>% pivot_wider(names_from = d28_death, values_from = str) -> p.cat
+p.cat <- merge(p.cat, p.catpvals)
+
+
+
+p <- bind_rows(p,p.cat)
+
+p$boldcol <- FALSE 
+p$boldcol[p$pval <= 0.05] <- TRUE
+
+p$pval <- specify_decimal(p$pval, 3)
+p$pval[p$pval == "0.000"] <- "<0.001"
+
+
+p[match(c("calc_age", "ptsex", "hivstatus", "CD4_Absolute", "Haemoglobin","screentemp", "t0hr", "t0sbp", "t0dbp", "t0map",
+        "t0rr", "t0spo2","gcs", "lactate_value" , "WCC", "Platelets", "NA.", "Potassium",
+        "Chloride", "CO2", "Urea", "Creatinine"), p$name),] -> p
+
+p <- p[c("name", "1", "0", "pval", "boldcol")]
+names(p) <- c("Variable", "Died", "Survived", "p", "boldcol")
+
+boldrows <- which(p$boldcol %in% TRUE)
+
+p$Variable[p$Variable == "calc_age"] <- "Age (years)"
+p$Variable[p$Variable == "ptsex"] <- "Male sex"
+p$Variable[p$Variable == "hivstatus"] <- "HIV Infected"
+p$Variable[p$Variable == "Haemoglobin"] <- "Haemoglobin (x10\\textsuperscript{9} g dL\\textsuperscript{-1})"
+p$Variable[p$Variable == "CD4_Absolute"] <- "CD4 count ($\\mu$L\\textsuperscript{-1})"
+p$Variable[p$Variable == "screentemp"] <- "Temperature (\\textdegree C)"
+p$Variable[p$Variable == "t0hr"] <- "Heart rate (min\\textsuperscript{-1}))"
+p$Variable[p$Variable == "t0sbp"] <- "Systolic BP (mmHg)"
+p$Variable[p$Variable == "t0dbp"] <- "Diastolic BP (mmHg)"
+p$Variable[p$Variable == "t0map"] <- "Mean arterial BP (mmHg)"
+p$Variable[p$Variable == "t0rr"] <- "Respiratory rate (min\\textsuperscript{-1}))"
+p$Variable[p$Variable == "t0spo2"] <- "Oxygen saturation (%)"
+p$Variable[p$Variable == "gcs"] <- "GCS"
+p$Variable[p$Variable == "lactate_value"] <- "Lactate (mmol L\\textsuperscript{-1})"
+p$Variable[p$Variable == "WCC"] <- "White cell count (x10\\textsuperscript{9} L\\textsuperscript{-1})"
+p$Variable[p$Variable == "Platelets"] <- "Platelet count (x10\\textsuperscript{9} L\\textsuperscript{-1})"
+p$Variable[p$Variable == "NA."] <- "Sodium (mmol L\\textsuperscript{-1})"
+p$Variable[p$Variable == "Potassium"] <- "Potassium (mmol L\\textsuperscript{-1})"
+p$Variable[p$Variable == "Chloride"] <- "Chloride (mmol L\\textsuperscript{-1})"
+p$Variable[p$Variable == "CO2"] <- "Bicarbonate (mmol L\\textsuperscript{-1})"
+p$Variable[p$Variable == "Urea"] <- "Urea (mmol L\\textsuperscript{-1})"
+p$Variable[p$Variable == "Creatinine"] <- "Creatinine (mmol L\\textsuperscript{-1})"
+
+sub("%", "\\\\%", p$Died) -> p$Died
+sub("%", "\\\\%", p$Survived) -> p$Survived
+sub("%", "\\\\%", p$Variable) -> p$Variable
+
+kable(select(p,-boldcol), "latex", booktabs =T, 
+      row.names = F, longtable = F, ,escape = F,caption = "Bivariate associations with death by 28 days" ) %>%
+ kable_styling("striped", full_width = F, latex_options = c("repeat_header")) %>%
+  row_spec(boldrows, bold = T) %>%
+  pack_rows("Host Variables", 1,5, bold = F) %>% 
+   pack_rows("Severity Variables", 6, 22, bold = F)
+
+
+
+
+```
