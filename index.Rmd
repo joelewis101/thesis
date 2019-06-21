@@ -25,6 +25,7 @@ header-includes:
    \usepackage{booktabs}
    \usepackage{setspace}
    \usepackage{textcomp}
+   \usepackage{pdflscape}
    \usepackage[font={small}]{caption}
    \raggedbottom
    \onehalfspacing
