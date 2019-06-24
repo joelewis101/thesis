@@ -149,6 +149,7 @@ df$csf[is.na(df$csf)] <- 0
 
 
 
+
 ```
 
 ## Chapter overview
@@ -1474,7 +1475,7 @@ df$hivstatus[df$hivstatus == "UK"] <- NA
 
 df2 <- dplyr::select(df, d28_death, calc_age ,ptsex , hivstatus ,Haemoglobin, screentemp ,t0map,
        t0spo2, gcs, lactate_value, CO2, Urea, Creatinine,
-      tb, bc, malaria,any_tb_rx, any_fung_rx, any_mal_rx)
+      tb, bc, malaria,any_tb_rx, any_fung_rx, any_mal_rx, no_diagnosis)
 
 df2.complete <- df2[complete.cases(df2),]
 
@@ -1482,12 +1483,21 @@ glm(d28_death ~ calc_age + ptsex + hivstatus + Haemoglobin +
        t0spo2 + gcs + lactate_value +  Urea +  
       tb + bc +  any_tb_rx + any_fung_rx, family = 'binomial', data = df) -> m 
 
+df3 <- dplyr::select(df, d28_death, calc_age ,ptsex , hivstatus ,Haemoglobin, screentemp ,t0map,
+       t0spo2, gcs, lactate_value, CO2, Urea, Creatinine,
+      tb, bc,csf, malaria,any_tb_rx, any_fung_rx, any_mal_rx, time_to_abx)
 
 
-  brms::brm(d28_death ~ calc_age + ptsex + hivstatus + Haemoglobin + screentemp +  t0map + 
-       t0spo2 + gcs + lactate_value + CO2 + Urea + Creatinine + 
-      tb + malaria + bc +  any_tb_rx + any_fung_rx + any_mal_rx, data = df2.complete, family = "bernoulli", prior = m1priors) -> m.brms
+df3.complete <- df3[complete.cases(df3),]
 
+
+
+
+
+    brms::brm(d28_death ~ Haemoglobin +
+       t0spo2 + gcs + lactate_value +  Urea + 
+      tb + malaria + bc + csf + time_to_abx + any_tb_rx + any_fung_rx + any_mal_rx, data = df3.complete, family = "bernoulli", prior = m1priors) -> m.brms3
+  
 df2.complete %>% add_fitted_draws(m.brms, scale = "linear") %>% ungroup() %>% dplyr::select( -c(d28_death, ptsex, hivstatus, tb, bc, malaria, any_tb_rx, any_fung_rx, any_mal_rx)) %>% pivot_longer(-c(.row, .chain,.iteration, .draw, .value)) %>% ggplot(aes(x= value, y = .value)) + stat_pointinterval() + geom_smooth() + geom_smooth(method = 'lm', linetype = "dashed", color = "red") + facet_wrap(~name, scales = "free")
 
 ## make partial residual
