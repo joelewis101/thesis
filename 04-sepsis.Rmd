@@ -74,6 +74,17 @@ df <- merge(df, select(df.tb, pid, any_tb_rx, time_to_tb_rx))
 df <- merge(df, select(fluid, pid, `6`))
 names(df)[names(df) == "6"] <- "fluid_6hr"
 
+df.mal.b <-select(df.mal, pid, first_ab, time_to_mal_rx)
+names(df.mal.b)[2:3] <- c("first_mal_rx", "time_to_mal_rx")
+
+df <- merge(df, df.mal.b)
+rm(df.mal.b)
+
+df.fung.b <-select(df.fung, pid, first_ab, time_to_fung_rx)
+names(df.fung.b)[2:3] <- c("first_fung_rx", "time_to_fung_rx")
+
+df <- merge(df, df.fung.b)
+rm(df.fung.b)
 
 
 #aetiol.m -> a
@@ -920,7 +931,7 @@ Univariate associations of host and severity variables
 
 Univariate association of 
 
-```{r causal-structure, echo = F, fig.scap="Hypothesised causal structre of mortality in sepsis", out.extra='', fig.cap="Hypothesised causal structre of death in sepsis. Host factors would theoretcially include variables quantifying age, sex, immune status; infection would theoretcially include causative agents, site, and variables quantifying pathogen burden; severity would include includes measures of disease severity such as shock or respiratory failure; therapy would include which antimicrobials were administered and rapidity of administration of antimicrobials. Dotted edges from host and infection to outcome are because it is not clear \textit{a priori} whether the effect of infection and host factors are entirely mediated by disease severity: see text for details. ",  out.height = '50%', fig.align = 'center'}
+```{r causal-structure, echo = F, fig.scap="Hypothesised causal structre of mortality in sepsis", out.extra='', fig.cap="Hypothesised causal structre of death in sepsis. Host factors (e.g. age, sex, immune status) influence the type of infection; disseminated TB is more common in HIV, for example. Severity  (variables quantifying e.g. shock or respiratory failure) is influenced by infection type and host factors. Therapy encodes which antimicrobials were administered and rapidity of administration of antimicrobials, and is influenced by disease severity (sicker patients may be given different therapies), host factors (HIV status may influence treatment) and the infection type (for example, malaria rapid diagnostic tests influenceing rapidity of malaria treatment). Dotted edges from host and infection to outcome are because it is not clear \textit{a priori} whether the effect of infection and host factors are entirely mediated by disease severity: in fact, even if this were the case in a theoretical sense, the available severity variables are unlikley to completely account for the causative effect of infection type on mortality and so conditioning on all available severity variables is likely to leave some residual causative effect of infection type. See text for further discussion",  out.height = '50%', fig.align = 'center'}
 
 knitr::include_graphics(paste0(wd, "figures/causal_dag_mortality.pdf"))
 
@@ -1036,7 +1047,7 @@ kable(select(p,-boldcol), "latex", booktabs =T,
   row_spec(boldrows, bold = T) %>%
   pack_rows("Host Variables", 1,5, bold = F) %>% 
    pack_rows("Severity Variables", 6, 22, bold = F)  %>%
-  footnote(general = "BP = Blood pressure, GCS = Glasgow coma scale. Numeric variables are presented as median (IQR) and categoric variables as proportions. P-values are from Kruskal-Wallace test for continuous variables and Fisher's exact test for categorical variables" , symbol = c("Participants with HIV status unknown not included in this row","CD4 count only measured for HIV-infected participants"), threeparttable = T, fixed_small_size = T)
+  footnote(general = "BP = Blood pressure, GCS = Glasgow coma scale. Numeric variables are presented as median (IQR) and categoric variables as proportions. P-values are from Kruskal-Wallace test for continuous variables and Fisher's exact test for categorical variables. PAtients with meningitis not shown in this table due to small numbers (n = 4)." , symbol = c("Participants with HIV status unknown not included in this row","CD4 count only measured for HIV-infected participants"), threeparttable = T, fixed_small_size = T)
 
 
 
@@ -1172,14 +1183,201 @@ sub("%", "\\\\%", p$Variable) -> p$Variable
 
 
 kable(select(p,-boldcol), "latex", booktabs =T, 
-      row.names = F, longtable = F, ,escape = F,caption = "Bivariate associations with diagnosis" ) %>%
+      row.names = F, longtable = F, ,escape = F,caption = "Bivariate associations of diagnosis with host and severty variables" ) %>%
  kable_styling("striped", full_width = F, latex_options = c("repeat_header", "scale_down")) %>%
   row_spec(boldrows, bold = T) %>%
   pack_rows("Host Variables", 2,6, bold = F) %>% 
    pack_rows("Severity Variables", 7, 23, bold = F)  %>%
-  footnote(general = "BP = Blood pressure, GCS = Glasgow coma scale. Numeric variables are presented as median (IQR) and categoric variables as proportions. P-values are from Kruskal-Wallace test for continuous variables and Fisher's exact test for categorical variables across four diganositic groups" , symbol = c("Participants with HIV status unknown not included in this row","CD4 count only measured for HIV-infected participants"), threeparttable = T, fixed_small_size = T) %>% 
+  footnote(general = "BP = Blood pressure, GCS = Glasgow coma scale. Numeric variables are presented as median (IQR) and categoric variables as proportions. P-values are from Kruskal-Wallace test for continuous variables and Fisher's exact test for categorical variables across four diganositic groups" , symbol = c("Participants with HIV status unknown not included in this row","CD4 count only measured for HIV-infected participants"), threeparttable = T, fixed_small_size = T) %>% add_indent(1) %>%
   landscape()
 
+```
+
+
+```{r bivariate-rx-mort, echo =F, warning=F, message=F}
+
+df.temp <- select(df, d28_death, first_ab, time_to_abx, any_tb_rx, time_to_tb_rx, first_mal_rx, time_to_mal_rx, first_fung_rx, time_to_fung_rx)
+
+df.temp$any_ab <- as.character(df.temp$first_ab != "none")
+df.temp$any_mal_rx <- as.character(!is.na(df.temp$first_mal_rx))
+df.temp$any_fung_rx <- as.character(!is.na(df.temp$first_fung_rx))
+
+df.temp$any_tb_rx[df.temp$any_tb_rx == "on admission"] <- "none"
+df.temp$any_tb_rx[df.temp$any_tb_rx == "none"] <- "FALSE"
+df.temp$any_tb_rx[df.temp$any_tb_rx == "yes"] <- "TRUE"
+
+df.temp %>% 
+  select(d28_death, any_ab, any_mal_rx, any_tb_rx, any_fung_rx) %>%
+  pivot_longer(-d28_death) %>%
+  group_by(name, value) %>%
+  summarise(n = sum(!is.na(d28_death)),
+                    e = sum(d28_death == 1, na.rm = T),
+                    prop = e/n,
+                    lci = binom.test(e,n)$conf.int[[1]],
+                    uci = binom.test(e,n)$conf.int[[2]],
+  ) %>% group_by(name) %>%
+  mutate(pval = fisher.test(matrix(c(n,e), ncol = 2))$p.value) -> rx
+
+rx$rx_str <- paste0(
+  rx$e, "/", rx$n, " (", 
+  specify_decimal(rx$prop *100, 0), "%)") #"% [",
+#  specify_decimal(rx$lci *100, 0), "-",
+#  specify_decimal(rx$uci *100, 0), "%])"
+
+
+rx %>% select(name, value, rx_str, pval) %>% pivot_wider(names_from = c(value), values_from = rx_str ) -> rx
+
+rx[,c(1,4,3,2)] -> rx
+rx$name <- c("Antibacterial", "Antifungal", "Antimalarial", "Anitmycobacterial")
+
+rx$pval <- specify_decimal(rx$pval, 3)
+
+names(rx) <- c("Class", "Yes", "No", "p")
+
+kable(rx, "latex", booktabs =T, 
+      row.names = F, longtable = F, ,escape = T,caption = "Bivariate associations of treatment recieved and death by 28 days") %>% 
+  #    col.names = c("Class", "Yes", "No", "p")) %>%
+ kable_styling("striped", full_width = F, latex_options = c("repeat_header")) %>%
+  footnote(general = "Table includes participants recieved specified treatment post admission only; for example, participants recieveing TB therapy prior to admission are included in the no column. P-values are from Fisher's exact test.", threeparttable = T, fixed_small_size = T) 
+
+```
+
+```{r outcome-by-diag, echo =F, warning=F, message=F,fig.scap="Mortality stratified by diagnosis", out.extra='', fig.cap="Day 28 and 90 mortality stratified by diagnosis.", fig.width= 5, fig.height =3 }
+
+# plot outcomes by diag
+
+
+df.temp4 <- dplyr::select(df, d28_death, d90_death, d180_death,  t0rr, gcs, t0spo2, lactate_value,
+                          Haemoglobin, any_tb_rx, time_to_abx, time_to_tb_rx, malaria, tb, bc
+) 
+
+
+# mortality of different diagnoses
+
+df.temp4[c("malaria", "tb", "bc")][is.na(df.temp4[c("malaria", "tb", "bc")])] <- 0
+
+df.temp4$no_diagnosis <- apply(df.temp4[c("malaria", "tb", "bc")], 1, sum, na.rm = T)
+
+df.temp4$no_diagnosis[df.temp4$no_diagnosis > 1] <- 1
+
+bind_rows(
+  df.temp4 %>% dplyr::select(d28_death,malaria, tb, bc, no_diagnosis) %>% 
+    pivot_longer(-d28_death) %>% group_by(name) %>% dplyr::summarise(e= sum(value == 1 & d28_death == 1, na.rm = T),
+                                                                     n = sum(value == 1 & !is.na(d28_death), na.rm = T), type = "d28"),
+  
+  df.temp4 %>% dplyr::select(d90_death,malaria, tb, bc, no_diagnosis) %>% 
+    pivot_longer(-d90_death) %>% group_by(name) %>% dplyr::summarise(e= sum(value == 1 & d90_death == 1, na.rm = T),
+                                                                     n = sum(value == 1 & !is.na(d90_death), na.rm = T), type = "d90"),
+  
+#  df.temp4 %>% dplyr::select(d180_death,malaria, tb, bc, no_diagnosis) %>% 
+#    pivot_longer(-d180_death) %>% group_by(name) %>% dplyr::summarise(e= sum(value == 1 & d180_death == 1, na.rm = T),
+#                                                                      n = sum(value == 1 & !is.na(d180_death), na.rm = T), type = "d180")
+  
+  
+  
+)  -> d.mort
+
+
+
+
+
+
+d.mort$prop <- apply(d.mort[2:3], 1, function(x) binom.test(x[1],x[2])$estimate )
+d.mort$lci <- apply(d.mort[2:3], 1, function(x) binom.test(x[1],x[2])$conf.int[[1]] )
+d.mort$uci <- apply(d.mort[2:3], 1, function(x) binom.test(x[1],x[2])$conf.int[[2]] )
+
+d.mort$name[d.mort$name == "bc"] <- "BSI"
+d.mort$name[d.mort$name == "malaria"] <- "Malaria"
+d.mort$name[d.mort$name == "tb"] <- "TB"
+d.mort$name[d.mort$name == "no_diagnosis"] <- "No Diagnosis"
+
+d.mort$type[d.mort$type == "d28"] <- "Day 28"
+d.mort$type[d.mort$type == "d90"] <- "Day 90"
+
+ggplot(d.mort, aes(fct_reorder(name,prop), prop, color = fct_reorder(type, prop))) + coord_flip() + geom_point(position = position_dodge(width = 0.3)) + 
+  geom_errorbar(aes(ymin = lci, ymax = uci), width = 0, position = position_dodge(width = 0.3)) + theme_bw()  +
+  labs(y = "Mortality", x = "") + theme(legend.title = element_blank())
+
+
+
+
+```
+
+```{r outcome-by-time-to-rx, echo =F, warning=F, message=F,fig.scap="Day 28 mortality stratified by time-to-antimicrobial time.", out.extra='', fig.cap="Day 28 mortality stratified by time-to-antimicrobial time. A and B show mortality stratified by time-to-antibacterial with different bin sizes to focus on the first 6hr (A) and afterwards (B). C shows mortality stratified by time to antituberculous therapy. In view of the small number of patients receiving antimalarial or antifungal therapy, this analysis was not repeated for those agents. ", fig.width= 6, fig.height =6, }
+
+
+cut(as.numeric(df$time_to_abx), breaks = c(0,6,24, 10000)) -> df$time_to_abx.cut
+
+bind_rows (
+  
+df %>% group_by(time_to_abx.cut) %>% dplyr::summarise(e= sum( d90_death == 1, na.rm = T),
+                                                            n = sum( !is.na(d90_death), na.rm = T), type = "d90"),
+
+df %>% group_by(time_to_abx.cut) %>% dplyr::summarise(e= sum( d28_death == 1, na.rm = T),
+                                                      n = sum( !is.na(d28_death), na.rm = T), type = "d28")
+) -> ab.t.mort
+
+ab.t.mort$prop <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$estimate )
+ab.t.mort$lci <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$conf.int[[1]] )
+ab.t.mort$uci <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$conf.int[[2]] )
+
+ggplot(subset(ab.t.mort, type == "d28"), aes(time_to_abx.cut, prop)) + geom_point(position = position_dodge(width = 0.4)) + 
+  geom_errorbar(aes(ymax = uci, ymin = lci), width = 0, position = position_dodge(width = 0.4)) +
+  theme_bw() + scale_x_discrete(breaks = c(levels(df$time_to_abx.cut), NA), labels = c("0-6hr", "6-24hr", "> 24hr", "None")) +
+  labs(x = "Time to antibacterials", y = "Mortality") + theme(axis.text.x = element_text(angle = 45, hjust =1))-> p2
+
+
+cut(as.numeric(df$time_to_abx), breaks = c(0,1,2,3,4,5,6, 10000)) -> df$time_to_abx.cut
+
+bind_rows (
+  
+df %>% group_by(time_to_abx.cut) %>% dplyr::summarise(e= sum( d90_death == 1, na.rm = T),
+                                                            n = sum( !is.na(d90_death), na.rm = T), type = "d90"),
+
+df %>% group_by(time_to_abx.cut) %>% dplyr::summarise(e= sum( d28_death == 1, na.rm = T),
+                                                      n = sum( !is.na(d28_death), na.rm = T), type = "d28")
+) -> ab.t.mort
+
+ab.t.mort$prop <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$estimate )
+ab.t.mort$lci <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$conf.int[[1]] )
+ab.t.mort$uci <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$conf.int[[2]] )
+
+ggplot(subset(ab.t.mort, type == "d28"), aes(time_to_abx.cut, prop)) + geom_point(position = position_dodge(width = 0.4)) + 
+  geom_errorbar(aes(ymax = uci, ymin = lci), width = 0, position = position_dodge(width = 0.4)) +
+  theme_bw() + scale_x_discrete(breaks = c(levels(df$time_to_abx.cut), NA), 
+                                labels = c("0-1hr", "1-2hr","2-3hr","3-4hr", "4-5hr","5-6hr", "> 6hr", "None")) +
+  labs(x = "Time to antibacterials", y = "Mortality")  + theme(axis.text.x = element_text(angle = 45, hjust =1))-> p1
+
+
+
+## tb rx
+
+cut(as.numeric(df$time_to_tb_rx), breaks = c(0,72,144, 216,10000)) -> df$time_to_tb_rx.cut
+
+bind_rows (
+  
+  df  %>% group_by(time_to_tb_rx.cut) %>% dplyr::summarise(e= sum( d90_death == 1, na.rm = T),
+                                                        n = sum( !is.na(d90_death), na.rm = T), type = "d90"),
+  
+  df  %>% group_by(time_to_tb_rx.cut) %>% dplyr::summarise(e= sum( d28_death == 1, na.rm = T),
+                                                        n = sum( !is.na(d28_death), na.rm = T), type = "d28")
+) -> ab.t.mort
+
+#%>% filter(hivstatus == "Reactive")
+#%>% filter(hivstatus == "Reactive")
+
+ab.t.mort$prop <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$estimate )
+ab.t.mort$lci <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$conf.int[[1]] )
+ab.t.mort$uci <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$conf.int[[2]] )
+
+ggplot(subset(ab.t.mort,type == "d28"), aes(time_to_tb_rx.cut, prop)) + geom_point(position = position_dodge(width = 0.4)) + 
+  geom_errorbar(aes(ymax = uci, ymin = lci), width = 0, position = position_dodge(width = 0.4)) +
+  theme_bw() + scale_x_discrete(breaks = c(levels(df$time_to_tb_rx.cut), NA), 
+                                labels = c("0-72hr", "72-144hr","144-216hr",">216hr", "None")) +
+  labs(x = "Time to antimycobacterials", y = "Mortality") + theme(axis.text.x = element_text(angle = 45, hjust =1)) -> p.tb
+
+ggarrange(ggarrange(p1,p2, ncol = 2, labels = c("A", "B")), ggarrange(NULL, p.tb, NULL, ncol =3, widths = c(0.5,1,0.5), labels = c(NA,"C", NA)), 
+          ncol = 1 , nrow = 2)
 
 
 
