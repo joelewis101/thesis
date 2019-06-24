@@ -86,6 +86,7 @@ names(df.fung.b)[2:3] <- c("first_fung_rx", "time_to_fung_rx")
 df <- merge(df, df.fung.b)
 rm(df.fung.b)
 
+df[df == 999] <- NA
 
 #aetiol.m -> a
 #a[is.na(a)] <- 0
@@ -1242,7 +1243,7 @@ kable(rx, "latex", booktabs =T,
 
 ```
 
-```{r outcome-by-diag, echo =F, warning=F, message=F,fig.scap="Mortality stratified by diagnosis", out.extra='', fig.cap="Day 28 and 90 mortality stratified by diagnosis.", fig.width= 5, fig.height =3 }
+```{r outcome-by-diag, echo =F, warning=F, message=F,fig.scap="Mortality stratified by diagnosis", out.extra='', fig.cap="Day 28 and 90 mortality stratified by diagnosis.", fig.width= 5, fig.height =3, out.width= '50%' , fig.align = 'center'}
 
 # plot outcomes by diag
 
@@ -1303,7 +1304,7 @@ ggplot(d.mort, aes(fct_reorder(name,prop), prop, color = fct_reorder(type, prop)
 
 ```
 
-```{r outcome-by-time-to-rx, echo =F, warning=F, message=F,fig.scap="Day 28 mortality stratified by time-to-antimicrobial time.", out.extra='', fig.cap="Day 28 mortality stratified by time-to-antimicrobial time. A and B show mortality stratified by time-to-antibacterial with different bin sizes to focus on the first 6hr (A) and afterwards (B). C shows mortality stratified by time to antituberculous therapy. In view of the small number of patients receiving antimalarial or antifungal therapy, this analysis was not repeated for those agents. ", fig.width= 6, fig.height =6, }
+```{r outcome-by-time-to-rx, echo =F, warning=F, message=F,fig.scap="Day 28 mortality stratified by time-to-antimicrobial time afn fluid volume recieved.", out.extra='', fig.cap="Day 28 mortality stratified by time-to-antimicrobial time (A-C) and intravenous fluid volume received over fist 6 hours of hospiytal admission (D). A and B show mortality stratified by time-to-antibacterial with different bin sizes to focus on the first 6hr (A) and afterwards (B). C shows mortality stratified by time to antituberculous therapy. In view of the small number of patients receiving antimalarial or antifungal therapy, this analysis was not repeated for those agents. D shows mortality stratified by the volume of intravenous fluid recieved over the first 6 hours of hospital attendance.", fig.width= 6, fig.height =9, out.height= '70%', fig.align= 'center'}
 
 
 cut(as.numeric(df$time_to_abx), breaks = c(0,6,24, 10000)) -> df$time_to_abx.cut
@@ -1376,10 +1377,158 @@ ggplot(subset(ab.t.mort,type == "d28"), aes(time_to_tb_rx.cut, prop)) + geom_poi
                                 labels = c("0-72hr", "72-144hr","144-216hr",">216hr", "None")) +
   labs(x = "Time to antimycobacterials", y = "Mortality") + theme(axis.text.x = element_text(angle = 45, hjust =1)) -> p.tb
 
+cut(as.numeric(df$fluid_6hr), breaks = c(-1,0,1000,2000,4000)) -> df$fluid_6hr.cut
+
+
+bind_rows (
+  
+  df  %>% group_by(fluid_6hr.cut) %>% dplyr::summarise(e= sum( d90_death == 1, na.rm = T),
+                                                        n = sum( !is.na(d90_death), na.rm = T), type = "d90"),
+  
+  df  %>% group_by(fluid_6hr.cut) %>% dplyr::summarise(e= sum( d28_death == 1, na.rm = T),
+                                                        n = sum( !is.na(d28_death), na.rm = T), type = "d28")
+) -> ab.t.mort
+
+#%>% filter(hivstatus == "Reactive")
+#%>% filter(hivstatus == "Reactive")
+
+ab.t.mort$prop <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$estimate )
+ab.t.mort$lci <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$conf.int[[1]] )
+ab.t.mort$uci <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$conf.int[[2]] )
+
+ggplot(subset(ab.t.mort,type == "d28"), aes(fluid_6hr.cut, prop)) + geom_point(position = position_dodge(width = 0.4)) + 
+  geom_errorbar(aes(ymax = uci, ymin = lci), width = 0, position = position_dodge(width = 0.4)) +
+  theme_bw() + scale_x_discrete(breaks = c(levels(df$fluid_6hr.cut)), 
+                                labels = c("None", "0-1L", "1-2L",">2L" )) +
+  labs(x = "IV fluid (first 6hr)", y = "Mortality") + theme(axis.text.x = element_text(angle = 45, hjust =1)) -> p.fluid
+
+
 ggarrange(ggarrange(p1,p2, ncol = 2, labels = c("A", "B")), ggarrange(NULL, p.tb, NULL, ncol =3, widths = c(0.5,1,0.5), labels = c(NA,"C", NA)), 
-          ncol = 1 , nrow = 2)
+          ggarrange(NULL, p.fluid, NULL, ncol =3, widths = c(0.5,1,0.5), labels = c(NA,"D", NA)),
+          ncol = 1 , nrow = 3)
 
 
 
 ```
 
+```{r outcome-by-time-to-rx, echo =F, warning=F, message=F,fig.scap="Day 28 mortality stratified by time-to-antimicrobial time afn fluid volume recieved.", out.extra='', fig.cap="Day 28 mortality stratified by time-to-antimicrobial time (A-C) and intravenous fluid volume received over fist 6 hours of hospiytal admission (D). A and B show mortality stratified by time-to-antibacterial with different bin sizes to focus on the first 6hr (A) and afterwards (B). C shows mortality stratified by time to antituberculous therapy. In view of the small number of patients receiving antimalarial or antifungal therapy, this analysis was not repeated for those agents. D shows mortality stratified by the volume of intravenous fluid recieved over the first 6 hours of hospital attendance.", fig.width= 6, fig.height =9, out.height= '70%', fig.align= 'center'}
+
+df.back <- df
+
+df$any_ab <- as.numeric(df$first_ab != "none")
+df$any_mal_rx <- as.numeric(!is.na(df$first_mal_rx))
+df$any_fung_rx <- as.numeric(!is.na(df$first_fung_rx))
+
+df$any_tb_rx[df$any_tb_rx == "on admission"] <- "none"
+df$any_tb_rx[df$any_tb_rx == "none"] <- 0
+df$any_tb_rx[df$any_tb_rx == "yes"] <- 1
+
+df$CD4_Absolute[df$hivstatus != "Reactive"] <- NA
+
+df$hivstatus[df$hivstatus == "Unknown"] <- NA
+df$hivstatus[df$hivstatus == "Reactive"] <- 1
+df$hivstatus[df$hivstatus == "Non reactive"] <- 0
+
+df$hivstatus <- as.numeric(df$hivstatus)
+
+df$CD4.scale <- scale(df$CD4_Absolute)
+df$CD4.scale <- log(df$CD4.scale)
+
+
+
+glm(d28_death ~ calc_age + ptsex + hivstatus  +  Haemoglobin + screentemp + t0hr + t0map + 
+      t0rr + t0spo2 + gcs + lactate_value + WCC + Platelets + NA. + Potassium + Chloride + CO2 + Urea +
+      tb + malaria + bc + csf + any_tb_rx + any_fung_rx + any_mal_rx, family = 'binomial', data = df) -> m
+
+df$calc_age <- scale(df$calc_age)
+
+df$Haemoglobin <- scale(df$Haemoglobin)
+df$screentemp <- scale(df$screentemp)
+df$t0hr <- scale(df$t0hr)
+df$t0map <- scale(df$t0map)
+df$t0rr <- scale(df$t0rr)
+df$t0spo2 <- scale(df$t0spo2)
+df$gcs <- scale(df$gcs)
+df$lactate_value <- scale(df$lactate_value)
+df$WCC <- scale(df$WCC)
+df$Platelets <- scale(df$Platelets)
+df$NA. <- scale(df$NA.)
+df$Potassium <- scale(df$Potassium)
+df$CO2 <- scale(df$CO2)
+df$Urea <- scale(df$Urea)
+df$Creatinine <- scale(df$Creatinine)
+
+df$d28_death <- as.factor(df$d28_death)
+df$hivstatus <- as.factor(df$hivstatus)
+df$tb <- as.factor(df$tb)
+df$malaria <- as.factor(df$malaria)
+df$bc <- as.factor(df$bc)
+df$any_tb_rx <- as.factor(df$any_tb_rx)
+df$any_fung_rx <- as.factor(df$any_fung_rx)
+df$any_mal_rx <- as.factor(df$any_mal_rx)
+df$any_ab <- as.factor(df$any_ab)
+
+df$hivstatus <- as.character(df$hivstatus)
+
+df$hivstatus[df$hivstatus == "UK"] <- NA
+
+df2 <- dplyr::select(df, d28_death, calc_age ,ptsex , hivstatus ,Haemoglobin, screentemp ,t0map,
+       t0spo2, gcs, lactate_value, CO2, Urea, Creatinine,
+      tb, bc, malaria,any_tb_rx, any_fung_rx, any_mal_rx)
+
+df2.complete <- df2[complete.cases(df2),]
+
+glm(d28_death ~ calc_age + ptsex + hivstatus + Haemoglobin + 
+       t0spo2 + gcs + lactate_value +  Urea +  
+      tb + bc +  any_tb_rx + any_fung_rx, family = 'binomial', data = df) -> m 
+
+
+
+  brms::brm(d28_death ~ calc_age + ptsex + hivstatus + Haemoglobin + screentemp +  t0map + 
+       t0spo2 + gcs + lactate_value + CO2 + Urea + Creatinine + 
+      tb + malaria + bc +  any_tb_rx + any_fung_rx + any_mal_rx, data = df2.complete, family = "bernoulli", prior = m1priors) -> m.brms
+
+df2.complete %>% add_fitted_draws(m.brms, scale = "linear") %>% ungroup() %>% dplyr::select( -c(d28_death, ptsex, hivstatus, tb, bc, malaria, any_tb_rx, any_fung_rx, any_mal_rx)) %>% pivot_longer(-c(.row, .chain,.iteration, .draw, .value)) %>% ggplot(aes(x= value, y = .value)) + stat_pointinterval() + geom_smooth() + geom_smooth(method = 'lm', linetype = "dashed", color = "red") + facet_wrap(~name, scales = "free")
+
+## make partial residual
+extract_draws(m.brms) -> b
+Y <- b$data
+draws <- as.data.frame(b$dpars$mu$fe$b) 
+ draws$.draw <- 1:nrow(draws)
+df.data <- as.data.frame(b$dpars$mu$fe$X)
+df.data <- bind_cols(df.data, Y)
+df.data$.row <- 1:nrow(df.data)
+  
+dfout <- bind_cols(
+
+  df.data %>% slice(rep(1:n(), each = nrow(draws))),
+draws %>% slice(rep(row_number(), nrow(df.data)))
+)
+
+# apply(dfout, 1, function(x) x[22] + sum(x[2:19] * x[23:40])) -> dfout$linear_pred
+#as.data.frame(t(apply(dfout[1:10,], 1, function(x) x[2:19] * x[23:40])))
+ 
+betas <- dfout[,2:19] * dfout[,23:40]
+names(betas) <- paste0("x_beta_", names(betas)) 
+dfout <- bind_cols(dfout, betas)
+
+dfout$linear_pred <- apply(dfout,1, function(x) x[22] + sum( x[42: ncol(dfout)]))
+
+dfout$p <- plogis(dfout$linear_pred)
+dfout$resid <- (dfout$Y - dfout$p) / (dfout$p*(1- dfout$p))
+
+dfout[,42:59] <- dfout[,42:59] + dfout$resid
+
+dfout %>% dplyr::select(.row,t0spo2,x_beta_t0spo2) %>%  group_by(.row) %>%
+  summarise(spo2 = median(t0spo2), 
+            med.par.resid = median(x_beta_t0spo2),
+            lci = quantile(x_beta_t0spo2, 0.025),
+            uci = quantile(x_beta_t0spo2, 0.975)) -> spo2plot
+
+#dfout[1:10,42:ncol(dfout)] - dfout$linear_pred[1:10]
+
+df2.complete %>% add_fitted_draws(m.brms, scale = "linear") %>% ggplot(aes(x= t0spo2, y = .value)) + stat_pointinterval() + geom_smooth() + geom_smooth(method = 'lm', linetype = "dashed")
+
+df2.complete
+
+```
