@@ -21,7 +21,7 @@ hourly$fluid_vol1[is.na(hourly$fluid_vol1)] <- 0
 
 
 
-hourly %>% filter(pid %in% e1$pid) %>%  dplyr::select(pid, assess_type, fluid_vol1) %>% 
+hourly %>% filter(pid %in% subset(enroll, arm == 1)$pid) %>%  dplyr::select(pid, assess_type, fluid_vol1) %>% 
   pivot_wider(id_cols = pid, names_from = assess_type, values_from = fluid_vol1) -> f1
 
 f1 %>% 
@@ -109,7 +109,7 @@ f1$`3`[f1$pid == "DAS1519G"] <- 2000
 apply(select(f1, -pid, -error), 1, does_cum_fl_decrease) -> f1$error
  # woop
 
-hourly %>% filter(pid %in% e1$pid) %>%  dplyr::select(pid, assess_type, fluid_vol2) %>% 
+hourly %>% filter(pid %in% subset(enroll, arm == 1)$pid) %>%  dplyr::select(pid, assess_type, fluid_vol2) %>% 
   pivot_wider(id_cols = pid, names_from = assess_type, values_from = fluid_vol2) -> f2
 
 f2$`1`[is.na(f2$`1`)] <- 0
@@ -125,7 +125,7 @@ subset(f2, error)
 
 ####
 
-hourly %>% filter(pid %in% e1$pid) %>%  dplyr::select(pid, assess_type, fluid_vol3) %>% 
+hourly %>% filter(pid %in% subset(enroll, arm == 1)$pid) %>%  dplyr::select(pid, assess_type, fluid_vol3) %>% 
   pivot_wider(id_cols = pid, names_from = assess_type, values_from = fluid_vol3) -> f3
 
 f3$`1`[is.na(f3$`1`)] <- 0
@@ -150,7 +150,7 @@ subset(f3,error)
 ### blood
 
 
-hourly %>% filter(pid %in% e1$pid) %>%  dplyr::select(pid, assess_type, fluid_vol4) %>% 
+hourly %>% filter(pid %in% subset(enroll, arm == 1)$pid) %>%  dplyr::select(pid, assess_type, fluid_vol4) %>% 
   pivot_wider(id_cols = pid, names_from = assess_type, values_from = fluid_vol4) -> f4
 
 f4$`1`[is.na(f4$`1`)] <- 0
