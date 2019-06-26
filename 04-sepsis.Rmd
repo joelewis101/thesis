@@ -24,6 +24,9 @@ wd <- "chapter_4/"
 output = "latex"
 T <- TRUE
 
+specify_decimal <- function(x, k) trimws(format(round(x, k), nsmall=k))
+
+
 # generate figures
 #source("chapter_4/generate_consort_diagram.R")
 source("final_cleaning_scripts/generate_visits_df.R")
@@ -44,9 +47,8 @@ source("final_cleaning_scripts/load_and_clean_fluid_hr1_to_6.R")
 
 h1.ustand <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/other_datasets/h1_ustand.csv")
 
-e1$datefirstunwell[e1$unwelfreq == "Weeks"] <- e1$datefirstunwell[e1$unwelfreq == "Weeks"] * 7
-e1$datefirstunwell[e1$unwelfreq == "Months"] <- e1$datefirstunwell[e1$unwelfreq == "Months"] * 30
 
+  
 # calc time to recruitment
 
 hourly %>% group_by(pid) %>% summarise(first_ax = min(date_time, na.rm= T)) -> fa
@@ -121,6 +123,8 @@ v1$d180_death[(v1$t >= 180)] <- 0
 
 df <- merge(df, v1, all.x = T)
 
+df <- merge(df, h1.ustand, all.x= T)
+
 df$sbp.dic <- (df$t0sbp <= 90)
 df$t.dic <- NA
 df$t.dic[df$screentemp < 36] <- "<36"
@@ -158,7 +162,10 @@ df$csf[is.na(df$csf)] <- 0
 
 blah blah
 
+Regression difficulties and solutions
 
+colinearity/variable selection -> FAMD
+nonidentifiability (zero cells) -> bayesian regression with weakly informative priors
 
 ## Results
 
@@ -180,6 +187,11 @@ knitr::include_graphics(paste0(wd, "/figures/consort_diagram.pdf"))
 ```{r sep-t1-demog-dassim, echo = F, warning = F, message = F}
 
 e1 <- subset(enroll, arm == 1)
+e1$datefirstunwell[e1$unwelfreq == "Weeks"] <- e1$datefirstunwell[e1$unwelfreq == "Weeks"] * 7
+e1$datefirstunwell[e1$unwelfreq == "Months"] <- e1$datefirstunwell[e1$unwelfreq == "Months"] * 30
+
+
+e1$t0map <- (e1$t0sbp + (e1$t0dbp * 2))/3 
 e1$art.time <- as.numeric((e1$data_date - e1$hivartstart) /(365.25/12))
 e1$hivart[e1$hivart != "5A" & !is.na(e1$hivart)] <- "ART regimen: other"
 e1$animalskept[e1$animalskept == "Other"] <- "Elsewhere"
@@ -379,16 +391,18 @@ e1$gcs.cat <- NA
 e1$gcs.cat[e1$gcs == 15] <- "15"
 e1$gcs.cat[e1$gcs > 10 & e1$gcs < 15] <- "11-14"
 e1$gcs.cat[e1$gcs < 11] <- "10 or below"
-
+e1$t0map <- (e1$t0sbp + (e1$t0dbp * 2))/3 
 
 
 e1$CD4_hiv_pos <- NA
 e1$CD4_hiv_pos[e1$hivstatus == "Reactive"] <- e1$CD4_Absolute[e1$hivstatus == "Reactive"] 
 e1$Neutrophils_count <- as.numeric(e1$Neutrophils_count )
 
+e1$ustand <- as.character(e1$ustand)
+
 rbind(
   pretty_tbl_df(
-    select(e1, t0hr, t0sbp, t0dbp, t0rr, t0spo2, gcs.cat, CD4_hiv_pos)
+    select(e1, t0hr, t0sbp, t0dbp,t0map, t0rr, t0spo2, gcs.cat, ustand, CD4_hiv_pos)
     ),
   
   pretty_tbl_df(
@@ -401,13 +415,15 @@ rbind(
 
 e1.sum.3$levels[e1.sum.3$variable == "screentemp"] <- "Temperature (\\textdegree C)"
 e1.sum.3$levels[e1.sum.3$variable == "t0hr"] <- "Heart rate (min\\textsuperscript{-1}))"
-e1.sum.3$levels[e1.sum.3$variable == "t0sbp"] <- "Systolic blood pressure (mmHg)"
-e1.sum.3$levels[e1.sum.3$variable == "t0dbp"] <- "Diatsolic blood pressure (mmHg)"
+e1.sum.3$levels[e1.sum.3$variable == "t0sbp"] <- "Systolic BP (mmHg)"
+e1.sum.3$levels[e1.sum.3$variable == "t0dbp"] <- "Diatsolic BP (mmHg)"
+e1.sum.3$levels[e1.sum.3$variable == "t0map"] <- "MAP (mmHg)"
 e1.sum.3$levels[e1.sum.3$variable == "t0rr"] <- "Respiratory rate (min\\textsuperscript{-1})"
 e1.sum.3$levels[e1.sum.3$variable == "t0spo2"] <- "Oxygen saturation (%)"
 e1.sum.3$levels[e1.sum.3$levels == "15"] <- "15"
 e1.sum.3$levels[e1.sum.3$levels == "11-14"] <- "11-14"
 e1.sum.3$levels[e1.sum.3$levels == "10 or below"] <- "< 11"
+e1.sum.3$levels[e1.sum.3$variable == "ustand"] <- "Unable to stand"
 e1.sum.3$levels[e1.sum.3$variable == "CD4_hiv_pos"] <- "CD4 count* ($\\mu$L\\textsuperscript{-1})"
 
 e1.sum.3$levels[e1.sum.3$variable == "Haemoglobin"] <- "Haemoglobin (x10\\textsuperscript{9} g dL\\textsuperscript{-1})"
@@ -428,11 +444,13 @@ sub("%", "\\\\%", e1.sum.3$value) -> e1.sum.3$value
 sub("%", "\\\\%", e1.sum.3$levels) -> e1.sum.3$levels
 rbind(e1.sum.3, data.frame(variable = "Admission physiology", `levels` = "GCS", value = " ")) -> e1.sum.3
 
-e1.sum.3 <- e1.sum.3[c(10,1:5,22,6:8, 9,11,12,13,17,21,14,19,18,15,20,16),]
-e1.sum.3$variable[1:10] <- "Admission physiology"
-e1.sum.3$variable[11] <- "Admission CD4 count"
-e1.sum.3$variable[12:15] <- "Admission haematology"
-e1.sum.3$variable[16:nrow(e1.sum.3)] <- "Admission biochemistry"
+e1.sum.3 <- e1.sum.3[c(13,1:5,6:8,9,11,12,14,15,16,20,24,17,22,21,18,23,19),]
+
+#e1.sum.3 <- e1.sum.3[c(10,1:5,22,6:8, 9,11,12,13,17,21,14,19,18,15,20,16),]
+e1.sum.3$variable[1:11] <- "Admission physiology"
+e1.sum.3$variable[12] <- "Admission CD4 count"
+e1.sum.3$variable[13:16] <- "Admission haematology"
+e1.sum.3$variable[17:nrow(e1.sum.3)] <- "Admission biochemistry"
 kstring3 <- make_kable_rowgroup_string(e1.sum.3)
 
 kable(select(e1.sum.3,`levels`,value), "latex", booktabs =T, 
@@ -440,7 +458,7 @@ kable(select(e1.sum.3,`levels`,value), "latex", booktabs =T,
   kable_styling("striped", full_width = F, latex_options = c("repeat_header", "hold_position")) %>%
   group_rows(index = kstring3) %>%
   add_indent(c(8:10)) %>%
-  footnote(general = "GCS = Glasgow coma scale. Numeric values are median (IQR)) unless otherwise stated." , symbol = "CD4 count includes only HIV-infected participants; 2 values were missing.", threeparttable = T, fixed_small_size = T)
+  footnote(general = "GCS = Glasgow coma scale, BP = Blood pressure, MAP = Mean arterial blood pressure. Numeric values are median (IQR)) unless otherwise stated." , symbol = "CD4 count includes only HIV-infected participants; 2 values were missing.", threeparttable = T, fixed_small_size = T)
 
 ```
 
@@ -941,9 +959,34 @@ knitr::include_graphics(paste0(wd, "figures/causal_dag_mortality.pdf"))
 
 ```{r bivariate-sev-mort-assoc, echo =F, warning=F, message=F}
 
-df.temp <- dplyr::select(df, d28_death, hivstatus,calc_age,ptsex,screentemp, t0sbp, t0dbp, t0map, t0hr, t0rr, t0spo2, gcs, lactate_value,
-                         WCC, CD4_Absolute, Haemoglobin, Platelets, NA.,Potassium, Urea, Creatinine, CO2, Chloride
+df.temp <- dplyr::select(df,pid, d28_death, hivstatus,hivonart, calc_age,ptsex,screentemp, t0sbp, t0dbp, t0map, t0hr, t0rr, t0spo2, gcs, ustand, lactate_value,
+                         WCC, CD4_Absolute, Haemoglobin, Platelets, NA.,Potassium, Urea, Creatinine, CO2, Chloride, fluid_6hr, any_tb_rx, time_to_tb_rx, first_mal_rx, time_to_mal_rx, first_fung_rx, time_to_fung_rx, first_ab, time_to_abx, fluid_6hr,
+                         bc, tb, csf, malaria
 ) 
+
+apply(df.temp[c("tb", "malaria", "bc", "csf")], 1, sum) -> df.temp$n_diagnoses
+
+
+#df.temp2 <- subset(df.temp2, n_diagnoses < 2 & csf == 0)
+
+df.temp$no_diagnosis <- as.numeric(df.temp$n_diagnoses == 0)
+
+
+df.temp$time_to_abx <- as.numeric(df.temp$time_to_abx)
+df.temp$time_to_tb_rx <- as.numeric(df.temp$time_to_tb_rx)
+df.temp$time_to_mal_rx <- as.numeric(df.temp$time_to_mal_rx)
+df.temp$time_to_fung_rx <- as.numeric(df.temp$time_to_fung_rx)
+
+df.temp$any_ab <- as.numeric(df.temp$first_ab != "none")
+df.temp$any_mal_rx <- as.numeric(!is.na(df.temp$first_mal_rx))
+df.temp$any_fung_rx <- as.numeric(!is.na(df.temp$first_fung_rx))
+
+df.temp$any_tb_rx[df.temp$any_tb_rx == "on admission"] <- "none"
+df.temp$any_tb_rx[df.temp$any_tb_rx == "none"] <- 0
+df.temp$any_tb_rx[df.temp$any_tb_rx == "yes"] <- 1
+df.temp$any_tb_rx <- as.numeric(df.temp$any_tb_rx)
+
+df.temp <- dplyr::select(df.temp, -c(first_mal_rx, first_fung_rx, first_ab, n_diagnoses))
 
 df.temp[df.temp == 999] <- NA
 
@@ -951,15 +994,22 @@ df.temp$CD4_Absolute[df.temp$hivstatus != "Reactive"] <- NA
 df.temp$hivstatus[df.temp$hivstatus == "Reactive"] <- 1
 df.temp$hivstatus[df.temp$hivstatus == "Non reactive"] <- 0
 df.temp$hivstatus[df.temp$hivstatus == "Unknown"] <- NA
+df.temp$hivstatus <- as.numeric(df.temp$hivstatus)
+
 
 df.temp$ptsex[df.temp$ptsex == "Male"] <- 1
 df.temp$ptsex[df.temp$ptsex == "Female"] <- 0
+df.temp$ptsex <- as.numeric(df.temp$ptsex)
 
+df.temp$hivonart[df.temp$hivonart == "Yes"] <- 1
+df.temp$hivonart[df.temp$hivonart == "No"] <- 0
+df.temp$hivonart <- as.numeric(df.temp$hivonart)
+#df.temp$ustand <- as.character(df.temp$ustand)
 
-df.temp %>% select(-c(hivstatus, ptsex)) %>% pivot_longer(-d28_death) %>% filter(!is.na(d28_death)) %>%
+df.temp %>% select(-c(hivstatus, ptsex, ustand, hivonart, any_ab, any_fung_rx, any_mal_rx, any_tb_rx,  time_to_mal_rx, malaria, tb, no_diagnosis, csf, bc, pid)) %>% pivot_longer(-d28_death) %>% filter(!is.na(d28_death)) %>%
   dplyr::group_by(name) %>% dplyr::summarise(pval = kruskal.test(value ~ d28_death)$p.value) -> pvals
 
-df.temp %>% select(-c(hivstatus, ptsex)) %>% pivot_longer(-d28_death) %>% filter(!is.na(d28_death)) %>%
+df.temp %>% select(-c(hivstatus, ptsex, ustand, hivonart, any_ab, any_fung_rx, any_mal_rx, any_tb_rx,  tb, no_diagnosis, csf, bc, malaria, pid)) %>% pivot_longer(-d28_death) %>% filter(!is.na(d28_death)) %>%
   dplyr::group_by(name, d28_death) %>% dplyr::summarise( median = median(value, na.rm = T),
                                                              LQ = quantile(value, 0.25, na.rm = T),
                                                               UQ = quantile(value, 0.75, na.rm = T)) -> p
@@ -974,22 +1024,22 @@ paste0(
 
 p %>% select(name, d28_death, med_str) %>% pivot_wider(names_from = d28_death, values_from = med_str) -> p
 
-p <- merge(p, pvals)
+p <- merge(p, pvals, all.x = T)
 
 
-df.temp %>% select(d28_death, hivstatus, ptsex) %>% pivot_longer(-d28_death) %>% filter(!is.na(d28_death)) %>%
+df.temp %>% dplyr::select(d28_death, hivstatus, hivonart, ptsex, ustand, any_ab, any_fung_rx, any_mal_rx, any_tb_rx, bc, tb, malaria, csf, no_diagnosis) %>% pivot_longer(-d28_death) %>% filter(!is.na(d28_death)) %>%
   dplyr::group_by(name, value) %>%
   dplyr::summarise(died = sum(d28_death == 1, na.rm = T), alive = sum(d28_death == 0, na.rm = T)) %>% filter(!is.na(value)) %>% group_by(name) %>%
    group_by(name) %>% dplyr::summarise(pval = fisher.test(matrix(c(died, alive), ncol =2))$p.value) -> p.catpvals
 
-df.temp %>% select(d28_death, hivstatus, ptsex) %>% pivot_longer(-d28_death) %>% filter(!is.na(d28_death)) %>%
+df.temp %>% dplyr::select(d28_death, hivstatus, hivonart, ptsex, ustand, any_ab, any_fung_rx, any_mal_rx, any_tb_rx, bc, tb, malaria, csf, no_diagnosis) %>% pivot_longer(-d28_death) %>% filter(!is.na(d28_death)) %>%
   dplyr::group_by(name, d28_death) %>% dplyr::summarise(`1` = sum(value == 1, na.rm = T), 
                                                         total = sum(!is.na(value)),
                                                         prop = `1`/total) -> p.cat
 
 p.cat$str <- paste0(
   p.cat$`1`, "/", p.cat$total,
-  " (", signif(p.cat$prop *100,2), "%)"
+  " (", specify_decimal(p.cat$prop *100,0), "%)"
 )
 
 
@@ -1007,9 +1057,15 @@ p$pval <- specify_decimal(p$pval, 3)
 p$pval[p$pval == "0.000"] <- "<0.001"
 
 
-p[match(c("calc_age", "ptsex", "hivstatus", "CD4_Absolute", "Haemoglobin","screentemp", "t0hr", "t0sbp", "t0dbp", "t0map",
-        "t0rr", "t0spo2","gcs", "lactate_value" , "WCC", "Platelets", "NA.", "Potassium",
-        "Chloride", "CO2", "Urea", "Creatinine"), p$name),] -> p
+#p[match(c("calc_age", "ptsex", "hivstatus", "hivonart","CD4_Absolute", "Haemoglobin","screentemp", "t0hr", "t0sbp", "t0dbp", "t0map",
+#        "t0rr", "t0spo2","gcs", "ustand", "lactate_value" , "WCC", "Platelets", "NA.", "Potassium",
+#        "Chloride", "CO2", "Urea", "Creatinine", "bc", "tb", "malaria", "csf", "no_diagnosis",
+#        "any_ab", "time_to_abx", "any_fung_rx","time_to_fung_rx", "any_mal_rx", "time_to_mal_rx", "any_tb_rx","time_to_tb_rx", "fluid_6hr"), p$name),] -> p
+
+p[match(c("calc_age", "ptsex", "hivstatus", "hivonart","CD4_Absolute", "Haemoglobin","screentemp", "t0hr", "t0sbp", "t0dbp", "t0map",
+        "t0rr", "t0spo2","gcs", "ustand", "lactate_value" , "WCC", "Platelets", "CO2", "Urea", "Creatinine", "bc", "tb", "malaria", "csf", "no_diagnosis",
+        "any_ab", "time_to_abx", "any_fung_rx","time_to_fung_rx", "any_mal_rx", "time_to_mal_rx", "any_tb_rx","time_to_tb_rx", "fluid_6hr"), p$name),] -> p
+
 
 p <- p[c("name", "1", "0", "pval", "boldcol")]
 names(p) <- c("Variable", "Died", "Survived", "p", "boldcol")
@@ -1019,6 +1075,7 @@ boldrows <- which(p$boldcol %in% TRUE)
 p$Variable[p$Variable == "calc_age"] <- "Age (years)"
 p$Variable[p$Variable == "ptsex"] <- "Male sex"
 p$Variable[p$Variable == "hivstatus"] <- "HIV Infected\\textsuperscript{*}"
+p$Variable[p$Variable == "hivonart"] <- "Taking ART\\textsuperscript{\\dag}"
 p$Variable[p$Variable == "Haemoglobin"] <- "Haemoglobin (x10\\textsuperscript{9} g dL\\textsuperscript{-1})"
 p$Variable[p$Variable == "CD4_Absolute"] <- "CD4 count\\textsuperscript{\\dag} ($\\mu$L\\textsuperscript{-1})"
 p$Variable[p$Variable == "screentemp"] <- "Temperature (\\textdegree C)"
@@ -1029,6 +1086,7 @@ p$Variable[p$Variable == "t0map"] <- "Mean arterial BP (mmHg)"
 p$Variable[p$Variable == "t0rr"] <- "Respiratory rate (min\\textsuperscript{-1}))"
 p$Variable[p$Variable == "t0spo2"] <- "Oxygen saturation (%)"
 p$Variable[p$Variable == "gcs"] <- "GCS"
+p$Variable[p$Variable == "ustand"] <- "Unable to stand"
 p$Variable[p$Variable == "lactate_value"] <- "Lactate (mmol L\\textsuperscript{-1})"
 p$Variable[p$Variable == "WCC"] <- "White cell count (x10\\textsuperscript{9} L\\textsuperscript{-1})"
 p$Variable[p$Variable == "Platelets"] <- "Platelet count (x10\\textsuperscript{9} L\\textsuperscript{-1})"
@@ -1039,39 +1097,128 @@ p$Variable[p$Variable == "CO2"] <- "Bicarbonate (mmol L\\textsuperscript{-1})"
 p$Variable[p$Variable == "Urea"] <- "Urea (mmol L\\textsuperscript{-1})"
 p$Variable[p$Variable == "Creatinine"] <- "Creatinine (mmol L\\textsuperscript{-1})"
 
+p$Variable[p$Variable == "bc"] <- "BSI"
+p$Variable[p$Variable == "tb"] <- "TB"
+p$Variable[p$Variable == "malaria"] <- "Malaria"
+p$Variable[p$Variable == "csf"] <- "Meningitis"
+p$Variable[p$Variable == "no_diagnosis"] <- "No diagnosis"
+
+p$Variable[p$Variable == "any_ab"] <- "Antibacterials"
+p$Variable[p$Variable == "time_to_abx"] <- "Time to Antibacterials (hr)"
+p$Variable[p$Variable == "any_fung_rx"] <- "Antifungals"
+p$Variable[p$Variable == "time_to_fung_rx"] <- "Time to Antifungals (hr)"
+p$Variable[p$Variable == "any_mal_rx"] <- "Antimalarials"
+p$Variable[p$Variable == "time_to_mal_rx"] <- "Time to Antimalarials (hr)"
+p$Variable[p$Variable == "any_tb_rx"] <- "Antimycobacterials"
+p$Variable[p$Variable == "time_to_tb_rx"] <- "Time to Antimycobacterials (hr)"
+
+p$Variable[p$Variable == "fluid_6hr"] <- "IV fluid (ml)"
+
 sub("%", "\\\\%", p$Died) -> p$Died
 sub("%", "\\\\%", p$Survived) -> p$Survived
+
 sub("%", "\\\\%", p$Variable) -> p$Variable
+
+
 
 kable(select(p,-boldcol), "latex", booktabs =T, 
       row.names = F, longtable = F, ,escape = F,caption = "Bivariate associations with death by 28 days" ) %>%
  kable_styling("striped", full_width = F, latex_options = c("repeat_header")) %>%
   row_spec(boldrows, bold = T) %>%
-  pack_rows("Host Variables", 1,5, bold = F) %>% 
-   pack_rows("Severity Variables", 6, 22, bold = F)  %>%
-  footnote(general = "BP = Blood pressure, GCS = Glasgow coma scale. Numeric variables are presented as median (IQR) and categoric variables as proportions. P-values are from Kruskal-Wallace test for continuous variables and Fisher's exact test for categorical variables. PAtients with meningitis not shown in this table due to small numbers (n = 4)." , symbol = c("Participants with HIV status unknown not included in this row","CD4 count only measured for HIV-infected participants"), threeparttable = T, fixed_small_size = T)
+  pack_rows("Host Variables", 1,6, bold = F) %>% 
+   pack_rows("Severity Variables", 7, 21, bold = F)  %>%
+    pack_rows("Diagnosis", 25,26, bold = F) %>% 
+   pack_rows("Treatment Recieved", 27, 35, bold = F)  %>%
+  footnote(general = "BP = Blood pressure, GCS = Glasgow coma scale. Numeric variables are presented as median (IQR) and categoric variables as proportions. P-values are from Kruskal-Wallace test for continuous variables and Fisher's exact test for categorical variables." , symbol = c("Participants with HIV status unknown not included in this row","Includes only HIV-infected participants"), threeparttable = T, fixed_small_size = T)
 
 
 
 
 ```
 
-```{r bivariate-diag-sev, echo =F, warning=F, message=F}
+```{r outcome-by-time-to-rx2, echo =F, warning=F, message=F,fig.scap="Day 28 mortality stratified by time-to-antimicrobial time afn fluid volume recieved.", out.extra='', fig.cap="Day 28 mortality stratified by time-to-antimicrobial time (A-C) and intravenous fluid volume received over fist 6 hours of hospiytal admission (D). A and B show mortality stratified by time-to-antibacterial with different bin sizes to focus on the first 6hr (A) and afterwards (B). C shows mortality stratified by time to antituberculous therapy. In view of the small number of patients receiving antimalarial or antifungal therapy, this analysis was not repeated for those agents. D shows mortality stratified by the volume of intravenous fluid recieved over the first 6 hours of hospital attendance.", fig.width= 6, fig.height =9, out.height= '70%', fig.align= 'center'}
+
+# Solve the problem of variable selection and colinearity with dimensionality reduction
+
+d <-  dplyr::select(df.temp, pid, d28_death, hivstatus, calc_age,ptsex,screentemp, t0map, t0hr, t0rr, t0spo2, gcs, ustand, lactate_value,
+                         WCC, CD4_Absolute, Haemoglobin, Platelets, Urea, Creatinine, CO2, fluid_6hr, any_tb_rx, any_mal_rx, any_fung_rx,  any_ab, fluid_6hr,
+                         bc, tb, csf, malaria
+) 
+
+d$gcs <- as.character(as.numeric(d$gcs < 15))
+d$t0spo2 <- as.character(as.numeric(d$t0spo2 < 92))
+d$CD4.dic <- as.character(as.numeric(d$CD4_Absolute < 100))
+d$CD4.dic[is.na(d$CD4.dic)] <- 0
+d <- select(d, -CD4_Absolute)
+d$ustand <- as.character(d$ustand)
+d$d28_death <- as.character(d$d28_death)
+d$screentemp <- scale(log(d$screentemp))
+d$WCC <- scale(log(d$WCC))
+d$Urea <- scale(log(d$Urea))
+d$Creatinine <- scale(log(d$Creatinine))
+d$lactate_value <- scale(log(d$lactate_value))
+d$hivstatus <- as.character(d$hivstatus)
+d$ptsex <- as.character(d$ptsex)
+d[c()]
+
+d[c("calc_age", "t0hr", "t0rr","t0map" ,"Haemoglobin", "Platelets", "CO2", "fluid_6hr")] <- 
+  scale(d[c("calc_age", "t0hr", "t0rr", "t0map", "Haemoglobin", "Platelets", "CO2", "fluid_6hr")])
+
+d.complete <- d[complete.cases(d),]
+
+FAMD(d.complete[c( "d28_death", "tb","bc", "csf", "malaria", "screentemp", "t0map", "t0hr", "t0rr", "t0spo2", "gcs","lactate_value",
+    "WCC" , "Platelets", "Urea",  "Creatinine", "CO2", "ustand")], sup.var = c(1:5), graph = FALSE) -> sev.famd
+
+FAMD(d.complete[c( "d28_death", "tb","bc", "csf", "malaria", "hivstatus", "CD4.dic", "calc_age", "ptsex","Haemoglobin")], sup.var = c(1:5), graph = FALSE) -> host.famd
+
+fviz_famd_ind(host.famd, habillage = c("d28_death","tb", "malaria", "csf", "bc"), axes = c(1,2), geom = "point",alpha = 0.7)
+
+fviz_famd_var(sev.famd, axes = c(1,3), shape.var = "circle", repel = TRUE) + theme_bw()
+
+as.data.frame(host.famd$ind$coord) -> hostcoords
+names(hostcoords) <- paste0("Host.", names(hostcoords))
+d.complete <- cbind(d.complete, hostcoords)
+
+as.data.frame(sev.famd$ind$coord) -> sevcoords
+names(sevcoords) <- paste0("Sev.", names(sevcoords))
+d.complete <- cbind(d.complete, sevcoords)
+
+glm(as.numeric(d28_death) ~ Host.Dim.1+ Sev.Dim.1+ Sev.Dim.2+ bc+ tb+ malaria + 
+      any_tb_rx + any_fung_rx + any_mal_rx + fluid_6hr, data = d.complete, family = "binomial") -> m.glm
+
+m1priors <- c(
+prior(student_t(3, 0, 2.5), class = "Intercept"),
+prior(student_t(3, 0, 2.5), class = "b")
+)
+
+
+brms::brm(as.numeric(d28_death) ~ Host.Dim.1 +
+           Sev.Dim.1 + Sev.Dim.2 + tb + 
+           malaria + bc + csf + any_tb_rx + 
+          any_fung_rx + 
+           any_mal_rx + fluid_6hr, data = d.complete, , family = "bernoulli", prior = m1priors) -> m.b
+```
+
+
+
+
+
+
+```{r bivariate-diag-sev, echo =F, warning=F, message=F, include = F}
 # severity by diagnosis
 
-df.temp2 <- dplyr::select(df, d28_death, hivstatus,calc_age,ptsex,screentemp, t0sbp, t0dbp, t0map, t0hr, t0rr, t0spo2, gcs, lactate_value,
+df.temp2 <- dplyr::select(df, d28_death, hivstatus,hivonart,calc_age,ptsex,screentemp, t0sbp, t0dbp, t0map, t0hr, t0rr, t0spo2, gcs, ustand, lactate_value,
                          WCC, CD4_Absolute, Haemoglobin, Platelets, NA.,Potassium, Urea, Creatinine, CO2, Chloride, tb, malaria, bc, csf
 ) 
-apply(df.temp2[24:26], 1, sum) -> df.temp2$n_diagnoses
+apply(df.temp2[c("tb", "malaria", "bc", "csf")], 1, sum) -> df.temp2$n_diagnoses
 
-#df.temp2$CD4_Absolute[df.temp2$hivstatus != "Reactive"] <- NA
 
-df.temp2 <- subset(df.temp2, n_diagnoses < 2)
+#df.temp2 <- subset(df.temp2, n_diagnoses < 2 & csf == 0)
 
 df.temp2$no_diagnosis <- as.numeric(df.temp2$n_diagnoses == 0)
 
-df.temp2$diagnosis <- factor(apply(df.temp2[c(24,25,26,29)], 1, function(x) which(x == 1)), 
-       labels = colnames(df.temp2[c(24,25,26,29)])) 
+#df.temp2$diagnosis <- factor(apply(df.temp2[c("tb", "malaria", "bc", "no_diagnosis")], 1, function(x) which(x == 1)), 
+ #      labels = colnames(df.temp2[c("tb", "malaria", "bc", "no_diagnosis")])) 
 
 df.temp2[df.temp2 == 999] <- NA
 df.temp2$CD4_Absolute[df.temp2$hivstatus != "Reactive"] <- NA
@@ -1081,34 +1228,51 @@ df.temp2$hivstatus[df.temp2$hivstatus == "Reactive"] <- 1
 df.temp2$hivstatus[df.temp2$hivstatus == "Non reactive"] <- 0
 df.temp2$hivstatus[df.temp2$hivstatus == "Unknown"] <- NA
 
+df.temp2$hivstatus <- as.numeric(df.temp2$hivstatus)
 df.temp2$ptsex[df.temp2$ptsex == "Male"] <- 1
 df.temp2$ptsex[df.temp2$ptsex == "Female"] <- 0
+df.temp2$ptsex <- as.numeric(df.temp2$ptsex)
 
-df.temp2 %>% select(-c(hivstatus, ptsex, d28_death, tb, malaria, bc, csf, n_diagnoses, no_diagnosis)) %>% pivot_longer(-diagnosis) %>% filter(!is.na(diagnosis)) %>%
-  dplyr::group_by(name) %>% dplyr::summarise(pval = kruskal.test(value ~ diagnosis)$p.value) -> pvals
+df.temp2$hivonart[df.temp2$hivonart == "Yes"] <- 1
+df.temp2$hivonart[df.temp2$hivonart == "No"] <- 0
+df.temp2$hivonart <- as.numeric(df.temp2$hivonart)
 
-df.temp2 %>% select(-c(hivstatus, ptsex, d28_death, tb, malaria, bc, csf, n_diagnoses, no_diagnosis)) %>% pivot_longer(-diagnosis) %>% filter(!is.na(diagnosis)) %>%
-  dplyr::group_by(name, diagnosis) %>% dplyr::summarise( median = median(value, na.rm = T),
-                                                         LQ = quantile(value, 0.25, na.rm = T),
-                                                         UQ = quantile(value, 0.75, na.rm = T)) -> p
+
+### new
+df.temp2 %>% 
+  select(-c(hivstatus, hivonart, ptsex, ustand, d28_death)) %>% pivot_longer(-c(malaria, tb,bc,no_diagnosis), names_to = "var_name", values_to = "var_val") %>% 
+  pivot_longer(-c(var_name, var_val)) %>% filter(value == 1) %>%
+  dplyr::group_by(var_name) %>% dplyr::summarise(pval = kruskal.test(var_val ~ name)$p.value) -> pvals
+
+df.temp2 %>% select(-c(hivstatus, hivonart, ptsex, ustand, d28_death, csf, n_diagnoses)) %>% pivot_longer(-c(malaria, tb,bc,no_diagnosis), , names_to = "var_name", values_to = "var_val")  %>% 
+  pivot_longer(-c(var_name, var_val)) %>% filter(value == 1) %>%
+  group_by(name, var_name) %>%
+  summarise(med = median(var_val, na.rm = T), 
+            LQ = quantile(var_val, 0.25, na.rm = T),
+            UQ = quantile(var_val, 0.75, na.rm = T)) -> p
+
+###
+
 
 paste0(
-  specify_decimal(p$median, 1), " (",
+  specify_decimal(p$med, 1), " (",
   specify_decimal(p$LQ, 1), "-",
   specify_decimal(p$UQ, 1) ,")"
 ) -> p$med_str
 
-p %>% select(name, diagnosis, med_str) %>% pivot_wider(names_from = diagnosis, values_from = med_str) -> p
+p %>% select(name, var_name, med_str) %>% pivot_wider(names_from = name, values_from = med_str) -> p
 
 p <- merge(p, pvals)
 
+## new
 
-df.temp2 %>% select(diagnosis, hivstatus, ptsex) %>% pivot_longer(-diagnosis) %>% 
-  dplyr::group_by(name, diagnosis) %>% dplyr::summarise(`1` = sum(value == 1, na.rm = T), 
-                                                        `0` = sum(value == 0, na.rm = T),
+df.temp2 %>% select( hivstatus, hivonart, ptsex, ustand, malaria, tb,bc, no_diagnosis) %>% pivot_longer(-c(malaria, tb,bc, no_diagnosis), names_to = "var_name", values_to = "var_val") %>% 
+  pivot_longer(-c(var_name, var_val)) %>% filter(value == 1 & !is.na(var_val)) %>% 
+  dplyr::group_by(name, var_name) %>% dplyr::summarise(`1` = sum(var_val == 1, na.rm = T), 
+                                                        `0` = sum(var_val == 0, na.rm = T),
                                                         total = sum(!is.na(value)),
                                                         prop = `1`/total) %>% 
-  group_by(name) %>% 
+  group_by(var_name) %>% 
   dplyr::mutate(pval = fisher.test(matrix(c(`1`,`0`), ncol =2))$p.value) -> p.cat
 
 
@@ -1119,8 +1283,10 @@ p.cat$str <- paste0(
 )
 
 
-p.cat %>% select(name, diagnosis, str, pval) %>% pivot_wider(names_from = diagnosis, values_from = str) -> p.cat
-#p.cat <- merge(p.cat, p.catpvals)
+p.cat %>% select(name, var_name, str, pval) %>% pivot_wider(names_from = name, values_from = str) -> p.cat
+
+
+##
 
 bind_rows(p,p.cat) -> p
 
@@ -1131,20 +1297,26 @@ p$boldcol[p$pval <= 0.05] <- TRUE
 p$pval <- specify_decimal(p$pval, 3)
 p$pval[p$pval == "0.000"] <- "<0.001"
 
-df.temp2 %>% select(diagnosis) %>% group_by(diagnosis) %>% tally() %>% 
-  pivot_wider(names_from = diagnosis, values_from = n) -> n_d
 
-n_d$name <- "n"
+## new
+
+df.temp2 %>% select(malaria, tb,bc, no_diagnosis) %>% 
+  pivot_longer(everything()) %>%
+  filter(value == 1) %>% group_by(name) %>% tally() %>%
+  pivot_wider(names_from = name, values_from = n) -> n_d
+
+
+##
+n_d$var_name <- "n"
 n_d$pval <- "-"
 
 sapply(n_d, as.character) -> n_d
 n_d$boldcol <- FALSE
 bind_rows(p, n_d) -> p
-p[match(c("n","calc_age", "ptsex", "hivstatus", "CD4_Absolute", "Haemoglobin","screentemp", "t0hr", "t0sbp", "t0dbp", "t0map",
-        "t0rr", "t0spo2","gcs", "lactate_value" , "WCC", "Platelets", "NA.", "Potassium",
-        "Chloride", "CO2", "Urea", "Creatinine"), p$name),] -> p
+p[match(c("n","calc_age", "ptsex", "hivstatus","hivonart", "CD4_Absolute", "Haemoglobin","screentemp", "t0hr", "t0sbp", "t0dbp", "t0map",
+        "t0rr", "t0spo2","gcs","ustand", "lactate_value" , "WCC", "Platelets",  "CO2", "Urea", "Creatinine"), p$var_name),] -> p
 
-p <- p[c("name", "tb", "malaria","bc", "no_diagnosis", "pval", "boldcol")]
+p <- p[c("var_name", "tb", "malaria","bc", "no_diagnosis", "pval", "boldcol")]
 names(p) <- c("Variable", "TB", "Malaria","BSI","No Diagnosis", "p", "boldcol")
 
 boldrows <- which(p$boldcol %in% TRUE)
@@ -1156,6 +1328,7 @@ p$Variable[p$Variable == "ptsex"] <- "Male sex"
 p$Variable[p$Variable == "hivstatus"] <- "HIV Infected\\textsuperscript{*}"
 p$Variable[p$Variable == "Haemoglobin"] <- "Haemoglobin (x10\\textsuperscript{9} g dL\\textsuperscript{-1})"
 p$Variable[p$Variable == "CD4_Absolute"] <- "CD4 count\\textsuperscript{\\dag} ($\\mu$L\\textsuperscript{-1})"
+p$Variable[p$Variable == "hivonart"] <- "Taking ART\\textsuperscript{\\dag}"
 p$Variable[p$Variable == "screentemp"] <- "Temperature (\\textdegree C)"
 p$Variable[p$Variable == "t0hr"] <- "Heart rate (min\\textsuperscript{-1}))"
 p$Variable[p$Variable == "t0sbp"] <- "Systolic BP (mmHg)"
@@ -1164,6 +1337,7 @@ p$Variable[p$Variable == "t0map"] <- "Mean arterial BP (mmHg)"
 p$Variable[p$Variable == "t0rr"] <- "Respiratory rate (min\\textsuperscript{-1}))"
 p$Variable[p$Variable == "t0spo2"] <- "Oxygen saturation (%)"
 p$Variable[p$Variable == "gcs"] <- "GCS"
+p$Variable[p$Variable == "ustand"] <- "Unable to stand"
 p$Variable[p$Variable == "lactate_value"] <- "Lactate (mmol L\\textsuperscript{-1})"
 p$Variable[p$Variable == "WCC"] <- "White cell count (x10\\textsuperscript{9} L\\textsuperscript{-1})"
 p$Variable[p$Variable == "Platelets"] <- "Platelet count (x10\\textsuperscript{9} L\\textsuperscript{-1})"
@@ -1188,63 +1362,15 @@ kable(select(p,-boldcol), "latex", booktabs =T,
       row.names = F, longtable = F, ,escape = F,caption = "Bivariate associations of diagnosis with host and severty variables" ) %>%
  kable_styling("striped", full_width = F, latex_options = c("repeat_header", "scale_down")) %>%
   row_spec(boldrows, bold = T) %>%
-  pack_rows("Host Variables", 2,6, bold = F) %>% 
-   pack_rows("Severity Variables", 7, 23, bold = F)  %>%
-  footnote(general = "BP = Blood pressure, GCS = Glasgow coma scale. Numeric variables are presented as median (IQR) and categoric variables as proportions. P-values are from Kruskal-Wallace test for continuous variables and Fisher's exact test for categorical variables across four diganositic groups" , symbol = c("Participants with HIV status unknown not included in this row","CD4 count only measured for HIV-infected participants"), threeparttable = T, fixed_small_size = T) %>% add_indent(1) %>%
+  pack_rows("Host Variables", 2,7, bold = F) %>% 
+   pack_rows("Severity Variables", 8, 22, bold = F)  %>%
+  footnote(general = "BP = Blood pressure, GCS = Glasgow coma scale. Numeric variables are presented as median (IQR) and categoric variables as proportions. P-values are from Kruskal-Wallace test for continuous variables and Fisher's exact test for categorical variables across four diganositic groups. Patients with meningitis are excluded from this table because of small numbers (n = 4)." , symbol = c("Participants with HIV status unknown not included in this row","HIV-infected participants only"), threeparttable = T, fixed_small_size = T) %>% add_indent(1) %>%
   landscape()
 
 ```
 
 
-```{r bivariate-rx-mort, echo =F, warning=F, message=F}
-
-df.temp <- select(df, d28_death, first_ab, time_to_abx, any_tb_rx, time_to_tb_rx, first_mal_rx, time_to_mal_rx, first_fung_rx, time_to_fung_rx)
-
-df.temp$any_ab <- as.character(df.temp$first_ab != "none")
-df.temp$any_mal_rx <- as.character(!is.na(df.temp$first_mal_rx))
-df.temp$any_fung_rx <- as.character(!is.na(df.temp$first_fung_rx))
-
-df.temp$any_tb_rx[df.temp$any_tb_rx == "on admission"] <- "none"
-df.temp$any_tb_rx[df.temp$any_tb_rx == "none"] <- "FALSE"
-df.temp$any_tb_rx[df.temp$any_tb_rx == "yes"] <- "TRUE"
-
-df.temp %>% 
-  select(d28_death, any_ab, any_mal_rx, any_tb_rx, any_fung_rx) %>%
-  pivot_longer(-d28_death) %>%
-  group_by(name, value) %>%
-  summarise(n = sum(!is.na(d28_death)),
-                    e = sum(d28_death == 1, na.rm = T),
-                    prop = e/n,
-                    lci = binom.test(e,n)$conf.int[[1]],
-                    uci = binom.test(e,n)$conf.int[[2]],
-  ) %>% group_by(name) %>%
-  mutate(pval = fisher.test(matrix(c(n,e), ncol = 2))$p.value) -> rx
-
-rx$rx_str <- paste0(
-  rx$e, "/", rx$n, " (", 
-  specify_decimal(rx$prop *100, 0), "%)") #"% [",
-#  specify_decimal(rx$lci *100, 0), "-",
-#  specify_decimal(rx$uci *100, 0), "%])"
-
-
-rx %>% select(name, value, rx_str, pval) %>% pivot_wider(names_from = c(value), values_from = rx_str ) -> rx
-
-rx[,c(1,4,3,2)] -> rx
-rx$name <- c("Antibacterial", "Antifungal", "Antimalarial", "Anitmycobacterial")
-
-rx$pval <- specify_decimal(rx$pval, 3)
-
-names(rx) <- c("Class", "Yes", "No", "p")
-
-kable(rx, "latex", booktabs =T, 
-      row.names = F, longtable = F, ,escape = T,caption = "Bivariate associations of treatment recieved and death by 28 days") %>% 
-  #    col.names = c("Class", "Yes", "No", "p")) %>%
- kable_styling("striped", full_width = F, latex_options = c("repeat_header")) %>%
-  footnote(general = "Table includes participants recieved specified treatment post admission only; for example, participants recieveing TB therapy prior to admission are included in the no column. P-values are from Fisher's exact test.", threeparttable = T, fixed_small_size = T) 
-
-```
-
-```{r outcome-by-diag, echo =F, warning=F, message=F,fig.scap="Mortality stratified by diagnosis", out.extra='', fig.cap="Day 28 and 90 mortality stratified by diagnosis.", fig.width= 5, fig.height =3, out.width= '50%' , fig.align = 'center'}
+```{r outcome-by-diag, echo =F, warning=F, message=F,fig.scap="Mortality stratified by diagnosis and IV fluid therapy", out.extra='', fig.cap="A; Day 28 and 90 mortality stratified by diagnosis, B: Day 28 mortality stratified by IV fluid volume recieved in first 6hr of hospital admission.", fig.width= 6, fig.height =3, out.height= '70%' , fig.align = 'center'}
 
 # plot outcomes by diag
 
@@ -1298,14 +1424,43 @@ d.mort$type[d.mort$type == "d90"] <- "Day 90"
 
 ggplot(d.mort, aes(fct_reorder(name,prop), prop, color = fct_reorder(type, prop))) + coord_flip() + geom_point(position = position_dodge(width = 0.3)) + 
   geom_errorbar(aes(ymin = lci, ymax = uci), width = 0, position = position_dodge(width = 0.3)) + theme_bw()  +
-  labs(y = "Mortality", x = "") + theme(legend.title = element_blank())
+  labs(y = "Mortality", x = "") + theme(legend.title = element_blank(), legend.position = "bottom") -> p.diag
 
 
+cut(as.numeric(df$fluid_6hr), breaks = c(-1,0,1000,2000,4000)) -> df$fluid_6hr.cut
+
+
+bind_rows (
+  
+  df  %>% group_by(fluid_6hr.cut) %>% dplyr::summarise(e= sum( d90_death == 1, na.rm = T),
+                                                        n = sum( !is.na(d90_death), na.rm = T), type = "d90"),
+  
+  df  %>% group_by(fluid_6hr.cut) %>% dplyr::summarise(e= sum( d28_death == 1, na.rm = T),
+                                                        n = sum( !is.na(d28_death), na.rm = T), type = "d28")
+) -> ab.t.mort
+
+#%>% filter(hivstatus == "Reactive")
+#%>% filter(hivstatus == "Reactive")
+
+ab.t.mort$prop <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$estimate )
+ab.t.mort$lci <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$conf.int[[1]] )
+ab.t.mort$uci <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$conf.int[[2]] )
+
+ggplot(subset(ab.t.mort,type == "d28"), aes(fluid_6hr.cut, prop)) + geom_point(position = position_dodge(width = 0.4)) + 
+  geom_errorbar(aes(ymax = uci, ymin = lci), width = 0, position = position_dodge(width = 0.4)) +
+  theme_bw() + scale_x_discrete(breaks = c(levels(df$fluid_6hr.cut)), 
+                                labels = c("None", "0-1L", "1-2L",">2L" )) +
+  labs(x = "IV fluid (first 6hr)", y = "Mortality") + theme(axis.text.x = element_text(angle = 45, hjust =1)) -> p.fluid
+
+
+ggarrange(p.diag, ggarrange(p.fluid,NULL, heights = c(0.90,0.1), labels = c("B", NA), nrow = 2), labels = c("A", NA), ncol = 2, widths = c(1.1,1))
 
 
 ```
 
-```{r outcome-by-time-to-rx, echo =F, warning=F, message=F,fig.scap="Day 28 mortality stratified by time-to-antimicrobial time afn fluid volume recieved.", out.extra='', fig.cap="Day 28 mortality stratified by time-to-antimicrobial time (A-C) and intravenous fluid volume received over fist 6 hours of hospiytal admission (D). A and B show mortality stratified by time-to-antibacterial with different bin sizes to focus on the first 6hr (A) and afterwards (B). C shows mortality stratified by time to antituberculous therapy. In view of the small number of patients receiving antimalarial or antifungal therapy, this analysis was not repeated for those agents. D shows mortality stratified by the volume of intravenous fluid recieved over the first 6 hours of hospital attendance.", fig.width= 6, fig.height =9, out.height= '70%', fig.align= 'center'}
+
+
+```{r outcome-by-time-to-rx, echo =F, warning=F, message=F,fig.scap="Day 28 mortality stratified by time-to-antimicrobials", out.extra='', fig.cap="Day 28 mortality stratified by time-to-antimicrobials in hours (A-C). A and B show mortality stratified by time-to-antibacterial with different bin sizes to focus on the first 6hr (A) and afterwards (B). C shows mortality stratified by time to antituberculous therapy. In view of the small number of patients receiving antimalarial or antifungal therapy, this analysis was not repeated for those agents.", fig.width= 6, fig.height =6, out.height= '70%', fig.align= 'center'}
 
 
 cut(as.numeric(df$time_to_abx), breaks = c(0,6,24, 10000)) -> df$time_to_abx.cut
@@ -1378,167 +1533,11 @@ ggplot(subset(ab.t.mort,type == "d28"), aes(time_to_tb_rx.cut, prop)) + geom_poi
                                 labels = c("0-72hr", "72-144hr","144-216hr",">216hr", "None")) +
   labs(x = "Time to antimycobacterials", y = "Mortality") + theme(axis.text.x = element_text(angle = 45, hjust =1)) -> p.tb
 
-cut(as.numeric(df$fluid_6hr), breaks = c(-1,0,1000,2000,4000)) -> df$fluid_6hr.cut
-
-
-bind_rows (
-  
-  df  %>% group_by(fluid_6hr.cut) %>% dplyr::summarise(e= sum( d90_death == 1, na.rm = T),
-                                                        n = sum( !is.na(d90_death), na.rm = T), type = "d90"),
-  
-  df  %>% group_by(fluid_6hr.cut) %>% dplyr::summarise(e= sum( d28_death == 1, na.rm = T),
-                                                        n = sum( !is.na(d28_death), na.rm = T), type = "d28")
-) -> ab.t.mort
-
-#%>% filter(hivstatus == "Reactive")
-#%>% filter(hivstatus == "Reactive")
-
-ab.t.mort$prop <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$estimate )
-ab.t.mort$lci <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$conf.int[[1]] )
-ab.t.mort$uci <- apply(ab.t.mort[2:3], 1, function(x) binom.test(x[1],x[2])$conf.int[[2]] )
-
-ggplot(subset(ab.t.mort,type == "d28"), aes(fluid_6hr.cut, prop)) + geom_point(position = position_dodge(width = 0.4)) + 
-  geom_errorbar(aes(ymax = uci, ymin = lci), width = 0, position = position_dodge(width = 0.4)) +
-  theme_bw() + scale_x_discrete(breaks = c(levels(df$fluid_6hr.cut)), 
-                                labels = c("None", "0-1L", "1-2L",">2L" )) +
-  labs(x = "IV fluid (first 6hr)", y = "Mortality") + theme(axis.text.x = element_text(angle = 45, hjust =1)) -> p.fluid
-
-
-ggarrange(ggarrange(p1,p2, ncol = 2, labels = c("A", "B")), ggarrange(NULL, p.tb, NULL, ncol =3, widths = c(0.5,1,0.5), labels = c(NA,"C", NA)), 
-          ggarrange(NULL, p.fluid, NULL, ncol =3, widths = c(0.5,1,0.5), labels = c(NA,"D", NA)),
-          ncol = 1 , nrow = 3)
+ggarrange(ggarrange(p1,p2, ncol = 2, labels = c("A", "B")), ggarrange(NULL, p.tb, NULL, ncol =3, widths = c(0.5,1,0.5), labels = c(NA,"C", NA)),
+          ncol = 1 , nrow = 2)
 
 
 
 ```
 
-```{r outcome-by-time-to-rx, echo =F, warning=F, message=F,fig.scap="Day 28 mortality stratified by time-to-antimicrobial time afn fluid volume recieved.", out.extra='', fig.cap="Day 28 mortality stratified by time-to-antimicrobial time (A-C) and intravenous fluid volume received over fist 6 hours of hospiytal admission (D). A and B show mortality stratified by time-to-antibacterial with different bin sizes to focus on the first 6hr (A) and afterwards (B). C shows mortality stratified by time to antituberculous therapy. In view of the small number of patients receiving antimalarial or antifungal therapy, this analysis was not repeated for those agents. D shows mortality stratified by the volume of intravenous fluid recieved over the first 6 hours of hospital attendance.", fig.width= 6, fig.height =9, out.height= '70%', fig.align= 'center'}
 
-df.back <- df
-
-df$any_ab <- as.numeric(df$first_ab != "none")
-df$any_mal_rx <- as.numeric(!is.na(df$first_mal_rx))
-df$any_fung_rx <- as.numeric(!is.na(df$first_fung_rx))
-
-df$any_tb_rx[df$any_tb_rx == "on admission"] <- "none"
-df$any_tb_rx[df$any_tb_rx == "none"] <- 0
-df$any_tb_rx[df$any_tb_rx == "yes"] <- 1
-
-df$CD4_Absolute[df$hivstatus != "Reactive"] <- NA
-
-df$hivstatus[df$hivstatus == "Unknown"] <- NA
-df$hivstatus[df$hivstatus == "Reactive"] <- 1
-df$hivstatus[df$hivstatus == "Non reactive"] <- 0
-
-df$hivstatus <- as.numeric(df$hivstatus)
-
-df$CD4.scale <- scale(df$CD4_Absolute)
-df$CD4.scale <- log(df$CD4.scale)
-
-
-
-glm(d28_death ~ calc_age + ptsex + hivstatus  +  Haemoglobin + screentemp + t0hr + t0map + 
-      t0rr + t0spo2 + gcs + lactate_value + WCC + Platelets + NA. + Potassium + Chloride + CO2 + Urea +
-      tb + malaria + bc + csf + any_tb_rx + any_fung_rx + any_mal_rx, family = 'binomial', data = df) -> m
-
-df$calc_age <- scale(df$calc_age)
-
-df$Haemoglobin <- scale(df$Haemoglobin)
-df$screentemp <- scale(df$screentemp)
-df$t0hr <- scale(df$t0hr)
-df$t0map <- scale(df$t0map)
-df$t0rr <- scale(df$t0rr)
-df$t0spo2 <- scale(df$t0spo2)
-df$gcs <- scale(df$gcs)
-df$lactate_value <- scale(df$lactate_value)
-df$WCC <- scale(df$WCC)
-df$Platelets <- scale(df$Platelets)
-df$NA. <- scale(df$NA.)
-df$Potassium <- scale(df$Potassium)
-df$CO2 <- scale(df$CO2)
-df$Urea <- scale(df$Urea)
-df$Creatinine <- scale(df$Creatinine)
-
-df$d28_death <- as.factor(df$d28_death)
-df$hivstatus <- as.factor(df$hivstatus)
-df$tb <- as.factor(df$tb)
-df$malaria <- as.factor(df$malaria)
-df$bc <- as.factor(df$bc)
-df$any_tb_rx <- as.factor(df$any_tb_rx)
-df$any_fung_rx <- as.factor(df$any_fung_rx)
-df$any_mal_rx <- as.factor(df$any_mal_rx)
-df$any_ab <- as.factor(df$any_ab)
-
-df$hivstatus <- as.character(df$hivstatus)
-
-df$hivstatus[df$hivstatus == "UK"] <- NA
-
-df2 <- dplyr::select(df, d28_death, calc_age ,ptsex , hivstatus ,Haemoglobin, screentemp ,t0map,
-       t0spo2, gcs, lactate_value, CO2, Urea, Creatinine,
-      tb, bc, malaria,any_tb_rx, any_fung_rx, any_mal_rx, no_diagnosis)
-
-df2.complete <- df2[complete.cases(df2),]
-
-glm(d28_death ~ calc_age + ptsex + hivstatus + Haemoglobin + 
-       t0spo2 + gcs + lactate_value +  Urea +  
-      tb + bc +  any_tb_rx + any_fung_rx, family = 'binomial', data = df) -> m 
-
-df3 <- dplyr::select(df, d28_death, calc_age ,ptsex , hivstatus ,Haemoglobin, screentemp ,t0map,
-       t0spo2, gcs, lactate_value, CO2, Urea, Creatinine,
-      tb, bc,csf, malaria,any_tb_rx, any_fung_rx, any_mal_rx, time_to_abx)
-
-
-df3.complete <- df3[complete.cases(df3),]
-
-
-
-
-
-    brms::brm(d28_death ~ Haemoglobin +
-       t0spo2 + gcs + lactate_value +  Urea + 
-      tb + malaria + bc + csf + time_to_abx + any_tb_rx + any_fung_rx + any_mal_rx, data = df3.complete, family = "bernoulli", prior = m1priors) -> m.brms3
-  
-df2.complete %>% add_fitted_draws(m.brms, scale = "linear") %>% ungroup() %>% dplyr::select( -c(d28_death, ptsex, hivstatus, tb, bc, malaria, any_tb_rx, any_fung_rx, any_mal_rx)) %>% pivot_longer(-c(.row, .chain,.iteration, .draw, .value)) %>% ggplot(aes(x= value, y = .value)) + stat_pointinterval() + geom_smooth() + geom_smooth(method = 'lm', linetype = "dashed", color = "red") + facet_wrap(~name, scales = "free")
-
-## make partial residual
-extract_draws(m.brms) -> b
-Y <- b$data
-draws <- as.data.frame(b$dpars$mu$fe$b) 
- draws$.draw <- 1:nrow(draws)
-df.data <- as.data.frame(b$dpars$mu$fe$X)
-df.data <- bind_cols(df.data, Y)
-df.data$.row <- 1:nrow(df.data)
-  
-dfout <- bind_cols(
-
-  df.data %>% slice(rep(1:n(), each = nrow(draws))),
-draws %>% slice(rep(row_number(), nrow(df.data)))
-)
-
-# apply(dfout, 1, function(x) x[22] + sum(x[2:19] * x[23:40])) -> dfout$linear_pred
-#as.data.frame(t(apply(dfout[1:10,], 1, function(x) x[2:19] * x[23:40])))
- 
-betas <- dfout[,2:19] * dfout[,23:40]
-names(betas) <- paste0("x_beta_", names(betas)) 
-dfout <- bind_cols(dfout, betas)
-
-dfout$linear_pred <- apply(dfout,1, function(x) x[22] + sum( x[42: ncol(dfout)]))
-
-dfout$p <- plogis(dfout$linear_pred)
-dfout$resid <- (dfout$Y - dfout$p) / (dfout$p*(1- dfout$p))
-
-dfout[,42:59] <- dfout[,42:59] + dfout$resid
-
-dfout %>% dplyr::select(.row,t0spo2,x_beta_t0spo2) %>%  group_by(.row) %>%
-  summarise(spo2 = median(t0spo2), 
-            med.par.resid = median(x_beta_t0spo2),
-            lci = quantile(x_beta_t0spo2, 0.025),
-            uci = quantile(x_beta_t0spo2, 0.975)) -> spo2plot
-
-#dfout[1:10,42:ncol(dfout)] - dfout$linear_pred[1:10]
-
-df2.complete %>% add_fitted_draws(m.brms, scale = "linear") %>% ggplot(aes(x= t0spo2, y = .value)) + stat_pointinterval() + geom_smooth() + geom_smooth(method = 'lm', linetype = "dashed")
-
-df2.complete
-
-```
