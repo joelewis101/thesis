@@ -11,10 +11,10 @@ prior(student_t(3, 0, 2.5), class = "b")
 )
 
 
-brms::brm(as.numeric(d28_death) ~ Dim.1 +
-           Dim.2 + Dim.3 + tb + 
-          malaria + bc + csf + any_tb_rx + 
-          any_fung_rx + 
+brms::brm(as.numeric(d28_death == "Died") ~ Dim.1 +
+           Dim.2 + Dim.3 +  
+          malaria + bc + csf + tb + 
+          any_fung_rx + any_ab + any_tb_rx +
            any_mal_rx + fluid_6hr, data = d.complete, , family = "bernoulli", prior = m1priors) -> m.b2
 
 
@@ -108,7 +108,7 @@ for (i in 1:10) {
 brm_multiple(d28_death ~ Dim.1 +
                Dim.2 + Dim.3 + tb + 
                malaria + bc + csf + any_tb_rx + 
-               any_fung_rx + 
+               any_fung_rx + any_ab +
                any_mal_rx + fluid_6hr, data = out.coords, , family = "bernoulli", prior = m1priors) -> m.imp
 
 saveRDS(m.imp, "/Users/joelewis/Documents/PhD/Thesis/bookdown/chapter_4/mortality_brms_model_imputed.rds")
