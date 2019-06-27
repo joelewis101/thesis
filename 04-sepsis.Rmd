@@ -945,11 +945,9 @@ theme_bw() +
 
 ```
 
-#### Associations of mortality
+#### Determinents of mortality
 
-Univariate associations of host and severity variables
-
-Univariate association of 
+Bivariate associations of mortality with host, disease severity and treatment variables are shown in \@ref(tab:outcome-morbidity)
 
 ```{r causal-structure, echo = F, fig.scap="Hypothesised causal structre of mortality in sepsis", out.extra='', fig.cap="Hypothesised causal structre of death in sepsis. Host factors (e.g. age, sex, immune status) influence the type of infection; disseminated TB is more common in HIV, for example. Severity  (variables quantifying e.g. shock or respiratory failure) is influenced by infection type and host factors. Therapy encodes which antimicrobials were administered and rapidity of administration of antimicrobials, and is influenced by disease severity (sicker patients may be given different therapies), host factors (HIV status may influence treatment) and the infection type (for example, malaria rapid diagnostic tests influenceing rapidity of malaria treatment). Dotted edges from host and infection to outcome are because it is not clear \textit{a priori} whether the effect of infection and host factors are entirely mediated by disease severity: in fact, even if this were the case in a theoretical sense, the available severity variables are unlikley to completely account for the causative effect of infection type on mortality and so conditioning on all available severity variables is likely to leave some residual causative effect of infection type. See text for further discussion",  out.height = '50%', fig.align = 'center'}
 
@@ -1127,7 +1125,7 @@ kable(select(p,-boldcol), "latex", booktabs =T,
   row_spec(boldrows, bold = T) %>%
   pack_rows("Host Variables", 1,6, bold = F) %>% 
    pack_rows("Severity Variables", 7, 21, bold = F)  %>%
-    pack_rows("Diagnosis", 25,26, bold = F) %>% 
+    pack_rows("Diagnosis", 22,26, bold = F) %>% 
    pack_rows("Treatment Recieved", 27, 35, bold = F)  %>%
   footnote(general = "BP = Blood pressure, GCS = Glasgow coma scale. Numeric variables are presented as median (IQR) and categoric variables as proportions. P-values are from Kruskal-Wallace test for continuous variables and Fisher's exact test for categorical variables." , symbol = c("Participants with HIV status unknown not included in this row","Includes only HIV-infected participants"), threeparttable = T, fixed_small_size = T)
 
@@ -1136,7 +1134,7 @@ kable(select(p,-boldcol), "latex", booktabs =T,
 
 ```
 
-```{r outcome-by-time-to-rx2, echo =F, warning=F, message=F,fig.scap="Day 28 mortality stratified by time-to-antimicrobial time afn fluid volume recieved.", out.extra='', fig.cap="Day 28 mortality stratified by time-to-antimicrobial time (A-C) and intravenous fluid volume received over fist 6 hours of hospiytal admission (D). A and B show mortality stratified by time-to-antibacterial with different bin sizes to focus on the first 6hr (A) and afterwards (B). C shows mortality stratified by time to antituberculous therapy. In view of the small number of patients receiving antimalarial or antifungal therapy, this analysis was not repeated for those agents. D shows mortality stratified by the volume of intravenous fluid recieved over the first 6 hours of hospital attendance.", fig.width= 6, fig.height =9, out.height= '70%', fig.align= 'center'}
+```{r pca-1, echo =F, warning=F, message=F,fig.scap="Dimensionalty reducition using FAMD", out.extra='', fig.cap="Dimensionality reduction of dataset using factor analysis of mixed data (FAMD); this is a combination of principal components analysis (PCA) for continuous variables and multiple correspondence analysis (MCA) for categorical variables, resulting in a new orthogonal coordinate system which maximises explained variance in each FAMD axis. A and B show the squared correlation ratio (for categoriacal variables) and the squared correlation coefficient (for continuous variables) with dimensions 1 and 2 (A) or 1 and 3 (B), along wih the proportion of variabce explained by each axis. C shows the location of all individuals in the FAMD space, with patients who died by 28 days coloured red to show that Dim.1 is associated with mortality. E-H show idividuals colored by diagnosis: TB (E), malaria (F), BSI (G) and meningtis (H) to show that malaria and tb seperate somewhat in Dim.1 and 2 with malaria patients clustering in top left and TB patients in bottom right ", fig.width= 6, fig.height =10, out.height = '80%' , fig.align= 'center'}
 
 # Solve the problem of variable selection and colinearity with dimensionality reduction
 
@@ -1145,13 +1143,33 @@ d <-  dplyr::select(df.temp, pid, d28_death, hivstatus, calc_age,ptsex,screentem
                          bc, tb, csf, malaria
 ) 
 
-d$gcs <- as.character(as.numeric(d$gcs < 15))
+
+ attributes(scale(d$fluid_6hr) )$`scaled:scale` -> fluidscale
+
+ d$gcs <- as.character(as.numeric(d$gcs < 15))
+d$gcs[d$gcs == 1] <- "gcs < 15"
+d$gcs[d$gcs == 0] <- "gcs 15"
 d$t0spo2 <- as.character(as.numeric(d$t0spo2 < 92))
+d$t0spo2[d$t0spo2 == 1] <- "spo2 < 92"
+d$t0spo2[d$t0spo2 == 0] <- "spo2 >= 92"
 d$CD4.dic <- as.character(as.numeric(d$CD4_Absolute < 100))
-d$CD4.dic[is.na(d$CD4.dic)] <- 0
+d$CD4.dic[is.na(d$CD4.dic) & !is.na(d$hivstatus)] <- 0
+d$CD4.dic[d$CD4.dic == 1] <- "CD4 < 100"
+d$CD4.dic[d$CD4.dic == 0] <- "CD4 >= 100"
+d$hivstatus[d$hivstatus == 1] <- "HIV+"
+d$hivstatus[d$hivstatus == 0] <- "HIV-"
+
+
+
+#d$CD4.dic[is.na(d$CD4.dic)] <- 0
 d <- select(d, -CD4_Absolute)
 d$ustand <- as.character(d$ustand)
+d$ustand[d$ustand == 1] <- "Unable to stand"
+d$ustand[d$ustand == 0] <- "Can stand"
+
 d$d28_death <- as.character(d$d28_death)
+d$d28_death[d$d28_death == 1] <- "Died"
+d$d28_death[d$d28_death == 0] <- "Survived"
 d$screentemp <- scale(log(d$screentemp))
 d$WCC <- scale(log(d$WCC))
 d$Urea <- scale(log(d$Urea))
@@ -1159,50 +1177,136 @@ d$Creatinine <- scale(log(d$Creatinine))
 d$lactate_value <- scale(log(d$lactate_value))
 d$hivstatus <- as.character(d$hivstatus)
 d$ptsex <- as.character(d$ptsex)
-d[c()]
+d$ptsex[d$ptsex == 1] <- "Male"
+d$ptsex[d$ptsex == 0] <- "Female"
+
+
 
 d[c("calc_age", "t0hr", "t0rr","t0map" ,"Haemoglobin", "Platelets", "CO2", "fluid_6hr")] <- 
   scale(d[c("calc_age", "t0hr", "t0rr", "t0map", "Haemoglobin", "Platelets", "CO2", "fluid_6hr")])
 
+d[c( "d28_death", "tb","bc", "csf", "malaria", "hivstatus", "CD4.dic", "calc_age", "ptsex","Haemoglobin", "screentemp", "t0map", "t0hr", "t0rr", "t0spo2", "gcs","lactate_value",
+    "WCC" , "Platelets", "Urea",  "Creatinine", "CO2", "ustand")] -> df.famd.vars
+
+
+d[c("hivstatus", "CD4.dic", "calc_age", "ptsex","Haemoglobin", "screentemp", "t0map", "t0hr", "t0rr", "t0spo2", "gcs","lactate_value",
+    "WCC" , "Platelets", "Urea",  "Creatinine", "CO2", "ustand")] -> df.famd.vars
+
+df.famd.vars$hivstatus <- as.factor(df.famd.vars$hivstatus)
+df.famd.vars$CD4 <- as.factor(df.famd.vars$CD4)
+df.famd.vars$ptsex <- as.factor(df.famd.vars$ptsex)
+df.famd.vars$ustand <- as.factor(df.famd.vars$ustand)
+df.famd.vars$gcs <- as.factor(df.famd.vars$gcs)
+df.famd.vars$t0spo2 <- as.factor(df.famd.vars$t0spo2)
+
+
+
+#data(ozone)
+
+## First the number of components has to be chosen 
+##   (for the reconstruction step)
+# nb <- estim_ncpFAMD(ozone) ## Time-consuming, nb = 2
+
+
+## Multiple Imputation
+#res.mi<-MIFAMD(ozone,ncp = 2,nboot=50)
+
+
+
+#MIFAMD(df.famd.vars, nboot = 10 , ncp = 2)  -> d.impute
+
+#FAMD(, sup.var = c(1:5), graph = FALSE) -> all.famd
+
+
 d.complete <- d[complete.cases(d),]
 
-FAMD(d.complete[c( "d28_death", "tb","bc", "csf", "malaria", "screentemp", "t0map", "t0hr", "t0rr", "t0spo2", "gcs","lactate_value",
-    "WCC" , "Platelets", "Urea",  "Creatinine", "CO2", "ustand")], sup.var = c(1:5), graph = FALSE) -> sev.famd
-
-FAMD(d.complete[c( "d28_death", "tb","bc", "csf", "malaria", "hivstatus", "CD4.dic", "calc_age", "ptsex","Haemoglobin")], sup.var = c(1:5), graph = FALSE) -> host.famd
-
-fviz_famd_ind(host.famd, habillage = c("d28_death","tb", "malaria", "csf", "bc"), axes = c(1,2), geom = "point",alpha = 0.7)
-
-fviz_famd_var(sev.famd, axes = c(1,3), shape.var = "circle", repel = TRUE) + theme_bw()
-
-as.data.frame(host.famd$ind$coord) -> hostcoords
-names(hostcoords) <- paste0("Host.", names(hostcoords))
-d.complete <- cbind(d.complete, hostcoords)
-
-as.data.frame(sev.famd$ind$coord) -> sevcoords
-names(sevcoords) <- paste0("Sev.", names(sevcoords))
-d.complete <- cbind(d.complete, sevcoords)
-
-glm(as.numeric(d28_death) ~ Host.Dim.1+ Sev.Dim.1+ Sev.Dim.2+ bc+ tb+ malaria + 
-      any_tb_rx + any_fung_rx + any_mal_rx + fluid_6hr, data = d.complete, family = "binomial") -> m.glm
-
-m1priors <- c(
-prior(student_t(3, 0, 2.5), class = "Intercept"),
-prior(student_t(3, 0, 2.5), class = "b")
-)
 
 
-brms::brm(as.numeric(d28_death) ~ Host.Dim.1 +
-           Sev.Dim.1 + Sev.Dim.2 + tb + 
-           malaria + bc + csf + any_tb_rx + 
-          any_fung_rx + 
-           any_mal_rx + fluid_6hr, data = d.complete, , family = "bernoulli", prior = m1priors) -> m.b
+d.complete[c("hivstatus", "CD4.dic", "calc_age", "ptsex","Haemoglobin", "screentemp", "t0map", "t0hr", "t0rr", "t0spo2", "gcs","lactate_value",
+    "WCC" , "Platelets", "Urea",  "Creatinine", "CO2", "ustand")] -> df.famd.vars
+
+names(df.famd.vars) <- c(  "hiv", "CD4", "age", "sex","Hb", "temp", "map", "hr", "rr", "spo2", "gcs","lactate",
+    "WCC" , "platelets", "urea",  "creatinine", "bicarbonate", "ustand")
+
+FAMD(df.famd.vars, graph = FALSE) -> all.famd
+
+
+fviz_famd_var(all.famd, axes = c(1,2), shape.var = "circle", repel = TRUE, col.var.sup = NA, col.var = "red", labelsize = 3,) + theme_bw() +ggtitle(element_blank()) -> p1
+fviz_famd_var(all.famd, axes = c(1,3), shape.var = "circle", repel = TRUE, col.var.sup = NA, col.var = "red", labelsize = 3, ) + theme_bw() +ggtitle(element_blank()) +ggtitle(element_blank())  -> p2
+
+cbind(d.complete,all.famd$ind$coord) -> d.complete
+
+
+
+ggplot(d.complete, aes(Dim.1, Dim.2, color = d28_death)) + geom_point(alpha = 0.7) + theme_bw() + geom_hline(yintercept =0,linetype = "dashed", alpha = 0.7) + geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.7) + scale_color_manual(values = c("red", "grey")) + theme(legend.title = element_blank()) -> p3
+
+ggplot(d.complete, aes(Dim.1, Dim.2, color = as.factor(tb))) + geom_point(alpha = 0.7) + theme_bw() + geom_hline(yintercept =0,linetype = "dashed", alpha = 0.7) + geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.7) + scale_color_manual(values = c("grey", "red")) + theme(legend.position = "none") -> p4
+
+ggplot(d.complete, aes(Dim.1, Dim.2, color = as.factor(malaria))) + geom_point(alpha = 0.7) + theme_bw() + geom_hline(yintercept =0,linetype = "dashed", alpha = 0.7) + geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.7) + scale_color_manual(values = c("grey", "red")) + theme(legend.position = "none") -> p5
+
+ggplot(d.complete, aes(Dim.1, Dim.2, color = as.factor(bc))) + geom_point(alpha = 0.7) + theme_bw() + geom_hline(yintercept =0,linetype = "dashed", alpha = 0.7) + geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.7) + scale_color_manual(values = c("grey", "red")) + theme(legend.position = "none") -> p6
+
+ggplot(d.complete, aes(Dim.1, Dim.2, color = as.factor(csf))) + geom_point(alpha = 0.7) + theme_bw() + geom_hline(yintercept =0,linetype = "dashed", alpha = 0.7) + geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.7) + scale_color_manual(values = c("grey", "red")) + theme(legend.position = "none") -> p7
+
+ggarrange(ggarrange(p1,p2, ncol =2, labels = c("A", "B")),
+          ggarrange(NULL,p3, NULL, widths = c(0.25,1,0.25), ncol = 3, labels = c(NA,"C", NA)),
+          ggarrange(p4,p5, ncol = 2, labels = c("D", "E")) ,
+           ggarrange(p6,p7, ncol = 2, labels = c("F", "G")), nrow = 4, heights = c(1,1,1,1))
+
+
 ```
 
+``` {r mortality-modelling, warning=F, message=F, echo = F}
+
+# to generate the models used inthis part of the analysis run
+
+# /Users/joelewis/Documents/PhD/Thesis/bookdown/other_scripts/ch4_impute_missing_data_and_run_mortality_brms_models.Rinclude = F}
+
+readRDS(paste0(wd, "mortality_brms_model_cca.rds")) -> m.cca
+readRDS(paste0(wd, "mortality_brms_model_imputed.rds")) -> m.imp
+readRDS(paste0(wd, "mortality_brms_model_cca_partial_residuals_df.rds")) -> par.res
+
+data.frame((posterior_summary(m.cca, robust = TRUE)), 2) -> op.cca
+data.frame((posterior_summary(m.imp, robust = TRUE)), 2) -> op.imp
+op.cca$variable <- rownames(op.cca)
+op.imp$variable <- rownames(op.imp)
+
+op.cca$Estimate[op.cca$variable == "b_fluid_6hr"] <- op.cca$Estimate[op.cca$variable == "b_fluid_6hr"] / (fluidscale/1000)
+op.cca$Q2.5[op.cca$variable == "b_fluid_6hr"] <- op.cca$Q2.5[op.cca$variable == "b_fluid_6hr"] / (fluidscale/1000)
+op.cca$Q97.5[op.cca$variable == "b_fluid_6hr"] <- op.cca$Q97.5[op.cca$variable == "b_fluid_6hr"] / (fluidscale/1000)
+
+op.imp$Estimate[op.imp$variable == "b_fluid_6hr"] <- op.imp$Estimate[op.imp$variable == "b_fluid_6hr"] / (fluidscale/1000)
+op.imp$Q2.5[op.imp$variable == "b_fluid_6hr"] <- op.imp$Q2.5[op.imp$variable == "b_fluid_6hr"] / (fluidscale/1000)
+op.imp$Q97.5[op.imp$variable == "b_fluid_6hr"] <- op.imp$Q97.5[op.imp$variable == "b_fluid_6hr"] / (fluidscale/1000)
+
+op.cca[1:4] <- exp(op.cca[1:4]) 
+op.imp[1:4] <- exp(op.imp[1:4]) 
+
+op.cca$aOR.cca <- paste0(specify_decimal(op.cca$Estimate,2), " (", specify_decimal(op.cca$Q2.5,2), "-", specify_decimal(op.cca$Q97.5,2), ")")
+
+op.imp$aOR.imp <- paste0(specify_decimal(op.imp$Estimate,2), " (", specify_decimal(op.imp$Q2.5,2), "-", specify_decimal(op.imp$Q97.5,2), ")")
+
+
+model.table <- join(select(op.cca, variable, aOR.cca), select(op.imp, variable, aOR.imp))
+model.table <- subset(model.table, variable != "b_Intercept" & variable != "lp__" )
+
+model.table$variable <- c("FAMD Dimension 1", "FAMD Dimension 2", "FAMD Dimension 3", "TB", "Malaria", "BSI", "Meningitis",
+                          "TB Therapy", "Antifungals", "Antimalarials", "IV Fluid Recieved (per L)")
+
+
+kable(model.table, "latex", booktabs =T,  
+      row.names = F, longtable = F, ,escape = F,
+      caption = "Adjusted odds ratios (aOR) for death by 28 days for complete case analysis (CCA) and multiply imputed data", col.names = c("Variable", "CCA", "Imputed") ) %>%
+ kable_styling("striped", full_width = F, latex_options = c("repeat_header")) %>%
+  add_header_above(c(" " = 1, "Adjusted Odds Ratio" = 2)) %>%
+  pack_rows("FAMD composite variables", 1,3, bold = F) %>% 
+   pack_rows("Diagnosis", 4, 7, bold = F)  %>%
+    pack_rows("Therapies recieved", 8,11, bold = F) %>% 
+  footnote(general = "FAMD = Factor Analysis of Mixed Data, BSI = Bloodstream infection, TB = Tuberculosis, CCA = Complete case analysis", threeparttable = T, fixed_small_size = T)
 
 
 
-
+```
 
 ```{r bivariate-diag-sev, echo =F, warning=F, message=F, include = F}
 # severity by diagnosis
@@ -1458,7 +1562,7 @@ ggarrange(p.diag, ggarrange(p.fluid,NULL, heights = c(0.90,0.1), labels = c("B",
 
 ```
 
-
+#### Time to antimicrobial therapy
 
 ```{r outcome-by-time-to-rx, echo =F, warning=F, message=F,fig.scap="Day 28 mortality stratified by time-to-antimicrobials", out.extra='', fig.cap="Day 28 mortality stratified by time-to-antimicrobials in hours (A-C). A and B show mortality stratified by time-to-antibacterial with different bin sizes to focus on the first 6hr (A) and afterwards (B). C shows mortality stratified by time to antituberculous therapy. In view of the small number of patients receiving antimalarial or antifungal therapy, this analysis was not repeated for those agents.", fig.width= 6, fig.height =6, out.height= '70%', fig.align= 'center'}
 
