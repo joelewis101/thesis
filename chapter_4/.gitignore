@@ -2,3 +2,8 @@ mortality_brms_model_imputed.rds
 mortality_brms_model_imputed_datasets.rds
 mortality_brms_model_cca_partial_residuals_df.rds
 mortality_brms_model_cca.rds
+time_to_ab_linear_cca.rds
+time_to_ab_linear_imp.rds
+time_to_ab_poly_cca.rds
+time_to_ab_poly_imp.rds
+timetoab.scale.rds
