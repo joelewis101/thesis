@@ -205,7 +205,7 @@ Ariba[@Hunt2017a] v2.12.1 was used to identify AMR-associated genes using the SR
 
 ## Statistical Analysis
 
-Details of anaysis methods are given in the relevant chapters. All analyses were undertaken using R v3.5.1 and any Bayesian modelling using Markov Chain Monte Carlo (MCMC) methods using Stan v2.18 via the Rstan interface with R. This thesis was written using the bookdown package in R and the code to generate it as well as all analysis scripts are avaiable at https://github.com/joelewis101/thesis. 
+Details of anaysis methods are given in the relevant chapters. All analyses were undertaken using R v3.5.1 and any Bayesian modelling using Markov Chain Monte Carlo (MCMC) methods using Stan v2.18 via the Rstan interface with R. This thesis was written using the bookdown package in R and the code to generate it as well as all analysis scripts are avaiable at https://github.com/joelewis101/thesis. Unless otherwise states, all boxplots show median and IQR as boxes, 1.5 times IQR a whiskers and outliers (any points outside the whiskers) as points.
 
 ## Study Team
 
