@@ -41,16 +41,16 @@ dfout <- bind_cols(
 # apply(dfout, 1, function(x) x[22] + sum(x[2:19] * x[23:40])) -> dfout$linear_pred
 #as.data.frame(t(apply(dfout[1:10,], 1, function(x) x[2:19] * x[23:40])))
 
-betas <- dfout[,2:12]  * dfout[,16:26]
+betas <- dfout[,2:13]  * dfout[,17:28]
 names(betas) <- paste0("x_beta_", names(betas)) 
 dfout <- bind_cols(dfout, betas)
 
-dfout$linear_pred <- apply(dfout,1, function(x) x[15] + sum( x[28:ncol(dfout)]))
+dfout$linear_pred <- apply(dfout,1, function(x) x[16] + sum( x[30:ncol(dfout)]))
 
 dfout$p <- plogis(dfout$linear_pred)
 dfout$resid <- (dfout$Y - dfout$p) / (dfout$p*(1- dfout$p))
 
-dfout[28:38] <- dfout[28:38] + dfout$resid
+dfout[30:41] <- dfout[30:41] + dfout$resid
 
 dfout %>% dplyr::select(.row,fluid_6hr,x_beta_fluid_6hr, linear_pred, Y, resid) %>%  group_by(.row) %>%
   summarise(Y = median(Y),
@@ -58,7 +58,7 @@ dfout %>% dplyr::select(.row,fluid_6hr,x_beta_fluid_6hr, linear_pred, Y, resid) 
             med.par.resid = median(x_beta_fluid_6hr),
             lci = quantile(x_beta_fluid_6hr, 0.025),
             uci = quantile(x_beta_fluid_6hr, 0.975),
-            linpred = median(linear_pred),
+            linpred = median(linear_pred, na.rm= TRUE),
             lci.lp = quantile(linear_pred, 0.025),
             uci.lp = quantile(linear_pred, 0.975),
     med.resid = median(resid),
@@ -102,7 +102,10 @@ for (i in 1:10) {
   coordtemp <- rbind(famd.temp$ind$coord, famd.temp$ind.sup$coord)
   coordtemp[order(as.numeric(rownames(coordtemp))),] -> coordtemp
   out.coords[[i]] <-   cbind(imp.list[[i]],coordtemp)
-   out.coords[[i]] <-   cbind(out.coords[[i]],d[c("any_tb_rx", "any_mal_rx", "any_fung_rx", "any_ab", "bc", "tb", "csf", "malaria", "fluid_6hr")])                         
+   out.coords[[i]] <-   cbind(out.coords[[i]],d[c("any_tb_rx", "any_mal_rx", "any_fung_rx", 
+                                                        "any_ab", "bc", "tb", "csf", "malaria", "fluid_6hr")])
+   out.coords[[i]] <-   cbind(out.coords[[i]],df.temp[c("time_to_abx", "time_to_tb_rx")])
+   out.coords[[i]]$time_to_abx <- scale(out.coords[[i]]$time_to_abx)
 }
 
 brm_multiple(d28_death ~ Dim.1 +
@@ -114,13 +117,38 @@ brm_multiple(d28_death ~ Dim.1 +
 saveRDS(m.imp, "/Users/joelewis/Documents/PhD/Thesis/bookdown/chapter_4/mortality_brms_model_imputed.rds")
 saveRDS(imp.list, "/Users/joelewis/Documents/PhD/Thesis/bookdown/chapter_4/mortality_brms_model_imputed_datasets.rds")
 
+# model time to ab
 
-fviz_famd_var(all.famd, axes = c(1,2), shape.var = "circle", repel = TRUE, col.var.sup = NA, col.var = "red", labelsize = 3,) + theme_bw() +ggtitle(element_blank()) -> p1
-fviz_famd_var(all.famd, axes = c(1,3), shape.var = "circle", repel = TRUE, col.var.sup = NA, col.var = "red", labelsize = 3, ) + theme_bw() +ggtitle(element_blank()) +ggtitle(element_blank())
+brm_multiple(d28_death ~ Dim.1 +
+               Dim.2 + Dim.3 + tb + 
+               malaria + bc + csf + any_tb_rx + 
+               any_fung_rx + any_ab +
+               any_mal_rx + fluid_6hr , data = out.coords,  family = "bernoulli", prior = m1priors) -> m.imp
 
-fviz_famd_ind(famd.temp, geom = "point")
+d2$time_to_abx <- scale(log(d2$time_to_abx ))
 
-lapply(imp.list, )
+d2.complete <- merge(d.complete, select(df.temp, pid, time_to_abx, time_to_tb_rx))
+d2.complete$time_to_abx <- scale(d2.complete$time_to_abx)
 
-# plan -> mice (10 datasets) -> FAMD with "missing" participants as extra data -> pull out -> brms
+brm(as.numeric(d28_death == "Died") ~ time_to_abx + I(time_to_abx^2) + 
+      Dim.1 + Dim.2 , data = d2.complete, family = "bernoulli", prior = m1priors ) -> m.poly
+
+brm(as.numeric(d28_death == "Died") ~ time_to_abx + 
+      Dim.1 , data = d2.complete, family = "bernoulli", prior = m1priors ) -> m.lin
+
+brm_multiple(d28_death ~  time_to_abx + I(time_to_abx^2) + 
+               Dim.1 + Dim.2, data = out.coords, , family = "bernoulli", prior = m1priors) -> m.poly.imp
+
+brm_multiple(d28_death ~  time_to_abx  + 
+               Dim.1 + Dim.2, data = out.coords, , family = "bernoulli", prior = m1priors) -> m.lin.imp
+
+data.frame(timetoab.scale.centre = attr(out.coords[[1]]$time_to_abx, "scaled:center"), 
+           timetoab.scale.scale = attr(out.coords[[1]]$time_to_abx, "scaled:scale")) -> timetoab.scale
+
+saveRDS(m.lin, "/Users/joelewis/Documents/PhD/Thesis/bookdown/chapter_4/time_to_ab_linear_cca.rds")
+saveRDS(m.poly, "/Users/joelewis/Documents/PhD/Thesis/bookdown/chapter_4/time_to_ab_poly_cca.rds")
+saveRDS(m.lin.imp, "/Users/joelewis/Documents/PhD/Thesis/bookdown/chapter_4/time_to_ab_linear_imp.rds")
+saveRDS(m.poly.imp, "/Users/joelewis/Documents/PhD/Thesis/bookdown/chapter_4/time_to_ab_poly_imp.rds")
+saveRDS(timetoab.scale, "/Users/joelewis/Documents/PhD/Thesis/bookdown/chapter_4/timetoab.scale.rds")
+
 
