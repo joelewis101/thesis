@@ -7,6 +7,7 @@ library(dplyr)
 library(ggplot2)
 library(tmap)
 library(ggmap)
+library(maptools)
 
 wd <- "/Users/joelewis/Documents/PhD/Thesis/bookdown/chapter_2/"
 output = "latex"
@@ -30,6 +31,9 @@ It has a subtropcial climate, with three main seasons: a warm wet season from No
 ```{r malawi-map, warning = F,  echo = F, message = F, fig.scap="Map of study site", out.extra='', fig.cap = "Malawi, showing administrative boundaries (North, Central, and South regions), Lilongwe, the capital city and Blantyre, the study location. Source: openstreetmap.org, used under Creative Commons Attribution ShareAlike 2.0 licence CC-BY-SA", fig.align= 'center'}
 
 
+mal <- readShapePoly(paste0(wd,"/MAA-level_1_SHP/MAA-level_1.shp"))
+mal2 <- fortify(mal)
+
 afbox <- bbox <- c(left = -21.22, right = 55.02, top= 17.17, bottom = -37.75)
 
 bbox <- c(left = 25.840, right = 42.737, top= -8.277, bottom = -18.167)
@@ -52,7 +56,7 @@ ggmap(m2) +
   geom_path(data = mal2, aes(x= long, y = lat, group = group), alpha = 0.8) + 
   geom_point(data = cities, aes(x = lon, y = lat)) + 
   geom_text(data = cities, aes(x = lon, y = lat,label = city,  vjust = -0.5, hjust = 0.5, size = 7, fontface = "bold")) +
-  theme_void() + theme(legend.position = "none") +  inset(grob = ggplotGrob(p1), xmin = 26.5, xmax = 31.5, ymin = -13, ymax = -9)
+  theme_void() + theme(legend.position = "none") +  ggmap::inset(grob = ggplotGrob(p1), xmin = 26.5, xmax = 31.5, ymin = -13, ymax = -9)
 
 
 ```
