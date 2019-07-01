@@ -24,6 +24,7 @@ library(viridis)
 library(ggraph)
 library(igraph)
 library(gggenes)
+library(IRanges)
 
 
  parse_checkm_lines <- function(s, n) {
@@ -468,7 +469,7 @@ ggarrange(p,
 
 ```{r wgs-131vs410-tree, echo = F, warning = F, message = F, fig.scap="Phylogeny of ST131,ST410 and ST167 \\textit{E. coli}.", out.extra='', fig.cap="Subtree of ST410 (A, left) and ST131 (B, right), and ST167 (C, bottom) showing multiple introductions of ST131 into Malawi, in comparison to a single introduction clonal ST410 and ST167 clades. Colour of tree tip label indicates isolation from this study (red) or other studies (black), and coloured heatmap indicates country of isolation. Note that the scale bar in C is an order of magnitude different from A and B.", fig.height = 7, fig.width=6}
 
-treeio::tree_subset(tree2, 1864, levels_back = 0) -> st410tree
+treeio::tree_subset(tree, 1864, levels_back = 0) -> st410tree
 
 select(metadata, Lane.Name, `This study`) -> this.study
 this.study$`This study` <- as.character(this.study$`This study`)
@@ -500,7 +501,7 @@ leg <- get_legend(fudgeplot)
 
 ## ST131 is node 1351
 
-treeio::tree_subset(tree2, 1351, levels_back = 0) -> st131tree
+treeio::tree_subset(tree, 1351, levels_back = 0) -> st131tree
 
 ggtree(st131tree) %<+% select(metadata, Lane.Name, `This study`)   %>%
  # gheatmap(select(esbl.cat, ESBL), width = 0.05, color = NA, font.size = 4, colnames_angle = 90,
@@ -510,7 +511,7 @@ ggtree(st131tree) %<+% select(metadata, Lane.Name, `This study`)   %>%
   geom_tiplab(size = 1, align = T, aes(color = `This study`)) + geom_treescale(x = 0.0005, y = 57,offset = 0.5 )+ scale_fill_manual(values = colz) +
   scale_color_manual(values = c("black", hue_pal()(1)))  + theme(legend.position = "none") -> b
 
-treeio::tree_subset(tree2, 2020, levels_back = 0) -> st167tree
+treeio::tree_subset(tree, 2020, levels_back = 0) -> st167tree
 
 
 ggtree(st167tree) %<+% select(metadata, Lane.Name, `This study`)   %>%
@@ -1065,6 +1066,7 @@ apply(select(jpvals_sig, gene1, gene2), 1,
 subset(jpvals_sig, !duplicated(key)) -> jpvals_sig_unique
 g1 <- graph_from_data_frame(jtots[1:3], directed = F)
 g2 <- graph_from_data_frame(jtots2[1:3], directed = F)
+all <- merge(qr,m.c, by.x = "sample", by.y = "name")
 n_genes <- apply(sapply(all[-1], as.numeric), 2, sum)
 
 
@@ -2030,6 +2032,7 @@ for (i in 1:nrow(prop.baps)) {
 prop.baps$type <- "hierBAPS cluster"
 prop.cont$type <- "ESBL-cluster"
 
+rollprop <- rbind(prop.baps, prop.cont)
   
 rollprop$prop <- apply(rollprop[1:3], 1, function(x) binom.test(x[2], x[3])$estimate)
 rollprop$lci <- apply(rollprop[1:3], 1, function(x) binom.test(x[2], x[3])$conf.int[1])
