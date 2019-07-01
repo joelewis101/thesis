@@ -179,7 +179,7 @@ Because of nonidenifiability of the model under a maximum likelihood framework, 
 
 Missing data were imputed using multiple imputation of chained equations using default settings in the _mice_ package in R, with each missing variable predicted by all other missing variables, to produce 10 imputed datasets. Models were fit using _brms_ and then pooled parameter values calculated by taking medians and 95% confidence intervals of pooled posterior parameter estimates from all imputed datasets. 
 
-Finally, the relationshp between time-to-antimicrbials and mortality was assessed, initially in bivariate associations using nonparametric locally estimates scatterpoly smoothing (LOESS) regression which performs a rolling linear regerssion and estimates the probability of death by 28 days as a function of the predictor variables. Only for antibacterials were there sufficient data to construct regression models which used time to antibacterial therapy (mean-centred and scaled as before) as a predictor for death by 28 days, alongside the first thre FAMD dimensions. In view of possible nonlinear relationship between time to therapy and death apparent in the bivariate plots both linear and second-order polynomial models were fit, as before. Coefficient estimates are presented, but because interpretation of polynomial coefficients is challenging, predicted probability plots with 95% confidence intervals with the levels of the other covariates set to their mean values were plotted, using all the posterior draws.
+Finally, the relationshp between time-to-antimicrbials and mortality was assessed, initially in bivariate associations using nonparametric locally estimates scatterpoly smoothing (LOESS) regression which performs a rolling linear regerssion and estimates the probability of death by 28 days as a function of the predictor variables. Only for antibacterials were there sufficient data to construct regression models which used time to antibacterial therapy (mean-centred and scaled as before) as a predictor for death by 28 days, alongside the first thre FAMD dimensions. In view of possible nonlinear relationship between time to therapy and death apparent in the bivariate plots both linear and second-order polynomial models were fit, as before. Coefficient estimates are presented, but because interpretation of polynomial coefficients is challenging, predicted probability plots with 95% confidence intervals with the levels of the other covariates set to their mean values were plotted, using all the posterior draws to generate the median prediction and 95% confidence intervals.
 
 ```{r causal-structure, echo = F, fig.scap="Hypothesised causal structre of mortality in sepsis", out.extra='', fig.cap="Hypothesised causal structre of death in sepsis. Host factors (e.g. age, sex, immune status) influence the type of infection; disseminated TB is more common in HIV, for example. Severity  (variables quantifying e.g. shock or respiratory failure) is influenced by infection type and host factors. Therapy encodes which antimicrobials were administered and rapidity of administration of antimicrobials, and is influenced by disease severity (sicker patients may be given different therapies), host factors (HIV status may influence treatment) and the infection type (for example, malaria rapid diagnostic tests influenceing rapidity of malaria treatment). Dotted edges from host and infection to outcome are because it is not clear \textit{a priori} whether the effect of infection and host factors are entirely mediated by disease severity: in fact, even if this were the case in a theoretical sense, the available severity variables are unlikley to completely account for the causative effect of infection type on mortality and so conditioning on all available severity variables is likely to leave some residual causative effect of infection type. See text for further discussion",  out.height = '50%', fig.align = 'center'}
 
@@ -484,6 +484,7 @@ kable(select(e1.sum.3,`levels`,value), "latex", booktabs =T,
 
 \clearpage
 
+
 ### Aetiology
 
 In total, 51% (114/225) of the 225 participants had at least one infectious agent identified (Table \@ref(tab:sep-diag)), most commonly tuberculosis (76/225 [34%]) followed by bloodstream infection (24/225 [11%]) and malaria (21/225 [9%]). Table \@ref(tab:sep-tests) shows the availability of test and proportion of positive tests across the cohort, stratified by HIV status. 2/225 patients (1%) had a missing aerobic blood culture; the remaining 223 patients had a total of 259 blood cultures performed. 15/259 (6%) blood cultures grew at least one contaminant, but 26 blood cultures from 24 patients were positive for a total of 28 pathogenic bacteria (Figure \@ref(fig:sep-bc-plot)): _Salmonella_ Typhi was the most commonly isolated pathogenic bacterium, and seemed to show an association with HIV-negative participants: all (8/8) of the participants from whom _S._ Typhi was isolated and whose HIV status was known were HIV noninfected. Of the 18 Gram negative bacteria isolated, 3/18 (17%) were cefpodoxime resistant on AST via disc diffusion testing, and likely ESBL producers: one _K. pneumoniae_ and one _E. coli_ (both from the same blood culture and same patient) and one _Acinetobacter baumannii_. Both _Staphyloccus aureus_ isolates were oxacillin sensitive. The one _Streptococcus pneumoniae_ cultured was penicillin intermediate on AST.
@@ -638,7 +639,7 @@ upset(a[-9], nsets = 7,order = "freq", query.legend = "bottom",
 
 At least one antimicrobial drug was recieved by 95% (214/225) of the cohort during their admission (Table \@ref:(time-to-ab-table)), most commonly an antibacterial (207/225 [92%]), but also a significant minority recieved antitubercular therapy (63/225 [28%]). Of those receiving antitubercular therapy, 16% (10/63) were taking the medication prior to admission, and the remainder were initiated on therapy during admission. The first antibacterial agent administered was most often ceftriaxone, in 87% (181/207) of cases but ciprofloxacin (18/207 [9%] of participants), amoxicillin (6/207 [3%]) and metronidazole (2/207 [1%]) were also used. Median door to antimicrobial time was 5.3 (IQR 3.7-10.8) hours for antibacterials and 4.5 (IQR 3.1-21.7) hours for antimalarials but longer for antifungals at 47.7 (IQR 27.9-73.9) hours and longer still for antitubercular therapy at 120.9 (IQR 63.7-171.0). Cumulative incidence curves for administration of the different antimicrobial classess are shown in Figure \@ref(fig:sep-abtime-fluid-plot)A-D.
 
-Of all participants, 85% (192/225) received any intravenous fluid in the first 6 hours of enrollment to the study; of these, most received 0.9% saline (160/192 [83%] of those recieving fluid) but 5% dextrose (91/192 [57%]) were also used; Ringer's lactate (6/192 [6%]) and blood (2/192 [1%]) were rarely administered. Of the 192 patients who were administered any fluid, a median of 1.5L (IQR 1-2L) was administered over the 6hr study period; fluid administration as a function of time is shown in Figure \@ref(fig:sep-abtime-fluid-plot)E.
+Of all participants, 85% (192/225) received any intravenous fluid in the first 6 hours of enrollment to the study; of these, most received 0.9% saline (160/192 [83%] of those recieving fluid) but 5% dextrose (91/192 [57%]) were also used; Ringer's lactate (6/192 [6%]) and blood (2/192 [1%]) were rarely administered. Of the 192 patients who were administered any fluid, a median of 1.5L (IQR 1.0-2.0L) was administered over the 6hr study period; fluid administration as a function of time is shown in Figure \@ref(fig:sep-abtime-fluid-plot)E.
 
 ```{r treatment-setup, include = F}
 
@@ -714,10 +715,6 @@ subset(e1, !(pid %in% subset(df.abs, first_ab != "none")$pid | pid %in% subset(d
 
 
 ```
-
-## Discussion
-
-In this chapter, I present a detailed description of the presentation, aetiology, and outcome of sepsis in Blantyre, and an analysis of the determinents of mortality.
 
 ```{r treatment-plot-setup, include = F}
 
@@ -873,7 +870,6 @@ psurv2 + theme(legend.position = "right", legend.title = element_blank()) + scal
 ggarrange(psurv1, psurv2, labels = c("A", "B"), widths = c(0.8,1))
 ```
 
-
 ```{r outcome-morbidity, echo =F, warning=F, message=F,fig.scap="Health-related QoL following admission with sepsis.", out.extra='', fig.cap="Health-related quality of life following sepsis admission, compared to community controls, showing a return to usual quality of life by 12 weeks following admission. A: proportion of participants across each of the five domains of the EQ-5D questionnaire who report at least moderate impariment. B: EQ-5D utility score derived using the Zimbabwean tariff set. The utility score is interpreted as the weight attached to a health state compared to perfect health, which is assigned a value of 1. By 12 weeks there is no statistically significant difference between sepsis and baseline community participant utility scores (p = 0.90 by t-test).", fig.width= 9, fig.height =5, }
 
 eq <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/dassim_eq05_raw.csv", stringsAsFactors = F)
@@ -971,15 +967,15 @@ theme_bw() +
 
 ### Determinents of mortality
 
-Bivariate associations of mortality are shown in \@ref(tab:bivariate-sev-mort-assoc) with variables grouped into putative host, severity, diagnosis and treatment variables. Variables associated with immunosupression - CD4 count and haemoglobin - were associated with death in bivariate analysis, as were well recognised markers of disease severity: shock, hypoxia, reduced conscious level, hyperlacateaemia, and inability to ambulate, as were reduced venous bicarbonate and increased venous urea. A diagnosis of malaria was strongly associated with survival; none of the 21 participants with a diagnosis of malaria died. Conversely, a diagnosis of meningitis was associated with mortality (Table \@ref(tab:bivariate-sev-mort-assoc) and Figure  \@ref(fig:univ-mort-assc-plots)) though numbers were small (n = 4) and so mortality estimates  have wide confidence intervals. Reciept of antibacterials, antifungals or antimalarials showed no association with mortality, though almost all participants recieved antibacterials and only a minority antimalarials and antifugals, so moderate effect sizes would be unlikely to be detected. However, reciept of antitubercular therapy was associated with survival: 8% (4/53) of participants recieving TB therapy died compared to 21% (35/169) who did not receive it (p = 0.04 by Fisher's exact test).
+Bivariate associations of mortality are shown in \@ref(tab:bivariate-sev-mort-assoc) with variables grouped into putative host, severity, diagnosis and treatment variables. Variables associated with immunosupression - CD4 count and haemoglobin - were associated with death in bivariate analysis, as were well recognised markers of disease severity: shock, hypoxia, reduced conscious level, hyperlacateaemia, and inability to ambulate, as were reduced venous bicarbonate and increased venous urea. A diagnosis of malaria was strongly associated with survival; none of the 21 participants with a diagnosis of malaria died. Conversely, a diagnosis of meningitis was associated with mortality (Table \@ref(tab:bivariate-sev-mort-assoc) and Figure  \@ref(fig:univ-mort-assc-plots)) though numbers were small (n = 4) and so mortality estimates  have wide confidence intervals. Reciept of antibacterials, antifungals or antimalarials showed no association with mortality, though almost all participants recieved antibacterials and only a minority antimalarials and antifugals, so moderate effect sizes would be unlikely to be detected. However, reciept of antitubercular therapy was associated with survival: 8% (4/53) of participants recieving TB therapy died compared to 21% (35/169) who did not receive it (p = 0.04 by Fisher's exact test). This is clearly a finding that is very open to confounding so the associations of reciept of TB treatment were explored (Table \@ref:(bivariate-sev-tb-rx) in the appendix to this chapter); patients who recieved TB therapy were almost all HIV-infected (88% [46/52] vs 60% [95/161] in the no-TB therapy group, p < 0.001) with lower CD4 count (median 60 vs 123 cells $\mu$L\textsuperscript{-1}, p = 0.006) and Haemoglobin (median 9.7 vs 11.1 g dL\textsuperscript{-1}), and recieved more antimalarials (11% [6/53] vs 3% [6.172], p = 0.037) and IV fluids (median 1.5L vs 1.2L, p= 0.02), though most of these associations would be expected to pull an estimate of the mortality effect of TB therapy towards the null, rather than inflate an effect size. More patients with a positive diagnostic test for TB recieved TB therapy, as might be expected (53% [28/53] of those recieveing TB therapy had a positive diagnostic test for TB, versus 28% [48/172] not recieveing therapy, p = 0.001), though almost all the TB treatment was empiric, as the treating clinicians did not have access to urinary LAM results (which were batch processed on frozen urines) or mycobacterial blood culture results (which take up to 6 weeks to beome positive). To explore the possibility that the apparent association of TB therapy with survival is driven by an effect in those with a diagnosis of TB only, crude mortality estimates stratified by both TB diagnosis and reciept of anti-TB therapy are shown in Figure \@ref(fig: mort-strat-tb-and-tb-rx); reduced mortality of TB therapy was in fact apparent (and seemed of similar magnitude) in groups with and without a positive TB diagnostic test. In contrast, mortality benefit of TB therapy did seem to be more pronounced in advanced immunosupression, defined by a CD4 count of less than 50 cells $\mu L^{-1}$ (Figure \@ref(fig: mort-strat-tb-and-tb-rx)B)
 
 Kruskal-Wallace test of time to treatment with all antimicrobials found no association with 28-day mortality, and no association with volume of intravenous fluid administered over 6 hours. Further exploration of bivariate associations of mortality with these continuous treatment variables are shown in Figure \@ref(fig:univ-mort-assc-plots), where LOESS moving linear regression provides a nonparametric estimate of probability of death by 28 days as a function of treatment variables. Time to antimalarial therapy is not shown in this plot as no patient who recieved antimalarial therapy died. No relationship is apparent , thanks to wide confidence intervalsexcept possibly for antibacterial therapy (Figures \@ref(fig:univ-mort-assc-plots)D and E): any effect would seem to be only apparent on delay on antimicrobial administration beyond around 40 hours post-admission, with likley non-linearity in effect size as a function of antimicrobial delay. Similarly, volume of intravenous fluid administered does has no apparent effect on 28 day mortality (Figure \@ref(fig:univ-mort-assc-plots)B). It might be expected that any effect would be most apparent in participants with shock: stratifying the analysis by shock (defined as mean arterial blood pressure below 75mmHg, Figure (Figures \@ref(fig:univ-mort-assc-plots)C) once again showed no appaent relationship.
 
 To explore these associations further, I used a logistic regression analysis, with a primary aim of describing the effect of treatments administered (antimicrobials and fluid) on mortality though as described above, there were several challenges. The problems of collinearity and variable selection were addressed with dimensionality reduction using factor analysis of mixed data (FAMD) on host and severity variables. First, temperature, white cell count, urea, creatinine, lactate were transformed with natural logarithms as their distribution was non-normal on inspection of histograms and kernal denisty plots. The distributions of oxygen saturation and GCS were very non-normal so were dichotomised into two categories each: GCS as either 15 or less than 15, and oxygen saturation as either above 92% or equal to or below 92%. The composition of first 3 FAMD dimensions in terms of squared correlation ratio (for categoriacal variables) and the squared correlation coefficient (for continuous variables) are shown in Figure \@ref(fig:pca1) and explained 39% of the variance in the dataset of 18 variables. Furthermore, the dimension provides some discrimination in terms of mortality (Figure \@ref(fig:pca1)C) and dimensions one and two provide some discrimination in terms of diagnosis, particularly bewteen TB and malaria (Figure \@ref(fig:pca1)D and E).
 
-The first three FAMD dimensions, along with diagnosis and treatment variables were used as explanatory variables in a logistic regression model to predict mortality, though the interest was primarily to correct effect size estimates for confounding rather than predicting outcome. Dimensionality reduction was not undertaken on diagnosis variables as they are largely orthogonal, and also to maintain interpretability. Because no patients with malaria died, the standard maximum likelihood estimation of a logistic regression model failed, so Bayesian logistic regression with weakly informative priors was used following imputation of missing data to form 10 imputed datasets, as described in methods, above. Parameter estimates and 95% credible intervals from this model are shown in \@ref(tab:mortality-modelling), and conclusions from univariate associations are largely unchanged: we can be confident that malaria is associated with survival, meningitis with death (though with very wide credible intervals reflecting the small number of cases), and administration of TB therapy with survival, following adjustment for the included confounders. It is possible that the apparent association of TB therapy with survival is driven by an effect in those with a diagnosis of TB only; the dataset is too small to effectively fit an interaction term to assess for a subgroup effect but crude mortality estimates stratified by both TB diagnosis and reciept of anti-TB therapy are shown in Figure \@ref(fig: mort-strat-tb-and-tb-rx).
+The first three FAMD dimensions, along with diagnosis and treatment variables were used as explanatory variables in a logistic regression model to predict mortality, though the interest was primarily to correct effect size estimates for confounding rather than predicting outcome. Dimensionality reduction was not undertaken on diagnosis variables as they are largely orthogonal, and also to maintain interpretability. Because no patients with malaria died, the standard maximum likelihood estimation of a logistic regression model failed, so Bayesian logistic regression with weakly informative priors was used following imputation of missing data to form 10 imputed datasets, as described in methods, above. MCMC diagnostics showed good sampling of the posterior: $\hat{R}$ was less than 1.1, traceplots showed good mixing of chains (Figure \@ref:(model-trplots) in the chapter appendix) and there were no divergences of the sampler. Parameter estimates and 95% credible intervals from this model are shown in \@ref(tab:mortality-modelling), and conclusions from univariate associations are largely unchanged: we can be confident that malaria is associated with survival, meningitis with death (though with very wide credible intervals reflecting the small number of cases), and administration of TB therapy with survival, following adjustment for the included confounders. The dataset is too small to effectively model interation terms that would be the equivalent of the bivariate subgroup analyses presented above to test the hypothesis that fluid administration would have a different effect in shock, and that TB therapy would have a different effect in confirmed TB; we will have to be content with the unadjusted analysis.
 
-I then went on to model the effect of antibacterial delay, including only patients who received antibacterials (n = 207) using both linear models, and, in view of a possible nonlinear effect, second order polynomial models, both in complete case analysis and following imputation of missing data as before. The estimates of the coefficients of these models are shown in Table \@ref(tab:time-to-ab-tab) and the predicted probability of death by 28 days shown in Figure (Figure \@ref(fig:time-to-ab-fig). We have low confidence that estimates of effect size of antimicrobial delay were different from 1 from simple linear models and, though interpreting the coefficients of linear models is difficult, the confidence intervals for the polynomial models are so wide that it is not possible to safely rule in or out a late effect of antimicrobial delay.
+I then went on to model the effect of antibacterial delay, including only patients who received antibacterials (n = 207) using both linear models, and, in view of a possible nonlinear effect, second order polynomial models, both in complete case analysis and following imputation of missing data as before. These data were not included in the full model as it would mean discarding the participants who recieved no antibacterials. The estimates of the coefficients of these models are shown in Table \@ref(tab:time-to-ab-tab) and the predicted probability of death by 28 days shown in Figure (Figure \@ref(fig:time-to-ab-fig). We have low confidence that estimates of effect size of antimicrobial delay were different from 1 from simple linear models and, though interpreting the coefficients of linear models is difficult, the confidence intervals for the polynomial models are so wide that it is not possible to safely rule in or out a late effect of antimicrobial delay.
 
 ```{r bivariate-sev-mort-assoc, echo =F, warning=F, message=F}
 
@@ -987,6 +983,8 @@ df.temp <- dplyr::select(df,pid, d28_death, hivstatus,hivonart, calc_age,ptsex,s
                          WCC, CD4_Absolute, Haemoglobin, Platelets, NA.,Potassium, Urea, Creatinine, CO2, Chloride, fluid_6hr, any_tb_rx, time_to_tb_rx, first_mal_rx, time_to_mal_rx, first_fung_rx, time_to_fung_rx, first_ab, time_to_abx, fluid_6hr,
                          bc, tb, csf, malaria
 ) 
+
+df.temp$fluid_6hr <- df.temp$fluid_6hr/1000
 
 apply(df.temp[c("tb", "malaria", "bc", "csf")], 1, sum) -> df.temp$n_diagnoses
 
@@ -1136,7 +1134,7 @@ p$Variable[p$Variable == "time_to_mal_rx"] <- "Time to Antimalarials (hr)"
 p$Variable[p$Variable == "any_tb_rx"] <- "Antimycobacterials"
 p$Variable[p$Variable == "time_to_tb_rx"] <- "Time to Antimycobacterials (hr)"
 
-p$Variable[p$Variable == "fluid_6hr"] <- "IV fluid (ml)"
+p$Variable[p$Variable == "fluid_6hr"] <- "IV fluid (L)"
 
 sub("%", "\\\\%", p$Died) -> p$Died
 sub("%", "\\\\%", p$Survived) -> p$Survived
@@ -1155,8 +1153,7 @@ kable(select(p,-boldcol), "latex", booktabs =T,
    pack_rows("Treatment Recieved", 27, 35, bold = F)  %>%
   footnote(general = "BP = Blood pressure, GCS = Glasgow coma scale. Numeric variables are presented as median (IQR) and categoric variables as proportions. P-values are from Kruskal-Wallace test for continuous variables and Fisher's exact test for categorical variables." , symbol = c("Participants with HIV status unknown not included in this row","Includes only HIV-infected participants"), threeparttable = T, fixed_small_size = T)
 
-
-
+df.temp$fluid_6hr <- df.temp$fluid_6hr * 1000
 
 ```
 
@@ -1238,23 +1235,6 @@ ggplot(df.temp, aes(time_to_fung_rx, as.numeric(d28_death))) + geom_point() + ge
 ggarrange(ggarrange(NULL,p.diag,NULL,NULL, ncol = 4, widths = c(0.15,1.5,0.25, 0.6), labels = c(NA, "A", NA, NA)), ggarrange(fluid1, fluid2, widths = c(1, 1.5), ncol = 2, labels = c("B", "C")), ggarrange(t_to_ab, t_to_ab2,NULL, ncol = 3, labels = c("D", "E"), widths = c(1,1,0.5)), ggarrange(t_to_tb, t_to_fung, NULL, labels = c("F", "G"), ncol = 3,widths= c(1,1,0.5) ), ncol = 1, nrow = 4)
 
 ```
-
-```{r mort-strat-tb-and-tb-rx, echo =F, warning=F, message=F,fig.scap="28-day mortality stratified by TB status and reciept of TB therapy.", out.extra='', fig.cap="Crude 28 day mortality stratified by TB status and reciept of antitubercular therapy: association of TB therapy with survival is not restricted to participants in whom a diagnosis of TB was made.", fig.width=5 , fig.height =3 , out.width ='50%' , fig.align = 'center'}
-
-df.temp %>% group_by(tb, any_tb_rx) %>% summarise(died = sum(d28_death == 1, na.rm = T), survived = sum(d28_death == 0, na.rm= T),prop = died/(died+survived), lci = binom.test(died, (died+survived))$conf.int[[1]], uci = binom.test(died, (died+survived))$conf.int[[2]]) -> t
-
-t$tb[t$tb == 0] <- "No TB diagnosis" 
-t$tb[t$tb == 1] <- "TB diagnosis" 
-
-t$any_tb_rx[t$any_tb_rx == 0] <- "No TB treatment"
-t$any_tb_rx[t$any_tb_rx == 1] <- "TB treatment"
-
-
-ggplot(t, aes(as.factor(any_tb_rx), prop, ymin = lci, ymax = uci, color = as.factor(tb))) + geom_point(position = position_dodge(width = 0.2)) + geom_errorbar(width = 0, position = position_dodge(width = 0.2)) + coord_flip() + theme_bw() + ylab("Pr(Death by 28 days)") + xlab(element_blank()) + theme(legend.title = element_blank())
-
-```
-
-
 
 ```{r pca-1, echo =F, warning=F, message=F,fig.scap="Dimensionalty reducition using FAMD", out.extra='', fig.cap="Dimensionality reduction of dataset using factor analysis of mixed data (FAMD); this is a combination of principal components analysis (PCA) for continuous variables and multiple correspondence analysis (MCA) for categorical variables, resulting in a new orthogonal coordinate system which maximises explained variance in each FAMD axis. A and B show the squared correlation ratio (for categoriacal variables) and the squared correlation coefficient (for continuous variables) with dimensions 1 and 2 (A) or 1 and 3 (B), along wih the proportion of variabce explained by each axis. C shows the location of all individuals in the FAMD space, with patients who died by 28 days coloured red to show that Dim.1 is associated with mortality. D-G show individuals colored by diagnosis: red in each case corresponds a diagnosis of TB (D), malaria (E), BSI (F) and meningtis (G) to show that malaria and tb seperate somewhat in Dim.1 and 2 with malaria patients clustering in top left and TB patients in bottom right ", fig.width= 6, fig.height =10, out.height = '80%' , fig.align= 'center'}
 
@@ -1511,4 +1491,217 @@ ggplot(me.all, aes(time_to_abx, estimate__, ymin = lower__, ymax = upper__, colo
          geom_line() + geom_ribbon(alpha = 0.3, color = NA) + facet_wrap(~ regression) + theme_bw() + xlab("Time to antibacterials (per hr)") + ylab("Pr(Death by 28 days)") + theme(legend.title = element_blank())
 
 ```
+
+### Discussion
+
+#### Demographics and outcome: significant longer-term mortality
+
+In this chapter, I have presented a clinical and microbiologic description of sepsis in adults in Blantyre, Malawi. Inkeeping with sepsis cohorts elsewhere, the participants are young, and predominently HIV infected. The proportion of HIV-infected participants (67% of those with known HIV status) is comparable to a study of Sepsis-2 defined sepsis which recruited in QECH in 2008/9 (75%) but lower than sSA sepsis studies with the highest prevalene of HIV-infected participants Uganda in 2006[@Jacob2009] (85%) and 2009[@Jacob2012] (86%) and Zambia in 2012-13[@Andrews2017] (90%). Notably, the proportion of participants recieving HIV therapy (82%) is high compared to other sepsis studies in sSA: higher than the 08/09 Malawian study (44%), Uganda (12-24%) and Zambia (51%), which likely reflects both the sucess of the Malawian ART programme as well as the impressive increases in ART coverage across the continent. Despite this ostensibly high coverage, it is likely that the sepsis presentation is for a high proportion of the participants in this study a manifestation of ART failure as evidenced by the low CD4 cell counts despite ART. Participants had been unwell for some time: a median 7 days. Published data on length of current illness in sepsis is lacking, but what data there are from elsewehere in sSA suggest that this is not unusual[@Andrews2014;@Andrews2017;M.A.M.2015; Amir2016]. Barriers to accessing care were not addressed in this study and so the reasons for delaying hospital attendance (including the role of patient and healthcare factors) are not clear; 55% of participants had sought care for their current illness prior to presentation at the hospital, usually at the health centre. Optimum triage and other management of critically unwell patients at the health centre in a resource limited setting is not clear, and is likely to differ from hospital management. This could represent a fruitful area for future research. 
+
+The 28-day mortality of the cohort was 18% at 28 days, comparable to the pooled Sepsis-2 sepsis mortality from the systematic review and meta analysis presented in Chapter 1 (23% 95% CI [12-38%]) though considerable lower than the pooled Sepsis-2 severe sepsis mortality (49% 95% CI [39-58]). This is perhaps surprising as the inclusion criteria of this study include organ dysfunction criteria that are more similar to Sepsis-2 severe sepsis definitions than the Sepsis-2 sepsis definitions that are based on the systemic inflammatory response syndrome (SIRS), and would perhaps be expected to result in a higher mortality. In particular, the previous Malawian sepsis study (in the same hospital) from 2008/09 used a SIRS based definition of sepsis and found a mortality of 22%, with a severe sepsis mortality (defined using either 2 SIRS criteria and SBP < 90mmHg or any two of SBP < 90mHg, capililliary refill time > 2s, oxygen saturations < 90% or thrombocytopaenia) of 50%. There are several possible explanations for this. First, there is likely an effect of differing inclusion criteria: this study includes a respiratory rate criterion for recruitment, which has been shown elsewhere in sSA in large pooled datasets to be associated with mortality[@Moore2017], a finding which was not replicated here. Second, sepsis mortality at our centre may be improving, either through improved management, or by population level changes resuting in improved health such as widespread ART coverage or reducing malaria incidence. Certainly, improving sepsis mortality in high-income settings is a trend that has been seen since the pivotal early goal directed therapy trial in 2001[@Rivers2001;PRISMInvestigators2017;Kaukonen2014]. Third, participants in this study received reasonably intensive monitoring over the first 6 hours of their hospital attendance, which may have contributed to improved processes of care and hence improved outcomes. There is no way to address this hypothesis with the available data.
+
+Participants continued to die post 28-days, to the end of the study period; this was most apparent in HIV-infected participants in whom there was a near-doubling of mortality from 19% at 28 days to 36% at 180 days. To my knowledge, this is the first data on post-30 day outcomes in sepsis in sSA, and demonstrates that longer term mortality following an admission with sepsis is a significant problem. The causes of late (post 28-day) death are unknown from this study. Given the advanced HIV of many of the participants, and the high prevalence of TB, opportunistic infection seems likely, but longitudinal CD4 and viral load measurements were not carried out. Nevertheless, this serves as a reminder of the importance of close clincial and virological monitoring of patients with advanced HIV - an undertaking which is problematic in resource-limited settings - and highlights that an acute sepsis admission can be a presentation of ART failure and an opportunity to intervene to initiate or switch treatment. Given the success of first-line ART roll out in Malawi (and across Africa), this may be an increasingly common scenario.
+
+In contrast to significant medium long term mortality, health-related quality of life (HRQoL, as measured by EQ-5D-3L) seems to return to baseline by 12 weeks following sepsis admission, in contrast to high income settings where longer term morbidity is significant[@Winters2010]. This may represent differing patient populations with differing levels of physiologic reserve and capacity for recovery from critical illness, as the patient popultaion in this study is significantly younger than a high-income setting sepsis population. It may also reflect the lack of resources available in LMIC: patients who would survive, but with disability, in a high-resource setting may die in a low-resource one. Nevertheless, the rapid return to a comparable HRQoL to healthy community controls following sepsis admission could make improvement of sepsis outcome a cost-effective condition. Once again, to my knowledge, this HRQoL is the first available such data from sepsis in sSA, and can inform health economics analyses in sepsis here: the EQ-5D-3L utility scores can be used to calcuate DALYs (disability-adjusted life years) in such an analysis.
+
+#### Aetiology: TB dominates as a cause of sepsis
+
+The aetiology of sepsis in this cohort is dominated by TB, with 34% of participants having at least one positive diagnosic test for TB. The majority of these were positive for urinary LAM. The prevalence of MTB BSI was lower than expected; in previous studies of Sepsis-2 defined severe sepsis in Uganda[@Jacob2009; @Jacob2012] and Zambia[@Andrews2014; @Andrews2017] it was 28-40% in HIV-infected participants. In Malawi in the pre-ART era[@Archibald2000] the prevalence of TB BSI in febrile adults at QECH was 14% (21/173), and 9% (9/104) in 2011 in the same centre in HIV-infected adults admitted with fever and chronic cough[@Feasey2013]. The 6% (8/138) I find here in HIV-infected participants therefore seems low. This could be due to technical (e.g. bottle under or over filling with blood) or laboratory factors, though the latter seems unlikley as the testing was carried out at the same laboratory and with the same SOP as the 2011 study by Feasey et al[@Feasey2013]. This could also be a true finding: given the association of MTB BSI with mortality the lower than expected mortality of this cohort could go hand-in-hand with a lower than expected MTB BSI prevalence, for example, or the high ART prevalence could have an effect on the prevalence of MTB BSI. 
+
+Other identified causes of sepsis are as might be expected. _Salmonella_ Typhi was the commonest blood stream infection isolate, reflecting the ongoing Typhoid epidemic in Blantyre which began in 2011[@Feasey2015], and seemed to be associated with HIV-uninfected participants, as has been previously described[@Reddy2010]. 51% of the cohort have an unknown diagnosis _Add PHE serology here when back and tidy up - compare unknown diagnosis fraction to eg crump tanzania paper_
+
+#### Determinents of 28-day mortality: an expanded role for TB therapy?
+
+Using dimensionality reduction and Bayesian logistic regression, I present an assessment of the independent mortality effects of the treatments administered to the cohort, with an aim to inform novel antimicrobial strategies for sepsis in sSA. These approaches were used to deal with the problems of variable selection, collinearlty, and nonidentifiability due to seperation in logistic regression, and it possible to draw several conclusions from the results. Firstly, there is heterogeneity in outcome across diagnoses: even after controlling for disease severity, malaria was strongly associated with survival to 28 days, and meningitis with death. Mindful of the hypothesised causal structure presented above, this suggests that not all of the mortality risk of death is mediated by the included disease severity markers. The reason for the low mortality of participants with malaria could be due to host factors (partial immunity) or treatment factors (rapid definative diagnosis using point of care tests) in the context of true malaria disease, or apparent postive tests for malaria could represent incidental parasitaemia. 
+
+In high-resource settings, rapid administration of antimicrobials has been shown to be associated with improved survival in sepsis[@Kumar2006], and all sepsis guidelines stress the importance of rapid administration of antimicrobials[@Levy2018]. This is based purely on observational evidence and no RCT has ever been (or will be, given the ethical issues) carried out; these studies are all open to confounding and requrie adjustment for disease severity. In this study, no significant effect of time-to-antibacterials was seen, though it is important not to interpret this lack of detected effect as lack of effect. The largest study to adress this question, in a high income setting (New York, USA) found an adjusted odds ratio of 1.04 (95% CI 1.02-1.05) for death per hour delay of antibiotics, and included 49,331 participants[Seymour2017]. Estimates from this study are at least consistent with those, though a lack of precision could be due to an underpowered study. It is also possible, of course, that the beneficial effect of rapid antimicrobials is reduced in a population with a diverse range of causes of sepsis, or a population with a very delayed presentation to hospital, as here. There was some suggestion of a late, possibly nonlinear, deleterious effect of delay of antibacterials after around 40 hours, though confidence intervals were wide and this cold represent random variablility. Alternatively, antimicrobials started this late after admission could represent hospital-acquired infection, which may well confer a high mortality risk.
+
+There was no detected benefit or harm associated with volume of intravenous fluid administered. How to safely administer intravenous fluid in sSA is unclear after RCTs in children[@Maitland2011] and adults[@Andrews2017] have shown harm to be associated with aggressive fluid resusitation. Participants in this study recieved a comparable volume of fluid to the usual care arm of the Zambian RCT in adults[@Andrews2017], given that the trial was recruiting participants with shock: median 2.0L (IQR 1.0-2.5L) by 6 hours versus 1.5L (1.0 - 2.0L) in this study. The intervention arm of the RCT recieved 3.5L (2.7-4.0L). It may be that participants in this study did not receive enough fluid to be harmful, that there was insufficient variation in fluid exposure to detect an effect on mortality, that the current study is underpowered, or that the Zambian study population differs in some way and so response to fluid is different. Further analysis exploring the effect of rapidity of administration of IV fluid in this cohort is planned.
+
+The most striking finding from the analysis of determinents of mortality is a very strong association between reciept of TB therapy and survival. Care must be taken in interpreting this as cause and effect. Though every attempt has been made to adjust for confounding, in an observational study such as this residual unmeasured confounding is likely. It does seem, however, as though confounding would be likely to bias an estimate of the effect of TB therapy towards the null (in that clinicians might initiate TB theray on patients who are more unwell and hence more likely to die) rather than producing a spurious protective effect. The benefit of TB therapy was not restricted to those with a confirmed diagnosis of TB, though almost all (88%) of participants who received TB therapy were HIV-infected and care should be exercised in exrapolating to the HIV-unininfected. A protective effect of therapy in sepsis of patients is plausible from prior studies: autopsy studies show that TB is underdiagnosed in HIV-infected patients who die in hospital[@Gupta2015a]. The STAMP trial[@Gupta-Wright2018] found a mortality benefit in some a priori subgroups of a strategy of screen-and-treat with urinary LAM for all HIV-infected inpatients, suggesting a significant burden of undiagnosed TB, and prior sepsis cohorts in sSA have found TB as a common cause of sepsis. A retrospective study of 149 HIV infected adults with sepsis in Uganda[@Hazard2019], 55 of whom recieved anti-TB therapy, found an association between reciept of TB therapy and survival in Sepsis-2 severe sepsis (hazard ratio 0.32 95% CI 0.13-0.80 from Cox proportional hazard model) but not Sepsis-2 sepsis (hazard ratio 1.24 95% CI 0.53-2.90), but is hampered by its retrospective design.
+
+What, then, is the role of TB therapy in sepsis in sSA? The fact that the mortality benefit in this study is not restricted to those with a confirmed diagnosis of TB suggests that empiric TB therapy in sepsis or a subset of patients with sepsis (particularly those with a CD4 cell count below 50 cells $\mu L^{-1}$, for example) could be beneficial. RCTs of emprirical TB treatment have not previously been sucessful. The REMEMBER trial recruited outpatients with CD4 cell count below 50 cells $\mu L^{-1}$ and randomised them to isoniazid preventative therapy or full TB therapy, and found no mortality benefit. STASIS found no difference in mortality between a strategy of Xpert and urine LAM screening versus empriric TB therapy in outpatients with CD4 count below 100 cells[ref croi abstract[]] $\mu L^{-1}$ and TB Fast Track found no mortality benefit in empiric therapy for outpatients with CD4 cell count below 150 $\mu L^{-1}$ if they were randomised to an algorithm that started TB therapy if they were assessed as high risk for TB using a combination of diagnostic tests (including urinary LAM) and clinical features (including BMI and haemoglobin)[nned ref croi abstract]. However all of these studies recruited ambulatory outpatients; it may be that inpatients have more disseminated TB, or a higher baseline risk of mortality. 
+
+The WHO provides guidance on empiric TB therapy. Hospitalised HIV-infected patients in high TB burden settings with cough and so-called "danger signs" (fever > 39\textdegree C, inability to stand, respiratory rate above 30 min$^{-1}$, heart rate above 120 min$^{-1}$) should recieve broad spectrum antimicrobials for 3-5 days, and, if there is no improvement, consider empiric TB therapy. This strategy was developed based largely on expert opinion, has been shown to improve survival compared to usual care in a before-after study in South Africa[@Holtz2011]. Whether a 3-5 day delay will worsen outcomes in criticlly unwell patients with TB is unknown. There was no apparent relationship seen in this study between time to antitubercular therapy and death, but numbers were small (n= 53).
+
+#### Limitations
+
+There are limitations to this study. There is no community control group, so it is not possible to calculate population attributable fractions for pathogens and, in particular, it is not possible to say whether the positive malaria rapid tests in this study represent incidental parasitaemia or disease. Malaria films could perhaps inform this question by quantifying parasitameia, but were not done. Only one aerobic blood culture and mycobacterial blood culture were done, and both tests are known to have suboptimal sensitivity with only a single culture[@Cockerill2004; @Barr2018]. No anaerobic culture was possible. HIV viral load lesting was not done due to resource limitations. 
+
+### Conclusions and further work
+
+In conclusion, this chapter presents an in-depth clincial and microbiologic assessment of sepsis in Blantyre, Malawi, and finds that the dominant cause is tuberculosis, that long-term mortality is significant, and that empiric TB therapy has a strong protective effect, particularly in advanced immunosupression. The role of early, empriric TB therapy in sepsis in sub-Saharan Africa is unknown, but these data, I suggest, highlight the potential benefit and provide support for interventional trials.
+
+Further work is planned. Fluid administration in sepsis in sSA is clearly complex, and longitudinal modelling of response to fluid over the first six hours of hospital admission in this cohort is planned. xx% of the cohort still have no diagnosis, and further testing for e.g. Q-fever, Brucellosis, PCP and histoplasmosis could provide insight into the rol of these pathogens as causes of sepsis in sSA. The reason for the low prevalence of TB BSI in combination with a high prevalane of urine LAM positivity is unknown, and running Xpert ultra on stored blood samples may help to understand if there wer etechnical problems with the mycobacterial blood cultures. 
+
+### Appendix
+
+```{r bivariate-sev-tb-rx, echo =F, warning=F, message=F}
+
+df.temp$fluid_6hr <- df.temp$fluid_6hr / 1000
+
+df.temp %>% select(-c(hivstatus, ptsex, ustand, hivonart, any_ab, any_fung_rx, any_mal_rx, malaria,  no_diagnosis, csf, bc, tb, pid, d28_death, time_to_tb_rx)) %>% pivot_longer(-any_tb_rx) %>% #filter(!is.na(d28_death)) %>%
+  dplyr::group_by(name) %>% dplyr::summarise(pval = kruskal.test(value ~ any_tb_rx)$p.value) -> pvals.tb
+
+df.temp %>% select(-c(hivstatus, ptsex, ustand, hivonart, any_ab, any_fung_rx, any_mal_rx,tb, no_diagnosis, csf, bc, malaria, pid,tb, d28_death, time_to_tb_rx)) %>% pivot_longer(-any_tb_rx) %>% # filter(!is.na(d28_death)) %>%
+  dplyr::group_by(name, any_tb_rx) %>% dplyr::summarise( median = median(value, na.rm = T),
+                                                             LQ = quantile(value, 0.25, na.rm = T),
+                                                              UQ = quantile(value, 0.75, na.rm = T)) -> p.tb
+
+
+
+paste0(
+  specify_decimal(p.tb$median, 1), " (",
+  specify_decimal(p.tb$LQ, 1), "-",
+  specify_decimal(p.tb$UQ, 1) ,")"
+) -> p.tb$med_str
+
+p.tb %>% select(name, any_tb_rx, med_str) %>% pivot_wider(names_from = any_tb_rx, values_from = med_str) -> p.tb
+
+p.tb <- merge(p.tb, pvals.tb, all.x = T)
+
+
+df.temp %>% dplyr::select( hivstatus, hivonart, ptsex, ustand, any_ab, any_fung_rx, any_mal_rx, any_tb_rx, bc, tb, malaria, csf, no_diagnosis) %>% pivot_longer(-any_tb_rx) %>% #filter(!is.na(d28_death)) %>%
+  dplyr::group_by(name, value) %>%
+  dplyr::summarise(tb_rx = sum(any_tb_rx == 1, na.rm = T), no_tb_rx = sum(any_tb_rx == 0, na.rm = T)) %>% filter(!is.na(value)) %>% group_by(name) %>%
+   group_by(name) %>% dplyr::summarise(pval = fisher.test(matrix(c(tb_rx, no_tb_rx), ncol =2))$p.value) -> p.catpvals.tb
+
+df.temp %>% dplyr::select(hivstatus, hivonart, ptsex, ustand, any_ab, any_fung_rx, any_mal_rx, any_tb_rx, bc, tb, malaria, csf, no_diagnosis) %>% pivot_longer(-any_tb_rx) %>% # %>% filter(!is.na(d28_death)) %>%
+  dplyr::group_by(name, any_tb_rx) %>% dplyr::summarise(`1` = sum(value == 1, na.rm = T), 
+                                                        total = sum(!is.na(value)),
+                                                        prop = `1`/total) -> p.cat.tb
+
+p.cat.tb$str <- paste0(
+  p.cat.tb$`1`, "/", p.cat.tb$total,
+  " (", specify_decimal(p.cat.tb$prop *100,0), "%)"
+)
+
+
+p.cat.tb %>% select(name, any_tb_rx, str) %>% pivot_wider(names_from = any_tb_rx, values_from = str) -> p.cat.tb
+p.cat.tb <- merge(p.cat.tb, p.catpvals.tb)
+
+
+
+p.tb <- bind_rows(p.tb,p.cat.tb)
+
+p.tb$boldcol <- FALSE 
+p.tb$boldcol[p.tb$pval <= 0.05] <- TRUE
+
+p.tb$pval <- specify_decimal(p.tb$pval, 3)
+p.tb$pval[p.tb$pval == "0.000"] <- "<0.001"
+
+
+#p[match(c("calc_age", "ptsex", "hivstatus", "hivonart","CD4_Absolute", "Haemoglobin","screentemp", "t0hr", "t0sbp", "t0dbp", "t0map",
+#        "t0rr", "t0spo2","gcs", "ustand", "lactate_value" , "WCC", "Platelets", "NA.", "Potassium",
+#        "Chloride", "CO2", "Urea", "Creatinine", "bc", "tb", "malaria", "csf", "no_diagnosis",
+#        "any_ab", "time_to_abx", "any_fung_rx","time_to_fung_rx", "any_mal_rx", "time_to_mal_rx", "any_tb_rx","time_to_tb_rx", "fluid_6hr"), p$name),] -> p
+
+p.tb[match(c("calc_age", "ptsex", "hivstatus", "hivonart","CD4_Absolute", "Haemoglobin","screentemp", "t0hr", "t0sbp", "t0dbp", "t0map",
+        "t0rr", "t0spo2","gcs", "ustand", "lactate_value" , "WCC", "Platelets", "CO2", "Urea", "Creatinine", "bc", "tb", "malaria", "csf", "no_diagnosis",
+        "any_ab", "time_to_abx", "any_fung_rx","time_to_fung_rx", "any_mal_rx", "time_to_mal_rx", "fluid_6hr"), p.tb$name),] -> p.tb
+
+
+p.tb <- p.tb[c("name", "1", "0", "pval", "boldcol")]
+names(p.tb) <- c("Variable", "TB treatment", "No TB treatment", "p", "boldcol")
+
+boldrows <- which(p.tb$boldcol %in% TRUE)
+
+p.tb$Variable[p.tb$Variable == "calc_age"] <- "Age (years)"
+p.tb$Variable[p.tb$Variable == "ptsex"] <- "Male sex"
+p.tb$Variable[p.tb$Variable == "hivstatus"] <- "HIV Infected\\textsuperscript{*}"
+p.tb$Variable[p.tb$Variable == "hivonart"] <- "Taking ART\\textsuperscript{\\dag}"
+p.tb$Variable[p.tb$Variable == "Haemoglobin"] <- "Haemoglobin (x10\\textsuperscript{9} g dL\\textsuperscript{-1})"
+p.tb$Variable[p.tb$Variable == "CD4_Absolute"] <- "CD4 count\\textsuperscript{\\dag} ($\\mu$L\\textsuperscript{-1})"
+p.tb$Variable[p.tb$Variable == "screentemp"] <- "Temperature (\\textdegree C)"
+p.tb$Variable[p.tb$Variable == "t0hr"] <- "Heart rate (min\\textsuperscript{-1}))"
+p.tb$Variable[p.tb$Variable == "t0sbp"] <- "Systolic BP (mmHg)"
+p.tb$Variable[p.tb$Variable == "t0dbp"] <- "Diastolic BP (mmHg)"
+p.tb$Variable[p.tb$Variable == "t0map"] <- "Mean arterial BP (mmHg)"
+p.tb$Variable[p.tb$Variable == "t0rr"] <- "Respiratory rate (min\\textsuperscript{-1}))"
+p.tb$Variable[p.tb$Variable == "t0spo2"] <- "Oxygen saturation (%)"
+p.tb$Variable[p.tb$Variable == "gcs"] <- "GCS"
+p.tb$Variable[p.tb$Variable == "ustand"] <- "Unable to stand"
+p.tb$Variable[p.tb$Variable == "lactate_value"] <- "Lactate (mmol L\\textsuperscript{-1})"
+p.tb$Variable[p.tb$Variable == "WCC"] <- "White cell count (x10\\textsuperscript{9} L\\textsuperscript{-1})"
+p.tb$Variable[p.tb$Variable == "Platelets"] <- "Platelet count (x10\\textsuperscript{9} L\\textsuperscript{-1})"
+p.tb$Variable[p.tb$Variable == "NA."] <- "Sodium (mmol L\\textsuperscript{-1})"
+p.tb$Variable[p.tb$Variable == "Potassium"] <- "Potassium (mmol L\\textsuperscript{-1})"
+p.tb$Variable[p.tb$Variable == "Chloride"] <- "Chloride (mmol L\\textsuperscript{-1})"
+p.tb$Variable[p.tb$Variable == "CO2"] <- "Bicarbonate (mmol L\\textsuperscript{-1})"
+p.tb$Variable[p.tb$Variable == "Urea"] <- "Urea (mmol L\\textsuperscript{-1})"
+p.tb$Variable[p.tb$Variable == "Creatinine"] <- "Creatinine (mmol L\\textsuperscript{-1})"
+
+p.tb$Variable[p.tb$Variable == "bc"] <- "BSI"
+p.tb$Variable[p.tb$Variable == "tb"] <- "TB"
+p.tb$Variable[p.tb$Variable == "malaria"] <- "Malaria"
+p.tb$Variable[p.tb$Variable == "csf"] <- "Meningitis"
+p.tb$Variable[p.tb$Variable == "no_diagnosis"] <- "No diagnosis"
+
+p.tb$Variable[p.tb$Variable == "any_ab"] <- "Antibacterials"
+p.tb$Variable[p.tb$Variable == "time_to_abx"] <- "Time to Antibacterials (hr)"
+p.tb$Variable[p.tb$Variable == "any_fung_rx"] <- "Antifungals"
+p.tb$Variable[p.tb$Variable == "time_to_fung_rx"] <- "Time to Antifungals (hr)"
+p.tb$Variable[p.tb$Variable == "any_mal_rx"] <- "Antimalarials"
+p.tb$Variable[p.tb$Variable == "time_to_mal_rx"] <- "Time to Antimalarials (hr)"
+p.tb$Variable[p.tb$Variable == "any_tb_rx"] <- "Antimycobacterials"
+p.tb$Variable[p.tb$Variable == "time_to_tb_rx"] <- "Time to Antimycobacterials (hr)"
+
+p.tb$Variable[p.tb$Variable == "fluid_6hr"] <- "IV fluid (ml)"
+
+sub("%", "\\\\%", p.tb$`TB treatment`) -> p.tb$`TB treatment`
+sub("%", "\\\\%", p.tb$`No TB treatment`) -> p.tb$`No TB treatment`
+
+sub("%", "\\\\%", p.tb$Variable) -> p.tb$Variable
+
+
+
+kable(select(p.tb,-boldcol), "latex", booktabs =T, 
+      row.names = F, longtable = F, ,escape = F,caption = "Bivariate associations with reciept of TB treatment" ) %>%
+ kable_styling("striped", full_width = F, latex_options = c("repeat_header")) %>%
+  row_spec(boldrows, bold = T) %>%
+  pack_rows("Host Variables", 1,6, bold = F) %>% 
+   pack_rows("Severity Variables", 7, 21, bold = F)  %>%
+    pack_rows("Diagnosis", 22,26, bold = F) %>% 
+   pack_rows("Treatment Recieved", 27, 33, bold = F)  %>%
+  footnote(general = "BP = Blood pressure, GCS = Glasgow coma scale. Numeric variables are presented as median (IQR) and categoric variables as proportions. P-values are from Kruskal-Wallace test for continuous variables and Fisher's exact test for categorical variables." , symbol = c("Participants with HIV status unknown not included in this row","Includes only HIV-infected participants"), threeparttable = T, fixed_small_size = T)
+
+```
+
+```{r mort-strat-tb-and-tb-rx, echo =F, warning=F, message=F,fig.scap="28-day mortality stratified by TB status and reciept of TB therapy.", out.extra='', fig.cap="Crude 28 day mortality stratified by TB status and reciept of antitubercular therapy: association of TB therapy with survival is not restricted to participants in whom a diagnosis of TB was made.", fig.width=10 , fig.height =3  , fig.align = 'center'}
+
+df.temp %>% group_by(tb, any_tb_rx) %>% summarise(died = sum(d28_death == 1, na.rm = T), survived = sum(d28_death == 0, na.rm= T),prop = died/(died+survived), lci = binom.test(died, (died+survived))$conf.int[[1]], uci = binom.test(died, (died+survived))$conf.int[[2]]) -> t
+
+t$tb[t$tb == 0] <- "No TB diagnosis" 
+t$tb[t$tb == 1] <- "TB diagnosis" 
+
+t$any_tb_rx[t$any_tb_rx == 0] <- "No TB treatment"
+t$any_tb_rx[t$any_tb_rx == 1] <- "TB treatment"
+
+
+ggplot(t, aes(as.factor(any_tb_rx), prop, ymin = lci, ymax = uci, color = as.factor(tb))) + geom_point(position = position_dodge(width = 0.2)) + geom_errorbar(width = 0, position = position_dodge(width = 0.2)) + coord_flip() + theme_bw() + ylab("Pr(Death by 28 days)") + xlab(element_blank()) + theme(legend.title = element_blank()) -> p.rx
+
+df.temp$CD4.dic <- df.temp$CD4_Absolute < 50
+
+df.temp %>% group_by(any_tb_rx, CD4.dic) %>% summarise(died = sum(d28_death == 1, na.rm = T), survived = sum(d28_death == 0, na.rm= T),prop = died/(died+survived), lci = binom.test(died, (died+survived))$conf.int[[1]], uci = binom.test(died, (died+survived))$conf.int[[2]]) %>% filter(!is.na(CD4.dic)) -> t2
+
+t2$CD4.dic[t2$CD4.dic == FALSE] <- "CD4 > 50" 
+t2$CD4.dic[t2$CD4.dic == TRUE] <- "CD4 < 50" 
+
+t2$any_tb_rx[t2$any_tb_rx == 0] <- "No TB treatment"
+t2$any_tb_rx[t2$any_tb_rx == 1] <- "TB treatment"
+
+ggplot(t2, aes(as.factor(any_tb_rx), prop, ymin = lci, ymax = uci, color = as.factor(CD4.dic))) + geom_point(position = position_dodge(width = 0.2)) + geom_errorbar(width = 0, position = position_dodge(width = 0.2)) + coord_flip() + theme_bw() + ylab("Pr(Death by 28 days)") + xlab(element_blank()) + theme(legend.title = element_blank()) -> p.cd4
+
+ggarrange(p.rx, p.cd4, ncol = 2, labels = c("A", "B"), widths = c(1.1,1))
+
+
+```
+
+```{r model-trplots, echo =F, warning=F, message=F,fig.scap="Traceplots from day 28 death logistic regression model", out.extra='', fig.cap="Traceplots showing sampling of the posterior for all 10 imputed datasets for the day 28 death outcome model. There are four chains per dataset so 40 chains in total. All show good mixing indicaing valid samplig of the posterior. R-hat statistic for all chains was less than 1.1", fig.width= 10, fig.height =8 , fig.align= 'center'}
+
+stanplot(m.imp, type = "trace")
+
+```
+
+
 
