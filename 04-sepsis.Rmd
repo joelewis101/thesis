@@ -1620,7 +1620,6 @@ Further work is planned. Fluid administration in sepsis in sSA is clearly comple
 
 Traceplots for the MCMC sampler in the mortality model and bivariate associations of receipt of TB therapy are shown here.
 
-
 ```{r bivariate-sev-tb-rx, echo =F, warning=F, message=F}
 
 df.temp$fluid_6hr <- df.temp$fluid_6hr / 1000
