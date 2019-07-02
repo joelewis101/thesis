@@ -2,7 +2,7 @@
 
 # Thesis
 
-Joe's PhD thesis. Eeeeeesh. Number ing of files gone weird but plan is below
+Joe's PhD thesis. Eeeeeesh. Numbering of files gone weird but plan is below
 
 ## Plan
 
