@@ -195,9 +195,13 @@ Stool and rectal swabs recieved in the laboratory were stored at 4C pending proc
 
 _PHE stuff_
 
+### Case definitions
+
+Bloodstream infection is defined as ant pathogenic organism isolated from at least one aerobic blood culture. Coagulase-negative _Staphylococci_, _bacillus spp._, _diptheroids_ and alpha-haemolytic _Streptococci_ other than _S. pneumoniae_  were considered as contaminants. Malaria was defined as a positive malaria rapid test. Meningitis was defined as either a positive CSF culture for a pathogenic organism - excluding the same contaminants as for bloodstream infection - or a positive cryptococcal antigen test on CSF. Tuberculosis was defined as any of positive sputum Xpert, positive urinary LAM at any grade, or positive mycobacterial blood culture. 
+
 ## Molecular methods
 
-One of each morphologically distinct colony from ESBL-E selective culture was taken forward for DNA extraction and whole genmone sequencing. DNA was extracted from overnight nutrient broth culture using the Qiagen DNA mini kit (Qiagen, Germany) following the manufacturers instructions. Extracted DNA was shipped to the Wellcome Sanger Institute where it underwent library preperation according to the Illumina protocol and paired-end sequencing on Illumina HiSeqX ( _check this_ ) by the WSI DNA pipelines team.
+One of each morphologically distinct colony from ESBL-E selective culture was taken forward for DNA extraction and whole genmone sequencing. DNA was extracted from overnight nutrient broth culture using the Qiagen DNA mini kit (Qiagen, Germany) following the manufacturers instructions. Extracted DNA was shipped to the Wellcome Sanger Institute where it underwent library preperation according to the Illumina protocol and paired-end sequencing on Illumina HiSeq X10 by the WSI DNA pipelines team.
 
 ## Bioinformatics
 
