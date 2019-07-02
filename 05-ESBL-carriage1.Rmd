@@ -1,5 +1,49 @@
 # Longitudinal ESBL-E carriage in Malawian adults in health and disease
 
+\chaptermark{ESBL-E carriage}
+
+```{r ch4-setup, include = F}
+
+library(plyr)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(grid)
+library(ggpubr)
+library(pheatmap)
+library(RColorBrewer)
+library(scales)
+library(lubridate)
+library(survival)
+library(ggsci)
+library(survminer)
+
+
+wd <- "chapter_5/"
+output = "latex"
+T <- TRUE
+
+specify_decimal <- function(x, k) trimws(format(round(x, k), nsmall=k))
+
+
+# generate figures
+#source("chapter_4/generate_consort_diagram.R")
+source("final_cleaning_scripts/generate_visits_df.R")
+source("final_cleaning_scripts/load_and_clean_followup_and_enroll_labelled.R")
+source("other_scripts/summary_table_functions.R")
+source("final_cleaning_scripts/make_composite_hivstatus_variable.R")
+#source("final_cleaning_scripts/load_and_clean_hourly.R")
+source("final_cleaning_scripts/load_and_clean_bloods.R")
+source("final_cleaning_scripts/load_and_clean_aetiol.R")
+source("final_cleaning_scripts/load_and_clean_hourly.R")
+source("final_cleaning_scripts/load_and_clean_upto72.R")
+source("final_cleaning_scripts/load_and_clean_post72.R")
+source("final_cleaning_scripts/load_and_clean_hosp_oc.R")
+source("final_cleaning_scripts/load_and_clean_time_to_ab.R")
+source("final_cleaning_scripts/load_and_clean_fluid_hr1_to_6.R")
+
+```
+
 ## Chapter Overview
 
 ## Introduction and chapter aims
@@ -7,6 +51,9 @@
 ## Methods
 
 ## Results
+
+### Study population
+
 
 ## Discussion
 
