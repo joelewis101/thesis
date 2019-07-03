@@ -27,20 +27,24 @@ specify_decimal <- function(x, k) trimws(format(round(x, k), nsmall=k))
 
 
 # generate figures
-#source("chapter_4/generate_consort_diagram.R")
-source("final_cleaning_scripts/generate_visits_df.R")
+#source("chapter_5/make_consort_diagram.R")
+#source("final_cleaning_scripts/generate_visits_df.R")
 source("final_cleaning_scripts/load_and_clean_followup_and_enroll_labelled.R")
 source("other_scripts/summary_table_functions.R")
 source("final_cleaning_scripts/make_composite_hivstatus_variable.R")
 #source("final_cleaning_scripts/load_and_clean_hourly.R")
-source("final_cleaning_scripts/load_and_clean_bloods.R")
-source("final_cleaning_scripts/load_and_clean_aetiol.R")
-source("final_cleaning_scripts/load_and_clean_hourly.R")
-source("final_cleaning_scripts/load_and_clean_upto72.R")
-source("final_cleaning_scripts/load_and_clean_post72.R")
-source("final_cleaning_scripts/load_and_clean_hosp_oc.R")
-source("final_cleaning_scripts/load_and_clean_time_to_ab.R")
-source("final_cleaning_scripts/load_and_clean_fluid_hr1_to_6.R")
+#source("final_cleaning_scripts/load_and_clean_bloods.R")
+#source("final_cleaning_scripts/load_and_clean_aetiol.R")
+#source("final_cleaning_scripts/load_and_clean_hourly.R")
+#source("final_cleaning_scripts/load_and_clean_upto72.R")
+#source("final_cleaning_scripts/load_and_clean_post72.R")
+#source("final_cleaning_scripts/load_and_clean_hosp_oc.R")
+#source("final_cleaning_scripts/load_and_clean_time_to_ab.R")
+#source("final_cleaning_scripts/load_and_clean_fluid_hr1_to_6.R")
+
+names(enroll)[names(enroll) == "data_date"] <- "enroll_date"
+followup <- merge(followup, select(enroll, pid, arm, enroll_date), all.x = T)
+followup$t <- followup$data_date - followup$enroll_date
 
 ```
 
@@ -53,6 +57,240 @@ source("final_cleaning_scripts/load_and_clean_fluid_hr1_to_6.R")
 ## Results
 
 ### Study population
+
+In total, 425 participants were recuited to the  study between 19th February 2017 and 2nd October 2018; 225 participants with sepsis (arm 1), 100 inpatients without antimicrobial exposure at baseline (arm 2) and 100 community members (arm 3). Flow of participants through the study is shown in Figure \@ref(fig:ESBL-consort-diag). It was often challenging to collect stool samples from participants but 87% (1416/1631) eligible patient-visits resulted in the collection of a stool sample. Drop out from the study and failure to collect stool samples were similar in arm 1 and 2 and with no apparent systematic bias, but both drop out and missing samples were less frequent in arm 3 (Figure \@ref(fig:ESBL-prop-samples)A). There was siginifcant variation in the timing of stool sample collecion, with a distribution around the ostensible collation day (Figure \@ref(fig:ESBL-prop-samples)B).
+
+The baseline characetristics of the enrolled participants are shown in Table \@tab:(dassim-2-demog). There were some important differences between the arms of the study: despite matching on age and sex, antimicrobial-unexposed participants were older. They were also less likely to be HIV-infected than participants with sepsis (13% [12/89] of those with known HIV status were HIV-infected versus 67% [143/213] with sepsis), and less likely to have been treated for TB. Sepsis participants were more likely to have recieved antimicroials or been hospitalised in the previous 4 weeks. In the community arm of the study, there were a high proportion of participants (60% [60/100]) with an unknown HIV status, and there were some differences in toilet facilities, water sources, cooking fuel and presence of animals at home across the three groups. 
+
+```{r ESBL-consort-diag, echo = F, fig.scap="ESBL carriage study recruitment and follow up.", out.extra='', fig.cap = "Study recruitment and follow up. At each time point \\textit{eligible participants} refers to participants who are known to be alive and have not withdrawn from the study by that time point, and \\textit{samples collected} refers to patients from whom a stool sample was sucessfully collectd for that visit.",  out.height = '100%', fig.align = 'center'}
+
+knitr::include_graphics(paste0(wd, "/figures/ESBLstudy_flow_diagram.odf"))
+
+```
+
+```{r ESBL-prop-samples, echo = F, warning = F, message = F,fig.scap="Missing samples and variation in sample collection time", out.extra='', fig.cap = "A: Missing stool samples stratified by arm and visit. Bar height at a given visit represents the number of eligible participants, coloured by successful sample collection (blue) or failure to collect a sample (red). B: Distribution of actual day of sample collection for ostensible day 7, 28, 90 and 180 samples showing considerable variation.",  fig.height = 3, fig.width=8, fig.align = 'center'}
+
+sampls <- read.csv("chapter_5/ESBL_carriage_recruitment.csv", stringsAsFactors = F)
+
+sampls$a_missed <- sampls$eligible - sampls$collected
+
+sampls %>% select(-eligible) %>% pivot_longer(-c(arm, visit)) %>% ggplot(aes(as.factor(visit), value, fill = name)) + geom_col() + facet_wrap(~arm, scales = 'free') + xlab("Visit day") + ylab("n") + theme_bw() + theme(legend.title = element_blank(), legend.position = "top") + scale_fill_manual(labels = c("No sample", "Sample collected"), values = hue_pal()(2)) -> p1
+
+
+visit_names <- c(
+  `1` = "Day 7",
+  `2` = "Day 28",
+  `3` = "Day 90",
+  `4` = "Day 180"
+)
+
+followup %>% filter(arm != 4, foutcome == 1) %>% ggplot(aes(as.numeric(t), group = as.factor(d2visit))) + geom_histogram(bins = 60) + facet_wrap(~ d2visit, scale = 'free_y', ncol = 1, strip.position = "right", labeller = as_labeller(visit_names)) + xlim(c(0,300)) + theme_bw() + xlab("Time post enrollment (days)") + ylab("n") -> p2
+
+ggarrange(ggarrange(p1,NULL, ncol = 1, nrow = 2, heights = c(1,0.1), labels = c("A",NA)),p2, ncol = 2, nrow = 1, labels = c(NA,"B"))
+
+```
+
+\renewcommand{\arraystretch}{0.8}
+
+```{r dassim-2-demog, echo = F, warning=F, message = F}
+
+enroll <- filter(enroll, arm != 4)
+enroll$art.time <- as.numeric((enroll$enroll_date - enroll$hivartstart) /(365.25/12))
+enroll$hivart[enroll$hivart != "5A" & !is.na(enroll$hivart)] <- "ART regimen: other"
+enroll$animalskept[enroll$animalskept == "Other"] <- "Elsewhere"
+enroll$keep.other[enroll$keep.cattle == "Yes" | enroll$keep.sheep == "Yes" | enroll$keep.mules == "Yes"] <- "Yes"
+enroll.sum <- dplyr::select(enroll, arm,calc_age, ptsex, hivstatus,recieved_prehosp_ab,pmhxrechospital,tbstatus, tbongoing, hivonart, hivart, art.time, hivcpt, 
+                  tobaccoyn, alcoholyn,  highestedu,
+                 job, housholdadultsno, householdchildno, toilet , watersource, watertreated,
+                 electricityyn, fuel, 
+                 keepanim, keep.poultry,  keep.goats,
+                 keep.dogs, keep.cattle,  keep.other)
+
+enroll.sum$arm <- as.character(enroll.sum$arm)
+
+enroll.sum %>% select_if(is.character) %>% 
+  pivot_longer(-arm) %>% 
+  group_by(name, arm, value) %>% 
+  tally() %>% 
+  pivot_wider(names_from = arm, values_from = n, , values_fill = list(n = 0) ) %>% filter(!is.na(value)) %>% group_by(name) %>% 
+  mutate(sum1 = sum(`1`), 
+         sum2 = sum(`2`), 
+         sum3 = sum(`3`),
+         str1 = glue('{`1`}/{sum1} ({specify_decimal(`1`*100/sum1, 0)}%)'),
+         str2 = glue('{`2`}/{sum2} ({specify_decimal(`2`*100/sum2, 0)}%)'),
+         str3 = glue('{`3`}/{sum3} ({specify_decimal(`3`*100/sum3, 0)}%)')
+  ) -> t1
+
+apply(t1[3:8], 1, function(x) fisher.test(matrix(x, ncol = 2))$p.value) -> t1$p
+t1$tot <- t1$`1` + t1$`2` + t1$`3`
+t1$n <- t1$sum1 + t1$sum2 + t1$sum3
+t1$Total <- t1 %>% glue_data('{tot}/{n} ({specify_decimal(tot*100/n, 0)}%)')
+t1$totalprop <- t1$tot /t1$n
+t1 <- filter(t1, value != "No")
+
+enroll.sum$arm <- as.numeric(enroll.sum$arm)
+
+enroll.sum %>% select_if(is.numeric) %>% 
+  pivot_longer(-arm) %>% 
+  group_by(name) %>% mutate(p = kruskal.test(value ~ arm)$p.value,
+                            median.t = median(value, na.rm = T),
+                                    lqr.t = quantile(value, 0.25, na.rm = T),
+                                    uqr.t = quantile(value, 0.75, na.rm = T),
+                                    Total = glue('{specify_decimal(median.t,1)} ({specify_decimal(lqr.t,1)}-{specify_decimal(uqr.t,1)})')) %>%
+  group_by(name, arm) %>% summarise(median = median(value, na.rm = T),
+                                    lqr = quantile(value, 0.25, na.rm = T),
+                                    uqr = quantile(value, 0.75, na.rm = T),
+                                    strz = glue('{specify_decimal(median,1)} ({specify_decimal(lqr,1)}-{specify_decimal(uqr,1)})'),
+                                    p = unique(p),
+                                    Total = unique(Total)) %>% select(name, arm, strz, p, Total) -> t1.1 
+
+dcast(t1.1, name+ p + Total ~ arm, value.var = "strz") -> t1.1
+names(t1.1)[4:6] <- c("str1", "str2", "str3")
+  bind_rows(dplyr::select(t1, name, value,str1, str2, str3, p, Total, totalprop), t1.1) -> t1
+    rm(t1.1)  
+    
+    t1$value[grepl("keep.", t1$name) & t1$name != "keepanim"] <- t1$name[grepl("keep.", t1$name)& t1$name != "keepanim"]
+     t1$name[grepl("keep.", t1$name)& t1$name != "keepanim"] <- "which.anim"
+    ord <- c("calc_age", "ptsex", 
+             "hivstatus", "tbstatus", "tbongoing",
+             "hivonart", "art.time", "hivart", "hivcpt",
+             "recieved_prehosp_ab", "pmhxrechospital",
+             "tobaccoyn","alcoholyn", 
+             "highestedu", "job", 
+             "toilet",
+             "watersource",
+             "watertreated",
+             "householdchildno",
+             "housholdadultsno",
+             "electricityyn",
+             "fuel",
+             "keepanim",
+             "which.anim"
+             )
+        
+       t1$name <- factor(t1$name, levels = ord)  
+       t1[order(t1$name, -t1$totalprop),] -> t1
+       
+# tweaky tweaky
+       
+       
+    t1$name <- as.character(t1$name)
+
+
+t1$value[t1$name == "householdchildno"] <- "Children"
+t1$value[t1$name == "housholdadultsno"] <- "Adults"
+t1$name[t1$name == "householdchildno"] <- "No. household members"
+t1$name[t1$name == "housholdadultsno"] <- "No. household members"
+t1$value[t1$name == "calc_age"] <- "Age (yr)"
+t1$value[t1$name == "art.time"] <- "Months on ART"
+
+t1 <- subset(t1, value != "Female")
+t1$value[t1$name == "ptsex"] <- "Male sex"
+t1$name[t1$name %in% c("calc_age", "ptsex")] <- "Demographics"
+
+# art variables
+t1$value[t1$value %in% c("Reactive", "Non reactive", "Unknown")] <- 
+  paste0("HIV ", str_to_title(t1$value[t1$value %in% c("Reactive", "Non reactive", "Unknown")]))
+
+t1$value[t1$name == "hivonart"] <- "Current ART*"
+
+t1$value[t1$name == "hivcpt"] <- "Current CPT\\textsuperscript{\\dag}"
+t1$value[t1$value == "5A"] <- "ART regimen: EFV/3TC/TDF"
+t1 <- subset(t1, value != "ART regimen: other")
+
+#t1$levels[t1$variable == "art.time"] <- "Months on ART"
+t1$name[t1$name == "hivstatus"] <- "HIV/TB status"
+t1$name[grepl("art", t1$name)] <- "ART status*"
+
+t1$name[grepl("cpt", t1$name)] <- "ART status"
+# tb variables
+t1$value[t1$name == "tbstatus"] <- "Ever treated for TB"
+t1$value[t1$name == "tbongoing"] <- "Of those, current TB treatment"
+t1$name[grepl("tb", t1$name)] <- "HIV/TB status"
+
+t1$value[t1$name == "recieved_prehosp_ab"] <- "Antibiotics"
+t1$value[t1$name == "pmhxrechospital"] <- "Hospitalised"
+
+t1$name[t1$name == "recieved_prehosp_ab"] <- "Healthcare exposure last 4wk"
+t1$name[t1$name == "pmhxrechospital"] <- "Healthcare exposure last 4wk"
+
+
+
+
+# tobacco use
+t1$value[grepl("tobacco", t1$name)] <- paste0(t1$value[grepl("tobacco", t1$name)], " tobacco" )
+t1$name[grepl("tobacco", t1$name)] <- "Tobacco/alcohol use"
+
+# alcohol use
+t1$value[t1$name == "alcoholyn"] <- "Current alcohol"
+t1$name[grepl("alcohol", t1$name)] <- "Tobacco/alcohol use"
+
+# education
+t1$name[grepl("highestedu", t1$name)] <- "Education"
+
+# employment 
+t1$name[grepl("job", t1$name)] <- "Employment"
+
+# toilet
+
+t1$name[grepl("toilet", t1$name)] <- "Toilet facilities"
+
+# toilet
+t1$value[t1$name == "watertreated"] <- "Treat water with chlorine"
+
+t1$name[grepl("water", t1$name)] <- "Main water source"
+
+# electricity
+t1$value[t1$name == "electricityyn"] <- "Electricity available in house"
+t1$name[grepl("electric", t1$name)] <- "Electricty"
+
+t1$name[grepl("fuel", t1$name)] <- "Main cooking fuel"
+
+# animals
+
+#t1$levels[grepl("keep", t1$variable)] <- t1$variable[grepl("keep", t1$variable)]
+
+sub("keep.", "",t1$value) -> t1$value
+t1$name[t1$name == "keepanim" | t1$name == "which.anim"] <- "Animals at home?"
+t1$value[t1$name == "Animals at home?"] <- str_to_title(t1$value[t1$name == "Animals at home?"])
+t1$value[t1$name == "Animals at home?" & t1$value == "Yes"] <- "Any animal"
+
+str_to_title(t1$levels[grepl("keep", t1$variable)] ) -> t1$levels[grepl("keep", t1$variable)]
+#t1$levels[t1$levels == "Nim"] <- "Any animal"
+names(t1)[1] <- "variable"
+kstring <- make_kable_rowgroup_string(t1)
+
+
+sub("%", "\\\\%", t1$str1) -> t1$str1
+sub("%", "\\\\%", t1$str2) -> t1$str2
+sub("%", "\\\\%", t1$str3) -> t1$str3
+sub("%", "\\\\%", t1$Total) -> t1$Total
+boldrows <- t1$p < 0.05
+
+t1$p <- specify_decimal(t1$p, 3)
+t1$p[t1$p == "0.000"] <- "<0.001"
+
+t1 <- ungroup(t1)
+boldrows <- which(boldrows %in% TRUE)
+
+kable(select(t1,value, str1, str2, str3, p,Total), "latex", booktabs =T, 
+      row.names = F, longtable = T, escape = F, col.names = c("Variable","Sepsis", "Inpatient", "Community", "p", "Total"), 
+      caption = "Participant Characteristics" ) %>%  kable_styling(font_size = 9, full_width = F,latex_options = c("scale_down")) %>%
+  pack_rows(index = kstring) %>%
+  row_spec(boldrows, bold = T) %>%
+  footnote(general = "ART = Antiretroviral therapy, CPT = Co-trimoxazole preventative therapy, EFV: Efavirenz, 3TC: Lamivudine, TDF: Tenofovir. Numeric values are median (IQR)) unless otherwise stated. P-values are to assess for differened across the three groups: Fisher's exact test across the groups for categorical variable, and Kruskal-Wallace test for continuous variables.", symbol = c("ART status includes HIV reactive only as denominator", "Missing CPT data for two participants. ") ,threeparttable = T, fixed_small_size = T) %>% landscape()
+
+
+
+
+                                               
+```
+
+### Exposures druring the study period
+
+
+
+### ESBL-E colonisation
 
 
 ## Discussion
