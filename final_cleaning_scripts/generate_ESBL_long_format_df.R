@@ -13,7 +13,7 @@ source("final_cleaning_scripts/load_and_clean_hourly.R")
 source("final_cleaning_scripts/load_and_clean_upto72.R")
 source("final_cleaning_scripts/load_and_clean_post72.R")
 source("final_cleaning_scripts/load_and_clean_hosp_oc.R")
-
+source("final_cleaning_scripts/load_and_clean_hosp_oc.R")
 fum <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/dassim_followup_micro_raw.csv", stringsAsFactors = FALSE)
 
 #functions
@@ -21,6 +21,7 @@ source("other_scripts/panel_data_helpers/expand_covariates.R")
 source("other_scripts/panel_data_helpers/sort_out_tb_rx_on_discharge.R")
 source("other_scripts/panel_data_helpers/shuffle_a_in_b2.R")
 source("other_scripts/panel_data_helpers/strip_post_dropout_rows.R")
+source("other_scripts/panel_data_helpers/extract_covariate_exposure.R")
 
 recode_abz <- function(upto72) {
   upto72[sapply(upto72, function(x) grepl("AMOX", x))] <- "amoxy"
@@ -454,17 +455,7 @@ outlong %>% select(-c(pid, died)) %>% pivot_longer(-c(assess_type, arm)) %>%
 
 # extractor fns
 
-extract_covariate_exposure <- function(dfin, a,b, endtime) {
-  dfin <- as.data.frame(dfin)
-  pid <- dfin$pid[1]
-  dftemp <- uncompress_covariates(dfin)
-  dftemp <- subset(dftemp, assess_type <= endtime)
-  #apply(dftemp[,a:b],2, sum)
-  cbind(pid,as.data.frame(t(apply(dftemp[,a:b],2, sum)))) -> dftemp
-  dftemp$pid <- as.character(dftemp$pid)
-  return(dftemp)
-  
-}
+
 
 d28_exp <- out %>% group_by(pid) %>% do(extract_covariate_exposure(., 4,26,28))
 
