@@ -145,6 +145,11 @@ upto72$amicro3[grepl("TB", upto72$amicro3)] <- "TB TREATMENT"
 upto72$amicro4[upto72$row_id %in% c("155", "179","269", "273", "348", "325")] <- NA
 upto72$amicro4[grepl("FLUCOX", upto72$amicro4)] <- "FLUCLOXACILLIN"
 
+upto72$amicro3[upto72$pid == "DAS11457" & upto72$assess_type == 1] <- NA
+upto72$amicro2[upto72$pid == "DAS12441" & upto72$assess_type == 2] <- NA
+upto72$amicro3[upto72$pid == "DAS1029F" & upto72$assess_type == 3] <- NA
+upto72$amicro2[upto72$pid == "DAS13990" & upto72$assess_type == 2] <- NA
+
 ## others
 
 upto72$assess_date[upto72$pid == "DAS12441" & upto72$assess_type == 3] <- "01-FEB-2018"
