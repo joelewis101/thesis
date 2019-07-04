@@ -2,7 +2,7 @@
 # get ESBL data into a format where there is a row for each change in status
 
 # tehen make some extractor functions to give number of days of ab etc
-
+source("final_cleaning_scripts/generate_visits_df.R")
 source("final_cleaning_scripts/load_and_clean_followup_and_enroll_labelled.R")
 source("other_scripts/summary_table_functions.R")
 source("final_cleaning_scripts/make_composite_hivstatus_variable.R")
@@ -14,10 +14,13 @@ source("final_cleaning_scripts/load_and_clean_upto72.R")
 source("final_cleaning_scripts/load_and_clean_post72.R")
 source("final_cleaning_scripts/load_and_clean_hosp_oc.R")
 
+fum <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/dassim_followup_micro_raw.csv", stringsAsFactors = FALSE)
+
 #functions
 source("other_scripts/panel_data_helpers/expand_covariates.R")
 source("other_scripts/panel_data_helpers/sort_out_tb_rx_on_discharge.R")
 source("other_scripts/panel_data_helpers/shuffle_a_in_b2.R")
+source("other_scripts/panel_data_helpers/strip_post_dropout_rows.R")
 
 recode_abz <- function(upto72) {
   upto72[sapply(upto72, function(x) grepl("AMOX", x))] <- "amoxy"
@@ -225,3 +228,184 @@ df[is.na(df)] <- 0
 merge_longit_dfs(df,expanded.outcome, 5,26, ditch_dfa_after_dc = TRUE) -> out
 
 ## now add in followup
+
+# pull out abx from f micro and add each in
+
+names(followup)[names(followup) == "t"] <- "assess_type"
+
+fu <- followup
+lookup <- data.frame(names(fu[,29:49]))
+names(lookup)[1] <- "antibiotic"
+lookup$micro_n <- 11:31
+lookup$antibiotic <- as.character(lookup$antibiotic)
+
+fum$data_date <- as.Date(fum$data_date, "%d-%b-%y")
+fum$d2visitnnewrxstart <- as.Date(fum$d2visitnnewrxstart, "%d/%m/%Y")
+fum <- merge(fum, select(enroll, pid, enroll_date))
+fum$assess_type <- as.numeric(fum$d2visitnnewrxstart - fum$enroll_date)
+
+lookup$antibiotic[lookup$antibiotic == "amoxily"] <- "amoxy"
+lookup$antibiotic[lookup$antibiotic == "ceft"] <- "cefo"
+lookup$antibiotic[lookup$antibiotic == "co_amo"] <- "coamo"
+lookup$antibiotic[lookup$antibiotic == "cotrim"] <- "cotri"
+lookup$antibiotic[lookup$antibiotic == "quinine"] <- "quin"
+lookup$antibiotic[lookup$antibiotic == "coartem"] <- "coart"
+lookup$antibiotic[lookup$antibiotic == "artesu"] <- "arte"
+lookup$antibiotic[lookup$antibiotic == "chrola"] <- "chlora"
+
+merge(fum, lookup) -> fum
+merge(fum, select(fu, pid, data_date,antim_other), by = c("pid", "data_date"), all.x = T) -> fum
+
+
+fum$antibiotic[fum$antibiotic == "otherab"] <- fum$antim_other[fum$antibiotic == "otherab"]
+fum$antibiotic[grepl("Acyclovir", fum$antibiotic)] <- "acicl"
+fum$antibiotic[grepl("Algmentine", fum$antibiotic)] <- "coamo"
+fum$antibiotic[grepl("Algumentine", fum$antibiotic)] <- "coamo"
+fum$antibiotic[grepl("Augmentin", fum$antibiotic)] <- "coamo"
+fum$antibiotic[grepl("Augumentin", fum$antibiotic)] <- "coamo"
+fum$antibiotic[grepl("Metro", fum$antibiotic)] <- "metro"
+fum$antibiotic[grepl("RHZE", fum$antibiotic)] <- "tb"
+fum$antibiotic[grepl("TB", fum$antibiotic)] <- "tb"
+fum$antibiotic[grepl("Tb", fum$antibiotic)] <- "tb"
+
+fum <- filter(fum, d2visitnnewrxwhy != "CAC14R")
+
+# add back in tb rx form fu
+
+fu$d2visittbstart <- as.Date(fu$d2visittbstart, "%d%b%Y")
+tb <- subset(fu, tbstart == 1)
+tb$assess_type <- as.numeric(tb$d2visittbstart - tb$enroll_date)
+tb$antinum <- 168
+tb$antibiotic <- "tb"
+
+# i've checkd the neg ones
+# they both are captured in the hosp data
+fum <- filter(fum, assess_type >= 0)
+
+
+fum$antinum[fu$antifreq == 2] <- fum$antinum[fu$antifreq == 2] * 7
+fum$antinum[fu$antifreq == 3] <- fum$antinum[fu$antifreq == 3] * 28
+
+fum$antinum[fum$ongmed == 1 & fum$antibiotic != "tb"] <- 5
+fum$antinum[fum$ongmed == 1 & fum$antibiotic == "tb"] <- 168
+
+# drop tb where tb is already in
+
+dropem <- merge(tb, fum, by = c("pid", "assess_type"))$pid
+
+tb <- subset(tb, !(pid %in% dropem))
+rm(dropem)
+fum <- bind_rows(fum, select(tb, pid, assess_type, antibiotic, antinum))
+
+
+fum %>% unique %>% select(pid, assess_type, antibiotic, antinum ) %>%
+  pivot_wider(names_from = antibiotic, values_from = antinum) -> fum
+
+#fum[3:ncol(fum)][fum[3:ncol(fum)] > 1] <- 1
+
+fum$died <- 0
+fum$hosp <- 0
+
+col_add <- rep(0, length(ab_var_names))
+names(col_add) <- ab_var_names
+fum %>% add_column(!!!col_add[!names(col_add) %in% names(.)]) -> fum
+rm(col_add)
+
+fum[is.na(fum)] <- 0
+
+fum[names(out)] -> fum
+
+rowwise_expand_and_shuffle_a_in_b2(fum, out,4, 26) -> out.2
+
+# now pull out hospitalisation and add in
+
+hosp <- subset(fu, d2visithosadm == 1)
+hosp <- select(hosp, pid, enroll_date, d2visitnhospadmwhenadm, d2visitnhospaadmwhendisc)
+names(hosp)[names(hosp) == "d2visitnhospadmwhenadm"] <- "adm_date"
+hosp$adm_date <- as.Date(hosp$adm_date, "%d%b%Y")
+names(hosp)[names(hosp) == "d2visitnhospaadmwhendisc"] <- "dc_date"
+hosp$dc_date <- as.Date(hosp$dc_date, "%d%b%Y")
+
+hosp$dc_date[is.na(hosp$dc_date)] <- hosp$adm_date[is.na(hosp$dc_date)] + 5
+hosp$hosp <-  as.numeric(hosp$dc_date - hosp$adm_date)
+hosp$hosp[hosp$hosp == 0] <- 1
+
+hosp$assess_type <- as.numeric(hosp$adm_date - hosp$enroll_date)
+
+hosp <- select(hosp, pid, hosp, assess_type, hosp)
+hosp$died <- 0
+
+col_add <- rep(0, length(ab_var_names))
+names(col_add) <- ab_var_names
+hosp %>% add_column(!!!col_add[!names(col_add) %in% names(.)]) -> hosp
+rm(col_add)
+
+hosp[names(out.2)] -> hosp
+
+rowwise_expand_and_shuffle_a_in_b2(hosp, out.2,4,26) -> out
+
+## add censor/death dates from visits df
+vb <- visits
+
+visits$t <- suppressWarnings(apply(visits[7:10], 1,max, na.rm= T ))
+
+visits$t[!is.na(visits$died_date)] <- visits$died_date[!is.na(visits$died_date)]
+
+censor <- select(visits, pid, status, t)
+censor$status[censor$status == 0] <- 2
+
+names(censor)[2:3] <- c("died", "assess_type")
+censor$hosp <- 0
+
+col_add <- rep(0, length(ab_var_names))
+names(col_add) <- ab_var_names
+censor %>% add_column(!!!col_add[!names(col_add) %in% names(.)]) -> censor
+rm(col_add)
+
+censor[names(out)] -> censor
+
+censor$died <- as.numeric(censor$died)
+censor <- select(censor, pid, assess_type, died, hosp, ab_var_names)
+out <- select(out, pid, assess_type, died, hosp, ab_var_names)
+rowwise_expand_and_shuffle_a_in_b2(censor, out,3,26) -> out.2
+
+# add arm and strip out a4s
+
+out.2 <- merge(out.2, select(enroll, pid, arm), all.x = T)
+
+subset(out.2, !is.na(arm)) -> out.2
+out.2 <- select(out.2, -arm)
+
+# add in d0 hosp = 1 for all arm 1 and 2
+
+d0add <- enroll %>% filter(arm ==1 | arm == 2) %>% select(pid)
+
+d0add$assess_type <- 0
+d0add$hosp <- 1
+d0add$died <- 0
+
+col_add <- rep(0, length(ab_var_names))
+names(col_add) <- ab_var_names
+d0add %>% add_column(!!!col_add[!names(col_add) %in% names(.)]) -> d0add
+rm(col_add)
+
+d0add[names(out.2)] -> d0add
+
+rowwise_expand_and_shuffle_a_in_b2(d0add, out.2,3,26) -> out.2
+
+## check dat ting
+
+as.data.frame(subset(out.2, pid == sample(unique(out.2$pid),1)))
+
+
+
+# add death by just mergin in then strip_post_dropout_rows
+
+
+out.2 %>% group_by(pid) %>% do(strip_post_dropout_rows(.)) -> out
+
+####
+
+
+
+
