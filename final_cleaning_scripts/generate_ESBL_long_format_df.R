@@ -225,7 +225,7 @@ identical(names(expanded.outcome), names(df))
 
 df[is.na(df)] <- 0
 
-merge_longit_dfs(df,expanded.outcome, 5,26, ditch_dfa_after_dc = TRUE) -> out
+merge_longit_dfs(df,expanded.outcome, 4,26, ditch_dfa_after_dc = TRUE) -> out
 
 ## now add in followup
 
@@ -397,15 +397,90 @@ rowwise_expand_and_shuffle_a_in_b2(d0add, out.2,3,26) -> out.2
 
 as.data.frame(subset(out.2, pid == sample(unique(out.2$pid),1)))
 
+# add arm3 day 0
+
+a3.add <- enroll %>% filter(arm == 3) %>% select(pid)
+
+a3.add$assess_type <- 0
+a3.add$hosp <- 0
+a3.add$died <- 0
+
+col_add <- rep(0, length(ab_var_names))
+names(col_add) <- ab_var_names
+a3.add %>% add_column(!!!col_add[!names(col_add) %in% names(.)]) -> a3.add
+rm(col_add)
+
+a3.add[names(out)] -> a3.add
+
+rowwise_expand_and_shuffle_a_in_b2(a3.add, out.2,3,26) -> out.2
 
 
-# add death by just mergin in then strip_post_dropout_rows
+# add in tb therapy at baseline
+
+tb.bl <- enroll %>% filter(tbongoing == "Yes") %>% select(pid, arm, tbrxstart, tbrxend, enroll_date)
+
+tb.bl$tbrxstart <- as.Date(tb.bl$tbrxstart, "%d%b%Y")
+tb.bl$tb <- as.numeric(tb.bl$enroll_date - tb.bl$tbrxstart)
+tb.bl <- filter(tb.bl, tb < 168)
+tb.bl$died <- 0
+tb.bl$hosp <- 0
+
+col_add <- rep(0, length(ab_var_names))
+names(col_add) <- ab_var_names
+tb.bl %>% add_column(!!!col_add[!names(col_add) %in% names(.)]) -> tb.bl
+rm(col_add)
+
+tb.bl$assess_type <- 0
+tb.bl[names(out.2)] -> tb.bl
+
+rowwise_expand_and_shuffle_a_in_b2(tb.bl, out.2,3,26) -> out
 
 
-out.2 %>% group_by(pid) %>% do(strip_post_dropout_rows(.)) -> out
+
+### strip rows post death
+
+out %>% filter(assess_type >= 0) %>% group_by(pid) %>% do(strip_post_dropout_rows(.)) -> out
 
 ####
 
+out %>% group_by(pid) %>% do(uncompress_covariates(.)) -> outlong
+
+as.data.frame(subset(outlong, pid == sample(unique(outlong$pid),1)))
+
+outlong <- merge(outlong, select(enroll, pid, arm))
+
+outlong %>% select(-c(pid, died)) %>% pivot_longer(-c(assess_type, arm)) %>%
+  group_by(arm, assess_type, name) %>% summarise(n = n(), x = sum(value == 1), prop = x/n) -> sumz
+
+# extractor fns
+
+extract_covariate_exposure <- function(dfin, a,b, endtime) {
+  dfin <- as.data.frame(dfin)
+  pid <- dfin$pid[1]
+  dftemp <- uncompress_covariates(dfin)
+  dftemp <- subset(dftemp, assess_type <= endtime)
+  #apply(dftemp[,a:b],2, sum)
+  cbind(pid,as.data.frame(t(apply(dftemp[,a:b],2, sum)))) -> dftemp
+  dftemp$pid <- as.character(dftemp$pid)
+  return(dftemp)
+  
+}
+
+d28_exp <- out %>% group_by(pid) %>% do(extract_covariate_exposure(., 4,26,28))
+
+d28_exp <- merge(d28_exp, select(enroll, pid, arm))
 
 
+d28_exp %>% pivot_longer(-c(pid, arm)) %>%
+  group_by(arm,name) %>%
+  summarise(median = median(value),
+            lq = quantile(value, 0.25),
+            uq = quantile(value, 0.75)) -> d28_exp_sum
+
+tot_exp <- out %>% group_by(pid) %>% do(extract_covariate_exposure(., 4,26,10000))
+
+tot_exp <- merge(tot_exp, select(enroll, pid, arm))
+
+as.data.frame(tot_exp %>% pivot_longer(-c(pid, arm)) %>%
+  group_by(arm,name) %>% filter(arm ==2, value > 0, name != "hosp"))
 
