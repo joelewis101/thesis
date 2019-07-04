@@ -93,3 +93,16 @@ merge_longit_dfs <- function(dfa, dfb, covariate_start_row, covariate_end_row, d
   ) -> df.out
   return(df.out)
 }
+
+# and to it rowwsie on df a
+
+rowwise_expand_and_shuffle_a_in_b2 <- function(dfa, dfb, a, b) {
+  for (i in 1:nrow(dfa)) {
+    dfb <- merge_longit_dfs(
+      expand_covariates(dfa[i,], a, b),
+      dfb,
+      a,b,
+    )
+  }
+  return(dfb)
+}
