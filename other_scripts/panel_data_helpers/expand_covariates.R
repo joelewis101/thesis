@@ -38,7 +38,7 @@ expand_covariates <- function(dfin, a, b) {
     
     newrow$assess_type[1] = dfin$assess_type[nrow(dfin)] + dfin[nrow(dfin), mincol + a - 1]
     #newrow$hosp[1] <- 0
-    newrow$data_date <- newrow$data_date + newrow$assess_type
+   # newrow$data_date <- newrow$data_date + newrow$assess_type
     newrow[,a:b] <- newrow[,a:b] - dfin[nrow(dfin), mincol + a -1]
     dfin[nrow(dfin), a:b][!is.na(dfin[nrow(dfin), a:b])] <- 1
     dfout <- rbind(dfin,newrow)
@@ -46,3 +46,4 @@ expand_covariates <- function(dfin, a, b) {
     return(expand_covariates(dfout, a, b))
   }
 }
+
