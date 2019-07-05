@@ -24,9 +24,9 @@ post72$enroll_date <- as.Date(post72$enroll_date, "%d%b%Y")
 # remove no PIDs
 
 
-print("checking for forms with no PID...")
+#print("checking for forms with no PID...")
 
-print(subset(post72, !(grepl("DAS", post72$pid))))
+#print(subset(post72, !(grepl("DAS", post72$pid))))
 
 #cont <- readline("Continue and delete these?")
 #if (cont == "N") {stop()}
@@ -55,8 +55,8 @@ post72$assess_type <- as.numeric(post72$data_date - post72$enroll_date)
 
 negative_assess_type <- post72$pid[post72$assess_type < 0]
 
-print("forms with date before enrollment follow")
-print(subset(post72, assess_type < 0))
+#print("forms with date before enrollment follow")
+#print(subset(post72, assess_type < 0))
 
 
 
@@ -81,8 +81,8 @@ two.forms.one.day <- sm$pid[apply(sm[, -1], MARGIN = 1, function(x) any(x > 1))]
 tf <- subset(post72, pid %in% two.forms.one.day)
 #tf[order(tf$pid, tf$assess_type),]
 
-print("forms with two on one day follow")
-print(two.forms.one.day)
+#print("forms with two on one day follow")
+#print(two.forms.one.day)
 
 
 cat("\n")

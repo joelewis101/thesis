@@ -31,7 +31,7 @@ find_double_scanned(upto72)
 
 print("checking for forms with no PID...")
 
-print(subset(upto72, !(grepl("DAS", upto72$pid))))
+#print(subset(upto72, !(grepl("DAS", upto72$pid))))
 print("deleting any that are there")
 #cont <- readline("Continue and delete these?")
 

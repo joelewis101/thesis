@@ -66,9 +66,9 @@ print("cleaning hourly ...")
 #hourly$pid[hourly$pid == "DAS14174A"] <- "DAS1474A"
 
 
-print("checking for forms with no PID...")
+#print("checking for forms with no PID...")
 
-print(subset(hourly, !(grepl("DAS", hourly$pid))))
+#print(subset(hourly, !(grepl("DAS", hourly$pid))))
 
 #cont <- readline("Continue and delete these?")
 #if (cont == "N") {stop()}
@@ -209,9 +209,9 @@ n_forms.not.6$comments[n_forms.not.6$Var1 == "DAS1506Q"] <- "Correct, discharged
 n_forms.not.6$comments[n_forms.not.6$Var1 == "DAS1507O"] <- "Correct, discharged at h4"
 n_forms.not.6$comments[n_forms.not.6$Var1 == "DAS1509K"] <- "Extra hr6 -> hr 7 - leave as is"
 
-print("number of forms for each pid. SHould be 6. If not, go and do something about it ...")
+#print("number of forms for each pid. SHould be 6. If not, go and do something about it ...")
 
-print(n_forms.not.6)
+#print(n_forms.not.6)
 #write.csv(n_forms.not.6, "/Users/joelewis/Documents/PhD/datasets/6hr/missing6hr_forms.csv")
 
 #cont <- readline("Continue?")
@@ -235,8 +235,8 @@ pids <- select(enroll, pid, arm, data_date)
 pids <- subset(pids, arm == 1 | arm == 4)
 pids <- subset(pids, !(pid %in% hourly$pid))
 
-print("PIDs completely missing hourly forms")
-print(pids)
+#print("PIDs completely missing hourly forms")
+#print(pids)
 #write.csv(pids, "/Users/joelewis/Documents/PhD/datasets/6hr/missing6hr_patients.csv")
 
 #cont <- readline("Continue?")
@@ -320,9 +320,9 @@ hourly$assess_type[hourly$pid == "DAS1261X" & hourly$assess_time == "16:00"] <- 
 hourly$assess_type[hourly$pid == "DAS12505" & hourly$assess_time == "11:00"] <- 1
 
 
-print("checking for missing assess_type...")
-print("should be none!")
-print(subset(hourly, is.na(assess_type)))
+#print("checking for missing assess_type...")
+#print("should be none!")
+#print(subset(hourly, is.na(assess_type)))
 #cont <- readline("Continue?")
 #if (cont == "N") {stop()}
 
@@ -355,19 +355,19 @@ hourly$discharged[is.na(hourly$discharged) & !is.na(hourly$sbp)] <- 0
 hourly$died[is.na(hourly$died) & hourly$discharged == 1] <- 0
 hourly$discharged[is.na(hourly$discharged) & hourly$died == 1] <- 0
 
-print("missing died ....")
+#print("missing died ....")
 
-subset(hourly, is.na(died))
-subset(hourly, is.na(discharged))
+#subset(hourly, is.na(died))
+#subset(hourly, is.na(discharged))
 
 
 ###############################################################
 ###### CLEAN UP ANTIBIOTICS ################################
 ###############################################################
 
-print("This is summary of what;s in the amicro vars")
-hourly[hourly == "CEFTRIAZONE"] <- "CEFTRIAXONE"
-hourly[hourly == ""] <- NA
+#print("This is summary of what;s in the amicro vars")
+#hourly[hourly == "CEFTRIAZONE"] <- "CEFTRIAXONE"
+#hourly[hourly == ""] <- NA
 
 #print("check that there aren't any abx names in anything other than amicro1 and 2")
 
@@ -412,8 +412,8 @@ hourly$amicro1[hourly$amicro1 == "DIAZEPUM"] <- NA
 hourly$amicro1[hourly$amicro1 == "METRONIDAZOLER"] <- "METRONIDAZOLE"
 
 
-print("amicro1")
-print(table(hourly$amicro1))
+#print("amicro1")
+#print(table(hourly$amicro1))
 
 
 
@@ -433,13 +433,13 @@ hourly$amicro2[hourly$pid == "DAS12361" & hourly$assess_type == 4] <- NA
 hourly$amicro2[hourly$pid == "DAS1245X" & hourly$assess_type == 3] <- NA
 
 
-print("amicro2")
-print(table(hourly$amicro2))
+#print("amicro2")
+#print(table(hourly$amicro2))
 
 hourly$amicro3[hourly$pid == "DAS1473C" & hourly$assess_type == 2] <- NA
 
-print("amicro3")
-print(table(hourly$amicro3))
+#print("amicro3")
+#print(table(hourly$amicro3))
 
 
 hourly$amicro4[hourly$pid == "DAS1120P" & hourly$assess_type == 1] <- NA
@@ -447,8 +447,8 @@ hourly$amicro4[hourly$amicro4 == "I"] <- NA
 hourly$amicro4[hourly$pid == "DAS10577" & hourly$assess_type == 1] <- NA
 hourly$amicro4[hourly$pid == "DAS1253X" & hourly$assess_type == 1] <- NA
 
-print("amicro4")
-print(table(hourly$amicro4))
+#print("amicro4")
+#print(table(hourly$amicro4))
 
 hourly$amicro5[hourly$pid == "DAS1093X" & hourly$assess_type == 6] <- NA
 hourly$amicro5[hourly$pid == "DAS10577" & hourly$assess_type == 2] <- NA
@@ -458,14 +458,14 @@ hourly$amicro5[hourly$pid == "DAS1261X" & hourly$assess_type == 3] <- NA
 hourly$amicro5[hourly$pid == "DAS1435O" & hourly$assess_type == 1] <- NA
 hourly$amicro5[hourly$pid == "DAS1055B" & hourly$assess_type == 4] <- NA
 
-print("amicro5")
-print(table(hourly$amicro5))
+#print("amicro5")
+#print(table(hourly$amicro5))
 
 hourly$amicro6[hourly$amicro6 == "I" | hourly$amicro6 == " I"] <- NA
 hourly$amicro6[hourly$pid == "DAS1293K" & hourly$assess_type == "2"] <- NA
 
-print("amicro6")
-print(table(hourly$amicro6))
+#print("amicro6")
+#print(table(hourly$amicro6))
 
 #cont <- readline("Continue?")
 #if (cont == "N") {stop()}
@@ -479,26 +479,26 @@ hourly$amicro_time1[hourly$amicro_time1 == ":    "] <- NA
 hourly$amicro_time2[hourly$amicro_time2 == ":    "] <- NA
 hourly$amicro_time2[hourly$amicro_time2 == ":1   "] <- NA
 
-print("forms lacking abx but having time - amicro1")
-print(subset(hourly, is.na(hourly$amicro1) & !is.na(hourly$amicro_time1)))
+#print("forms lacking abx but having time - amicro1")
+#print(subset(hourly, is.na(hourly$amicro1) & !is.na(hourly$amicro_time1)))
 
 ### check all of these with the data team
 #write.csv(subset(hourly, is.na(hourly$amicro1) & !is.na(hourly$amicro_time1)), "/Users/joelewis/Documents/PhD/R/PhD/cleaning_script/data_queries/hourly_missing_amicro1.csv")
 
-print("forms lacking time but having abx- amicro1")
-print(subset(hourly, !is.na(hourly$amicro1) & is.na(hourly$amicro1)))
+#print("forms lacking time but having abx- amicro1")
+#print(subset(hourly, !is.na(hourly$amicro1) & is.na(hourly$amicro1)))
 
-print("forms lacking abx but having time - amicro2")
+#print("forms lacking abx but having time - amicro2")
 
-print(subset(hourly, is.na(hourly$amicro2) & !is.na(hourly$amicro_time2)))
-print("forms lacking time but having abx- amicro2")
-print(subset(hourly, !is.na(hourly$amicro2) & is.na(hourly$amicro2)))
+#print(subset(hourly, is.na(hourly$amicro2) & !is.na(hourly$amicro_time2)))
+#print("forms lacking time but having abx- amicro2")
+#print(subset(hourly, !is.na(hourly$amicro2) & is.na(hourly$amicro2)))
 
 #cont <- readline("Continue and make all of these ceftriaxone?")
 #if (cont == "N") {stop()}
 
-print("Making all these ceftriaxone")
-hourly$amicro1[is.na(hourly$amicro1) & !is.na(hourly$amicro_time1)] <-  "CEFTRIAXONE"
+#print("Making all these ceftriaxone")
+#hourly$amicro1[is.na(hourly$amicro1) & !is.na(hourly$amicro_time1)] <-  "CEFTRIAXONE"
 
 
 ### check for impossible times
@@ -508,46 +508,46 @@ hourly$amicro1[is.na(hourly$amicro1) & !is.na(hourly$amicro_time1)] <-  "CEFTRIA
 ###### CLEAN UP FLUIDS ########################################
 ###############################################################
 
-print("This is summary of what;s in the fluid vars")
-print("fluid1")
-print(table(hourly$fluid1))
-print("fluid2")
-print(table(hourly$fluid2))
-print("fluid3")
-print(table(hourly$fluid3))
-print("fluid4")
-print(table(hourly$fluid4))
+#print("This is summary of what;s in the fluid vars")
+#print("fluid1")
+#print(table(hourly$fluid1))
+#print("fluid2")
+#print(table(hourly$fluid2))
+#print("fluid3")
+#print(table(hourly$fluid3))
+#print("fluid4")
+#print(table(hourly$fluid4))
 
-print("fluid5 - all of this will be set to NA - check that is what you want")
-print(table(hourly$fluid5))
-hourly$fluid5[!is.na(hourly$fluid5)] <- NA
+#print("fluid5 - all of this will be set to NA - check that is what you want")
+#print(table(hourly$fluid5))
+#hourly$fluid5[!is.na(hourly$fluid5)] <- NA
 
-print("fluid6 - all of this will be set to NA - check that is what you want")
-print(table(hourly$fluid6))
-hourly$fluid5[!is.na(hourly$fluid6)] <- NA
+#print("fluid6 - all of this will be set to NA - check that is what you want")
+#print(table(hourly$fluid6))
+#hourly$fluid5[!is.na(hourly$fluid6)] <- NA
 
 #cont <- readline("Continue?")
 #if (cont == "N") {stop()}
 
-print("fluid_vol1")
-print(table(hourly$fluid_vol1))
+#print("fluid_vol1")
+#print(table(hourly$fluid_vol1))
 
-print("fluid_vol2")
-print(table(hourly$fluid_vol2))
+#print("fluid_vol2")
+#print(table(hourly$fluid_vol2))
 
-print("fluid_vol3")
-print(table(hourly$fluid_vol3))
+#print("fluid_vol3")
+#print(table(hourly$fluid_vol3))
 
-print("fluid_vol4")
-print(table(hourly$fluid_vol4))
+#print("fluid_vol4")
+#print(table(hourly$fluid_vol4))
 
 hourly$fluid_vol5[hourly$pid == "DAS1167W" & hourly$assess_type == 1] <- NA
 
-print("fluid_vol5")
-print(table(hourly$fluid_vol5))
+#print("fluid_vol5")
+#print(table(hourly$fluid_vol5))
 
-print("fluid_vol6")
-print(table(hourly$fluid_vol6))
+#print("fluid_vol6")
+#print(table(hourly$fluid_vol6))
 
 #cont <- readline("Continue?")
 #if (cont == "N") {stop()}
@@ -558,7 +558,7 @@ print(table(hourly$fluid_vol6))
 
 # any of these that are misisng should be set to 999 (as per the instructions on teleform)
 
-print("missing sbp...")
+#print("missing sbp...")
 
 hourly$sbp[hourly$pid == "DAS1166Y" & hourly$assess_type == 1] <- 999
 hourly$dbp[hourly$pid == "DAS1166Y" & hourly$assess_type == 1] <- 999
@@ -586,23 +586,23 @@ hourly$oxy_suppl[hourly$pid == "DAS1336U" & hourly$assess_type == 3] <- 9
 
 
 
-subset(hourly, is.na(sbp) & !(died == 1 | discharged == 1))
+#subset(hourly, is.na(sbp) & !(died == 1 | discharged == 1))
 
-print("missing dbp...")
-print(subset(hourly, is.na(sbp) & !(died == 1 | discharged == 1)))
+#print("missing dbp...")
+#print(subset(hourly, is.na(sbp) & !(died == 1 | discharged == 1)))
 
-print("missing hrh...")
-print(subset(hourly, is.na(hrh) & !(died == 1 | discharged == 1)))
+#print("missing hrh...")
+#print(subset(hourly, is.na(hrh) & !(died == 1 | discharged == 1)))
 
 hourly$rr[hourly$pid == "DAS1020X" & hourly$assess_type == 2] <- 99
 
-print("missing rr...")
-print(subset(hourly, is.na(rr) & !(died == 1 | discharged == 1)))
+#print("missing rr...")
+#print(subset(hourly, is.na(rr) & !(died == 1 | discharged == 1)))
 
 hourly$temp[hourly$pid == "DAS1024P" & hourly$assess_type == 6] <- 99.9
 
-print("missing temp...")
-print(subset(hourly, is.na(temp) & !(died == 1 | discharged == 1)))
+#print("missing temp...")
+#print(subset(hourly, is.na(temp) & !(died == 1 | discharged == 1)))
 
 hourly$spo2[hourly$pid == "DAS1167W" & (hourly$assess_type == 4 | hourly$assess_type == 5)] <- 999
 hourly$spo2[hourly$pid == "DAS1141F" & (hourly$assess_type == 6)] <- 999
@@ -627,8 +627,8 @@ hourly$spo2[hourly$pid == "DAS11297" & (hourly$assess_type == 4)] <- 999
 hourly$spo2[hourly$pid == "DAS1345S" & (hourly$assess_type == 6)] <- 999
 hourly$spo2[hourly$pid == "DAS1364M" & (hourly$assess_type == 6)] <- 999
 
-print("missing spo2...")
-print(subset(hourly, is.na(spo2) & !(died == 1 | discharged == 1)))
+#print("missing spo2...")
+#print(subset(hourly, is.na(spo2) & !(died == 1 | discharged == 1)))
 
 
 # lots of missing oxy_supl
@@ -660,8 +660,8 @@ hourly$oxy_suppl[hourly$pid == "DAS1020X"] <- 3
 hourly$oxy_flow[hourly$pid == "DAS1020X"] <- 3
 hourly$oxy_suppl[hourly$pid == "DAS1336U" & hourly$assess_type == 2] <- 9
 
-print("missing oxy_suppl...")
-print(subset(hourly, is.na(oxy_suppl) & !(died == 1 | discharged == 1)))
+#print("missing oxy_suppl...")
+#print(subset(hourly, is.na(oxy_suppl) & !(died == 1 | discharged == 1)))
 
 # missing oxy_flow
 
@@ -693,9 +693,9 @@ hourly$oxy_flow[hourly$pid == "DAS14846" & hourly$assess_type == 4] <- 7
 
 
 
-print("missing oxy_flow")
+#print("missing oxy_flow")
 
-print(subset(hourly, is.na(oxy_flow) & oxy_suppl > 1 & oxy_suppl != 9 & !(died == 1 | discharged == 1)))
+#print(subset(hourly, is.na(oxy_flow) & oxy_suppl > 1 & oxy_suppl != 9 & !(died == 1 | discharged == 1)))
 
 hourly$gcs_m[hourly$pid == "DAS1020X" & hourly$assess_type == 3] <- 6
 hourly$gcs_m[hourly$pid == "DAS13878" & hourly$assess_type == 2] <- 9
@@ -707,8 +707,8 @@ hourly$gcs_e[hourly$pid == "DAS1336U" & hourly$assess_type == 3] <- 4
 hourly$gcs_v[hourly$pid == "DAS1336U" & hourly$assess_type == 3] <- 5
 
 
-print("missing gcs_m...")
-print(subset(hourly, is.na(gcs_m) & !(died == 1 | discharged == 1)))
+#print("missing gcs_m...")
+#print(subset(hourly, is.na(gcs_m) & !(died == 1 | discharged == 1)))
 
 hourly$gcs_v[hourly$pid == "DAS1140H" & hourly$assess_type == 2] <- 5
 hourly$gcs_e[hourly$pid == "DAS1140H" & hourly$assess_type == 2] <- 4
@@ -725,15 +725,15 @@ hourly$gcs_e[hourly$pid == "DAS11705" & hourly$assess_type == 1] <- 9
 
 hourly$gcs_e[hourly$pid == "DAS1293K" & hourly$assess_type == 2] <- 9
 
-print("missing gcs_v...")
-print(subset(hourly, is.na(gcs_v) & !(died == 1 | discharged == 1)))
+#print("missing gcs_v...")
+#print(subset(hourly, is.na(gcs_v) & !(died == 1 | discharged == 1)))
 
 hourly$gcs_e[hourly$pid == "DAS1285K" & hourly$assess_type == 5] <- 4
 
-print("missing gcs_e...")
-print(subset(hourly, is.na(gcs_e) & !(died == 1 | discharged == 1)))
+#print("missing gcs_e...")
+#print(subset(hourly, is.na(gcs_e) & !(died == 1 | discharged == 1)))
 
-print("missing sbp_pslr...")
+#print("missing sbp_pslr...")
 hourly$sbp_pslr[hourly$pid == "DAS1020X" & hourly$assess_type == 5] <- 999
 hourly$dbp_pslr[hourly$pid == "DAS1020X" & hourly$assess_type == 5] <- 999
 hourly$hr_pslr[hourly$pid == "DAS1020X" & hourly$assess_type == 5] <- 999
@@ -774,17 +774,17 @@ hourly$sbp_pslr[hourly$pid == "DAS1511W" & hourly$assess_type == 1] <- 999
 hourly$dbp_pslr[hourly$pid == "DAS1511W" & hourly$assess_type == 1] <- 999
 hourly$hr_pslr[hourly$pid == "DAS1511W" & hourly$assess_type == 1] <- 999
 
-print(subset(hourly, is.na(sbp_pslr) & !(died == 1 | discharged == 1)))
+#print(subset(hourly, is.na(sbp_pslr) & !(died == 1 | discharged == 1)))
 
-print("missing dbp_pslr...")
-print(subset(hourly, is.na(dbp_pslr) & !(died == 1 | discharged == 1)))
+#print("missing dbp_pslr...")
+#print(subset(hourly, is.na(dbp_pslr) & !(died == 1 | discharged == 1)))
 
-print("missing hr_pslr...")
-print(subset(hourly, is.na(dbp_pslr) & !(died == 1 | discharged == 1)))
+#print("missing hr_pslr...")
+#print(subset(hourly, is.na(dbp_pslr) & !(died == 1 | discharged == 1)))
 
 ## missing volume status vars ##
 
-print("missing temp_extr...")
+#print("missing temp_extr...")
 
 hourly <- ddply(hourly, "pid", make.missing.val.same.as.others.if.all.remaining.same, 18)
 
@@ -869,10 +869,10 @@ hourly$temp_extr[hourly$pid == "DAS1511W" & hourly$assess_type == 5] <- 3
 pids_missing_temp_extr <- subset(hourly, is.na(temp_extr)  & !(died == 1 | discharged == 1))
 pids_missing_temp_extr <- unique(pids_missing_temp_extr$pid)
 
-print(subset(hourly, is.na(temp_extr) & !(died == 1 | discharged == 1)))
+#print(subset(hourly, is.na(temp_extr) & !(died == 1 | discharged == 1)))
 
 
-print("missing sunk eyes...")
+#print("missing sunk eyes...")
 ## sunk eyes
 # 0  = no
 # 1 = Y
@@ -896,7 +896,7 @@ hourly$sunk_eyes[hourly$pid == "DAS14846" & hourly$assess_type == 2] <- 0
 
 hourly <- ddply(hourly, "pid", make.missing.val.same.as.others.if.all.remaining.same, 19)
 
-print((subset(hourly, is.na(sunk_eyes) & !(died == 1 | discharged == 1))))
+#print((subset(hourly, is.na(sunk_eyes) & !(died == 1 | discharged == 1))))
 
 # skin turgour
 
@@ -921,8 +921,8 @@ hourly$skin_turgor[hourly$pid == "DAS1245X" & hourly$assess_type == 3] <- 1
 hourly$skin_turgor[hourly$pid == "DAS1249S" & hourly$assess_type == 3] <- 2
 hourly$skin_turgor[hourly$pid == "DAS14854" & hourly$assess_type == 1] <- 2
 
-print("missing skin turgor")
-print((subset(hourly, is.na(skin_turgor) & !(died == 1 | discharged == 1))))
+#print("missing skin turgor")
+#print((subset(hourly, is.na(skin_turgor) & !(died == 1 | discharged == 1))))
 
 # ustand
 
@@ -937,7 +937,7 @@ hourly$ustand[hourly$pid == "DAS1200P" & hourly$assess_type == 2] <- 1
 hourly$ustand[hourly$pid == "DAS1343W" & hourly$assess_type == 1] <- 1
 hourly$ustand[hourly$pid == "DAS14113" & hourly$assess_type == 5] <- 0
 
-print((subset(hourly, is.na(ustand) & !(died == 1 | discharged == 1))))
+#print((subset(hourly, is.na(ustand) & !(died == 1 | discharged == 1))))
 
 
 
