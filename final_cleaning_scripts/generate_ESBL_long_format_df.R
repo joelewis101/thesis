@@ -464,6 +464,5 @@ out %>% filter(assess_type >= 0) %>% group_by(pid) %>% do(strip_post_dropout_row
 
 ####
 
-out %>% group_by(pid) %>% do(uncompress_covariates(.)) -> outlong
 
 write.csv(out,"data/longit_covariate_data.csv", row.names = FALSE)
