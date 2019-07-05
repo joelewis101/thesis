@@ -1,4 +1,19 @@
 
+library(plyr)
+library(reshape2)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(grid)
+library(ggpubr)
+library(pheatmap)
+library(RColorBrewer)
+library(scales)
+library(lubridate)
+library(survival)
+library(ggsci)
+library(survminer)
+
 # get ESBL data into a format where there is a row for each change in status
 
 # tehen make some extractor functions to give number of days of ab etc
@@ -13,7 +28,7 @@ source("final_cleaning_scripts/load_and_clean_hourly.R")
 source("final_cleaning_scripts/load_and_clean_upto72.R")
 source("final_cleaning_scripts/load_and_clean_post72.R")
 source("final_cleaning_scripts/load_and_clean_hosp_oc.R")
-source("final_cleaning_scripts/load_and_clean_hosp_oc.R")
+
 fum <- read.csv("/Users/joelewis/Documents/PhD/Data/Current/portal_downloads/dassim_followup_micro_raw.csv", stringsAsFactors = FALSE)
 
 #functions
@@ -22,6 +37,7 @@ source("other_scripts/panel_data_helpers/sort_out_tb_rx_on_discharge.R")
 source("other_scripts/panel_data_helpers/shuffle_a_in_b2.R")
 source("other_scripts/panel_data_helpers/strip_post_dropout_rows.R")
 source("other_scripts/panel_data_helpers/extract_covariate_exposure.R")
+source("other_scripts/panel_data_helpers/collapse_covariates.R")
 
 recode_abz <- function(upto72) {
   upto72[sapply(upto72, function(x) grepl("AMOX", x))] <- "amoxy"
@@ -95,7 +111,7 @@ upto72 %>% unique %>% pivot_longer(-c(pid, assess_type, died, discharged)) %>%
 df <- bind_rows(upto72, post72)
 
 # add in hourly my man
-
+hourly[hourly == ""] <- NA
 hourly <- select(hourly, pid, amicro1, amicro2, amicro3, amicro4, amicro5,amicro6)
 hourly$assess_type <- 0
 hourly <- recode_abz(hourly)
@@ -226,7 +242,8 @@ identical(names(expanded.outcome), names(df))
 
 df[is.na(df)] <- 0
 
-merge_longit_dfs(df,expanded.outcome, 4,26, ditch_dfa_after_dc = TRUE) -> out
+# just changed this
+merge_longit_dfs(df,expanded.outcome, 3,26, ditch_dfa_after_dc = TRUE) -> out
 
 ## now add in followup
 
@@ -276,7 +293,7 @@ fum <- filter(fum, d2visitnnewrxwhy != "CAC14R")
 fu$d2visittbstart <- as.Date(fu$d2visittbstart, "%d%b%Y")
 tb <- subset(fu, tbstart == 1)
 tb$assess_type <- as.numeric(tb$d2visittbstart - tb$enroll_date)
-tb$antinum <- 168
+tb$antinum <- 180
 tb$antibiotic <- "tb"
 
 # i've checkd the neg ones
@@ -288,7 +305,7 @@ fum$antinum[fu$antifreq == 2] <- fum$antinum[fu$antifreq == 2] * 7
 fum$antinum[fu$antifreq == 3] <- fum$antinum[fu$antifreq == 3] * 28
 
 fum$antinum[fum$ongmed == 1 & fum$antibiotic != "tb"] <- 5
-fum$antinum[fum$ongmed == 1 & fum$antibiotic == "tb"] <- 168
+fum$antinum[fum$ongmed == 1 & fum$antibiotic == "tb"] <- 180
 
 # drop tb where tb is already in
 
@@ -316,7 +333,8 @@ fum[is.na(fum)] <- 0
 
 fum[names(out)] -> fum
 
-rowwise_expand_and_shuffle_a_in_b2(fum, out,4, 26) -> out.2
+#just changed this
+rowwise_expand_and_shuffle_a_in_b2(fum, out,3, 26) -> out.2
 
 # now pull out hospitalisation and add in
 
@@ -343,7 +361,8 @@ rm(col_add)
 
 hosp[names(out.2)] -> hosp
 
-rowwise_expand_and_shuffle_a_in_b2(hosp, out.2,4,26) -> out
+# just changed this
+rowwise_expand_and_shuffle_a_in_b2(hosp, out.2,3,26) -> out
 
 ## add censor/death dates from visits df
 vb <- visits
@@ -422,7 +441,8 @@ tb.bl <- enroll %>% filter(tbongoing == "Yes") %>% select(pid, arm, tbrxstart, t
 
 tb.bl$tbrxstart <- as.Date(tb.bl$tbrxstart, "%d%b%Y")
 tb.bl$tb <- as.numeric(tb.bl$enroll_date - tb.bl$tbrxstart)
-tb.bl <- filter(tb.bl, tb < 168)
+tb.bl <- filter(tb.bl, tb < 180)
+tb.bl$tb <- 180 - tb.bl$tb
 tb.bl$died <- 0
 tb.bl$hosp <- 0
 
@@ -446,32 +466,4 @@ out %>% filter(assess_type >= 0) %>% group_by(pid) %>% do(strip_post_dropout_row
 
 out %>% group_by(pid) %>% do(uncompress_covariates(.)) -> outlong
 
-as.data.frame(subset(outlong, pid == sample(unique(outlong$pid),1)))
-
-outlong <- merge(outlong, select(enroll, pid, arm))
-
-outlong %>% select(-c(pid, died)) %>% pivot_longer(-c(assess_type, arm)) %>%
-  group_by(arm, assess_type, name) %>% summarise(n = n(), x = sum(value == 1), prop = x/n) -> sumz
-
-# extractor fns
-
-
-
-d28_exp <- out %>% group_by(pid) %>% do(extract_covariate_exposure(., 4,26,28))
-
-d28_exp <- merge(d28_exp, select(enroll, pid, arm))
-
-
-d28_exp %>% pivot_longer(-c(pid, arm)) %>%
-  group_by(arm,name) %>%
-  summarise(median = median(value),
-            lq = quantile(value, 0.25),
-            uq = quantile(value, 0.75)) -> d28_exp_sum
-
-tot_exp <- out %>% group_by(pid) %>% do(extract_covariate_exposure(., 4,26,10000))
-
-tot_exp <- merge(tot_exp, select(enroll, pid, arm))
-
-as.data.frame(tot_exp %>% pivot_longer(-c(pid, arm)) %>%
-  group_by(arm,name) %>% filter(arm ==2, value > 0, name != "hosp"))
-
+write.csv(out,"data/longit_covariate_data.csv", row.names = FALSE)
