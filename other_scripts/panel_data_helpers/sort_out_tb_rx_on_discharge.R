@@ -22,23 +22,23 @@ sort_out_tb_rx_on_discharge <- function(dfa, dfb){
     tbrxstartindex <- suppressWarnings( min(which(temp$tb == 1)))
     if (!is.infinite(tbrxstartindex)) {
       tbrxstart <- temp$assess_type[tbrxstartindex]
-      dfa$tb <- 168 - (dfa$assess_type - tbrxstart) 
+      dfa$tb <- 180 - (dfa$assess_type - tbrxstart) 
       }
     return(dfa)
     
   } else if (dfa$tb > 0) {
     if (dfa$tbongoing == 1 & !is.na(dfa$tbongoing)) {
-      dfa$tb <- 168 - as.numeric(as.Date(dfa$enroll_date) - as.Date(dfa$tbrxstart)) - dfa$assess_type
+      dfa$tb <- 180 - as.numeric(as.Date(dfa$enroll_date) - as.Date(dfa$tbrxstart)) - dfa$assess_type
     } else if (dfa$tbongoing == 0 | is.na(dfa$tbongoing)) {
       temp <- subset(dfb, pid == dfa$pid[1])
       tbrxstartindex <- suppressWarnings( min(which(temp$tb == 1)))
       if (!is.infinite(tbrxstartindex)) {
         tbrxstart <- temp$assess_type[tbrxstartindex]
       } else {tbrxstart <- dfa$assess_type}
-      dfa$tb <- 168 - (dfa$assess_type - tbrxstart)
+      dfa$tb <- 180 - (dfa$assess_type - tbrxstart)
     }
   }
-  if (dfa$tb > 168) {dfa$tb <- 168}
+  if (dfa$tb > 180) {dfa$tb <- 180}
   return(dfa)
   
 }
