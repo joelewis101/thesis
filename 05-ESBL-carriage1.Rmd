@@ -17,6 +17,7 @@ library(lubridate)
 library(survival)
 library(ggsci)
 library(survminer)
+library(glue)
 
 
 wd <- "chapter_5/"
@@ -42,6 +43,15 @@ source("final_cleaning_scripts/load_and_clean_hosp_oc.R")
 #source("final_cleaning_scripts/load_and_clean_time_to_ab.R")
 #source("final_cleaning_scripts/load_and_clean_fluid_hr1_to_6.R")
 
+#panel data helper functions
+source("other_scripts/panel_data_helpers/expand_covariates.R")
+source("other_scripts/panel_data_helpers/sort_out_tb_rx_on_discharge.R")
+source("other_scripts/panel_data_helpers/shuffle_a_in_b2.R")
+source("other_scripts/panel_data_helpers/strip_post_dropout_rows.R")
+source("other_scripts/panel_data_helpers/extract_covariate_exposure.R")
+source("other_scripts/panel_data_helpers/collapse_covariates.R")
+source("other_scripts/panel_data_helpers/ditch_everything_after_first_1.R")
+
 names(enroll)[names(enroll) == "data_date"] <- "enroll_date"
 followup <- merge(followup, select(enroll, pid, arm, enroll_date), all.x = T)
 followup$t <- followup$data_date - followup$enroll_date
@@ -60,15 +70,9 @@ followup$t <- followup$data_date - followup$enroll_date
 
 In total, 425 participants were recuited to the  study between 19th February 2017 and 2nd October 2018; 225 participants with sepsis (arm 1), 100 inpatients without antimicrobial exposure at baseline (arm 2) and 100 community members (arm 3). Flow of participants through the study is shown in Figure \@ref(fig:ESBL-consort-diag). It was often challenging to collect stool samples from participants but 87% (1416/1631) eligible patient-visits resulted in the collection of a stool sample. Drop out from the study and failure to collect stool samples were similar in arm 1 and 2 and with no apparent systematic bias, but both drop out and missing samples were less frequent in arm 3 (Figure \@ref(fig:ESBL-prop-samples)A). There was siginifcant variation in the timing of stool sample collecion, with a distribution around the ostensible collation day (Figure \@ref(fig:ESBL-prop-samples)B).
 
-The baseline characetristics of the enrolled participants are shown in Table \@tab:(dassim-2-demog). There were some important differences between the arms of the study: despite matching on age and sex, antimicrobial-unexposed participants were older. They were also less likely to be HIV-infected than participants with sepsis (13% [12/89] of those with known HIV status were HIV-infected versus 67% [143/213] with sepsis), and less likely to have been treated for TB. Sepsis participants were more likely to have recieved antimicroials or been hospitalised in the previous 4 weeks. In the community arm of the study, there were a high proportion of participants (60% [60/100]) with an unknown HIV status, and there were some differences in toilet facilities, water sources, cooking fuel and presence of animals at home across the three groups. 
+The baseline characetristics of the enrolled participants are shown in Table \@ref:(tab:dassim-2-demog). There were some important differences between the arms of the study: despite matching on age and sex, antimicrobial-unexposed participants were older. They were also less likely to be HIV-infected than participants with sepsis (13% [12/89] of those with known HIV status were HIV-infected versus 67% [143/213] with sepsis), and less likely to have been treated for TB. Sepsis participants were more likely to have recieved antimicroials or been hospitalised in the previous 4 weeks. In the community arm of the study, there were a high proportion of participants (60% [60/100]) with an unknown HIV status, and there were some differences in toilet facilities, water sources, cooking fuel and presence of animals at home across the three groups. 
 
-```{r ESBL-consort-diag, echo = F, fig.scap="ESBL carriage study recruitment and follow up.", out.extra='', fig.cap = "Study recruitment and follow up. At each time point \\textit{eligible participants} refers to participants who are known to be alive and have not withdrawn from the study by that time point, and \\textit{samples collected} refers to patients from whom a stool sample was sucessfully collectd for that visit.",  out.height = '100%', fig.align = 'center'}
-
-knitr::include_graphics(paste0(wd, "/figures/ESBLstudy_flow_diagram.odf"))
-
-```
-
-```{r ESBL-prop-samples, echo = F, warning = F, message = F,fig.scap="Missing samples and variation in sample collection time", out.extra='', fig.cap = "A: Missing stool samples stratified by arm and visit. Bar height at a given visit represents the number of eligible participants, coloured by successful sample collection (blue) or failure to collect a sample (red). B: Distribution of actual day of sample collection for ostensible day 7, 28, 90 and 180 samples showing considerable variation.",  fig.height = 3, fig.width=8, fig.align = 'center'}
+```{r ESBL-prop-samples, echo = F, warning = F, message = F,fig.scap="Missing samples and variation in sample collection time", out.extra='', fig.cap = "A: Missing stool samples stratified by arm and visit. Bar height at a given visit represents the number of eligible participants, coloured by successful sample collection (blue) or failure to collect a sample (red). B: Distribution of actual day of sample collection for ostensible day 7, 28, 90 and 180 samples showing considerable variation.",  fig.height = 4, fig.width=8, fig.align = 'center'}
 
 sampls <- read.csv("chapter_5/ESBL_carriage_recruitment.csv", stringsAsFactors = F)
 
@@ -86,9 +90,17 @@ visit_names <- c(
 
 followup %>% filter(arm != 4, foutcome == 1) %>% ggplot(aes(as.numeric(t), group = as.factor(d2visit))) + geom_histogram(bins = 60) + facet_wrap(~ d2visit, scale = 'free_y', ncol = 1, strip.position = "right", labeller = as_labeller(visit_names)) + xlim(c(0,300)) + theme_bw() + xlab("Time post enrollment (days)") + ylab("n") -> p2
 
-ggarrange(ggarrange(p1,NULL, ncol = 1, nrow = 2, heights = c(1,0.1), labels = c("A",NA)),p2, ncol = 2, nrow = 1, labels = c(NA,"B"))
+ggarrange(ggarrange(NULL,p1,NULL, ncol = 1, nrow = 3, heights = c(0.15,1,0.15), labels = c(NA,"A",NA)),p2, ncol = 2, nrow = 1, labels = c(NA,"B"))
 
 ```
+
+
+```{r ESBL-consort-diag, echo = F, fig.scap="ESBL carriage study recruitment and follow up.", out.extra='', fig.cap = "Study recruitment and follow up. At each time point \\textit{eligible participants} refers to participants who are known to be alive and have not withdrawn from the study by that time point, and \\textit{samples collected} refers to patients from whom a stool sample was sucessfully collected for that visit.",  out.height = '100%', fig.align = 'center'}
+
+knitr::include_graphics(paste0(wd, "/figures/ESBLstudy_flow_diagram.odf"))
+
+```
+
 
 \renewcommand{\arraystretch}{0.8}
 
@@ -288,8 +300,212 @@ kable(select(t1,value, str1, str2, str3, p,Total), "latex", booktabs =T,
 
 ### Exposures druring the study period
 
+Exposures to antimicrobials and hospitalisation of the cohort are show in Figures \@ref(fig:ESBL-study-exp) and \@ref(fig:ESBL-a2-time-to-ab) and Table \@ref(tab:exposure-tab). Antimicrobial-unexposed inpatients had a shorter length of hospital stay than participants with sepsis (median [IQR] 2 [2-7] versus 5 [2-10] days, p = 0.002 by Kruskal-Wallace test). Despite being antimicrobial unexposed at baseline, 18/100 baseline antimicroial-unexposed inpatients received antibacterials (not including cotrimoxazole preventative therapy CPT) at some point during the study period and 2 participants received TB therapy, one of whom also received other antibacterials. Both antimicrobial exposure and hospitalisation were unusal in the community cohort; one participant received a 5-day course of amoxicillin and one participant was hospitalised for 1 day, over the entire study period. 
+
+The most commonly receievd antibacterial by participants with sepsis (apart from co-trimoxazole and TB therapy) was ceftrixaxone by some distance with 998 participant-days of expsoure in 189 participants during the study period, and a median 5 (IQR 3-7) day course on admission. Ciprofloxacin and amoxicillin were also commonly received, with 61 participants receiving 398 participant-days of exposure to ciprofloxacin with a median 7 (IQR 5-7) day course, and 39 participants receiving 235 participant-days of exposure to amoxicillin with a median 5 (IQR 5-7) day course. Inkeeping with the higher HIV prevalence, more participants with sepsis (Arm 1) were receiving CPT (44% [98/225]) that baseline antibiotic-unexposed inpatients (5% [5/100]) and community members (7% [7/100]).
 
 
+
+```{r ESBL-study-exp, echo = F, warning = F, message = F,fig.scap="Hospital and antibacterial exposure of participants", out.extra='', fig.cap = "Hospital and antibacterial exposure of participants expressed as (A) proportion of participants in the sepsis (arm 1) and inpatient antimicrobial-unexposed (arm 2) groups who are hospitalised and exposed to the most commonly received antibacterials, as a function of time and (B) participant-days of exposure to the most commonly received antibacterials (excluding TB therapy and co-trimoxazole) across the three arms of the study over the whole study period.",  fig.height = 8, fig.width=8, fig.align = 'center'}
+
+read.csv("data/longit_covariate_data.csv") -> df.covs
+
+df.covs <- merge(df.covs, select(enroll, pid, arm))
+
+
+df.covs %>% group_by(pid) %>% do(uncompress_covariates(.)) -> outlong
+df.covs.cpt <- merge(df.covs, select(enroll, pid, hivcpt), all.x = T)
+
+df.covs.cpt$hivcpt <- as.numeric(df.covs.cpt$hivcpt == "Yes")
+df.covs.cpt$cotri[df.covs.cpt$hivcpt == 1] <- 1
+df.covs.cpt <- select(df.covs.cpt, -hivcpt)
+
+df.covs.cpt %>% group_by(pid) %>% do(uncompress_covariates(.)) -> outlong.cpt
+
+abs.lookup <- c(
+  "Amoxicillin",
+  "Gentamicin",
+  "Azithromycin",
+  "TB therapy",
+  "Penicillin",
+  "Fluconazole",
+  "Ceftriaxone",
+  "Amphotericin",
+  "Quinine",
+  "Chloramphenicol",
+  "LA",
+  "Ciprofloxacin",
+  "Co-amoxiclav",
+  "Artesunate",
+  "Cotrimoxazole",
+  "Clindamycin",
+  "Doxycycline",
+  "Erythromycin",
+  "Aciclovir",
+  "Flucloxacillin",
+  "Metronidazole",
+  "Streptomycin"
+)
+
+names(abs.lookup) <- outlong %>% ungroup() %>% select(-c(pid, assess_type, died, hosp, arm)) %>% names 
+
+abs.lookup <- c(abs.lookup, "Hospitalised", "Other AB")
+names(abs.lookup) <- c(names(abs.lookup)[1:(length(abs.lookup) - 2)], "hosp", "other")
+
+#other.antibac <- c("genta", "azithro","benzy", "coamo","clinda", "doxy","erythro", "fluclox", "metro", "strepto")
+
+#apply(outlong.cpt[other.antibac],1,sum) -> outlong.cpt$other
+
+
+arm_names <- c(
+  `1` = "Arm 1: Sepsis",
+  `2` = "Arm 2: Inpatient",
+  `3` = "Arm 3: Community"
+)
+
+
+outlong.cpt %>%
+  ungroup() %>% 
+  select(-c(pid, died)) %>% filter(arm != 3) %>%
+  pivot_longer(-c(assess_type, arm)) %>%
+  group_by(arm, assess_type, name)%>%
+  summarise(n = n(), x = sum(value == 1), prop = x/n)  %>% 
+  filter(name %in% c("cefo","amoxy","hosp", "cipro", "cotri")) %>%
+  mutate(name = recode(name, !!!abs.lookup)) %>%
+  ggplot(aes(assess_type,prop, group = name, color = name, linetype = name)) +
+  geom_line(alpha = 0.8, size = 0.75) + 
+  facet_wrap(~ arm, ncol = 1, , labeller = as_labeller(arm_names)) + 
+  theme_bw() + 
+  scale_x_continuous(breaks = c(0,5,10,15,20,25,30), limits = c(0,30)) +
+  scale_linetype_manual(values = c("solid","solid","solid","solid","dashed"),
+                        breaks = c("Hospitalised", "Ceftriaxone", "Cotrimoxazole", "Ciprofloxacin", "Amoxicillin")) + 
+  scale_colour_manual(values = c("Amoxicillin" =  pal_lancet()(4)[1],
+                                 "Ceftriaxone" = pal_lancet()(4)[2],
+                                 "Ciprofloxacin" = pal_lancet()(4)[3],
+                                 "Cotrimoxazole" = pal_lancet()(4)[4],
+                                 "Hospitalised" = "black"),
+                      breaks = c("Hospitalised", "Ceftriaxone", "Cotrimoxazole", "Ciprofloxacin", "Amoxicillin")) +
+  theme(legend.title = element_blank()) + 
+  xlab("Day post enrollment") + 
+  ylab("Proportion") -> p1
+
+outlong %>% ungroup() %>% select(-c(pid, assess_type, died, hosp,tb, cotri)) %>% 
+  group_by(arm) %>% 
+  summarise_all(sum) %>%
+  pivot_longer(-arm) %>% group_by(name) %>% mutate(tots = sum(value)) %>% ungroup() %>%
+  mutate(name = recode(name, !!!abs.lookup)) %>%
+  ggplot(aes((fct_reorder(name, tots)), value)) + 
+  geom_col() + 
+  facet_wrap(~arm, scales = "free_x", labeller = as_labeller(arm_names)) +
+  coord_flip() +
+  theme_bw()  + 
+  theme(panel.spacing = unit(1,"lines")) +
+  ylab("Participant-days of exposure") +
+  xlab(element_blank()) -> p2 
+
+# cumulative fraction with no ab and no hosp
+# start with hosp
+
+abs.lookup[!names(abs.lookup) %in% c("tb","fluco", "ampho", "quin", "coart", "arte", "acicl", "flu", "hosp", "other")] -> anti_bacterials
+
+apply(df.covs[names(anti_bacterials)], 1, sum) -> df.covs$any_antibacterial
+
+df.covs$any_antibacterial[df.covs$any_antibacterial > 1] <- 1
+
+time.to.ab <- df.covs %>% group_by(pid) %>% do(ditch_everything_after_first_1(.,28))
+
+
+survfit(Surv(assess_type, any_antibacterial) ~ arm, data = subset(time.to.ab, arm == 3)) -> abfit.3
+survfit(Surv(assess_type, any_antibacterial) ~ arm, data = subset(time.to.ab, arm == 2)) -> abfit.2
+survfit(Surv(assess_type, any_antibacterial) ~ arm, data = subset(time.to.ab, arm == 1)) -> abfit.1
+
+cum.ab <- rbind(
+  data.frame(time = abfit.2$time, prop = 1- abfit.2$surv, arm = "Arm 2", stringsAsFactors = FALSE),
+  data.frame(time = abfit.1$time, prop = 1- abfit.1$surv, arm = "Arm 1", stringsAsFactors = FALSE),
+  data.frame(time = abfit.3$time, prop = 1- abfit.3$surv, arm = "Arm 3", stringsAsFactors = FALSE)
+)
+
+cum.ab %>% filter(arm != "Arm 1") %>%
+ggplot( aes(time, prop, group = arm, color = as.factor(arm))) +
+  geom_step(size = 0.75) + 
+  theme_bw() +
+  ylab("Proportion") +
+  xlab("Days post enrollment") +
+  theme(legend.title = element_blank()) +
+  scale_x_continuous(limits = c(0,190), breaks = c(0,30,60,90,120,150,180)) -> p3
+
+
+ggarrange(ggarrange(NULL,p1,widths = c(0.09,1), ncol = 2, nrow = 1, labels = c("A", NA)),
+          ggarrange(p2, NULL, nrow = 1, ncol = 2, widths = c(1,0.2), labels = c("B", NA)),
+          ncol = 1, nrow = 2)
+
+
+```
+
+```{r exposure-tab, echo = F, warning = F, message = F}
+
+df.covs %>% group_by(pid) %>% do(extract_covariate_exposure(.,4,26,0,1000)) -> hosp
+hosp <- merge(hosp, select(enroll, pid, arm))
+
+apply(hosp[names(anti_bacterials)],1,sum) -> hosp$tot.ab
+#hosp %>% group_by(arm) %>% summarise(median = median(hosp),
+#                                     lq = quantile(hosp, 0.25),
+#                                     uq = quantile(hosp,0.75))
+
+other.antibac <- c("genta", "azithro","benzy", "coamo","clinda", "doxy","erythro", "fluclox", "metro", "strepto")
+
+d0_30.exp <- df.covs.cpt %>% group_by(pid) %>% do(extract_covariate_exposure(.,4,26,0,30))
+d0_30.exp$period <- "d0-30"
+d30_90.exp <- df.covs.cpt %>% group_by(pid) %>% do(extract_covariate_exposure(.,4,26,30,90))
+d30_90.exp$period <- "d30-90"
+d90_180.exp <- df.covs.cpt %>% group_by(pid) %>% do(extract_covariate_exposure(.,4,26,90,180))
+d90_180.exp$period <- "d90-180"
+
+exposure <- bind_rows(
+  d0_30.exp,
+  d30_90.exp,
+  d90_180.exp
+)
+
+exposure$other.antibacterials <- apply(exposure[other.antibac], 1, sum)
+exposure <- merge(exposure, select(enroll, pid , arm))
+
+exposure %>% 
+  select(arm, amoxy,cefo, cipro,hosp,tb, cotri,other.antibacterials, period) %>% 
+  pivot_longer(-c(arm, period)) %>% filter(value != 0) %>%
+  group_by(arm, period,name) %>% 
+  summarise(n = n(),
+    median = median(value),
+            lq = quantile(value, 0.25),
+            uq = quantile(value, 0.75),
+    n = n()) %>%
+  mutate(str = glue('{specify_decimal(median,0)} ({specify_decimal(lq,0)}-{specify_decimal(uq,0)})'))  %>%
+  select(arm, period, name, n, str)  %>%
+  pivot_wider(names_from = arm, values_from = c(n, str), values_fill = list(n = 0, str = "-")) -> exp.tab
+
+exp.tab$name <- factor(exp.tab$name, levels = c("hosp", "cefo", "cotri", "cipro", "amoxy", "tb", "other.antibacterials"))
+
+exp.tab[order(exp.tab$period, exp.tab$name),] -> exp.tab
+
+exp.tab  %>% mutate(name = recode(name, !!!abs.lookup)) %>%
+  mutate(name = recode(name, other.antibacterials = "Other Antibacterials")) -> exp.tab
+
+kable(select(exp.tab, name, n_1, n_2, n_3, str_1, str_2, str_3), "latex", booktabs = TRUE,
+      row.names = FALSE, escape = TRUE, col.names = c("Exposure","Arm 1", "Arm 2", "Arm 3", "Arm 1", "Arm 2", "Arm 3"),
+      caption = "Antimicrobial and hospital exposure stratified by arm and study time period") %>% kable_styling(full_width = FALSE) %>%
+  pack_rows("Day 0 - 30", 1,7) %>%
+  pack_rows("Day 30 - 90", 8,14) %>%
+  pack_rows("Day 90 - 180", 15,21) %>%
+  add_header_above(c(" " = 1, "Number exposed" = 3, "Median (IQR) exposure length" = 3)) %>% 
+  footnote(general = "TB = tuberculosis. Median exposure length includes only those exposed. Other antimicrobials includes penicillin, azithromycin, co-amoxiclav, gentamicin, strepromycin, doxycycline, erythromycin, flucloxicillin, metronidazole " ,threeparttable = T, fixed_small_size = T)
+
+```
+
+```{r ESBL-a2-time-to-ab, echo = F, warning = F, message = F,fig.scap="Cumulative antibacterial exposure for baseline unexposed participants", out.extra='', fig.cap = "Cumulative exposure to antibacterials as a function of time for baseline antimicrobial unexposed inpatients (arm 2) and community members (arm 3).",  fig.height = 2, fig.width=4, fig.align = 'center'}
+
+p3
+
+```
 ### ESBL-E colonisation
 
 
