@@ -16,7 +16,7 @@ ditch_everything_after_first_1 <- function(dfin, a) {
     return(dfin[nrow(dfin),])
   } else {
     dfin <- dfin[(dfin[,a] != 0),] 
-    dfin <- subset(dfin, assess_type == max(dfin$assess_type))
+    dfin <- subset(dfin, assess_type == min(dfin$assess_type))
     return(dfin)
   }
 }
