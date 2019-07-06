@@ -42,6 +42,12 @@ source("final_cleaning_scripts/load_and_clean_post72.R")
 source("final_cleaning_scripts/load_and_clean_hosp_oc.R")
 #source("final_cleaning_scripts/load_and_clean_time_to_ab.R")
 #source("final_cleaning_scripts/load_and_clean_fluid_hr1_to_6.R")
+source("final_cleaning_scripts/load_and_clean_lims.R")
+
+# lims
+
+
+
 
 #panel data helper functions
 source("other_scripts/panel_data_helpers/expand_covariates.R")
@@ -70,7 +76,7 @@ followup$t <- followup$data_date - followup$enroll_date
 
 In total, 425 participants were recuited to the  study between 19th February 2017 and 2nd October 2018; 225 participants with sepsis (arm 1), 100 inpatients without antimicrobial exposure at baseline (arm 2) and 100 community members (arm 3). Flow of participants through the study is shown in Figure \@ref(fig:ESBL-consort-diag). It was often challenging to collect stool samples from participants but 87% (1416/1631) eligible patient-visits resulted in the collection of a stool sample. Drop out from the study and failure to collect stool samples were similar in arm 1 and 2 and with no apparent systematic bias, but both drop out and missing samples were less frequent in arm 3 (Figure \@ref(fig:ESBL-prop-samples)A). There was siginifcant variation in the timing of stool sample collecion, with a distribution around the ostensible collation day (Figure \@ref(fig:ESBL-prop-samples)B).
 
-The baseline characetristics of the enrolled participants are shown in Table \@ref:(tab:dassim-2-demog). There were some important differences between the arms of the study: despite matching on age and sex, antimicrobial-unexposed participants were older. They were also less likely to be HIV-infected than participants with sepsis (13% [12/89] of those with known HIV status were HIV-infected versus 67% [143/213] with sepsis), and less likely to have been treated for TB. Sepsis participants were more likely to have recieved antimicroials or been hospitalised in the previous 4 weeks. In the community arm of the study, there were a high proportion of participants (60% [60/100]) with an unknown HIV status, and there were some differences in toilet facilities, water sources, cooking fuel and presence of animals at home across the three groups. 
+The baseline characetristics of the enrolled participants are shown in Table \@ref(tab:dassim-2-demog). There were some important differences between the arms of the study: despite matching on age and sex, antimicrobial-unexposed participants were older. They were also less likely to be HIV-infected than participants with sepsis (13% [12/89] of those with known HIV status were HIV-infected versus 67% [143/213] with sepsis), and less likely to have been treated for TB. Sepsis participants were more likely to have recieved antimicroials or been hospitalised in the previous 4 weeks. In the community arm of the study, there were a high proportion of participants (60% [60/100]) with an unknown HIV status, and there were some differences in toilet facilities, water sources, cooking fuel and presence of animals at home across the three groups. 
 
 ```{r ESBL-prop-samples, echo = F, warning = F, message = F,fig.scap="Missing samples and variation in sample collection time", out.extra='', fig.cap = "A: Missing stool samples stratified by arm and visit. Bar height at a given visit represents the number of eligible participants, coloured by successful sample collection (blue) or failure to collect a sample (red). B: Distribution of actual day of sample collection for ostensible day 7, 28, 90 and 180 samples showing considerable variation.",  fig.height = 4, fig.width=8, fig.align = 'center'}
 
@@ -300,13 +306,13 @@ kable(select(t1,value, str1, str2, str3, p,Total), "latex", booktabs =T,
 
 ### Exposures druring the study period
 
-Exposures to antimicrobials and hospitalisation of the cohort are show in Figures \@ref(fig:ESBL-study-exp) and \@ref(fig:ESBL-a2-time-to-ab) and Table \@ref(tab:exposure-tab). Antimicrobial-unexposed inpatients had a shorter length of hospital stay than participants with sepsis (median [IQR] 2 [2-7] versus 5 [2-10] days, p = 0.002 by Kruskal-Wallace test). Despite being antimicrobial unexposed at baseline, 18/100 baseline antimicroial-unexposed inpatients received antibacterials (not including cotrimoxazole preventative therapy CPT) at some point during the study period and 2 participants received TB therapy, one of whom also received other antibacterials. Both antimicrobial exposure and hospitalisation were unusal in the community cohort; one participant received a 5-day course of amoxicillin and one participant was hospitalised for 1 day, over the entire study period. 
+Exposures to antimicrobials and hospitalisation of the cohort are shown in Figures \@ref(fig:ESBL-study-exp) and \@ref(fig:ESBL-a2-time-to-ab) and Table \@ref(tab:exposure-tab). Antimicrobial-unexposed inpatients (Arm 2 participants) had a shorter length of hospital stay than participants with sepsis (median [IQR] 2 [2-7] versus 5 [2-10] days, p = 0.002 by Kruskal-Wallace test). Five of the 100 Arm 2 participants were taking co-trimoxazole preventative therapy (CPT) at baseline, 18 received further courses of antimicrobials during the study period, and two were started on TB therapy. Some participants received combinations of these therapies, so in total 23% (23/100) Arm 2 participants received an antibacterial during the study period, most commonly within 30 days following enrollment (Figure \@ref(fig:ESBL-a2-time-to-ab)).
 
-The most commonly receievd antibacterial by participants with sepsis (apart from co-trimoxazole and TB therapy) was ceftrixaxone by some distance with 998 participant-days of expsoure in 189 participants during the study period, and a median 5 (IQR 3-7) day course on admission. Ciprofloxacin and amoxicillin were also commonly received, with 61 participants receiving 398 participant-days of exposure to ciprofloxacin with a median 7 (IQR 5-7) day course, and 39 participants receiving 235 participant-days of exposure to amoxicillin with a median 5 (IQR 5-7) day course. Inkeeping with the higher HIV prevalence, more participants with sepsis (Arm 1) were receiving CPT (44% [98/225]) that baseline antibiotic-unexposed inpatients (5% [5/100]) and community members (7% [7/100]).
+Both antimicrobial exposure and hospitalisation were unusal in the community cohort; 7% (7/100) community (Arm 3) participants were taking CPT and one received a 5-day course of amoxicillin meaning that 8% (8/100) Arm 3 participants received an antibacterial during the study period. In addition one Arm 3 participant was hospitalised for 1 day in the study period.
 
+The most commonly receievd antibacterial by participants with sepsis (apart from co-trimoxazole and TB therapy) was ceftrixaxone by some distance with 998 participant-days of expsoure in 189 participants during the study period, and a median 5 (IQR 3-7) day course on admission. Ciprofloxacin and amoxicillin were also commonly received, with 61 participants receiving 398 participant-days of exposure to ciprofloxacin with a median 7 (IQR 5-7) day course, and 39 participants receiving 235 participant-days of exposure to amoxicillin with a median 5 (IQR 5-7) day course.  Because of the chronic nature of the therapy, the greatest exposure (in terms of participant-days) were to co-trimoxazole and TB therapy, by an order of magnitude.
 
-
-```{r ESBL-study-exp, echo = F, warning = F, message = F,fig.scap="Hospital and antibacterial exposure of participants", out.extra='', fig.cap = "Hospital and antibacterial exposure of participants expressed as (A) proportion of participants in the sepsis (arm 1) and inpatient antimicrobial-unexposed (arm 2) groups who are hospitalised and exposed to the most commonly received antibacterials, as a function of time and (B) participant-days of exposure to the most commonly received antibacterials (excluding TB therapy and co-trimoxazole) across the three arms of the study over the whole study period.",  fig.height = 8, fig.width=8, fig.align = 'center'}
+```{r ESBL-study-exp, echo = F, warning = F, message = F,fig.scap="Hospital and antibacterial exposure of participants", out.extra='', fig.cap = "Hospital and antibacterial exposure of participants expressed as (A) proportion of participants in the sepsis (arm 1) and inpatient antimicrobial-unexposed (arm 2) groups who are hospitalised and exposed to the most commonly received antibacterials, as a function of time and (B) participant-days of exposure to the most commonly received antibacterials (excluding TB therapy and co-trimoxazole) across the three arms of the study over the whole study period.  ",  fig.height = 8, fig.width=8, fig.align = 'center'}
 
 read.csv("data/longit_covariate_data.csv") -> df.covs
 
@@ -370,21 +376,37 @@ outlong.cpt %>%
   pivot_longer(-c(assess_type, arm)) %>%
   group_by(arm, assess_type, name)%>%
   summarise(n = n(), x = sum(value == 1), prop = x/n)  %>% 
-  filter(name %in% c("cefo","amoxy","hosp", "cipro", "cotri")) %>%
+  filter(name %in% c("cefo","amoxy","hosp", "cipro", "cotri", "tb")) %>%
   mutate(name = recode(name, !!!abs.lookup)) %>%
   ggplot(aes(assess_type,prop, group = name, color = name, linetype = name)) +
   geom_line(alpha = 0.8, size = 0.75) + 
   facet_wrap(~ arm, ncol = 1, , labeller = as_labeller(arm_names)) + 
   theme_bw() + 
   scale_x_continuous(breaks = c(0,5,10,15,20,25,30), limits = c(0,30)) +
-  scale_linetype_manual(values = c("solid","solid","solid","solid","dashed"),
-                        breaks = c("Hospitalised", "Ceftriaxone", "Cotrimoxazole", "Ciprofloxacin", "Amoxicillin")) + 
+  scale_linetype_manual(values = c("Amoxicillin" =  "solid",
+                                   "Ceftriaxone" = "solid",
+                                   "Ciprofloxacin" = "solid",
+                                   "Cotrimoxazole" = "solid",
+                                   "Hospitalised" = "dashed",
+                                   "TB therapy" = "dotted"),
+                        breaks = c("Hospitalised",
+                                   "TB therapy" ,
+                                   "Ceftriaxone",
+                                   "Cotrimoxazole", 
+                                   "Ciprofloxacin", 
+                                   "Amoxicillin")) + 
   scale_colour_manual(values = c("Amoxicillin" =  pal_lancet()(4)[1],
                                  "Ceftriaxone" = pal_lancet()(4)[2],
                                  "Ciprofloxacin" = pal_lancet()(4)[3],
                                  "Cotrimoxazole" = pal_lancet()(4)[4],
-                                 "Hospitalised" = "black"),
-                      breaks = c("Hospitalised", "Ceftriaxone", "Cotrimoxazole", "Ciprofloxacin", "Amoxicillin")) +
+                                 "Hospitalised" = "black",
+                                 "TB therapy" = "grey20"),
+                      breaks = c("Hospitalised",
+                                 "TB therapy" ,
+                                 "Ceftriaxone",
+                                 "Cotrimoxazole", 
+                                 "Ciprofloxacin", 
+                                 "Amoxicillin")) +
   theme(legend.title = element_blank()) + 
   xlab("Day post enrollment") + 
   ylab("Proportion") -> p1
@@ -408,31 +430,27 @@ outlong %>% ungroup() %>% select(-c(pid, assess_type, died, hosp,tb, cotri)) %>%
 
 abs.lookup[!names(abs.lookup) %in% c("tb","fluco", "ampho", "quin", "coart", "arte", "acicl", "flu", "hosp", "other")] -> anti_bacterials
 
-apply(df.covs[names(anti_bacterials)], 1, sum) -> df.covs$any_antibacterial
 
-df.covs$any_antibacterial[df.covs$any_antibacterial > 1] <- 1
+apply(df.covs.cpt[c(names(anti_bacterials), "tb")], 1, sum) -> df.covs.cpt$any_antibacterial
 
-time.to.ab <- df.covs %>% group_by(pid) %>% do(ditch_everything_after_first_1(.,28))
+df.covs.cpt$any_antibacterial[df.covs.cpt$any_antibacterial > 1] <- 1
 
+time.to.ab.cot <- df.covs.cpt %>% group_by(pid) %>% do(ditch_everything_after_first_1(.,28))
 
-survfit(Surv(assess_type, any_antibacterial) ~ arm, data = subset(time.to.ab, arm == 3)) -> abfit.3
-survfit(Surv(assess_type, any_antibacterial) ~ arm, data = subset(time.to.ab, arm == 2)) -> abfit.2
-survfit(Surv(assess_type, any_antibacterial) ~ arm, data = subset(time.to.ab, arm == 1)) -> abfit.1
+#time.to.ab.cot <- filter(time.to.ab.cot, any_antibacterial > 0, arm == 3)
 
-cum.ab <- rbind(
-  data.frame(time = abfit.2$time, prop = 1- abfit.2$surv, arm = "Arm 2", stringsAsFactors = FALSE),
-  data.frame(time = abfit.1$time, prop = 1- abfit.1$surv, arm = "Arm 1", stringsAsFactors = FALSE),
-  data.frame(time = abfit.3$time, prop = 1- abfit.3$surv, arm = "Arm 3", stringsAsFactors = FALSE)
-)
-
-cum.ab %>% filter(arm != "Arm 1") %>%
-ggplot( aes(time, prop, group = arm, color = as.factor(arm))) +
-  geom_step(size = 0.75) + 
-  theme_bw() +
+time.to.ab.cot %>%
+  filter(any_antibacterial == 1) %>% 
+  group_by(arm, assess_type) %>%
+  tally() %>% group_by(arm) %>%
+  mutate(cumsm = cumsum(n)) %>% 
+  filter(arm == 2) %>% 
+  ggplot(aes(assess_type, cumsm)) +
+  geom_step(size = 0.75)  +  theme_bw() +
   ylab("Proportion") +
   xlab("Days post enrollment") +
-  theme(legend.title = element_blank()) +
-  scale_x_continuous(limits = c(0,190), breaks = c(0,30,60,90,120,150,180)) -> p3
+  theme(legend.title = element_blank()) + ylim(c(0,30)) +
+  scale_x_continuous(limits = c(0,120), breaks = c(0,30,60,90,120)) -> p3
 
 
 ggarrange(ggarrange(NULL,p1,widths = c(0.09,1), ncol = 2, nrow = 1, labels = c("A", NA)),
@@ -443,71 +461,85 @@ ggarrange(ggarrange(NULL,p1,widths = c(0.09,1), ncol = 2, nrow = 1, labels = c("
 ```
 
 ```{r exposure-tab, echo = F, warning = F, message = F}
+outlong.cpt %>% ungroup() %>% 
+  select(-c(assess_type, died)) %>% 
+  pivot_longer(-c(pid, arm)) %>% 
+  filter(value > 0) %>%
+  group_by(pid, name,arm) %>% 
+  summarise(pid.exp = sum(value)) %>% group_by(arm, name) %>%
+  summarise(n.p = length(unique(pid)),
+            exposure = sum(pid.exp),
+            median.exp.len = median(pid.exp),
+            lq.exp.len = quantile(pid.exp, 0.25),
+            uq.exp.len = quantile(pid.exp, 0.75)) -> exposures
+  
+outlong.cpt %>% group_by(arm) %>%
+  summarise(n.tot = length(unique(pid)),
+            tot.exp = length(pid)) -> tots.exposures
 
-df.covs %>% group_by(pid) %>% do(extract_covariate_exposure(.,4,26,0,1000)) -> hosp
-hosp <- merge(hosp, select(enroll, pid, arm))
+exposures <- merge(tots.exposures, exposures)
 
-apply(hosp[names(anti_bacterials)],1,sum) -> hosp$tot.ab
-#hosp %>% group_by(arm) %>% summarise(median = median(hosp),
-#                                     lq = quantile(hosp, 0.25),
-#                                     uq = quantile(hosp,0.75))
 
-other.antibac <- c("genta", "azithro","benzy", "coamo","clinda", "doxy","erythro", "fluclox", "metro", "strepto")
+exposures$exp.perc <- specify_decimal(exposures$exposure*100/exposures$tot.exp,0)
+exposures$exp.perc[exposures$exp.perc == "0"] <- "<1"
 
-d0_30.exp <- df.covs.cpt %>% group_by(pid) %>% do(extract_covariate_exposure(.,4,26,0,30))
-d0_30.exp$period <- "d0-30"
-d30_90.exp <- df.covs.cpt %>% group_by(pid) %>% do(extract_covariate_exposure(.,4,26,30,90))
-d30_90.exp$period <- "d30-90"
-d90_180.exp <- df.covs.cpt %>% group_by(pid) %>% do(extract_covariate_exposure(.,4,26,90,180))
-d90_180.exp$period <- "d90-180"
+exposures$exp.str <- as.character(exposures %>% glue_data('{exposure} ({exp.perc}%)'))
+exposures$tr.len.str <- as.character(exposures %>% glue_data('{specify_decimal(median.exp.len, 0)} ({specify_decimal(lq.exp.len,0)}-{specify_decimal(uq.exp.len,0)})'))
 
-exposure <- bind_rows(
-  d0_30.exp,
-  d30_90.exp,
-  d90_180.exp
-)
+exposures %>% select(name, arm,n.p, exp.str, tr.len.str) %>%
+  pivot_wider(names_from = arm, 
+              values_from = c(n.p, exp.str, tr.len.str),
+              values_fill= list(n.p = 0, exp.str = "0 (0%)", tr.len.str = "-")) -> exp.tab
 
-exposure$other.antibacterials <- apply(exposure[other.antibac], 1, sum)
-exposure <- merge(exposure, select(enroll, pid , arm))
+#subset(exposures, arm == 1 & name != "hosp")
+exp.tab$name <- factor(exp.tab$name, levels = c("hosp",
+                                                subset(exposures, arm == 1 & name != "hosp")$name[order(subset(exposures, arm == 1 & name != "hosp")$exposure, decreasing = T)]))
 
-exposure %>% 
-  select(arm, amoxy,cefo, cipro,hosp,tb, cotri,other.antibacterials, period) %>% 
-  pivot_longer(-c(arm, period)) %>% filter(value != 0) %>%
-  group_by(arm, period,name) %>% 
-  summarise(n = n(),
-    median = median(value),
-            lq = quantile(value, 0.25),
-            uq = quantile(value, 0.75),
-    n = n()) %>%
-  mutate(str = glue('{specify_decimal(median,0)} ({specify_decimal(lq,0)}-{specify_decimal(uq,0)})'))  %>%
-  select(arm, period, name, n, str)  %>%
-  pivot_wider(names_from = arm, values_from = c(n, str), values_fill = list(n = 0, str = "-")) -> exp.tab
+exp.tab %>% mutate(name = recode(name, !!!abs.lookup)) -> exp.tab
 
-exp.tab$name <- factor(exp.tab$name, levels = c("hosp", "cefo", "cotri", "cipro", "amoxy", "tb", "other.antibacterials"))
+exp.tab[order(exp.tab$name),] -> exp.tab
+tots.exposures %>% pivot_wider(names_from = arm, values_from = c(n.tot, tot.exp)) -> tots.exposures
+tots.exposures$name <- "Total At Risk"
+names(tots.exposures)[1:6] <- names(exp.tab)[2:7]
+tots.exposures[4:6] <- sapply(tots.exposures[4:6], as.character)
+tots.exposures <- select(tots.exposures, names(exp.tab)[1:7] )
+bind_rows(tots.exposures, exp.tab) -> exp.tab
+exp.tab[is.na(exp.tab)] <- "-"
 
-exp.tab[order(exp.tab$period, exp.tab$name),] -> exp.tab
+#exp.tab <- select(exp.tab, 
+#                  n.p_1, exp.str_1, tr.len.str_1,
+#                  n.p_2, exp.str_2, tr.len.str_2,
+ #                 n.p_3, exp.str_3, tr.len.str_3)
 
-exp.tab  %>% mutate(name = recode(name, !!!abs.lookup)) %>%
-  mutate(name = recode(name, other.antibacterials = "Other Antibacterials")) -> exp.tab
 
-kable(select(exp.tab, name, n_1, n_2, n_3, str_1, str_2, str_3), "latex", booktabs = TRUE,
-      row.names = FALSE, escape = TRUE, col.names = c("Exposure","Arm 1", "Arm 2", "Arm 3", "Arm 1", "Arm 2", "Arm 3"),
-      caption = "Antimicrobial and hospital exposure stratified by arm and study time period") %>% kable_styling(full_width = FALSE) %>%
-  pack_rows("Day 0 - 30", 1,7) %>%
-  pack_rows("Day 30 - 90", 8,14) %>%
-  pack_rows("Day 90 - 180", 15,21) %>%
-  add_header_above(c(" " = 1, "Number exposed" = 3, "Median (IQR) exposure length" = 3)) %>% 
-  footnote(general = "TB = tuberculosis. Median exposure length includes only those exposed. Other antimicrobials includes penicillin, azithromycin, co-amoxiclav, gentamicin, strepromycin, doxycycline, erythromycin, flucloxicillin, metronidazole " ,threeparttable = T, fixed_small_size = T)
+kable(exp.tab, "latex", booktabs = TRUE,
+      row.names = FALSE, escape = TRUE, col.names = c("Exposure", "Arm 1", "Arm 2", "Arm 3", "Arm 1", "Arm 2", "Arm 3", "Arm 1", "Arm 2", "Arm 3"),
+      caption = "Antimicrobial and hospital exposure stratified by arm") %>% kable_styling(full_width = FALSE, latex_options = "scale_down") %>%
+#  pack_rows("Total", 1,1) %>%
+#  pack_rows("Hospitalisation", 2,2) %>%
+ pack_rows("Exposures", 2,23) %>%
+  add_header_above(c(" " = 1, "Number exposed" = 3, "Exposure (person-days)" = 3,
+                     "Median (IQR) exposure length (days)" = 3)) %>% 
+  footnote(general = "TB = tuberculosis, LA =lumefantrine artemether. Median exposure length includes only those exposed. Total at risk shows the total number of participants and participant-days of follow up included in the study." ,threeparttable = T, fixed_small_size = T) %>% landscape()
 
 ```
 
-```{r ESBL-a2-time-to-ab, echo = F, warning = F, message = F,fig.scap="Cumulative antibacterial exposure for baseline unexposed participants", out.extra='', fig.cap = "Cumulative exposure to antibacterials as a function of time for baseline antimicrobial unexposed inpatients (arm 2) and community members (arm 3).",  fig.height = 2, fig.width=4, fig.align = 'center'}
+```{r ESBL-a2-time-to-ab, echo = F, warning = F, message = F,fig.scap="Cumulative antibacterial exposure for baseline unexposed inpatients.", out.extra='', fig.cap = "Cumulative number of arm 2 particpants exposed to antibacterials (including CPT and TB therapy) as a function of time.",  fig.height = 2, fig.width=3, fig.align = 'center'}
 
 p3
 
 ```
+
 ### ESBL-E colonisation
 
+```{r ESBL-carriage-plot}
+
+
+
+```
+### Determinents of baseline ESBL colonisation
+
+### Determinents of d28 ESBL-E acquisition
 
 ## Discussion
 
