@@ -2,15 +2,16 @@
 ### v1 25 Jan 2018 ##
 ## JL ###
 
-require(dplyr)
+require(tidyverse)
 
+cat(rep("DON'T PANIC ", 100))
 
 ### get .CSVs
 
 ### get .CSVs
 wd.lims <- "/Users/joelewis/Documents/PhD/Data/ESBL"
 
-cat(paste0("  Loading lims CSVs from ", wd.lims, "/ESBL2.csv ...  \n  "))
+cat(paste0("\nLoading lims CSVs from ", wd.lims, "/ESBL2.csv ...  \n  "))
 
 
 lims <- read.csv(paste0(wd.lims,"/ESBL2.csv"), header = TRUE, stringsAsFactors = FALSE)
@@ -144,7 +145,7 @@ lims$pid[lims$pid == "DAS13710"] <- "DAS1371O"
 
 #lims$pid[lims$pid == "DAS1412I"] <- "DAS14121"
 
-lims$pid[lims$lab_id == "CAM10M" | lims$lab_id == "CAL10R"] <- "DAS14121"
+#lims$pid[lims$lab_id == "CAM10M" | lims$lab_id == "CAL10R"] <- "DAS14121"
 
 # add CAG105 DAS1112P Negative
 
@@ -609,5 +610,93 @@ lims$visit[lims$lab_id == "CAI18Y"] <- 2
 
 
 
-cat("LIMS ESBL data now in lims.  \n  ")
-cat("Share and enjoy! \n  ")
+lims_orgs <- read.csv(paste0(wd.lims,"/ESBL_orgs.csv"), header = TRUE, stringsAsFactors = FALSE)
+lims_orgs <- select(lims_orgs,sample_number, organism)
+lims_orgs <- unique(lims_orgs)
+
+
+names(lims_orgs)[names(lims_orgs) == "sample_number"] <- "lab_id"
+
+lims_orgs <- merge(lims, lims_orgs, all.x = T)
+
+lims$ESBL[lims$ESBL != "Positive"] <- "Negative"
+
+lims$arm[lims$lab_id == "CAM172"] <- 2
+
+lims$pid[lims$lab_id == "CAN10C"] <- "DAS1898X"
+
+lims$arm[lims$lab_id == "CAE1BF"] <- 2
+
+### add dates
+
+lims_dates <- lims
+fu.merge <- followup
+enroll.merge <- enroll
+names(fu.merge)[names(fu.merge) == "d2visit"] <- "visit"
+lims_dates <- merge(lims, select(fu.merge, pid, visit, d2visitnstoolsampletype, d2visitnstoolsampledate, stoolid), by = c("pid", "visit"), all.x = T)
+
+enroll.merge$visit <- 0
+lims_dates <- merge(lims_dates, select(enroll.merge, pid, visit, enroll_date, stool, rswab, lid), by = c("pid", "visit"), all.x = T)
+
+names(lims_dates)[names(lims_dates) == "d2visitnstoolsampledate"] <- "data_date" 
+
+lims_dates$data_date <- as.Date(lims_dates$data_date, "%d%b%Y")
+lims_dates$data_date[is.na(lims_dates$data_date) & !is.na(lims_dates$enroll_date)] <-  lims_dates$enroll_date[is.na(lims_dates$data_date) & !is.na(lims_dates$enroll_date)]
+
+
+# messed up visit dates or unmatched samples. Get sample date from LIMS
+
+lims_dates$data_date[lims_dates$lab_id == "CAM10H"] <- "2017-09-15"
+lims_dates$data_date[lims_dates$lab_id == "CAC14F"] <- "2018-04-11"
+lims_dates$data_date[lims_dates$lab_id == "CAC14F"] <- "2018-04-11"
+lims_dates$data_date[lims_dates$lab_id == "CAB18S"] <- "2018-03-30"
+lims_dates$pid[lims_dates$lab_id == "CAB18S"] <- "DAS1174Y"
+
+lims_dates$data_date[lims_dates$lab_id == "CAC13E"] <- "2018-01-30"
+lims_dates$data_date[lims_dates$lab_id == "CAD141"] <- "2017-12-12"
+lims_dates$data_date[lims_dates$lab_id == "CAD118"] <- "2017-12-05"
+lims_dates$data_date[lims_dates$lab_id == "CAE12M"] <- "2017-12-11"
+lims_dates$data_date[lims_dates$lab_id == "CAE1BE"] <- "2018-10-11"
+lims_dates$data_date[lims_dates$lab_id == "CAM16Y"] <- "2018-10-24"
+lims_dates$data_date[lims_dates$lab_id == "CAN1AF"] <- "2019-02-27"
+lims_dates$data_date[lims_dates$lab_id == "CAM1AS"] <- "2018-09-05"
+lims_dates$data_date[lims_dates$lab_id == "CAH17M"] <- "2018-08-07"
+lims_dates$data_date[lims_dates$lab_id == "CAJ19G"] <- "2018-10-31"
+lims_dates$data_date[lims_dates$lab_id == "CAJ191"] <- "2019-01-10"
+lims_dates$data_date[lims_dates$lab_id == "CAH144"] <- "2018-08-14"
+lims_dates$data_date[lims_dates$lab_id == "CAH147"] <- "2018-08-29"
+lims_dates$data_date[lims_dates$lab_id == "CAH145"] <- "2018-08-27"
+
+lims_dates$data_date[lims_dates$lab_id == "CAF18G"] <- "2018-11-14"
+lims_dates$data_date[lims_dates$lab_id == "CAI18Y"] <- "2018-09-27"
+
+names(lims_dates)[names(lims_dates) == "d2visitnstoolsampletype"] <- "sample_type"
+lims_dates$sample_type[is.na(lims_dates$sample_type) & lims_dates$stool == "Yes"] <- 1
+lims_dates$sample_type[is.na(lims_dates$sample_type) & lims_dates$rswab == "Yes"] <- 2
+recode(lims_dates$sample_type, '1' = "stool", '2' = "rectal_swab") -> lims_dates$sample_type
+
+lims_dates <- dplyr::select(lims_dates,pid, lab_id,arm,visit, data_date, sample_type, ESBL) 
+lims_dates <- merge(lims_dates, select(enroll.merge, pid,enroll_date), all.x = T)
+subset(lims_dates, !is.na(enroll_date)) -> lims_dates
+lims_dates$assess_type <- as.numeric(lims_dates$data_date) - as.numeric(lims_dates$enroll_date)
+
+# clean up
+
+lims_dates <- subset(lims_dates, !(pid == "DAS11705" & visit == 4 & sample_type == "rectal_swab"))
+lims_dates <- subset(lims_dates, !(pid == "DAS1329S" & visit == 2 & is.na(sample_type)))
+lims_dates <- subset(lims_dates, !(pid == "DAS14870" & visit == 1 & assess_type == 5))
+lims_dates <- subset(lims_dates, !(pid == "DAS1533K" & visit == 2 & assess_type == 105))
+lims_dates <- subset(lims_dates, !(pid == "DAS15742" & visit == 4 & assess_type == 99))
+
+
+
+lims_dates <- unique(lims_dates)
+
+rm (enroll.merge)
+rm(fu.merge)
+
+cat("\nLIMS ESBL data now in lims  \n")
+cat("LIMS orgs in lims_orgs from.  \n")
+cat(paste0(wd.lims,"/ESBL_orgs.csv", " \n"))
+cat("Dates in  in lims_dates with dates merged from fu and enroll and cleaned.  \n")
+cat("Share and enjoy! \n")
