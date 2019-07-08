@@ -551,6 +551,7 @@ lims <- subset(lims, lab_id != "CAF11M")
 
 lims$pid[lims$lab_id == "CAL11E"] <- "DAS1899Y"
 lims$pid[lims$lab_id == "CAM11A"] <- "DAS1899Y"
+lims$pid[lims$lab_id == "CAB18S"] <- "DAS1174Y"
 
 # dupicate sampes? CAC14W, CAC14Y?
 # Keep 20 June
@@ -611,6 +612,12 @@ lims$visit[lims$lab_id == "CAI18Y"] <- 2
 
 
 lims_orgs <- read.csv(paste0(wd.lims,"/ESBL_orgs.csv"), header = TRUE, stringsAsFactors = FALSE)
+lims_sens <-  subset(lims_orgs,profile_name == "DASSIM Culture")
+
+lims_sens <- lims_sens[c(1,4,5:10)]
+lims_sens[lims_sens == ""] <- NA
+lapply(names(lims_sens),function(x) strsplit(x, "\\.")[[1]][[1]]) -> names(lims_sens)
+
 lims_orgs <- select(lims_orgs,sample_number, organism)
 lims_orgs <- unique(lims_orgs)
 
