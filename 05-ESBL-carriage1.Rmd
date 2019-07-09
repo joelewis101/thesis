@@ -18,6 +18,7 @@ library(survival)
 library(ggsci)
 library(survminer)
 library(glue)
+library(broom)
 
 
 wd <- "chapter_5/"
@@ -310,7 +311,7 @@ kable(select(t1,value, str1, str2, str3, p,Total), "latex", booktabs =T,
 
 ### Exposures druring the study period
 
-Exposures to antimicrobials and hospitalisation of the cohort are shown in Figures \@ref(fig:ESBL-study-exp) and \@ref(fig:ESBL-a2-time-to-ab) and Table \@ref(tab:exposure-tab). Antimicrobial-unexposed inpatients (Arm 2 participants) had a shorter length of hospital stay than participants with sepsis (Arm 1 participants): median (IQR) 2 (2-7) versus 5 (2-10) days, p = 0.002 by Kruskal-Wallace test. Five of the 100 Arm 2 participants were taking co-trimoxazole preventative therapy (CPT) at baseline, 18 received further courses of antimicrobials during the study period, and two were started on TB therapy. Some participants received combinations of these therapies, so in total 23% (23/100) Arm 2 participants received an antibacterial during the study period, mostly within 30 days following enrollment (Figure \@ref(fig:ESBL-a2-time-to-ab)), and most commonly ceftriaxone (Table \@ref(tab:exposure-tab)).
+Exposures to antimicrobials and hospitalisation of the cohort are shown in Figure \@ref(fig:ESBL-study-exp) and Table \@ref(tab:exposure-tab). Antimicrobial-unexposed inpatients (Arm 2 participants) had a shorter length of hospital stay than participants with sepsis (Arm 1 participants): median (IQR) 2 (2-7) versus 5 (2-10) days, p = 0.002 by Kruskal-Wallace test. Five of the 100 Arm 2 participants were taking co-trimoxazole preventative therapy (CPT) at baseline, 18 received further courses of antimicrobials during the study period, and two were started on TB therapy. Some participants received combinations of these therapies, so in total 23% (23/100) Arm 2 participants received an antibacterial during the study period, mostly within 30 days following enrollment (Figure \@ref(fig:ESBL-study-exp))), and most commonly ceftriaxone (Table \@ref(tab:exposure-tab)).
 
 Both antimicrobial exposure and hospitalisation were unusal in the community cohort; 7% (7/100) community (Arm 3) participants were taking CPT and one received a 5-day course of amoxicillin meaning that 8% (8/100) Arm 3 participants received an antibacterial during the study period. In addition one Arm 3 participant was hospitalised for 1 day in the study period. No Arm 3 participant received any TB therapy, and no Arm 2 or 3 participants received any antimalarial or antifungal therapy during the study period.
 
@@ -589,7 +590,7 @@ kable(ESBLtab, "latex", booktabs = TRUE,
 
 ```
 
-```{r ESBL-carriage-plots, echo = F, warning = F, message = F,fig.scap="ESBL colonisation prevalence as a function of time", out.extra='', fig.cap = "ESBL carriage prevalence as a function of time visualised in a number of different ways. In each case participants from Arm 2 are censored on first antimicrobial exposure and Arm 3 are censored on first antimicrobial exposure or hospitalisation. Top (A) prevalence at each visit plotted at ostensible visit time; however, the visits are in fact distributed in time themselves so the middle plot (B) is an attempt to show this by fitting a nonparametric smoothed LOESS regression line with a local linear regression. However the confidence intervals in this method are too narrow because they assume indepence of the measurements, which are in fact clustered within patients. The bottom panel (C) is an estimate of the proportion of ESBL-colonised participants from the Aalen-Johansen estimate, which is a generalisation of the Kaplan-Meier curve. This takes into account the nonindependence of the measurements, but does not take into account the interval-censored nature of the data, and transitions to and from the ESBL colonised state are hence assumed to happen halfway between measurements. The best estimate of state occupancy to account for all these difficulties requires the fitting of a Markov model: see chapter xx.",  fig.height = 8, fig.width=6, out.height = '70%', fig.align = 'center'}
+```{r ESBL-carriage-plots, echo = F, warning = F, message = F,fig.scap="ESBL colonisation prevalence as a function of time", out.extra='', fig.cap = "ESBL carriage prevalence as a function of time visualised in a number of different ways. In each case participants from Arm 2 are censored on first antimicrobial exposure and Arm 3 are censored on first antimicrobial exposure or hospitalisation. Top (A) prevalence at each visit plotted at ostensible visit time; however, the visits are in fact distributed in time themselves so the middle plot (B) is an attempt to show this by fitting a nonparametric smoothed LOESS regression line with a local linear regression. However the confidence intervals in this method are too narrow because they assume independence of the measurements, which are in fact clustered within patients. The bottom panel (C) is an estimate of the proportion of ESBL-colonised participants from the Aalen-Johansen estimate, which is a generalisation of the Kaplan-Meier curve. This takes into account the nonindependence of the measurements, but does not take into account the interval-censored nature of the data, and transitions to and from the ESBL colonised state are hence assumed to happen halfway between measurements. The best estimate of state occupancy to account for all these difficulties requires the fitting of a Markov model: see chapter xx.",  fig.height = 8, fig.width=6, out.height = '70%', fig.align = 'center'}
 
 
 p.lci <- function(x,n) {
@@ -695,7 +696,7 @@ ggarrange(p1.c,p2.c,p4.c, ncol = 1, nrow = 3, common.legend = TRUE, labels = c("
 ```
 
 
-```{r ESBL-spec-sens, echo = F, warning = F, message = F,fig.scap="Species and antimicrobial sensitivities of cultured ESBL-E", out.extra='', fig.cap = "Species (A) and antimicrobial sensitivities (B) of cultured ESBL-E",  fig.height = 4, fig.width=6, fig.align = 'center'}
+```{r ESBL-spec-sens, echo = F, warning = F, message = F,fig.scap="Species and antimicrobial sensitivities of cultured ESBL-E", out.extra='', fig.cap = "Species (A) and antimicrobial sensitivities (B) of cultured ESBL-E",  fig.height = 3, fig.width=6, fig.align = 'center'}
 
 labz <-  c(expression(italic("Escherichia coli")),
            expression(italic("Klebsiella pneumoniae")),
@@ -721,7 +722,7 @@ lims_orgs %>%
   ggplot(aes(fct_rev(organism))) + 
   geom_bar() + coord_flip() + 
   scale_x_discrete(labels = rev(labz)) +
-  xlab(element_blank()) + ylab("n") + theme_bw() -> p.org
+  xlab(element_blank()) + ylab("n") + theme_bw() + theme(axis.text = element_text(size = 8))-> p.org
 
 lims_sens[3:8][lims_sens[3:8] == "Sensitive"] <- 0
 lims_sens[3:8][lims_sens[3:8] == "Resistant" | lims_sens[3:8] == "Intermediate"] <- 1
@@ -744,7 +745,7 @@ lims_sens %>%
   facet_wrap(~ organism, ncol = 1) + 
   scale_fill_manual(values = hue_pal()(8)[c(3,1)]) +
   theme_bw() + 
-  theme(legend.title = element_blank(),legend.position = "bottom") + 
+  theme(legend.title = element_blank(),legend.position = "bottom", axis.text = element_text(size = 8)) + 
   xlab(element_blank()) +
   ylab("Propotion") -> psens
 
@@ -752,19 +753,22 @@ ggarrange(ggarrange(NULL,p.org, NULL, ncol = 1, nrow = 3, heights = c(0.4,1,0.7)
                     psens, ncol = 2, nrow = 1, labels = c(NA, "B"))
 ```
 
-### Determinents of baseline ESBL colonisation
+### Associations of ESBL colonisation
 
+I then used logistic regression to explore associations of ESBL-E colonisation at baseline Of the 420 participants with an available enrollment stool culture result, 42% (178/420) cultured at least one ESBL-E. Univariable and multivariable associations of colonisation at enrollment are shown in \@ref(tab:esbl-baseline-model). In univarible analysis HIV infection, ART and CPT are associated with ESBL-E colonisation, but this seems to be largely mediated by CPT as the HIV and CPT associations largely dissapear on multivariable modelling but the effect of CPT is still apparent (aOR 2.3 [95% CI 1.0 - 5.5]). Hospitalistion within the 4 weeks prior to admission was strongly associated with ESBL-E colonisation on multivariable modelling, though with wide confidence intervals (aOR 5.9 [95% CI 1.8-27.0]), perhaps expected as it is a rare baseline exposure. Antimicrobial exposure was not, but with confidence intervals that contained a clinially relevant effect size (aOR 1.3 [95% 0.7 - 2.6]). ESBL-E colonisation was more likely with more adults in the household (aOR 1.2 [95% CI 1.0-1.4] per exta adult) , with use of an unprotected water source (aOR 3.0 [95% CI 1.1 - 8.8]) and in the rainy season (aOR 2.2 [95% CI 1.4-3.4]); a constellation of variables that are consistent with a significant role of community faecal-oral transmission in the spread of ESBL-E. 
 
-```{r}
+To explore associations of acquisition of ESBL-E by the day 28 visit, I analysed only those participants who had no detectiable ESBL-E at basline, and an available follow up samples at 28 days +/- 14 days. These numbered 150 participants: 64 Arm 1, 37 Arm 2 and 49 Arm 3 participants, and 49% (73/77) of them had a detectable ESBL-E at day 28. Bivariable associations of ESBL-E aquistion with animicrobial and hospital exposures are shown in Figure \@ref(fig:esbl-aq-mod)A, stratified by the length of exposure; all antibacterials (including TB therapy) showed an association with ESBL-E acquisition, with a suggestion of a dose-response effect, but confidence intervals were large in many cases. Antimalarials did not show this effect though here undcertainty in the estimates precludes drawing any firm conclusions, as it does for antifungals. These relationships are very likely confounded, so shold be regarded with extreme caution; however, due to a small dataset size and collinearity, logistic regression modelling of ESBL-E acquisition (Figure \@ref(fig:esbl-aq-mod)B) produces such uncertain parameter estimates that no conclusions can be drawn. A better modelling strategy using continuous time Markov models was used to understand the drivers of ESBL-E carriage; this analysis is presented in Chapter xx.
+
+```{r esbl-baseline-model, echo = FALSE, warning = FALSE, message = FALSE}
 
 merge(enroll, subset(lims, visit == 0)) -> bl.esbl
-bl.esbl <- merge(bl.esbl, select(bloods, pid, CD4_Absolute), all.x = T )
-bl.esbl %>% select(d2arm, calc_age, ptsex, hivstatus, hivonart, hivcpt, 
+#bl.esbl <- merge(bl.esbl, select(bloods, pid, CD4_Absolute), all.x = T )
+bl.esbl %>% select(d2arm, calc_age, ptsex, hivstatus, hivonart, hivcpt, tbongoing,
                    recieved_prehosp_ab,pmhxrechospital,
                    watersource, watertreated, toilet,
                    housholdadultsno, householdchildno,
                    keepanim, 
-                   ESBL, enroll_date) -> bl.esbl
+                   ESBL, enroll_date, ) -> bl.esbl
 
 
 bl.esbl$d2arm[is.na(bl.esbl$d2arm)] <- "Arm 3 (Community)"
@@ -786,6 +790,11 @@ bl.esbl <- select(bl.esbl, -enroll_date)
 bl.esbl[bl.esbl == "Yes"] <- 1
 
 bl.esbl[bl.esbl == "No"] <- 0
+
+bl.esbl$tbongoing[bl.esbl$d2arm == "Arm 3 (Community)"] <- 0
+bl.esbl$tbongoing[is.na(bl.esbl$tbongoing)] <- 0
+bl.esbl$recieved_prehosp_ab[bl.esbl$tbongoing == 1] <- 1
+bl.esbl <- select(bl.esbl, -tbongoing)
 
 univ_or <- function(df, oc_var) {
   out <- list()
@@ -817,16 +826,142 @@ glm(ESBL ~ ., data = bl.esbl, family = 'binomial') -> mv.mod
     names(uv)[2:6] <- paste0("uv_", names(uv)[2:6] )
     names(dfout)[2:6] <- paste0("mv_", names(dfout)[2:6] )
     bl.esbl.tab <- merge(uv, dfout) %>% select(term, uv_str, uv_p.value, mv_str, mv_p.value)
-    boldrows <- bl.esbl.tab$mv_p.value < 0.05
+    bl.esbl.tab$boldrows.mv <- bl.esbl.tab$mv_p.value < 0.05
+    bl.esbl.tab$boldrows.uv <- bl.esbl.tab$uv_p.value < 0.05
     bl.esbl.tab$uv_p.value <- specify_decimal(bl.esbl.tab$uv_p.value, 3)
      bl.esbl.tab$mv_p.value <- specify_decimal(bl.esbl.tab$mv_p.value, 3)
       bl.esbl.tab$uv_p.value[ bl.esbl.tab$uv_p.value  == "0.000"] <- "<0.001" 
+      
+      recode.str <- c(calc_age = "Age (per year)",
+                      ptsexMale = "Male sex (vs female)",
+                      `d2armArm 2 (Inpatient)` = "Arm 2 (vs 1)",
+                      `d2armArm 3 (Community)` = "Arm 3 (vs 1)",
+                      
+                      hivstatusReactive = "HIV+ (vs HIV-)",
+                      hivstatusUnknown = "HIV unknown (vs HIV-)",
+                      hivcpt1 = "CPT (vs none)",
+                      hivonart1 = "ART (vs none)",
+                      tbongoing1 = "Current TB treatment",
+              
+                      pmhxrechospital1 = "Hospitalisation",
+                      recieved_prehosp_ab1 = "Antibiotics*",
+                      
+                      householdchildno = "Children (per 1)",
+                      housholdadultsno = "Adults (per 1)",
+                      keepanim1 = "Keep animals (vs not)",
+                      toilet = "Flushing toilet (vs not)",
+                      watersourceunprotected = "Unprotected water source",
+                      watertreated1 = "Treat water (vs not)",
+                      
+                      seasonrainy = "Rainy season (vs. dry)"
+                      
+                      )
+  
+      recode_factor(bl.esbl.tab$term , !!!recode.str, .ordered = TRUE)   -> bl.esbl.tab$term
+      bl.esbl.tab[order(bl.esbl.tab$term),] -> bl.esbl.tab
+      
+      bl.esbl.tab[2:3]<- sapply(bl.esbl.tab[2:3], function(x) text_spec(x, "latex", bold = bl.esbl.tab$boldrows.uv))
+           bl.esbl.tab[4:5]<- sapply(bl.esbl.tab[4:5], function(x) text_spec(x, "latex", bold = bl.esbl.tab$boldrows.mv))
+      
+      kable(select(bl.esbl.tab, -c(boldrows.mv, boldrows.uv)), "latex", booktabs = TRUE,
+      row.names = FALSE, escape = FALSE, col.names = c("Variable","OR (95\\% CI)", "p-value", "aOR (95\\% CI)", "p-value"),
+      caption = "Univariable and multivariable associations of ESBL colonisation at enrollment") %>% kable_styling(full_width = FALSE) %>%
+       pack_rows("Demographics", 1,2, bold = FALSE) %>%
+       pack_rows("Study Arm", 3,4, bold = FALSE) %>%
+       pack_rows("HIV status", 5,8, bold = FALSE) %>%
+       pack_rows("Exposures last month", 9,10, bold = FALSE) %>%
+       pack_rows("Household size", 11,13, bold = FALSE) %>%
+       pack_rows("WaSH behaviour", 14,16, bold = FALSE) %>%
+       pack_rows("Season", 17,17, bold = FALSE) %>%
+  add_header_above(c(" " = 1, "Univariable" = 2, "Multivariable" = 2)) %>% 
+  footnote(general = "CPT = Cotrimoxazole preventative therapy, ART = antiretroviral therapy, WaSH = Water, sanitation and hygiene. Entries in bold are those for which 95\\% confidence intervals do not cross 1.", symbol = "Antibiotics includes TB therapy but excludes CPT.", threeparttable = T, fixed_small_size = T) 
+      
 ```
 
 
-### Determinents of d28 ESBL-E acquisition
+```{r, esbl-aq-mod, echo = FALSE, message = FALSE, warning = FALSE, fig.scap="Associations of ESBL-E acquisition by 28 days", out.extra='', fig.cap = "Association of ESBL-E acquisition by 28 days. Bivariable (A) and multivariable (B) associations of antimicrobial and hospital exposure with acquisition of ESBL-E by 28 days. A: These plots show the proportion of participants who have no detectable ESBL-E baseline but who do at 28 days, as a function of various exposures. All antibacterials and hospitalisation show an association between exposure and ESBL-E acquisition, with a suggestion of a dose-response relationship, though confidence intervals are wide in many cases. Antimalarials show no apparent relationship though, as with fluconazole, the wide confidence intervals make it difficult to draw any conclusions. The results from logistic regression to predict ESBL-E acquisition are shown in (B); colinearity and small dataset size means that confidence intervals are so large as to make the model useless. A better approach to modelling ESBL-E acquisition, Markov modelling, is shown in Chapter xx.",  fig.height = 7, fig.width=7, fig.align = 'center'}
+
+lims_dates$delta28 <- abs(28 - lims_dates$assess_type)
+
+lims_dates %>% 
+  filter(assess_type >= 14 & assess_type <= 42) %>%
+  mutate(delta28 = abs(28-assess_type)) %>%
+  group_by(pid) %>% slice(which.min(delta28)) -> d14.42
+
+
+merge(d14.42, lims_dates %>% filter(visit == 0) %>% select(pid, ESBL), all.x = T , by = "pid") -> d14.42
+
+names(d14.42)[names(d14.42) == "ESBL.x"] <- "ESBL.d28"
+names(d14.42)[names(d14.42) == "ESBL.y"] <- "ESBL.d0"
+
+exposures.42 <- df.covs.cpt %>% group_by(pid) %>% do(extract_covariate_exposure(dfin = ., 4, 26, 0, 42))
+
+d14.42 <- merge(d14.42, exposures.42, by = "pid", all.x = T)
+
+d14.42[c(12:34)] <- apply(d14.42[c(12:34)], 2, function(x) ifelse(x > d14.42$assess_type, d14.42$assess_type, x))
+
+#d14.42 <- select(d.14.42pid, assess_type, ESBL.d0, ESBL.d28, names(exposures.42))
+
+select(d14.42, pid, assess_type, ESBL.d0, ESBL.d28, names(exposures.42)) -> d
+
+d <- filter(d,ESBL.d0 == "Negative")
+d$ESBL.d28 <- as.numeric(d$ESBL.d28 == "Positive")
+
+cutz <- c(-1,0,5, 42)
+
+cutnames <- levels(cut(d$assess_type, c(-1,0,5, 42)))
+
+out <- list()
+for (i in 1:(length(cutz)-1)) {
+  out[[i]] <- paste0(cutz[i], "-",cutz[i+1])
+}
+
+unlist(out) -> cutnewnames
+
+cutnewnames[2] <- "1-5"
+
+paste0(cutnewnames, " days") -> cutnewnames
+cutnewnames[1] <- "0 Days"
+names(cutnewnames) <- cutnames
+
+d %>% select(ESBL.d28,  amoxy, cotri, cefo, cipro, hosp, tb, coart, arte, fluco) %>%
+    pivot_longer(-ESBL.d28) %>%
+    mutate(value.cut = cut(value, c(-1,0,5, 42))) %>% 
+    group_by(name, value.cut) %>% 
+    summarise(n = n(), e = sum(ESBL.d28 == 1), prop = e/n, lci = binom.test(e,n)$conf.int[[1]], uci = binom.test(e,n)$conf.int[[2]]) %>% ungroup() %>%
+    mutate(name = recode_factor(name, !!!abs.lookup[c("amoxy", "cipro", "cotri", "cefo", "arte", "coart", "tb", "fluco","hosp")], .ordered = TRUE),
+           value.cut = recode_factor(value.cut, !!!cutnewnames, .ordered = TRUE )) %>%
+    ggplot(aes(value.cut, prop, ymin = lci, ymax = uci, group = name)) + geom_point() + geom_line() + theme_bw() + facet_wrap(~ name, ncol = 4) + 
+  geom_errorbar(width = 0) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab(element_blank()) +
+  ylab("Proportion aquire ESBL-E at 28 days") -> pa
+
+glm(ESBL.d28 ~ (cefo > 0) + (amoxy > 0) +  (cotri > 0)+ (hosp > 0) + (tb > 0) + (cipro > 0), data = d, family = 'binomial') -> m                           
+bind_cols(tidy(m),confint_tidy(m)) -> mod
+
+mod$term <- map_chr(mod$term, ~  strsplit(., ">")[[1]][[1]]) %>% str_trim
+
+mod %>% filter(term != "(Intercept)") %>% 
+  mutate(term = recode_factor(term, !!!abs.lookup[c("amoxy", "cipro", "cotri", "cefo", "tb","hosp")], .ordered = TRUE)) %>%
+           ggplot(aes(fct_rev(term), exp(estimate), ymin = exp(conf.low), ymax = exp(conf.high))) + 
+           geom_point() +
+           geom_errorbar(width = 0) +
+           coord_flip() +
+           theme_bw() +
+           geom_hline(yintercept = 1, linetype = "dashed") +
+  xlab(element_blank()) +
+  ylab("aOR of ESBL acquisition by 28 days") -> pb
+
+ggarrange(pa, 
+          ggarrange(NULL,pb, NULL, ncol = 3, nrow = 1, widths = c(0.4,1.5,0.6)),
+          ncol =1 , nrow =2, heights = c(3,1.5), labels = c("A", "B")
+)
+
+```
 
 ## Discussion
+
+I have here presented 
 
 ### Limitations
 
