@@ -66,7 +66,7 @@ add_covariate_to_state_df <- function(esbl.df, cov.df, cov.name) {
   esbl.df$cov_start_time <- NA
   esbl.df$cov_end_time <- NA
   esbl.df$prev_cov_exposure <- 0
-  esbl.df$prev_cov_stop <- NA
+  esbl.df$prev_cov_stop_time <- NA
     for (c in nrow(cov.df)) {
       if (all(is.na(cov.df[c,1:2]))) {
       # don't do anything
@@ -102,7 +102,7 @@ add_covariate_to_state_df <- function(esbl.df, cov.df, cov.name) {
     for (i in 2:nrow(esbl.df)) {
       if (any(!is.na(esbl.df$cov_end_time[1:(i-1)]))) {
         esbl.df$prev_cov_exposure[i] <- 1
-        esbl.df$prev_cov_stop[i] <- max(esbl.df$cov_end_time[1:(i-1)], na.rm = TRUE)
+        esbl.df$prev_cov_stop_time[i] <- max(esbl.df$cov_end_time[1:(i-1)], na.rm = TRUE)
       }
     }
   }
@@ -127,10 +127,4 @@ generate_stan_df <- function(df, state_var, covariate_var_list) {
   }
 }
 
-spliced$ESBL <- as.numeric(spliced$ESBL)  
 
-spliced  %>% group_by(pid) %>% do(generate_stan_df(., "ESBL", c("hosp", "abx"))) -> stan.df
-
-as.data.frame(
-  subset(stan.df, pid == sample(unique(stan.df$pid), 1))
-)
