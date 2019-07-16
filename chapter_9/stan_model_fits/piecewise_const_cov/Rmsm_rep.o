@@ -1,0 +1,43 @@
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@farm4-os0000129>
+Subject: Job 1111237: <R CMD BATCH run_stan_model_msm_replica.R> in cluster <farm4> Done
+
+Job <R CMD BATCH run_stan_model_msm_replica.R> was submitted from host <farm4-head1> by user <jl25> in cluster <farm4> at Mon Jul 15 21:53:47 2019.
+Job was executed on host(s) <4*farm4-os0000129>, in queue <long>, as user <jl25> in cluster <farm4> at Mon Jul 15 21:53:47 2019.
+</nfs/users/nfs_j/jl25> was used as the home directory.
+</nfs/users/nfs_j/jl25/stan/stan_model_msm_replica> was used as the working directory.
+Started at Mon Jul 15 21:53:47 2019.
+Terminated at Tue Jul 16 00:29:07 2019.
+Results reported at Tue Jul 16 00:29:07 2019.
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+R CMD BATCH run_stan_model_msm_replica.R
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   29084.71 sec.
+    Max Memory :                                 1693 MB
+    Average Memory :                             343.83 MB
+    Total Requested Memory :                     8000.00 MB
+    Delta Memory :                               6307.00 MB
+    Max Swap :                                   3155 MB
+    Max Processes :                              10
+    Max Threads :                                11
+    Run time :                                   9320 sec.
+    Turnaround time :                            9320 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <Rmsm_rep.e> for stderr output of this job.
+
