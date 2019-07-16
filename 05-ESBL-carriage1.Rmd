@@ -59,6 +59,7 @@ source("other_scripts/panel_data_helpers/extract_covariate_exposure.R")
 source("other_scripts/panel_data_helpers/collapse_covariates.R")
 source("other_scripts/panel_data_helpers/ditch_everything_after_first_1.R")
 source("other_scripts/panel_data_helpers/mstate_helper_functions.R")
+source("other_scripts/panel_data_helpers/splice_ESBL2.R")
 
 names(enroll)[names(enroll) == "data_date"] <- "enroll_date"
 followup <- merge(followup, select(enroll, pid, arm, enroll_date), all.x = T)
