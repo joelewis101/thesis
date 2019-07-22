@@ -1,0 +1,23 @@
+# Continuous time Markov models to understand ESBL-E carriage dynamics
+
+\chaptermark{Markov models}
+
+## Chapter Overview
+
+## Introduction and chapter aims
+
+## Methods
+
+
+
+## Results
+
+### Exploring the effect of antimicrobial expousure on carriage
+
+### Exploring bacterial species differences in carriage dynamics
+
+### Exploring genotypic differences in carriage dynamics
+
+## Discussion
+
+## Conclusion and further work
