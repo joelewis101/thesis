@@ -4,16 +4,133 @@
 
 ## Chapter Overview
 
+whatevs bru
+
 ## Introduction and chapter aims
 
 ## Methods
 
+In the broadest sense when constructing a model, our aim is to estimate the most likely values of the parameters of the model, $\theta$, given the data we have, $x$. The starting point for estimating likely parameter values, given a choice of model, is usually the _likelihood_: this is the probability of the data, given a set of parameter values. In standard probability notation, this is written as $P(x | \theta)$. In fact, this is not the quantity we are interested in; we would like to know $P(\theta | x )$: the probability of the parameter values, given the data. Both frequentist and Bayesian modelling approaches provide methods to estimate this quantity, but the starting point for both is the likelihood, $P(x| \theta)$, because it is usally much more straightforward to derive an expression for $P(x | \theta)$ rather than $P(\theta | x )$. I will here derive a general likelihood for a two state intermittentently observed process; in order to use this likelihood, it is necessary to make some assumptions about the data generating process. I have chosen to use a Markov model, and I will then derive the likelihood for this model, describe how covariates will be incorporated , describe how the model was fit - the process taking us  from the likelihood to the most likely parameter values - and finally how goodness of was fit assessed.
 
+### General form of likelihood
+
+First, I derive a general expression for the likelihood without making any assumptions about the model structure or functional form. Assume we have $N$ participants with any givenparticipant $n$ in a state $S_{n}(t)$ at time $t$: either ESBL-E colonised ($S_{n}(t) = 1$) or uncolonised ($S_{n}(t) = 1$). For each participant $n$ we have a number of measurements of $S_{n}(t)$ at a number of time points. The number of measurements varies for each participant, and can be denoted by $j_{n}$, making the time of measurements $t^n_{j_{n}}$ for patricipant $n$; and so for participant $n$ we know the  $j_{n}$ values $S_{n}(t^n_{j_{n}})$. 
+
+To arrive at the likelihood for these observations, consider first the simplest situation that we have: the measurements of ESBL status at two time points, $t_{A}$ and $t_{B}$ for a single participant, $n$. The likelihood we wish to calculate, in words, is the probability of the participant being in the second observed state at time $t_{B}$, given they were in the first state at $t_{A}$ and given the parameters of the model, $\theta$. Or, mathematically:
+
+\begin{equation} 
+P(S_{n}(t_{B}) | S_{n}(t_{A}), \theta)
+(\#eq:1)
+\end{equation} 
+
+Assuming all the observations are independent, the probability of  all of the states we have observed for this participant is the product of all the probabilities of the individual states:
+
+\begin{equation} 
+\prod^{j_{n}}_{k =2} P(S_{n}(t^n_{k}) | S_{n}(t^n_{k-1}), \theta )
+(\#eq:2)
+\end{equation} 
+
+And the probability of observing the data we have is then simply the product of the probability of all the individual transitions:
+
+\begin{equation} 
+\prod^N_{n=1}\prod^{j_{n}}_{k =2} P(S_{n}(t^n_{k}) | S_{n}(t^n_{k-1}), \theta )
+(\#eq:3)
+\end{equation} 
+
+This is the quantity that we wish to calculate: the likelihood for the observed data, $P(x|\theta)$.
+
+### Markov model likelihood
+
+In order to calculate the likelihood, we need to make some assumptions about the data generating process. In this case, I have chosen to use a Markov model. Markov models are defined by instantanous transition probabilities, analogous to the hazard of death in a survival model, which is a simple two-state Markov system. Unlike a survival model (where it is not possible to move from the death state to alive), a general Markov model is defined by a transition hazard from each state to each other state in the system. These are traditionally expressed as a Q matrix of instantaneous transition intensities (assuming a two-state system):
+
+\begin{equation} 
+\mathbf{Q}(t) = \begin{pmatrix} q_{00}(t) & q_{01}(t) \\\ q_{10}(t) & q_{11}(t) \end{pmatrix}
+(\#eq:4)
+\end{equation} 
+
+Where $q_{ij}$ represents the instantaneous transition intensity from state $i$ to state $j$. The rows of the Q-matrix must sum to 1 (every participant has to be in one state or another), so if we define the hazard of ESBL-E acquisition to be $\lambda$ and the hazard of ESBL-E loss to be $\mu$ (\@ref(fig:ESBL-twostate-diag)), the Q-matrix becomes, in our case:
+
+\begin{equation} 
+\mathbf{Q}(t) =  \begin{pmatrix} -\lambda(t) & \lambda(t) \\\ \mu(t)  & -\mu(t) \end{pmatrix} 
+(\#eq:5)
+\end{equation} 
+
+
+However, we are not interested in the Q-matrix _per se_ but rather the probability $p_{ij}$ of starting in state $i$ at time 0 and being in state $j$ at time $t$; this can be written in matrix notation as  $\mathbf{P}(t)$ and is related to $\mathbf{Q}(t)$ by the differential equations:
+
+\begin{equation} 
+\displaystyle \frac{d\mathbf{P}(t)}{dt} =  \mathbf{Q}(t) . \mathbf{P}(t)
+(\#eq:6)
+\end{equation} 
+
+Where $\mathbf{Q}(t) . \mathbf{P}(t)$ is the matrix product of $\mathbf{Q}(t)$ and $\mathbf{P}(t)$. In order to eva,uate $\mathbf{P}(t)$, therefore we need to solve this system of differential equations. However, there are limited situations in which these equations have analytic solutions. If the system has time constant or piecewise constant Q matrix the matrix exponential is a solution:
+
+\begin{equation} 
+\mathbf{P}(t) = e^{\mathbf{Q}}
+(\#eq:7)
+\end{equation} 
+
+However, there is no reason to suspect particularly that the effect of covariates on ESBL-E carriage (e.g. antimicrobials) would be stepwise constant and so a more flexible model is needed. For general time-varying transition intensities, there is no analytic solution to the above equations. However, all is not lost: we can express the likelihood in terms of the differential equations defined by the equations above  and solve them numerically in order to calculate the likelihood. The matrix notation aboev can be simplified, assuming that the system starts in state 1 or 0:
+
+\begin{equation} 
+\displaystyle \frac{dP_0(t)}{dt} = -\lambda(t) P_0(t) + \mu(t) P_1(t)
+(\#eq:8a)
+\end{equation} 
+\begin{equation} 
+\displaystyle \frac{dP_1(t)}{dt} = \lambda(t) P_0(t) - \mu(t) P_1(t)
+(\#eq:8b)
+\end{equation} 
+
+Where $P_i(t)$ is the probability of being in state $i$ at time t. Numerical ordinary differential equation (ODE) solvers can quickly solve these equations to calculate, for example, $P(S_{n}(t_{B}) | S_{n}(t_{A}), \theta)$ from the simplest example above: the probability that a participant $n$ at time $t_{B}$ is in a given state, given that they were in state $S_{n}(t_{A})$ at time $t_{A}$, and given the parameters $\theta$. This calculation can be completed for all meaurements and participants, resulting in the likelihood of the system, $P(x | \theta)$.
+
+In order to use this model for inference, two questions must be addressed: first, how to incorporate time-varying covariates; and second, how to practically fit the model. I address each of these questions below.
+
+```{r ESBL-twostate-diag, echo = F, warning = F, message = F,fig.scap='Two state ESBL-E model', out.extra='', fig.cap = 'Two state ESBL-E model showing instanteneous hazard of ESBL-E acquisition ($\\lambda$) or loss ($\\mu$).', out.height = '20%',fig.align = 'center'}
+
+
+knitr::include_graphics("chapter_9/state_diag.png")
+```
+
+### Incorporating covariates: a proportional hazard model
+
+I have chosen to incorporate covariates using a proportional-hazards model, following both Marshall and Jones[ref] and the _msm_ package in R. In this model the transmission intensities become:
+\begin{align} 
+\lambda(t) = \lambda_{0}\exp{(\beta_0x_{0}(t) + \beta_1x_{1}(t) + ...\beta_mx_{m}(t))} \\
+\mu(t) = \mu_{0}\exp{(\alpha_0x_{0}(t) + \alpha_1x_{1}(t) + ...\alpha_mx_{m}(t))}
+(\#eq:9b)
+\end{align} 
+
+Where the $x_{k}, k = 1,2...m$ are the $m$ time-varying covariates in the model and the coefficients $\alpha_{k}$ and $\beta_{k}$ are the coefficients of these covariates; these have a straightforward interpretation in that the exponential, $e^{\alpha_{k}}$ or$e^{\beta_{k}}$ can be interpreted as a hazard ratio, as per a simple surivival model. 
+
+An assumption then needs to be made about the functional form of $x_{m}$. In a stepwise-constant covariate model in which an exposure occurs between $t_{A}$ and $t_{B}$,  $x(t)$ would take the value 1 for all $t_{A} \le t \le t_{B}$t and 0 at other times, meaning that the effect of the exposure does not persist once it ceases. Though this may be plausible for some exposures, it seems possible that antimicrobial exposure (for example) might have a longer lasting effect (perhaps mediated through the microbiota); in order to explore this possibility, it is necessary to decide on a flexible, plausible, functional form that such an effect might take. I have decided to use an exponential function, such that:
+
+\begin{equation}
+x_{k}(t) = 
+\begin{cases} 
+0  & \text{if } t < t_{A}\\
+1   & \text{if } t_{A} \le t \le t_{B}\\
+\exp{\displaystyle \frac{-(t - t_{B})}{\gamma_{k}}} & \text{if } t > t_{B}\\
+\end{cases}
+(\#eq:10)
+\end{equation}
+
+Where the parameter $\gamma_{k}$ is a model parameter for each of the covariates, to be estimated from the data, and is related to the half life, $t^{k}_{\frac{1}{2}}$ of the decay of the effect of the exposure by:
+
+\begin{equation}
+t^k_{\frac{1}{2}} = \gamma_{k}\ln(2) \approx 0.69\gamma_{k}
+(\#eq:11)
+\end{equation}
+
+From the definition of the half life of an exponential decay process. This parameterisation has the advantage that the data can fit the size of the parameters $\gamma_{k}$; if the data are more inkeeping with a stepwise effect of the covariates, then a small ($\ll 1$) $\gamma$ would approximate a step functon and this could be fit by the model. Alternatively a larger would result in the effect of the covariate persisting after exposure, but decaying over time. This allows us to test the hypothesis that antimicrobial exposure (for example) has an effect that persists once exposure finishes, by both the magnitude of the fitted $\gamma_{k}$, and comparing stepwise-constant covariate models to models incorporating the $\gamma_{k}$ parameters.
+
+### Fitting the model
+
+### Assessing goodness of fit
 
 ## Results
 
 ### Exploring the effect of antimicrobial expousure on carriage
-
+ 
 ### Exploring bacterial species differences in carriage dynamics
 
 ### Exploring genotypic differences in carriage dynamics
