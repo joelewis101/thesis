@@ -35,7 +35,7 @@ long_to_wide_panel_states <- function(dfin, state_var) {
                         tstart = dfin[[i, "assess_type"]],
                         tstop = dfin[[(i+1),"assess_type"]],
                         var_start = dfin[[i,state_var]],
-                        var_stop = dfin[[i+1,state_var]])
+                        var_stop = dfin[[i+1,state_var]], stringsAsFactors = FALSE)
       names(outdf)[4:5] <- c(paste0(state_var, "_start"), paste0(state_var, "_stop"))
       out[[i]] <- outdf
       }
@@ -45,21 +45,26 @@ long_to_wide_panel_states <- function(dfin, state_var) {
   }
 }
 
-long_to_wide_panel_covariates <- function(dfin, cov_var) {
+long_to_wide_panel_covariates <- function(dfin, cov_var, smooth = TRUE) {
   dfin <- dfin[c("pid", "assess_type", cov_var)]
   dfin <- uncompress_covariates(dfin)
+  if (smooth == TRUE) {dfin[cov_var] <- smooth(dfin[[cov_var]],2)}
   if (all(dfin[cov_var] == 0)) {
     ranges <- data.frame(V1 = NA, V2 = NA)
     names(ranges) <- c(paste0(cov_var, "_start"), paste0(cov_var ,"_end"))
   } else {
     dfin <- dfin[dfin[cov_var] == 1,]
   #dfin <- dfin[order(dfin$assess_type),]
-    tapply(dfin["assess_type"], cumsum(c(1, diff(dfin["assess_type"])) != 1), range) -> ranges
+    tapply(dfin[["assess_type"]], cumsum(c(1, diff(dfin[["assess_type"]])) != 1), range) -> ranges
     as.data.frame(do.call(rbind, ranges)) -> ranges
     names(ranges) <- c(paste0(cov_var, "_start"), paste0(cov_var ,"_end"))
   }
   return(ranges)
 }
+
+
+
+
 
 add_covariate_to_state_df <- function(esbl.df, cov.df, cov.name) {
   # assumes a two col df of start and stop times for covs -
@@ -67,7 +72,7 @@ add_covariate_to_state_df <- function(esbl.df, cov.df, cov.name) {
   esbl.df$cov_end_time <- NA
   esbl.df$prev_cov_exposure <- 0
   esbl.df$prev_cov_stop_time <- NA
-    for (c in nrow(cov.df)) {
+    for (c in 1:nrow(cov.df)) {
       if (all(is.na(cov.df[c,1:2]))) {
       # don't do anything
       } else {
@@ -80,21 +85,50 @@ add_covariate_to_state_df <- function(esbl.df, cov.df, cov.name) {
         
           # else set cov_start to cov start time and cov end to end
           # and then set hem based on tstart and tstopto make sense
-          if (cov.df[c,1] > esbl.df$tstop[e] | cov.df[c,2] < esbl.df$tstart[e]) {
-            # don't do anthing
-          } else {
-            if (!is.na(esbl.df$cov_start_time[e]) | !is.na(esbl.df$cov_end_time[e])) { 
-              stop(paste0("Overlapping intervals in add_covariate_to_state_df, pid ", esbl.df$pid[1])) }
+          if ((cov.df[c,1] == cov.df[c,2]) & cov.df[c,2] == esbl.df$tstart[e]) {
             esbl.df$cov_start_time[e] <- cov.df[c,1]
             esbl.df$cov_end_time[e] <- cov.df[c,2]
+          }  else if (cov.df[c,1] >= esbl.df$tstop[e] | cov.df[c,2] <= esbl.df$tstart[e]) {
+            
+            # don't do anthing, there is nothing in this segment
+          } else {
+            if (!is.na(esbl.df$cov_start_time[e]) | !is.na(esbl.df$cov_end_time[e])) 
+            { warning(paste0("Overlapping intervals in add_covariate_to_state_df, pid ", esbl.df$pid[1])) 
+              # if one exposure finish time wawas within 28 days 
+              # of esbl measurement and the other not, choose the closer
+              # otherwise choose the longer exposure
+              if (((cov.df[c,2] - esbl.df$tstop[e]) <= 28) & (esbl.df$cov_end_time[e] > 28)) {
+                esbl.df$cov_start_time[e] <- cov.df[c,1]
+                esbl.df$cov_end_time[e] <- cov.df[c,2]
+              } else if (((cov.df[c,2] - esbl.df$tstop[e]) > 28) & (esbl.df$cov_end_time[e] > 28)) {
+                if ((esbl.df$cov_end_time[e] - esbl.df$cov_start_time[e]) <= (cov.df[c,2] - cov.df[c,1])) {
+                  esbl.df$cov_start_time[e] <- cov.df[c,1]
+                  esbl.df$cov_end_time[e] <- cov.df[c,2]
+                }
+              }
+            }
+            
+            esbl.df$cov_start_time[e] <- cov.df[c,1]
+            esbl.df$cov_end_time[e] <- cov.df[c,2]
+            
+            ## correct starts and stops outside current time
+            
+            if (esbl.df$cov_start_time[e] < esbl.df$tstart[e]) {
+              esbl.df$cov_start_time[e] <- esbl.df$tstart[e]
+            }
+            
+            if (esbl.df$cov_end_time[e] > esbl.df$tstop[e]) {
+              esbl.df$cov_end_time[e] <- esbl.df$tstop[e]
+            }
+            
           }
      
         }
       }
-      esbl.df$cov_start_time[esbl.df$cov_start_time < esbl.df$tstart & !is.na(esbl.df$cov_start_time )] <- 
-        esbl.df$tstart[esbl.df$cov_start_time < esbl.df$tstart & !is.na(esbl.df$cov_start_time )]
-      esbl.df$cov_end_time[esbl.df$cov_end_time > esbl.df$tstop & !is.na(esbl.df$cov_end_time)] <- 
-        esbl.df$tstop[esbl.df$cov_end_time > esbl.df$tstop &  !is.na(esbl.df$cov_end_time)]
+   #   esbl.df$cov_start_time[esbl.df$cov_start_time < esbl.df$tstart & !is.na(esbl.df$cov_start_time )] <- 
+  #      esbl.df$tstart[esbl.df$cov_start_time < esbl.df$tstart & !is.na(esbl.df$cov_start_time )]
+  #    esbl.df$cov_end_time[esbl.df$cov_end_time > esbl.df$tstop & !is.na(esbl.df$cov_end_time)] <- 
+  #      esbl.df$tstop[esbl.df$cov_end_time > esbl.df$tstop &  !is.na(esbl.df$cov_end_time)]
     }
   ## add in prev_exposure
   
@@ -109,7 +143,7 @@ add_covariate_to_state_df <- function(esbl.df, cov.df, cov.name) {
   sub("cov", cov.name, names(esbl.df)) -> names(esbl.df)
   return(esbl.df)
   }
-}
+
 
 generate_stan_df <- function(df, state_var, covariate_var_list) {
   # assume handed a df with a single pid's values
@@ -127,4 +161,21 @@ generate_stan_df <- function(df, state_var, covariate_var_list) {
   }
 }
 
+
+smooth <- function(v, n=1) {
+  # n is number of contiguous 0s to smooth with ones
+  m <- n+2
+  # m is kmer length
+  for (i in 1:(length(v)-m)){
+    
+     v_sub <- v[i:(i+m-1)]
+   #  print(v_sub)
+  #   print(i)
+    if (sum(v_sub) < (m) & v_sub[1] == 1 & v_sub[m] == 1) {
+     # print("YES")
+      v[i:(i+m-1)] <- 1
+  }
+  }
+  return(v)
+}
 
