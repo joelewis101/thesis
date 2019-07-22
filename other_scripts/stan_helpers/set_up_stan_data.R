@@ -1,6 +1,6 @@
 
 ### splice in ESBL results to the covariates df
-nerate figures
+#nerate figures
 #source("chapter_5/make_consort_diagram.R")
 #source("final_cleaning_scripts/generate_visits_df.R")
 source("final_cleaning_scripts/load_and_clean_followup_and_enroll_labelled.R")
@@ -15,7 +15,7 @@ source("final_cleaning_scripts/load_and_clean_post72.R")
 source("final_cleaning_scripts/load_and_clean_hosp_oc.R")
 #source("final_cleaning_scripts/load_and_clean_time_to_ab.R")
 #source("final_cleaning_scripts/load_and_clean_fluid_hr1_to_6.R")
-
+source("other_scripts/stan_helpers/arrange_stan_df_functions.R")
 
 # lims
 
@@ -57,11 +57,17 @@ spliced$ESBL[is.na(spliced$ESBL)] <- 999
 
 spliced %>%
   rowwise() %>%
-  mutate(abx = sum(amoxy, genta, azithro, tb, benzy, cefo, chlora, cipro, coamo, cotri, clinda, doxy, erythro, fluclox, metro, strepto)) %>% ungroup() %>%
+  mutate(abx = sum(amoxy, genta, azithro, tb, benzy, cefo, chlora, cipro, coamo, clinda, doxy, erythro, fluclox, metro, strepto, cotri)) %>% ungroup() %>%
   mutate(abx = case_when(abx > 0 ~ 1,
                          abx == 0 ~ 0)) -> spliced
 
-spliced  %>% group_by(pid) %>% do(generate_stan_df(., "ESBL", c("hosp", "abx"))) -> stan.df
+spliced %>%
+  rowwise() %>%
+  mutate(blact = sum(amoxy, benzy, cefo, coamo, fluclox)) %>% ungroup() %>%
+  mutate(blact = case_when(abx > 0 ~ 1,
+                         abx == 0 ~ 0)) -> spliced
+
+spliced  %>% group_by(pid) %>% do(generate_stan_df(., "ESBL", c("hosp", "cotri", "cefo", "amoxy", "cipro", "tb"))) -> stan.df
 
 # zero times
 stan.df[c("tstart", "tstop", grep("_time", names(stan.df),value = TRUE ))] <- 
