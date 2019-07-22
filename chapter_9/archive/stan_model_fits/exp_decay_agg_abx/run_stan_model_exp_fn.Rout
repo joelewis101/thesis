@@ -1,0 +1,168 @@
+
+R version 3.5.3 (2019-03-11) -- "Great Truth"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(dplyr)
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> library(rstan)
+Loading required package: StanHeaders
+Loading required package: ggplot2
+rstan (Version 2.19.2, GitRev: 2e1f913d3ca3)
+For execution on a local, multicore CPU with excess RAM we recommend calling
+options(mc.cores = parallel::detectCores()).
+To avoid recompilation of unchanged Stan programs, we recommend calling
+rstan_options(auto_write = TRUE)
+> 
+> df_t0 <- read.csv("stan_df.csv")
+> 
+> 
+> 
+> N <- nrow(df_t0)
+> t <- df_t0$tstop
+> 
+> covariates <- as.matrix(dplyr::select(df_t0,abx_start_time, abx_end_time, hosp_start_time, hosp_end_time, prev_abx_stop_time))
+> ab_flags <- as.matrix(dplyr::select(df_t0,prev_abx_exposure, ab_this_step))
+> 
+> df_t0$p0 <- 0
+> df_t0$p1 <- 0
+> df_t0$p0[df_t0$ESBL_start == 0] <- 1
+> df_t0$p1[df_t0$ESBL_start == 1] <- 1
+> 
+> start_state = as.matrix(dplyr::select(df_t0,p0,p1))
+> end_state = df_t0$ESBL_stop
+> 
+> stan_data <- list(N = N, t = t, covariates = covariates, start_state = start_state, end_state = end_state, ab_flags = ab_flags)
+> 
+> stan_model <- "stan_model_real_data_exp_fn_loglik.stan"
+> #saveRDS(fit,"/Users/joelewis/Documents/PhD/R/PhD/stan/stan_model_real_data_msm_replica.rda" )
+> 
+> fit <- stan(stan_model, data = stan_data, warmup = 500, iter = 2000, chains = 4, cores = 4, thin = 1)
+
+SAMPLING FOR MODEL 'stan_model_real_data_exp_fn_loglik' NOW (CHAIN 1).
+
+SAMPLING FOR MODEL 'stan_model_real_data_exp_fn_loglik' NOW (CHAIN 2).
+
+SAMPLING FOR MODEL 'stan_model_real_data_exp_fn_loglik' NOW (CHAIN 3).
+
+SAMPLING FOR MODEL 'stan_model_real_data_exp_fn_loglik' NOW (CHAIN 4).
+Chain 1: 
+Chain 1: Gradient evaluation took 0.76 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 7600 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 3: 
+Chain 3: Gradient evaluation took 1.12 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 11200 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 2: 
+Chain 2: Gradient evaluation took 1.23 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 12300 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 4: 
+Chain 4: Gradient evaluation took 1.51 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 15100 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 3: Iteration:  501 / 2000 [ 25%]  (Sampling)
+Chain 4: Iteration:  501 / 2000 [ 25%]  (Sampling)
+Chain 2: Iteration:  501 / 2000 [ 25%]  (Sampling)
+Chain 1: Iteration:  501 / 2000 [ 25%]  (Sampling)
+Chain 3: Iteration:  700 / 2000 [ 35%]  (Sampling)
+Chain 4: Iteration:  700 / 2000 [ 35%]  (Sampling)
+Chain 1: Iteration:  700 / 2000 [ 35%]  (Sampling)
+Chain 2: Iteration:  700 / 2000 [ 35%]  (Sampling)
+Chain 3: Iteration:  900 / 2000 [ 45%]  (Sampling)
+Chain 4: Iteration:  900 / 2000 [ 45%]  (Sampling)
+Chain 1: Iteration:  900 / 2000 [ 45%]  (Sampling)
+Chain 2: Iteration:  900 / 2000 [ 45%]  (Sampling)
+Chain 3: Iteration: 1100 / 2000 [ 55%]  (Sampling)
+Chain 4: Iteration: 1100 / 2000 [ 55%]  (Sampling)
+Chain 1: Iteration: 1100 / 2000 [ 55%]  (Sampling)
+Chain 2: Iteration: 1100 / 2000 [ 55%]  (Sampling)
+Chain 3: Iteration: 1300 / 2000 [ 65%]  (Sampling)
+Chain 4: Iteration: 1300 / 2000 [ 65%]  (Sampling)
+Chain 1: Iteration: 1300 / 2000 [ 65%]  (Sampling)
+Chain 2: Iteration: 1300 / 2000 [ 65%]  (Sampling)
+Chain 3: Iteration: 1500 / 2000 [ 75%]  (Sampling)
+Chain 4: Iteration: 1500 / 2000 [ 75%]  (Sampling)
+Chain 1: Iteration: 1500 / 2000 [ 75%]  (Sampling)
+Chain 3: Iteration: 1700 / 2000 [ 85%]  (Sampling)
+Chain 2: Iteration: 1500 / 2000 [ 75%]  (Sampling)
+Chain 1: Iteration: 1700 / 2000 [ 85%]  (Sampling)
+Chain 4: Iteration: 1700 / 2000 [ 85%]  (Sampling)
+Chain 3: Iteration: 1900 / 2000 [ 95%]  (Sampling)
+Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 9001.86 seconds (Warm-up)
+Chain 3:                22608.1 seconds (Sampling)
+Chain 3:                31609.9 seconds (Total)
+Chain 3: 
+Chain 2: Iteration: 1700 / 2000 [ 85%]  (Sampling)
+Chain 1: Iteration: 1900 / 2000 [ 95%]  (Sampling)
+Chain 4: Iteration: 1900 / 2000 [ 95%]  (Sampling)
+Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 9571.76 seconds (Warm-up)
+Chain 1:                24371.2 seconds (Sampling)
+Chain 1:                33943 seconds (Total)
+Chain 1: 
+Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 9295.2 seconds (Warm-up)
+Chain 4:                24786.3 seconds (Sampling)
+Chain 4:                34081.5 seconds (Total)
+Chain 4: 
+Chain 2: Iteration: 1900 / 2000 [ 95%]  (Sampling)
+Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 9527.39 seconds (Warm-up)
+Chain 2:                26761.6 seconds (Sampling)
+Chain 2:                36288.9 seconds (Total)
+Chain 2: 
+> saveRDS(fit,"stan_model_real_data_exp_fn_loglik.rda" )
+> 
+> proc.time()
+      user     system    elapsed 
+136222.936     24.159  36474.100 

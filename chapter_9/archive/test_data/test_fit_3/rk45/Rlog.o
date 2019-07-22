@@ -1,0 +1,172 @@
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@bc-28-1-05>
+Subject: Job 1148524: </software/R-3.5.3/bin/R CMD BATCH run_stan_model.R> in cluster <farm4> Exited
+
+Job </software/R-3.5.3/bin/R CMD BATCH run_stan_model.R> was submitted from host <farm4-head1> by user <jl25> in cluster <farm4> at Thu Jul 18 13:56:58 2019.
+Job was executed on host(s) <bc-28-1-05>, in queue <normal>, as user <jl25> in cluster <farm4> at Thu Jul 18 13:56:58 2019.
+</nfs/users/nfs_j/jl25> was used as the home directory.
+</nfs/users/nfs_j/jl25/stan/test_multicov_models3/rk45> was used as the working directory.
+Started at Thu Jul 18 13:56:58 2019.
+Terminated at Thu Jul 18 13:57:00 2019.
+Results reported at Thu Jul 18 13:57:00 2019.
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/software/R-3.5.3/bin/R CMD BATCH run_stan_model.R
+------------------------------------------------------------
+
+Exited with exit code 132.
+
+Resource usage summary:
+
+    CPU time :                                   1.84 sec.
+    Max Memory :                                 67 MB
+    Average Memory :                             67.00 MB
+    Total Requested Memory :                     4000.00 MB
+    Delta Memory :                               3933.00 MB
+    Max Swap :                                   532 MB
+    Max Processes :                              4
+    Max Threads :                                5
+    Run time :                                   2 sec.
+    Turnaround time :                            2 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <Rlog.e> for stderr output of this job.
+
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@bc-28-1-05>
+Subject: Job 1148526: </software/R-3.5.3/bin/R CMD BATCH run_stan_model.R> in cluster <farm4> Exited
+
+Job </software/R-3.5.3/bin/R CMD BATCH run_stan_model.R> was submitted from host <farm4-head1> by user <jl25> in cluster <farm4> at Thu Jul 18 13:58:02 2019.
+Job was executed on host(s) <bc-28-1-05>, in queue <normal>, as user <jl25> in cluster <farm4> at Thu Jul 18 13:58:02 2019.
+</nfs/users/nfs_j/jl25> was used as the home directory.
+</nfs/users/nfs_j/jl25/stan/test_multicov_models3/rk45> was used as the working directory.
+Started at Thu Jul 18 13:58:02 2019.
+Terminated at Thu Jul 18 13:58:04 2019.
+Results reported at Thu Jul 18 13:58:04 2019.
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/software/R-3.5.3/bin/R CMD BATCH run_stan_model.R
+------------------------------------------------------------
+
+Exited with exit code 132.
+
+Resource usage summary:
+
+    CPU time :                                   1.83 sec.
+    Max Memory :                                 68 MB
+    Average Memory :                             68.00 MB
+    Total Requested Memory :                     4000.00 MB
+    Delta Memory :                               3932.00 MB
+    Max Swap :                                   533 MB
+    Max Processes :                              4
+    Max Threads :                                5
+    Run time :                                   2 sec.
+    Turnaround time :                            2 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <Rlog.e> for stderr output of this job.
+
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@bc-28-1-05>
+Subject: Job 1148531: </software/R-3.5.3/bin/R CMD BATCH run_stan_model.R> in cluster <farm4> Exited
+
+Job </software/R-3.5.3/bin/R CMD BATCH run_stan_model.R> was submitted from host <farm4-head1> by user <jl25> in cluster <farm4> at Thu Jul 18 14:02:43 2019.
+Job was executed on host(s) <bc-28-1-05>, in queue <normal>, as user <jl25> in cluster <farm4> at Thu Jul 18 14:02:44 2019.
+</nfs/users/nfs_j/jl25> was used as the home directory.
+</nfs/users/nfs_j/jl25/stan/test_multicov_models3/rk45> was used as the working directory.
+Started at Thu Jul 18 14:02:44 2019.
+Terminated at Thu Jul 18 14:02:46 2019.
+Results reported at Thu Jul 18 14:02:46 2019.
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/software/R-3.5.3/bin/R CMD BATCH run_stan_model.R
+------------------------------------------------------------
+
+Exited with exit code 132.
+
+Resource usage summary:
+
+    CPU time :                                   1.77 sec.
+    Max Memory :                                 65 MB
+    Average Memory :                             65.00 MB
+    Total Requested Memory :                     4000.00 MB
+    Delta Memory :                               3935.00 MB
+    Max Swap :                                   511 MB
+    Max Processes :                              4
+    Max Threads :                                5
+    Run time :                                   2 sec.
+    Turnaround time :                            3 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <Rlog.e> for stderr output of this job.
+
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@farm4-os0000131>
+Subject: Job 1148536: </software/R-3.5.3/bin/R CMD BATCH run_stan_model.R> in cluster <farm4> Done
+
+Job </software/R-3.5.3/bin/R CMD BATCH run_stan_model.R> was submitted from host <farm4-head1> by user <jl25> in cluster <farm4> at Thu Jul 18 14:07:20 2019.
+Job was executed on host(s) <farm4-os0000131>, in queue <normal>, as user <jl25> in cluster <farm4> at Thu Jul 18 14:07:20 2019.
+</nfs/users/nfs_j/jl25> was used as the home directory.
+</nfs/users/nfs_j/jl25/stan/test_multicov_models3/rk45> was used as the working directory.
+Started at Thu Jul 18 14:07:20 2019.
+Terminated at Thu Jul 18 22:53:10 2019.
+Results reported at Thu Jul 18 22:53:10 2019.
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/software/R-3.5.3/bin/R CMD BATCH run_stan_model.R
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   31541.12 sec.
+    Max Memory :                                 1925 MB
+    Average Memory :                             224.87 MB
+    Total Requested Memory :                     2000.00 MB
+    Delta Memory :                               75.00 MB
+    Max Swap :                                   3318 MB
+    Max Processes :                              10
+    Max Threads :                                11
+    Run time :                                   31550 sec.
+    Turnaround time :                            31550 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <Rlog.e> for stderr output of this job.
+
