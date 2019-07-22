@@ -13,7 +13,7 @@
 # then merge in esbl
 
 splice_ESBL2 <- function(df, esbl) {
-  if (!esbl$pid %in% df$pid) {stop("Dude, there are no entries for pid ", 
+  if (!esbl$pid[1] %in% df$pid) {stop("Dude, there are no entries for pid ", 
                                    esbl$pid[1], "
                                   in df handed to splice_ESBL2")}
   if (length(unique(esbl$pid)) > 1) {stop("Dude,more than 2 pids in esbl handed to splice_ESBL2") }
