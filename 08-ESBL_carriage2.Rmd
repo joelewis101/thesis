@@ -2,6 +2,55 @@
 
 \chaptermark{Markov models}
 
+```{r ch8-setup, include = F}
+library(plyr)
+library(tidyverse)
+library(reshape2)
+library(rstan)
+library(loo)
+library(kableExtra)
+
+source("final_cleaning_scripts/load_and_clean_followup_and_enroll_labelled.R")
+source("other_scripts/summary_table_functions.R")
+source("final_cleaning_scripts/make_composite_hivstatus_variable.R")
+source("final_cleaning_scripts/load_and_clean_hourly.R")
+source("final_cleaning_scripts/load_and_clean_bloods.R")
+#source("final_cleaning_scripts/load_and_clean_aetiol.R")
+#source("final_cleaning_scripts/load_and_clean_hourly.R")
+source("final_cleaning_scripts/load_and_clean_upto72.R")
+source("final_cleaning_scripts/load_and_clean_post72.R")
+source("final_cleaning_scripts/load_and_clean_hosp_oc.R")
+#source("final_cleaning_scripts/load_and_clean_time_to_ab.R")
+#source("final_cleaning_scripts/load_and_clean_fluid_hr1_to_6.R")
+source("other_scripts/stan_helpers/arrange_stan_df_functions.R")
+
+# lims
+
+
+
+
+#panel data helper functions
+source("other_scripts/panel_data_helpers/expand_covariates.R")
+source("other_scripts/panel_data_helpers/sort_out_tb_rx_on_discharge.R")
+source("other_scripts/panel_data_helpers/shuffle_a_in_b2.R")
+source("other_scripts/panel_data_helpers/strip_post_dropout_rows.R")
+source("other_scripts/panel_data_helpers/extract_covariate_exposure.R")
+source("other_scripts/panel_data_helpers/collapse_covariates.R")
+source("other_scripts/panel_data_helpers/ditch_everything_after_first_1.R")
+source("other_scripts/panel_data_helpers/mstate_helper_functions.R")
+source("other_scripts/panel_data_helpers/splice_ESBL2.R")
+
+names(enroll)[names(enroll) == "data_date"] <- "enroll_date"
+followup <- merge(followup, select(enroll, pid, arm, enroll_date), all.x = T)
+followup$t <- followup$data_date - followup$enroll_date
+
+# and load lims
+source("final_cleaning_scripts/load_and_clean_lims.R")
+
+stan.df <- read.csv("data/stan_df.csv", stringsAsFactors = F)
+# ans stan df
+
+```
 ## Chapter Overview
 
 whatevs bru
@@ -14,7 +63,7 @@ In the broadest sense when constructing a model, our aim is to estimate the most
 
 ### General form of likelihood
 
-First, I derive a general expression for the likelihood without making any assumptions about the model structure or functional form. Assume we have $N$ participants with any givenparticipant $n$ in a state $S_{n}(t)$ at time $t$: either ESBL-E colonised ($S_{n}(t) = 1$) or uncolonised ($S_{n}(t) = 1$). For each participant $n$ we have a number of measurements of $S_{n}(t)$ at a number of time points. The number of measurements varies for each participant, and can be denoted by $j_{n}$, making the time of measurements $t^n_{j_{n}}$ for patricipant $n$; and so for participant $n$ we know the  $j_{n}$ values $S_{n}(t^n_{j_{n}})$. 
+First, I derive a general expression for the likelihood of a two-state intermittently observed process without making any assumptions about the model structure or functional form. Assume we have $N$ participants with any givenparticipant $n$ in a state $S_{n}(t)$ at time $t$: either ESBL-E colonised ($S_{n}(t) = 1$) or uncolonised ($S_{n}(t) = 1$). For each participant $n$ we have a number of measurements of $S_{n}(t)$ at a number of time points. The number of measurements varies for each participant, and can be denoted by $j_{n}$, making the time of measurements $t^n_{j_{n}}$ for patricipant $n$; and so for participant $n$ we know the  $j_{n}$ values $S_{n}(t^n_{j_{n}})$. 
 
 To arrive at the likelihood for these observations, consider first the simplest situation that we have: the measurements of ESBL status at two time points, $t_{A}$ and $t_{B}$ for a single participant, $n$. The likelihood we wish to calculate, in words, is the probability of the participant being in the second observed state at time $t_{B}$, given they were in the first state at $t_{A}$ and given the parameters of the model, $\theta$. Or, mathematically:
 
@@ -123,12 +172,208 @@ t^k_{\frac{1}{2}} = \gamma_{k}\ln(2) \approx 0.69\gamma_{k}
 
 From the definition of the half life of an exponential decay process. This parameterisation has the advantage that the data can fit the size of the parameters $\gamma_{k}$; if the data are more inkeeping with a stepwise effect of the covariates, then a small ($\ll 1$) $\gamma$ would approximate a step functon and this could be fit by the model. Alternatively a larger would result in the effect of the covariate persisting after exposure, but decaying over time. This allows us to test the hypothesis that antimicrobial exposure (for example) has an effect that persists once exposure finishes, by both the magnitude of the fitted $\gamma_{k}$, and comparing stepwise-constant covariate models to models incorporating the $\gamma_{k}$ parameters.
 
-### Fitting the model
+### Building and fitting models 
+
+The Bayesian probabablistic programming language _Stan_ incorporates an ordinary differential equation solver, and will allow the fitting of the model in a Bayesian framework. In this framework, Bayes' rule  allows us to estimate our probability distribution of interest, $P(\theta | x)$, called the _posterior_ in the Bayesian framework, a long as we provide a _prior_, encoding our prior beliefs about the values of the parameters. _Stan_ then uses the No-U-Turn Sampler  (NUTS) implementation of Markov-chain Monte-Carlo (MCMC) sampling to sample from the posterior to provide $P(\theta | x)$. It can be shown that, given infinite chain length, MCMC estimates are guaranteed to be unbiased samples from the posterior; when they are providing unbiased samples the chains have said to converged. Unfortunately there is no diagnotsic test that guarantees convergence, rather tests that are necessary but not sufficent to ensure convergence: running multiple chains from differet starting points with examination of traceplots to show within and betwene mixing of chains, and the $\hat{R}$ statistic, which measures mixing of the two halves of an MCMC chain. At convergence, $\hat{R}$ should be close to 1. In addition, divergences - failure in the NUTS sampler - can be indicative of difficult topography in the posterior at the area where the divergences occur, and suggest that parameter estimates may be biased, and are flagged by _Stan_. All of these tests were used to diagnose convergence.
+
+Two decsisions must be made in order to fit the model: covariates must be chosen to include and priors specified. Models were built sequentially, starting from the simplest possible, then adding complexity:
+
+* _Model 1:_ Composite antibacterial variable (includes all antibacterials) and hospitalisation variable as explanatory variables, both included with stepwise constant effect and no post exposure effect.
+
+* _Model 2:_ As per model 1 except antibacterial exposure modelled with decaying post-exposure effect.
+
+* _Model 3:_ Hospitalisation, TB therapy and co-trimoxazole exposure all modelled as stepwise constant covariates. All other antibacterials included in a composite variabe with decaying post-exposure effec.
+
+* _Model 4:_ Hospitalisation, TB therapy and co-trimoxazole exposure all modelled as stepwise constant covariates; ceftriaxone, ciprofloxacin and amoxicillin exposure included in a composite variable with decaying post-exposure effect, with $\gamma$ allowed to vary for each agent.
+
+Weakly informative priors were used. A normally distributed prior centered at 0 with standard deviation 2 was used for all the $\alpha$ and $\beta$ parameters. A parameter value of 2 corresponds to a hazard ratio of 7.4; it would be surprising if any effect is greater than this so this could be argued to be a weakly informative prior. Normally distributed priors centered at 0 with standard deviation 0.2 were used for the $\mu$ and $\lambda$ parameters; in a model with no covariates, the inverse of these parameters are the mean times that an individual would remain in the colonised or uncolonised states, respectively, so a value of 0.2 corresponds to a mean state occupancy time of 50 days. A normally distributed prior centred at 0 and with standard deviation 50 days was used for all $\gamma$ parameters.
+
+The _Stan_ code for the models is given in the appendix to this chapter. Four chains were run in each case, with a warmup of 500 iterations and run for 1000 iterations in total. Convergence was assessed using the diagnostics described above. _Stan_ v2.19 was used to sample from the posterior, accessed via Rstan v2.19.2, and run on the Wellcome Sanger Institute computing cluster under Linux red hat v7.6, running R v3.5.3, and using 4 cores per run. Posterior samples were brought to my local machine and further analyses undertaken with R3.6.0.
 
 ### Assessing goodness of fit
 
+Model goodness of fit was assessed in two ways; first, by graphical posterior predictive checks. The posterior parameter estimates for each MCMC draw were used to estimate a predicted probability for each data point then sampling from a bernoulli distribution generated predicted state occupancy. These were plotted against actual state occupancy, stratified by arm, to visualise the goodness of fit of the model, and to compare between models. Second, models were compared using leave-one-out cross validation, as implemented in the _loo_ v2.1.0 package in R. This estimates the out-of sample predictive ability of the model by estimating a quantity called the expected log pointwise predictive denisty ($ELPD$) essentially the log of the likelihood for a new, unseen dataset conditional on the current data. This quantity is estimated using leave-one-out cross validation to produce and estimate of the $ELPD$ - $ELPD_{loo}$. The standard error of $ELPD_{loo}$ for a model is also calculated and so two models can be compared by comparing the $ELPD_{loo}$ difference and standard error; if the difference is greater than twice the standard error (i.e. a 95% confidence interval, assuming normality) we can be confident that one model would be expected to have greater out-of-sample predictive ability than the other. Because this technique estimates out-of-sample predictive ability it naturally incorporates a penalty for including multiple parameters and hence overfitting, as an overfit model would be expected to have worse out of sample predictive ability and hence lower $ELPD_{loo}$. 
+
+This process was repeated, replacing the ESBL-E state first with _E. coli_ (coding presence of _E.coli_ at any time point as 1 and absence as 0) and then with _Klebsiella pneuomoniae_, and then _add genomics chat here_
+
 ## Results
 
+All models seemed to converge within the 1000 iterations; $\hat{R}$ was less than 1.1 for all parameters and all traceplots showed good mixing of chains (see appendix to this chapter). There was a computational cost to increasing the number of parameters: model one took 3.5hr to fit, model two 13.7hr, model three 17.1hr and model four xxxx. The parameter estimates for the models are shown in fig xxx
+
+```{r ESBL-mod-param-est, echo = F, warning = F, message = F,fig.scap="Parameter estimates from Markov models", out.extra='', fig.cap = "Parameter estimates from increasingly complex Markov models to predict ESBL carriage. Black lines are 95\\% and red lines 80\\% credible intervals. A: Model 1 includes stepwise constant covariates only, animicrobial exposure and hospitalisation. $\\lambda$ is the baseline hazard and $\\beta$ the log hazard ratio of ESBL-E acquisition, $\\mu$ the baseline hazard and $\\alpha$ the log hazard ratio of ESBL-E loss. B: Model 2 adds a time-varying decay of the effect of antimicrobial exposure, parameterised by $\\gamma$ as described in the text. C: Model 3 adds stepwise constant covariates for TB therapy (tb) and cotrimoxazole (cotri) with all other antimicrobial exposure captured in the abx variable, which has a time verying decay of effect as before. In almost all cases 95\\% credible intervals of $\\alpha$[hosp] and $\\beta$[hosp] do not cross zero, suggesting that hospitaliation acts to both increase rate of ESBL-E acquisition and loss; for antimicrobial exposure, on the other hand, only the 95\\% for antimicrobial $\\beta$ values consistently do not cross zero, suggesting that the effect of antimicrobial exposure is to reduce the rate of ESBL-E loss.",  fig.height = 8, fig.width=8,fig.align = 'center'}
+
+
+stan.df <- merge(stan.df, select(enroll, pid, arm), all.x = TRUE)
+
+fit_mod1 <- readRDS("chapter_9/stan_models/model_1/stanfit_m1.rds")
+fit_mod2 <- readRDS("chapter_9/stan_models/model_2/stanfit_m2.rds")
+fit_mod3 <- readRDS("chapter_9/stan_models/model_3/stanfit_m3.rds")
+
+
+##mod 1
+
+plot(fit_mod1, pars = c("ab_alpha0", "ab_beta0", "hosp_alpha1", "hosp_beta1")) + 
+  theme_bw() +
+  geom_vline(xintercept = 0, linetype = "dashed") + scale_y_discrete(limits = c("hosp_beta1", "hosp_alpha1","ab_beta0", "ab_alpha0" ), labels = c('hosp_beta1' =  expression(beta~"[hosp]"), 'hosp_alpha1' =  expression(alpha~"[hosp]"), 'ab_beta0' =  expression(beta~"[abx]"), 'ab_alpha0' =  expression(alpha~"[abx]"))) + theme(axis.title.y = element_blank(), axis.text.y = element_text(size = 14)) + xlab("Parameter value") +
+  coord_cartesian(xlim = c(-3,5))  -> a.mod1
+
+plot(fit_mod1, pars = c("lambda", "mu")) + 
+  theme_bw() +
+  geom_vline(xintercept = 0, linetype = "dashed") + scale_y_discrete(limits = c("lambda", "mu"), labels = c('lambda' =  expression(lambda), 'mu' =  expression(mu))) + theme(axis.title.y = element_blank(), axis.text.y = element_text(size = 14)) + xlab("Parameter value") + 
+  coord_cartesian(xlim = c(0,0.4))-> b.mod1 
+
+ggarrange(a.mod1, b.mod1, NULL, ncol = 3, nrow = 1, labels = c("A", NA, NA), widths = c(1.5,1,1)) -> m1.plot
+
+plot(fit_mod2, pars = c("alphas[1]", "betas[1]", "alphas[2]", "betas[2]")) + 
+  theme_bw() +
+  geom_vline(xintercept = 0, linetype = "dashed") + scale_y_discrete(limits = c("betas[2]", "alphas[2]","betas[1]", "alphas[1]" ), labels = c('betas[2]' =  expression(beta~"[hosp]"), 'alphas[2]' =  expression(alpha~"[hosp]"), 'betas[1]' =  expression(beta~"[abx]"), 'alphas[1]' =  expression(alpha~"[abx]"))) + theme(axis.title.y = element_blank(), axis.text.y = element_text(size = 14)) + xlab("Parameter value") +
+  coord_cartesian(xlim = c(-3,5)) -> a.mod2
+
+plot(fit_mod2, pars = c("lambda", "mu")) + 
+  theme_bw() +
+  geom_vline(xintercept = 0, linetype = "dashed") + scale_y_discrete(limits = c("lambda", "mu"), labels = c('lambda' =  expression(lambda), 'mu' =  expression(mu))) + theme(axis.title.y = element_blank(), axis.text.y = element_text(size = 14)) + xlab("Parameter value") +
+  coord_cartesian(xlim = c(0,0.4))-> b.mod2  
+
+plot(fit_mod2, pars = c("gammas")) + 
+  theme_bw() + 
+  scale_y_discrete(limits = c("gammas[1]"), labels = c('gammas[1]' = expression(gamma~"[abx]"))) + theme(axis.title.y = element_blank(),axis.text.y = element_text(size = 14)) + xlab("Parameter value") + 
+  coord_cartesian(xlim = c(0,150))-> c.mod2  
+
+ ggarrange(a.mod2, b.mod2, c.mod2, ncol = 3, nrow = 1, labels = c("B", NA, NA), widths = c(1.5,1,1)) -> m2.plot
+ 
+ # mod 3
+ 
+ plot(fit_mod3, pars = c("alphas[1]", "betas[1]", "alphas[2]", "betas[2]",
+                         "alphas[3]", "betas[3]", "alphas[4]", "betas[4]")) + 
+   theme_bw() +
+   geom_vline(xintercept = 0, linetype = "dashed") + 
+   scale_y_discrete(limits = rev(c("alphas[1]", "betas[1]", "alphas[2]", "betas[2]", 
+                                "alphas[3]", "betas[3]", "alphas[4]", "betas[4]")),
+                    labels = c('betas[4]' =  expression(beta~"[hosp]"), 
+                               'alphas[4]' =  expression(alpha~"[hosp]"),
+                               'betas[3]' =  expression(beta~"[tb]"), 
+                               'alphas[3]' =  expression(alpha~"[tb]"),
+                               'betas[2]' =  expression(beta~"[cotr]"), 
+                                'alphas[2]' =  expression(alpha~"[cotr]"),
+                                'betas[1]' =  expression(beta~"[abx]"), 
+                                'alphas[1]' =  expression(alpha~"[abx]"))
+                    ) + theme(axis.title.y = element_blank(), axis.text.y = element_text(size = 14)) +
+                      xlab("Parameter value") +
+                      coord_cartesian(xlim = c(-3,5)) -> a.mod3 
+ 
+ plot(fit_mod3, pars = c("lambda", "mu")) + 
+   theme_bw() +
+   geom_vline(xintercept = 0, linetype = "dashed") + scale_y_discrete(limits = c("lambda", "mu"), labels = c('lambda' =  expression(lambda), 'mu' =  expression(mu))) + theme(axis.title.y = element_blank(), axis.text.y = element_text(size = 14)) + xlab("Parameter value") +
+   coord_cartesian(xlim = c(0,0.4))-> b.mod3  
+ 
+ plot(fit_mod2, pars = c("gammas")) + 
+   theme_bw() + 
+   scale_y_discrete(limits = c("gammas[1]"), labels = c('gammas[1]' = expression(gamma~"[abx]"))) + theme(axis.title.y = element_blank(),axis.text.y = element_text(size = 14)) + xlab("Parameter value") + 
+   coord_cartesian(xlim = c(0,150))-> c.mod3  
+ 
+ ggarrange(a.mod3, b.mod3, c.mod3, ncol = 3, nrow = 1, labels = c("C", NA, NA), widths = c(1.5,1,1)) -> m3.plot
+ 
+ 
+ 
+ ggarrange(m1.plot, m2.plot,m3.plot, ncol = 1, nrow = 3, heights = c(1,1,1.5))
+
+```
+
+```{r ESBL-mod-ppc, echo = F, warning = F, message = F,fig.scap="Predicted proprtion of ESBL-E positive samples, stratified by arm.", out.extra='', fig.cap = "Posterior predictive checks: kernal density estimate, D, of predicted proprtion of ESBL-E positive samples, stratified by arm for Model 1 (A), Model 2 (B), Model 3 (C), generated by sampling from a Bernoulli distribution using the predicted probability for each sample (n=993) for each draw from the posterior, excluding warmup draws (n = 2000). True proportion of ESBL-E positive samples are shown for each arm by dotted vertical line. In all cases, predictions are poor for arm 2 and 3 samples, but the addition of a term conferring an effect of antimicrobials that persists once exposure has stopped (quantified by $\\gamma$) improves fit, especially  in arm 1 participants: compare Model 1 (A) with stepwise constant covariates to Model 2 (B) with persistent antimicrobial effect.",  fig.height = 4, fig.width=6,fig.align = 'center'}
+
+
+log_lik_mod1 <- extract_log_lik(fit_mod1)
+log_lik_mod1.df <- as.data.frame(t(log_lik_mod1))
+log_lik_mod1.df$pid <- as.character(stan.df$pid)
+log_lik_mod1.df$actual_end_state <- stan.df$ESBL_stop
+log_lik_mod1.df<- merge(log_lik_mod1.df, select(enroll, pid, arm), all.x = T)
+log_lik_mod1.df %>% pivot_longer(-c(pid, actual_end_state, arm)) -> log_lik_mod1.df.long
+exp(log_lik_mod1.df.long$value) ->  log_lik_mod1.df.long$pred_prob
+log_lik_mod1.df.long$pred_prob[log_lik_mod1.df.long$actual_end_state == 0] <- 1 - log_lik_mod1.df.long$pred_prob[log_lik_mod1.df.long$actual_end_state == 0]
+log_lik_mod1.df.long$pred_state <- map_int(log_lik_mod1.df.long$pred_prob, ~rbinom(1,1,.))
+
+
+actuals <- stan.df %>%
+  group_by(arm) %>% 
+  dplyr::summarise(n.esbl = sum(ESBL_stop == 1),
+                   n = length(ESBL_stop),
+                   prop = n.esbl/n) %>%
+  ungroup() %>%
+  mutate(arm = as.character(arm),
+         arm = recode(arm, `1` = "Arm 1", `2` = "Arm 2", `3` = "Arm 3")) 
+  
+
+predicted <- log_lik_mod1.df.long %>% group_by(arm, name) %>% dplyr::summarise(n.esbl = sum(pred_state == 1),                                                         n = length(pred_state),
+                                                            prop = n.esbl/n) 
+
+predicted %>% 
+  ungroup() %>% mutate(arm = as.character(arm),
+                       arm = recode(arm, `1` = "Arm 1", `2` = "Arm 2", `3` = "Arm 3")) %>%
+ggplot(aes(prop, fill = as.factor(arm), group = arm)) + 
+  geom_density(alpha = 0.5) +
+  geom_vline(data = actuals, aes(xintercept = prop, color = as.factor(arm)), linetype = "dashed") +
+  coord_cartesian(xlim = c(0.3, 0.7)) +
+  xlab("Proportion") + ylab("D") +
+  theme_bw() + theme(legend.title = element_blank())-> a
+
+
+##
+
+
+log_lik_mod2 <- extract_log_lik(fit_mod2)
+log_lik_mod2.df <- as.data.frame(t(log_lik_mod2))
+log_lik_mod2.df$pid <- as.character(stan.df$pid)
+log_lik_mod2.df$actual_end_state <- stan.df$ESBL_stop
+log_lik_mod2.df<- merge(log_lik_mod2.df, select(enroll, pid, arm), all.x = T)
+log_lik_mod2.df %>% pivot_longer(-c(pid, actual_end_state, arm)) -> log_lik_mod2.df.long
+exp(log_lik_mod2.df.long$value) ->  log_lik_mod2.df.long$pred_prob
+log_lik_mod2.df.long$pred_prob[log_lik_mod2.df.long$actual_end_state == 0] <- 1 - log_lik_mod2.df.long$pred_prob[log_lik_mod2.df.long$actual_end_state == 0]
+log_lik_mod2.df.long$pred_state <- map_int(log_lik_mod2.df.long$pred_prob, ~rbinom(1,1,.))
+
+predicted_m2 <- log_lik_mod2.df.long %>% group_by(arm, name) %>% dplyr::summarise(n.esbl = sum(pred_state == 1),                                                         n = length(pred_state),
+                                                                               prop = n.esbl/n) 
+
+predicted_m2 %>% 
+  ungroup() %>% mutate(arm = as.character(arm),
+    arm = recode(arm, `1` = "Arm 1", `2` = "Arm 2", `3` = "Arm 3")) %>%
+  ggplot(aes(prop, fill = as.factor(arm), group = arm)) + 
+  geom_density(alpha = 0.5) +
+  geom_vline(data = actuals, aes(xintercept = prop, color = as.factor(arm)), linetype = "dashed")+
+  coord_cartesian(xlim = c(0.3, 0.7))  +
+  xlab("Proportion") + ylab("D") +
+  theme_bw() + theme(legend.title = element_blank())-> b
+
+log_lik_mod3 <- extract_log_lik(fit_mod3)
+log_lik_mod3.df <- as.data.frame(t(log_lik_mod3))
+log_lik_mod3.df$pid <- as.character(stan.df$pid)
+log_lik_mod3.df$actual_end_state <- stan.df$ESBL_stop
+log_lik_mod3.df<- merge(log_lik_mod3.df, select(enroll, pid, arm), all.x = T)
+log_lik_mod3.df %>% pivot_longer(-c(pid, actual_end_state, arm)) -> log_lik_mod3.df.long
+exp(log_lik_mod3.df.long$value) ->  log_lik_mod3.df.long$pred_prob
+log_lik_mod3.df.long$pred_prob[log_lik_mod3.df.long$actual_end_state == 0] <- 1 - log_lik_mod3.df.long$pred_prob[log_lik_mod3.df.long$actual_end_state == 0]
+log_lik_mod3.df.long$pred_state <- map_int(log_lik_mod3.df.long$pred_prob, ~rbinom(1,1,.))
+
+predicted_m3 <- log_lik_mod3.df.long %>% group_by(arm, name) %>% dplyr::summarise(n.esbl = sum(pred_state == 1),                                                         n = length(pred_state),
+                                                                                  prop = n.esbl/n) 
+
+predicted_m3 %>% 
+  ungroup() %>% mutate(arm = as.character(arm),
+                       arm = recode_factor(arm, `1` = "Arm 1", `2` = "Arm 2", `3` = "Arm 3")) %>% 
+  ggplot(aes(prop, fill = as.factor(arm), group = arm)) + 
+  geom_density(alpha = 0.5) +
+  geom_vline(data = actuals, aes(xintercept = prop, color = as.factor(arm)), linetype = "dashed")+
+  coord_cartesian(xlim = c(0.3, 0.7))  +
+  xlab("Proportion") + ylab("D") +
+  theme_bw() + theme(legend.title = element_blank())-> c
+
+
+ggarrange(a,b,c, ncol = 1,nrow = 3, labels = c("A", "B", "C"),
+          common.legend = TRUE, legend = "bottom")
+
+
+
+
+```
 ### Exploring the effect of antimicrobial expousure on carriage
  
 ### Exploring bacterial species differences in carriage dynamics
