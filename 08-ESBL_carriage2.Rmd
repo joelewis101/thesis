@@ -50,6 +50,7 @@ source("final_cleaning_scripts/load_and_clean_lims.R")
 stan.df <- read.csv("data/stan_df.csv", stringsAsFactors = F)
 # ans stan df
 
+specify_decimal <- function(x, k) trimws(format(round(x, k), nsmall=k))
 ```
 ## Chapter Overview
 
@@ -86,7 +87,7 @@ And the probability of observing the data we have is then simply the product of 
 (\#eq:3)
 \end{equation} 
 
-This is the quantity that we wish to calculate: the likelihood for the observed data, $P(x|\theta)$.
+This is the quantity that we wish to calculate: the likelihood for the observed data, $P(x|\theta)$. Note that the sum over states for an individual in equation \@ref(eq:3) starts from 2; if a participant has only one available sample then this does not provide any information about transition probabilities, and must be excluded from the analysis.
 
 ### Markov model likelihood
 
@@ -130,7 +131,7 @@ However, there is no reason to suspect particularly that the effect of covariate
 (\#eq:8b)
 \end{equation} 
 
-Where $P_i(t)$ is the probability of being in state $i$ at time t. Numerical ordinary differential equation (ODE) solvers can quickly solve these equations to calculate, for example, $P(S_{n}(t_{B}) | S_{n}(t_{A}), \theta)$ from the simplest example above: the probability that a participant $n$ at time $t_{B}$ is in a given state, given that they were in state $S_{n}(t_{A})$ at time $t_{A}$, and given the parameters $\theta$. This calculation can be completed for all meaurements and participants, resulting in the likelihood of the system, $P(x | \theta)$.
+Where $P_i(t)$ is the probability of being in state $i$ at time t. Numerical ordinary differential equation (ODE) solvers can quickly solve these equations to calculate, for example, $P(S_{n}(t_{B}) | S_{n}(t_{A}), \theta)$ from the simplest example above: the probability that a participant $n$ at time $t_{B}$ is in a given state, given that they were in state $S_{n}(t_{A})$ at time $t_{A}$, and given the parameters $\theta$. This calculation can be completed for all meaurements and participants, resulting in the likelihood of the system, $P(x | \theta)$. 
 
 In order to use this model for inference, two questions must be addressed: first, how to incorporate time-varying covariates; and second, how to practically fit the model. I address each of these questions below.
 
@@ -174,7 +175,7 @@ From the definition of the half life of an exponential decay process. This param
 
 ### Building and fitting models 
 
-The Bayesian probabablistic programming language _Stan_ incorporates an ordinary differential equation solver, and will allow the fitting of the model in a Bayesian framework. In this framework, Bayes' rule  allows us to estimate our probability distribution of interest, $P(\theta | x)$, called the _posterior_ in the Bayesian framework, a long as we provide a _prior_, encoding our prior beliefs about the values of the parameters. _Stan_ then uses the No-U-Turn Sampler  (NUTS) implementation of Markov-chain Monte-Carlo (MCMC) sampling to sample from the posterior to provide $P(\theta | x)$. It can be shown that, given infinite chain length, MCMC estimates are guaranteed to be unbiased samples from the posterior; when they are providing unbiased samples the chains have said to converged. Unfortunately there is no diagnotsic test that guarantees convergence, rather tests that are necessary but not sufficent to ensure convergence: running multiple chains from differet starting points with examination of traceplots to show within and betwene mixing of chains, and the $\hat{R}$ statistic, which measures mixing of the two halves of an MCMC chain. At convergence, $\hat{R}$ should be close to 1. In addition, divergences - failure in the NUTS sampler - can be indicative of difficult topography in the posterior at the area where the divergences occur, and suggest that parameter estimates may be biased, and are flagged by _Stan_. All of these tests were used to diagnose convergence.
+The Bayesian probabablistic programming language _Stan_ incorporates an ordinary differential equation solver, and will allow the fitting of the model in a Bayesian framework. In this framework, Bayes' rule  allows us to estimate our probability distribution of interest, $P(\theta | x)$, called the _posterior_ in the Bayesian framework, a long as we provide a _prior_, encoding our prior beliefs about the values of the parameters. Stan then uses the No-U-Turn Sampler  (NUTS) implementation of Markov-chain Monte-Carlo (MCMC) sampling to sample from the posterior to provide $P(\theta | x)$. It can be shown that, given infinite chain length, MCMC estimates are guaranteed to be unbiased samples from the posterior; when they are providing unbiased samples the chains have said to converged. Unfortunately there is no diagnotsic test that guarantees convergence, rather tests that are necessary but not sufficent to ensure convergence: running multiple chains from differet starting points with examination of traceplots to show within and betwene mixing of chains, and the $\hat{R}$ statistic, which measures mixing of the two halves of an MCMC chain. At convergence, $\hat{R}$ should be close to 1. In addition, divergences - failure in the NUTS sampler - can be indicative of difficult topography in the posterior at the area where the divergences occur, and suggest that parameter estimates may be biased, and are flagged by Stan. All of these tests were used to diagnose convergence.
 
 Two decsisions must be made in order to fit the model: covariates must be chosen to include and priors specified. Models were built sequentially, starting from the simplest possible, then adding complexity:
 
@@ -188,19 +189,29 @@ Two decsisions must be made in order to fit the model: covariates must be chosen
 
 Weakly informative priors were used. A normally distributed prior centered at 0 with standard deviation 2 was used for all the $\alpha$ and $\beta$ parameters. A parameter value of 2 corresponds to a hazard ratio of 7.4; it would be surprising if any effect is greater than this so this could be argued to be a weakly informative prior. Normally distributed priors centered at 0 with standard deviation 0.2 were used for the $\mu$ and $\lambda$ parameters; in a model with no covariates, the inverse of these parameters are the mean times that an individual would remain in the colonised or uncolonised states, respectively, so a value of 0.2 corresponds to a mean state occupancy time of 50 days. A normally distributed prior centred at 0 and with standard deviation 50 days was used for all $\gamma$ parameters.
 
-The _Stan_ code for the models is given in the appendix to this chapter. Four chains were run in each case, with a warmup of 500 iterations and run for 1000 iterations in total. Convergence was assessed using the diagnostics described above. _Stan_ v2.19 was used to sample from the posterior, accessed via Rstan v2.19.2, and run on the Wellcome Sanger Institute computing cluster under Linux red hat v7.6, running R v3.5.3, and using 4 cores per run. Posterior samples were brought to my local machine and further analyses undertaken with R3.6.0.
+The Stan code for the models is given in the appendix to this chapter. Four chains were run in each case, with a warmup of 500 iterations and run for 1000 iterations in total. Convergence was assessed using the diagnostics described above. Stan v2.19 was used to sample from the posterior, accessed via Rstan v2.19.2, and run on the Wellcome Sanger Institute computing cluster under Linux red hat v7.6, running R v3.5.3, and using 4 cores per run. Posterior samples were brought to my local machine and further analyses undertaken with R3.6.0.
 
 ### Assessing goodness of fit
 
-Model goodness of fit was assessed in two ways; first, by graphical posterior predictive checks. The posterior parameter estimates for each MCMC draw were used to estimate a predicted probability for each data point then sampling from a bernoulli distribution generated predicted state occupancy. These were plotted against actual state occupancy, stratified by arm, to visualise the goodness of fit of the model, and to compare between models. Second, models were compared using leave-one-out cross validation, as implemented in the _loo_ v2.1.0 package in R. This estimates the out-of sample predictive ability of the model by estimating a quantity called the expected log pointwise predictive denisty ($ELPD$) essentially the log of the likelihood for a new, unseen dataset conditional on the current data. This quantity is estimated using leave-one-out cross validation to produce and estimate of the $ELPD$ - $ELPD_{loo}$. The standard error of $ELPD_{loo}$ for a model is also calculated and so two models can be compared by comparing the $ELPD_{loo}$ difference and standard error; if the difference is greater than twice the standard error (i.e. a 95% confidence interval, assuming normality) we can be confident that one model would be expected to have greater out-of-sample predictive ability than the other. Because this technique estimates out-of-sample predictive ability it naturally incorporates a penalty for including multiple parameters and hence overfitting, as an overfit model would be expected to have worse out of sample predictive ability and hence lower $ELPD_{loo}$. 
+Model goodness of fit was assessed in two ways; first, by graphical posterior predictive checks: comparing predicted total number of ESBL-E positive samples to the actual number across the three arms. This was done by using the posterior parameter estimates for each MCMC draw (after disgarding warmup samples) to generate a predicted probability of the ESBL-E positive state ofr each data point, then sampling from a bernoulli distribution to convert to predicted state occupancy. Each data point there for had 2000 predictions for state occupancy, one for each posterior draw. These were plotted as kernal density plots against actual state occupancy, stratified by arm, to visualise the goodness of fit of the model, and to compare between models. 
+
+Second, models were compared using leave-one-out cross validation, as implemented in the _loo_ v2.1.0 package in R. This estimates the out-of sample predictive ability of the model by estimating a quantity called the expected log pointwise predictive denisty ($ELPD$) essentially the log of the likelihood for a new, unseen dataset conditional on the current data. This quantity is estimated using leave-one-out cross validation to produce and estimate of the $ELPD$ - $ELPD_{loo}$. The standard error of $ELPD_{loo}$ for a model is also calculated and so two models can be compared by comparing the $ELPD_{loo}$ difference and standard error; if the difference is greater than twice the standard error (i.e. a 95% confidence interval, assuming normality) we can be confident that one model would be expected to have greater out-of-sample predictive ability than the other. Because this technique estimates out-of-sample predictive ability it naturally incorporates a penalty for including multiple parameters and hence overfitting, as an overfit model would be expected to have worse out of sample predictive ability and hence lower $ELPD_{loo}$. 
 
 This process was repeated, replacing the ESBL-E state first with _E. coli_ (coding presence of _E.coli_ at any time point as 1 and absence as 0) and then with _Klebsiella pneuomoniae_, and then _add genomics chat here_
 
 ## Results
 
-All models seemed to converge within the 1000 iterations; $\hat{R}$ was less than 1.1 for all parameters and all traceplots showed good mixing of chains (see appendix to this chapter). There was a computational cost to increasing the number of parameters: model one took 3.5hr to fit, model two 13.7hr, model three 17.1hr and model four xxxx. The parameter estimates for the models are shown in fig xxx
+### Exploring the effect of antibacterials and hospitalisation on ESBL-E carriage
 
-```{r ESBL-mod-param-est, echo = F, warning = F, message = F,fig.scap="Parameter estimates from Markov models", out.extra='', fig.cap = "Parameter estimates from increasingly complex Markov models to predict ESBL carriage. Black lines are 95\\% and red lines 80\\% credible intervals. A: Model 1 includes stepwise constant covariates only, animicrobial exposure and hospitalisation. $\\lambda$ is the baseline hazard and $\\beta$ the log hazard ratio of ESBL-E acquisition, $\\mu$ the baseline hazard and $\\alpha$ the log hazard ratio of ESBL-E loss. B: Model 2 adds a time-varying decay of the effect of antimicrobial exposure, parameterised by $\\gamma$ as described in the text. C: Model 3 adds stepwise constant covariates for TB therapy (tb) and cotrimoxazole (cotri) with all other antimicrobial exposure captured in the abx variable, which has a time verying decay of effect as before. In almost all cases 95\\% credible intervals of $\\alpha$[hosp] and $\\beta$[hosp] do not cross zero, suggesting that hospitaliation acts to both increase rate of ESBL-E acquisition and loss; for antimicrobial exposure, on the other hand, only the 95\\% for antimicrobial $\\beta$ values consistently do not cross zero, suggesting that the effect of antimicrobial exposure is to reduce the rate of ESBL-E loss.",  fig.height = 8, fig.width=8,fig.align = 'center'}
+To explore the relative effects of hospitalisation versus antimicrobial exposure, the four models described above were fit to the data with the colonised state defined as at least one ESBL-E identified in a sample, and uncolonised as no ESBL-E identified. After exluding participants with only one sample, there were 993 pairs of samples in 363 participants that contributed data to the analysis. All four models converged within the 1000 iterations; $\hat{R}$ was less than 1.1 for all parameters and all traceplots showed good mixing of chains (see chapter appendix). There were no divergences of the NUTS MCMC sampler in any of the models. There was a computational cost to increasing the number of parameters, as would be expected from the increase in dimensionality of the posterior: model one took 3.5 hours to fit, model two 13.7 hours, model three 17.1 hours and model four 33.4 hours. 
+
+The parameter estimates for the models are shown in Figure \@ref(fig:ESBL-mod-param-est). The effect of hospitalisation is consistent across all models; in most models, the 95% credible intervals for both $\alpha_{hospitalisation}$ and $\beta_{hospitalisation}$ do not cross zero and are positive, suggesting that the hazard ratio of hospitalisation on both the rate of acquisition and loss of ESBL-E is very likely to be greater than one, and the effect of hospitalisation is to increase both the rate of acquisition and loss of ESBL-E. The estimated effect sizes are consistent across the models though, as expected, uncertainty in the estimate increases as more parameters are addded to the model. 
+
+The effect of antibacterial exposure is also reasonably consistent accross the models; the parameter $\alpha$ is negative in all cases, and often the 95% credible intervals do not cross zero, suggesting that the hazard ratio of antimicrobial exposure is likely to be less than zero. The effect sizes are similar in all cases, for all agents (incuding TB therapy), whether antibacterial exposure is considered as an aggregate variable or as individual agents; though in the extreme case where agents are all considered individually (Model 4, Figure \@ref(fig:ESBL-mod-param-est)D) the uncertainty in the estimates makes it difficult to draw any firm conclusions. This suggests that all the considered antibacterial agents act, with broadly similar effect size, to prolong ESBL-E carriage by reducing the rate of loss. No $\beta$ parameter (the log hazard ratio of ESBL-E acquisition) has 95% credible intervals that do not cross zero, consistent with antibacterial exposure not affecting ESBL-E acqusition.
+
+To assess the relative predictive ability of the four models, the predicted proportion of ESBL-E positive samples were plotted by sampling from the posterior (Figure \@ref(fig:ESBL-mod-ppc)) and the pairwise $ELPD_{loo}$ differences (and standard errors in the differences) between all models calculated (Table \@ref(tab:ESBL-loo)). All models predicted ESBL-E carriage reasonably poorly for arm two and three participants, but better for arm one. The addition of a post-antibiotic effect improved model fit (seen by comparing model 1 to model 2) but models two, three and four, had similar fit despite the increase in number of parameters from seven in model two to seventeen parameters in model four. Model two therefore provides a good balance between computational tractability, interpretation and predictive ability; the parameter estimates for this model, expressed as hazard ratios for $\alpha$ and $\beta$, the mean time in state for $\lambda$ and $\mu$ and half life of post-antibacterial effect for $\gamma$ are shown in Table
+
+```{r ESBL-mod-param-est, echo = F, warning = F, message = F,fig.scap="Parameter estimates from Markov models", out.extra='', fig.cap = "Parameter estimates from increasingly complex Markov models to predict ESBL carriage. Black lines are 95\\% and red lines 80\\% credible intervals. A: Model 1 includes stepwise constant covariates only, animicrobial exposure and hospitalisation. $\\lambda$ is the baseline hazard and $\\beta$ the log hazard ratio of ESBL-E acquisition, $\\mu$ the baseline hazard and $\\alpha$ the log hazard ratio of ESBL-E loss. B: Model 2 adds a post-exposure effect of antimicrobial exposure, parameterised by $\\gamma$ as described in the text. C: Model 3 adds stepwise constant covariates for TB therapy (tb) and cotrimoxazole (cotri) with all other antimicrobial exposure captured in the abx variable, which has a post exposure effect as before. D: Model 4 seperates the effect of antimicrobial exposure into the component agents, with post exposure effects for all except cotrimoxazole and TB therapy.  In most models 95\\% credible intervals of $\\alpha$[hosp] and $\\beta$[hosp] do not cross zero and are positive, suggesting that hospitaliation acts to both increase rate of ESBL-E acquisition and loss; for antimicrobial exposure, on the other hand, only the 95\\% for antimicrobial $\\alpha$ values consistently do not cross zero, and are negative, suggesting that the effect of antimicrobial exposure is to reduce the rate of ESBL-E loss. It is also clear that adding parameters to the model increases the uncertainty in the estimates (e.g. compare model 2, B, to model 4, D).",  fig.height = 10, fig.width=8, out.height = '70%', fig.align = 'center'}
 
 
 stan.df <- merge(stan.df, select(enroll, pid, arm), all.x = TRUE)
@@ -208,6 +219,7 @@ stan.df <- merge(stan.df, select(enroll, pid, arm), all.x = TRUE)
 fit_mod1 <- readRDS("chapter_9/stan_models/model_1/stanfit_m1.rds")
 fit_mod2 <- readRDS("chapter_9/stan_models/model_2/stanfit_m2.rds")
 fit_mod3 <- readRDS("chapter_9/stan_models/model_3/stanfit_m3.rds")
+fit_mod4 <- readRDS("chapter_9/stan_models/model_4/stanfit_m4.rds")
 
 
 ##mod 1
@@ -237,7 +249,7 @@ plot(fit_mod2, pars = c("lambda", "mu")) +
 plot(fit_mod2, pars = c("gammas")) + 
   theme_bw() + 
   scale_y_discrete(limits = c("gammas[1]"), labels = c('gammas[1]' = expression(gamma~"[abx]"))) + theme(axis.title.y = element_blank(),axis.text.y = element_text(size = 14)) + xlab("Parameter value") + 
-  coord_cartesian(xlim = c(0,150))-> c.mod2  
+  coord_cartesian(xlim = c(0,250))-> c.mod2  
 
  ggarrange(a.mod2, b.mod2, c.mod2, ncol = 3, nrow = 1, labels = c("B", NA, NA), widths = c(1.5,1,1)) -> m2.plot
  
@@ -266,20 +278,68 @@ plot(fit_mod2, pars = c("gammas")) +
    geom_vline(xintercept = 0, linetype = "dashed") + scale_y_discrete(limits = c("lambda", "mu"), labels = c('lambda' =  expression(lambda), 'mu' =  expression(mu))) + theme(axis.title.y = element_blank(), axis.text.y = element_text(size = 14)) + xlab("Parameter value") +
    coord_cartesian(xlim = c(0,0.4))-> b.mod3  
  
- plot(fit_mod2, pars = c("gammas")) + 
+ plot(fit_mod3, pars = c("gammas")) + 
    theme_bw() + 
    scale_y_discrete(limits = c("gammas[1]"), labels = c('gammas[1]' = expression(gamma~"[abx]"))) + theme(axis.title.y = element_blank(),axis.text.y = element_text(size = 14)) + xlab("Parameter value") + 
-   coord_cartesian(xlim = c(0,150))-> c.mod3  
+   coord_cartesian(xlim = c(0,250))-> c.mod3  
  
  ggarrange(a.mod3, b.mod3, c.mod3, ncol = 3, nrow = 1, labels = c("C", NA, NA), widths = c(1.5,1,1)) -> m3.plot
  
+ # mod 4
  
  
- ggarrange(m1.plot, m2.plot,m3.plot, ncol = 1, nrow = 3, heights = c(1,1,1.5))
+ 
+ 
+ plot(fit_mod4, pars = c("alphas[1]", "betas[1]", "alphas[2]", "betas[2]",
+                         "alphas[3]", "betas[3]", "alphas[4]", "betas[4]",
+                         "alphas[5]", "betas[5]", "alphas[6]", "betas[6]")) + 
+   theme_bw() +
+   geom_vline(xintercept = 0, linetype = "dashed") + 
+   scale_y_discrete(limits = rev(c("alphas[1]", "betas[1]", "alphas[2]", "betas[2]", 
+                                   "alphas[3]", "betas[3]", "alphas[4]", "betas[4]",
+                                   "alphas[5]", "betas[5]", "alphas[6]", "betas[6]")),
+                    labels = c('betas[6]' =  expression(beta~"[hosp]"), 
+                               'alphas[6]' =  expression(alpha~"[hosp]"),
+                               'betas[5]' =  expression(beta~"[tb]"), 
+                               'alphas[5]' =  expression(alpha~"[tb]"),
+                               'betas[4]' =  expression(beta~"[cotr]"), 
+                               'alphas[4]' =  expression(alpha~"[cotr]"),
+                               'betas[3]' =  expression(beta~"[amx]"), 
+                               'alphas[3]' =  expression(alpha~"[amx]"),
+                               'betas[2]' =  expression(beta~"[cip]"), 
+                               'alphas[2]' =  expression(alpha~"[cip]"),
+                               'betas[1]' =  expression(beta~"[cef]"), 
+                               'alphas[1]' =  expression(alpha~"[cef]"))
+   ) + theme(axis.title.y = element_blank(), axis.text.y = element_text(size = 14)) +
+   xlab("Parameter value") +
+   coord_cartesian(xlim = c(-3,5)) -> a.mod4
+ 
+ plot(fit_mod4, pars = c("lambda", "mu")) + 
+   theme_bw() +
+   geom_vline(xintercept = 0, linetype = "dashed") + scale_y_discrete(limits = c("lambda", "mu"), labels = c('lambda' =  expression(lambda), 'mu' =  expression(mu))) + theme(axis.title.y = element_blank(), axis.text.y = element_text(size = 14)) + xlab("Parameter value") +
+   coord_cartesian(xlim = c(0,0.4))-> b.mod4
+ 
+ plot(fit_mod4, pars = c("gammas")) + 
+   theme_bw() + 
+   scale_y_discrete(limits = rev(c("gammas[1]", "gammas[2]", "gammas[3]")), 
+                    labels = c('gammas[3]' = expression(gamma~"[amx]"), 
+                               'gammas[2]' =  expression(gamma~"[cip]"),
+                               'gammas[1]' =  expression(gamma~"[cef]") )) + 
+   theme(axis.title.y = element_blank(),axis.text.y = element_text(size = 14)) + 
+   xlab("Parameter value") + 
+   coord_cartesian(xlim = c(0,250)) -> c.mod4  
+ 
+ ggarrange(a.mod4, b.mod4, c.mod4, ncol = 3, nrow = 1, labels = c("D", NA, NA), widths = c(1.5,1,1)) -> m4.plot
+ 
+ 
+ 
+ ggarrange(m1.plot, m2.plot,m3.plot, m4.plot, ncol = 1, nrow = 4, heights = c(1,1,1.3, 1.8))
+
+
 
 ```
 
-```{r ESBL-mod-ppc, echo = F, warning = F, message = F,fig.scap="Predicted proprtion of ESBL-E positive samples, stratified by arm.", out.extra='', fig.cap = "Posterior predictive checks: kernal density estimate, D, of predicted proprtion of ESBL-E positive samples, stratified by arm for Model 1 (A), Model 2 (B), Model 3 (C), generated by sampling from a Bernoulli distribution using the predicted probability for each sample (n=993) for each draw from the posterior, excluding warmup draws (n = 2000). True proportion of ESBL-E positive samples are shown for each arm by dotted vertical line. In all cases, predictions are poor for arm 2 and 3 samples, but the addition of a term conferring an effect of antimicrobials that persists once exposure has stopped (quantified by $\\gamma$) improves fit, especially  in arm 1 participants: compare Model 1 (A) with stepwise constant covariates to Model 2 (B) with persistent antimicrobial effect.",  fig.height = 4, fig.width=6,fig.align = 'center'}
+```{r ESBL-mod-ppc, echo = F, warning = F, message = F,fig.scap="Predicted proprtion of ESBL-E positive samples, stratified by arm.", out.extra='', fig.cap = "Posterior predictive checks: kernal density estimate, D, of predicted proprtion of ESBL-E positive samples, stratified by arm for Model 1 (A), Model 2 (B), Model 3 (C) and Model 4 (D), generated by sampling from a Bernoulli distribution using the predicted probability for each sample (n=993) for each draw from the posterior, excluding warmup draws (n = 2000). True proportion of ESBL-E positive samples are shown for each arm by dotted vertical line. In all cases, predictions are poor for arm 2 and 3 samples, but the addition of a post-antibacterial effect (quantified by $\\gamma$) improves fit, especially in arm 1 participants: compare Model 1 (A) with stepwise constant covariates to Model 2 (B) with post-antibacterial effect. Models 2-3 (B-D) have similar predictions despite more parameters.",  fig.height = 6, fig.width=6,fig.align = 'center'}
 
 
 log_lik_mod1 <- extract_log_lik(fit_mod1)
@@ -366,20 +426,125 @@ predicted_m3 %>%
   xlab("Proportion") + ylab("D") +
   theme_bw() + theme(legend.title = element_blank())-> c
 
+##
+### mod 4
 
-ggarrange(a,b,c, ncol = 1,nrow = 3, labels = c("A", "B", "C"),
+log_lik_mod4 <- extract_log_lik(fit_mod4)
+log_lik_mod4.df <- as.data.frame(t(log_lik_mod4))
+log_lik_mod4.df$pid <- as.character(stan.df$pid)
+log_lik_mod4.df$actual_end_state <- stan.df$ESBL_stop
+log_lik_mod4.df<- merge(log_lik_mod4.df, select(enroll, pid, arm), all.x = T)
+log_lik_mod4.df %>% pivot_longer(-c(pid, actual_end_state, arm)) -> log_lik_mod4.df.long
+exp(log_lik_mod4.df.long$value) ->  log_lik_mod4.df.long$pred_prob
+log_lik_mod4.df.long$pred_prob[log_lik_mod4.df.long$actual_end_state == 0] <- 1 - log_lik_mod4.df.long$pred_prob[log_lik_mod4.df.long$actual_end_state == 0]
+log_lik_mod4.df.long$pred_state <- map_int(log_lik_mod4.df.long$pred_prob, ~rbinom(1,1,.))
+
+predicted_m4 <- log_lik_mod4.df.long %>% group_by(arm, name) %>% dplyr::summarise(n.esbl = sum(pred_state == 1),                                                         n = length(pred_state),
+                                                                                  prop = n.esbl/n) 
+
+predicted_m4 %>% 
+  ungroup() %>% mutate(arm = as.character(arm),
+                       arm = recode_factor(arm, `1` = "Arm 1", `2` = "Arm 2", `3` = "Arm 3")) %>% 
+  ggplot(aes(prop, fill = as.factor(arm), group = arm)) + 
+  geom_density(alpha = 0.5) +
+  geom_vline(data = actuals, aes(xintercept = prop, color = as.factor(arm)), linetype = "dashed")+
+  coord_cartesian(xlim = c(0.3, 0.7))  +
+  xlab("Proportion") + ylab("Denisty") +
+  theme_bw() + theme(legend.title = element_blank())-> d
+
+ggarrange(a,b,c,d, ncol = 1,nrow = 4, labels = c("A", "B", "C", "D"),
           common.legend = TRUE, legend = "bottom")
 
 
 
 
 ```
-### Exploring the effect of antimicrobial expousure on carriage
- 
+
+```{r ESBL-loo, echo = F, warning = F, message = F}
+
+ll_m1 <- extract_log_lik(fit_mod1, merge_chains = FALSE)
+
+r_eff_m1 <- relative_eff(exp(ll_m1)) 
+
+ll_m2 <- extract_log_lik(fit_mod2, merge_chains = FALSE)
+r_eff_m2 <- relative_eff(exp(ll_m2)) 
+
+ll_m3 <- extract_log_lik(fit_mod3, merge_chains = FALSE)
+r_eff_m3 <- relative_eff(exp(ll_m3)) 
+
+ll_m4 <- extract_log_lik(fit_mod4, merge_chains = FALSE)
+r_eff_m4 <- relative_eff(exp(ll_m4)) 
+
+loo_mod <- list()
+
+loo_mod[[1]] <- loo(ll_m1, r_eff = r_eff_m1, cores = 2 )
+loo_mod[[2]] <- loo(ll_m2, r_eff = r_eff_m2, cores = 2 )
+loo_mod[[3]] <- loo(ll_m3, r_eff = r_eff_m3, cores = 2 )
+loo_mod[[4]] <- loo(ll_m4, r_eff = r_eff_m4, cores = 2 )
+
+loo_mat <- matrix(nrow = 4, ncol = 4)
+for (r in 1:4) {
+  for (c in 1:4) {
+    loo_temp <- loo::compare(loo_mod[[r]], loo_mod[[c]]) 
+    if (r <= c) {
+    loo_mat[r,c] <- glue('{specify_decimal(loo_temp[[1]],1)} ({specify_decimal(loo_temp[[2]],1)})')
+     }
+  }
+}
+
+loo_mat <- as.data.frame(loo_mat, stringsAsFactors = FALSE )
+names(loo_mat) <- c("Model 1", "Model 2", "Model 3", "Model 4")
+rownames(loo_mat) <- c("Model 1", "Model 2", "Model 3", "Model 4")
+loo_mat[is.na(loo_mat)] <- "-"
+
+kable(loo_mat, "latex", booktabs = TRUE,
+      row.names = TRUE, escape = TRUE,
+      caption = "Estimates (and standard error) of pairwise expected log pointwise predictive denisty differences for all models ") %>% kable_styling(full_width = FALSE) %>%
+  footnote(general = "Cells in table compare row model to column model. A positive number favours the model in the column. The standard error of the ELPD difference is given in brackets; if twice the standard error is less than the estimated ELPD difference then we can be confident that the column model has better out-of-sample predictive fit than the row model. All models have better fit than model 1 but models 2-4 all have similar fit." ,threeparttable = T, fixed_small_size = T)
+```
+
+```{r mod2-params, echo = F, warning = F, message = F}
+
+summary(fit_mod2, pars = c("alphas[1]", "betas[1]", "alphas[2]", "betas[2]", "gammas", "lambda", "mu")) -> s
+as.data.frame(s$summary) -> s
+
+s$vars <- rownames(s)
+
+s <- dplyr::select(s,vars, `2.5%`, `50%`, `97.5%`)
+# scale
+s[1:4,2:4] <- exp(s[1:4,2:4])
+s[5,2:4] <- s[5,2:4] * log(2)
+s[6:7, 2:4] <- 1/s[6:7, 2:4] 
+s[6,2:4] <- rev(s[6,2:4])
+s[7,2:4] <- rev(s[7,2:4])
+
+s$stri <- glue('{specify_decimal(s$`50%`,2)} ({specify_decimal(s$`2.5%`,2)}-{specify_decimal(s$`97.5%`,2)}) ')
+s$vars <- c("Hazard ratio for ESBL-E loss", "Hazard ratio for ESBL-E acquisition",
+            "Hazard ratio for ESBL-E loss", "Hazard ratio for ESBL-E acquisition",
+            "Half life (days)",
+            "Uncolonised (days)", "Colonised (days)")
+
+kable(dplyr::select(s, vars, stri), "latex", booktabs = TRUE,
+      row.names = FALSE, escape = FALSE, col.names = c("Variable", "Value"),
+      caption = "Parameter estimates (and 95\\% confidence intervals) from model 2") %>% kable_styling(full_width = FALSE) %>%
+  pack_rows("Effect of Antibacterials", 1,2) %>%
+  pack_rows("Effect of Hospitalisation", 3,4) %>%
+ pack_rows("Post Antibacterial Effect", 5,5) %>%
+  pack_rows("Mean time in state", 6,7) %>%
+  footnote(general = "Hazard ratios are the exponential of the parameters $\\\\alpha$ and $\\\\beta$ in the model; half life is equal to log(2) multiplied by $\\\\gamma$; mean time in state assumes all other covariates are equal to zero and is then the reciprocal of $\\\\lambda$ or $\\\\mu$." ,threeparttable = T, fixed_small_size = T, escape = FALSE)
+
+
+```
 ### Exploring bacterial species differences in carriage dynamics
 
 ### Exploring genotypic differences in carriage dynamics
 
+### _In silico_ testing of different antibacterial and hospitalisation scenarios
+
 ## Discussion
+
+$\gamma$
+parameter estimates
+Some care is warranted in interpreting this finding as a lack of effect of antimicrobial exposure on ESBL-E acquisition, however: firstly, the credible intervals cover a relevent effect size, and secondly, for cotrimoxazole in particular, in many models $\beta$ has a reasonably high probability of being different than zero. For example in Model 3 (Figure \@ref(fig:ESBL-twostate-diag)C) the 80% credible interval for $\beta_{cotrimoxazole}$ does not cross zero, meaning there is an 80% probability that $\beta_{cotrimoxazole}$ is different from zero. Nevertheless, given these parameter estimates we can have good confidence in the conclusion that, (conditional on the models and assumptions made) hospitalisation acts to increase both ESBL-E acquisition and loss, and antibacterial exposure acts to reduce ESBL-E loss, and moderate confidence
 
 ## Conclusion and further work
