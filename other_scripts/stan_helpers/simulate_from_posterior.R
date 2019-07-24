@@ -86,14 +86,26 @@ pmap(sim.df[,c( "p0", "p1","abx_start", "abx_stop", "prev_abx",
                                    pid = ..9)) -> test
 
 do.call(rbind, test) -> test
-
-outsum <- test %>% group_by(time, pid) %>% summarise(median = median(`2`),
-                                               lq = quantile(`2`, 0.025),
-                                               uq = quantile(`2`, 0.975))
+test
+outsum <- test %>% group_by(time, pid) %>% dplyr::summarise(median = median(`2`),
+                                               lq = quantile(`2`, 0.025)[[1]],
+                                               uq = quantile(`2`, 0.975)[[1]])
 
 outsum <- merge(outsum, select(sim.df, pid, hosp_days, abx_days, abx_cpt), all.x =T)
 
-ggplot(outsum, aes(time, median, ymin = lq, ymax = uq, group = abx_cpt, color = as.factor(abx_cpt), fill = as.factor(abx_cpt))) +
-  geom_line() + geom_ribbon(alpha = 0.2, color = NA) + facet_grid(hosp_days ~ abx_days) + theme_bw()
+outsum$hosp_days_str <- paste0("Hosp: ",outsum$hosp_days, "d" )
+outsum$hosp_days_str <- factor(outsum$hosp_days_str, levels = unique(outsum$hosp_days_str[order(outsum$hosp_days)]))
+outsum$abx_days_str <- paste0("Abx: ",outsum$abx_days, "d" )
+outsum$abx_days_str <- factor(outsum$abx_days_str, levels = unique(outsum$abx_days_str[order(outsum$abx_days)]))
+
+outsum$abx_cpt[outsum$abx_cpt == 0] <- "No CPT"
+outsum$abx_cpt[outsum$abx_cpt == 1] <- "CPT"
+
+write.csv(outsum, "chapter_9/simulations.csv")
+
+ggplot(outsum, aes(time, median, ymin = lq, ymax = uq, group = abx_cpt, linetype = as.factor(abx_cpt))) +
+  geom_line() + geom_ribbon(alpha = 0.2, color = NA) + facet_grid(hosp_days_str ~ abx_days_str) + theme_bw() + theme(legend.title = element_blank(), panel.spacing = unit(1, "line")) + scale_linetype_manual(values = c("dotted", "solid")) + xlab("Time (days") + ylab("Pr(ESBL)")
+
+# color = as.factor(abx_cpt), fill = as.factor(abx_cpt),
 
   
