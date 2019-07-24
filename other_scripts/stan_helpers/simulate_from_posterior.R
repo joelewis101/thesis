@@ -101,7 +101,7 @@ outsum$abx_days_str <- factor(outsum$abx_days_str, levels = unique(outsum$abx_da
 outsum$abx_cpt[outsum$abx_cpt == 0] <- "No CPT"
 outsum$abx_cpt[outsum$abx_cpt == 1] <- "CPT"
 
-write.csv(outsum, "chapter_9/simulations.csv")
+write.csv(outsum, "chapter_9/simulations.csv", row.names = FALSE)
 
 ggplot(outsum, aes(time, median, ymin = lq, ymax = uq, group = abx_cpt, linetype = as.factor(abx_cpt))) +
   geom_line() + geom_ribbon(alpha = 0.2, color = NA) + facet_grid(hosp_days_str ~ abx_days_str) + theme_bw() + theme(legend.title = element_blank(), panel.spacing = unit(1, "line")) + scale_linetype_manual(values = c("dotted", "solid")) + xlab("Time (days") + ylab("Pr(ESBL)")
