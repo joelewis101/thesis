@@ -9,6 +9,10 @@ library(reshape2)
 library(rstan)
 library(loo)
 library(kableExtra)
+library(glue)
+library(deSolve)
+
+source("other_scripts/load_metadata.R")
 
 source("final_cleaning_scripts/load_and_clean_followup_and_enroll_labelled.R")
 source("other_scripts/summary_table_functions.R")
@@ -203,13 +207,13 @@ This process was repeated, replacing the ESBL-E state first with _E. coli_ (codi
 
 ### Exploring the effect of antibacterials and hospitalisation on ESBL-E carriage
 
-To explore the relative effects of hospitalisation versus antimicrobial exposure, the four models described above were fit to the data with the colonised state defined as at least one ESBL-E identified in a sample, and uncolonised as no ESBL-E identified. After exluding participants with only one sample, there were 993 pairs of samples in 363 participants that contributed data to the analysis. All four models converged within the 1000 iterations; $\hat{R}$ was less than 1.1 for all parameters and all traceplots showed good mixing of chains (see chapter appendix). There were no divergences of the NUTS MCMC sampler in any of the models. There was a computational cost to increasing the number of parameters, as would be expected from the increase in dimensionality of the posterior: model one took 3.5 hours to fit, model two 13.7 hours, model three 17.1 hours and model four 33.4 hours. 
+First, I fit the four models with two aims: to identify the model that provides the best trade off between predictive ability and the computational cost to fit, and to explore the relative effects of hospitalisation versus antimicrobial exposure on ESBL-E carriage. The colonised state was defined as at least one ESBL-E identified in a sample, and uncolonised as no ESBL-E identified. After excluding participants with only one sample, there were 993 pairs of samples in 363 participants that contributed data to the analysis. All four models converged within the 1000 iterations; $\hat{R}$ was less than 1.1 for all parameters and all traceplots showed good mixing of chains. There were no divergences of the NUTS MCMC sampler in any of the models. There was a computational cost to increasing the number of parameters, as would be expected from the increase in dimensionality of the posterior: model one took 3.5 hours to fit, model two 13.7 hours, model three 17.1 hours and model four 33.4 hours. 
 
 The parameter estimates for the models are shown in Figure \@ref(fig:ESBL-mod-param-est). The effect of hospitalisation is consistent across all models; in most models, the 95% credible intervals for both $\alpha_{hospitalisation}$ and $\beta_{hospitalisation}$ do not cross zero and are positive, suggesting that the hazard ratio of hospitalisation on both the rate of acquisition and loss of ESBL-E is very likely to be greater than one, and the effect of hospitalisation is to increase both the rate of acquisition and loss of ESBL-E. The estimated effect sizes are consistent across the models though, as expected, uncertainty in the estimate increases as more parameters are addded to the model. 
 
-The effect of antibacterial exposure is also reasonably consistent accross the models; the parameter $\alpha$ is negative in all cases, and often the 95% credible intervals do not cross zero, suggesting that the hazard ratio of antimicrobial exposure is likely to be less than zero. The effect sizes are similar in all cases, for all agents (incuding TB therapy), whether antibacterial exposure is considered as an aggregate variable or as individual agents; though in the extreme case where agents are all considered individually (Model 4, Figure \@ref(fig:ESBL-mod-param-est)D) the uncertainty in the estimates makes it difficult to draw any firm conclusions. This suggests that all the considered antibacterial agents act, with broadly similar effect size, to prolong ESBL-E carriage by reducing the rate of loss. No $\beta$ parameter (the log hazard ratio of ESBL-E acquisition) has 95% credible intervals that do not cross zero, consistent with antibacterial exposure not affecting ESBL-E acqusition.
+The effect of antibacterial exposure is also reasonably consistent accross the models; the parameter $\alpha$ is negative in all cases, and often the 95% credible intervals do not cross zero, suggesting that the hazard ratio of antimicrobial exposure is likely to be less than zero. The effect sizes are similar in all cases, for all agents (incuding TB therapy), whether antibacterial exposure is considered as an aggregate variable or as individual agents; though in the extreme case where agents are all considered individually (Model 4, Figure \@ref(fig:ESBL-mod-param-est)D) the uncertainty in the estimates makes it difficult to draw any firm conclusions. This suggests that all the considered antibacterial agents act, with broadly similar effect size, to prolong ESBL-E carriage by reducing the rate of loss. No $\beta$ parameter (the log hazard ratio of ESBL-E acquisition) has 95% credible intervals that do not cross zero, consistent with antibacterial exposure have no or limited effect on ESBL-E acqusition.
 
-To assess the relative predictive ability of the four models, the predicted proportion of ESBL-E positive samples were plotted by sampling from the posterior (Figure \@ref(fig:ESBL-mod-ppc)) and the pairwise $ELPD_{loo}$ differences (and standard errors in the differences) between all models calculated (Table \@ref(tab:ESBL-loo)). All models predicted ESBL-E carriage reasonably poorly for arm two and three participants, but better for arm one. The addition of a post-antibiotic effect improved model fit (seen by comparing model 1 to model 2) but models two, three and four, had similar fit despite the increase in number of parameters from seven in model two to seventeen parameters in model four. Model two therefore provides a good balance between computational tractability, interpretation and predictive ability; the parameter estimates for this model, expressed as hazard ratios for $\alpha$ and $\beta$, the mean time in state for $\lambda$ and $\mu$ and half life of post-antibacterial effect for $\gamma$ are shown in Table
+The relative predictive ability of the four models were assessed in two ways: first, the predicted proportion of ESBL-E positive samples were plotted by sampling from the posterior (Figure \@ref(fig:ESBL-mod-ppc)); second, the pairwise $ELPD_{loo}$ differences (and standard errors in the differences) between all models calculated (Table \@ref(tab:ESBL-loo)). All models predicted ESBL-E carriage reasonably poorly for arm two and three participants, but better for arm one \@ref(fig:ESBL-mod-ppc)). The addition of a post-antibiotic effect improved model fit (seen by comparing model 1 to model 2) but models two, three and four, had similar fit despite the increase in number of parameters from seven in model two to seventeen parameters in model four. Model two therefore provides a good balance between computational tractability, interpretation and predictive ability; the parameter estimates for this model, expressed as hazard ratios for $\alpha$ and $\beta$, the mean time in state for $\lambda$ and $\mu$ and half life of post-antibacterial effect for $\gamma$ are shown in Table \@ref(tab:mod2-params).
 
 ```{r ESBL-mod-param-est, echo = F, warning = F, message = F,fig.scap="Parameter estimates from Markov models", out.extra='', fig.cap = "Parameter estimates from increasingly complex Markov models to predict ESBL carriage. Black lines are 95\\% and red lines 80\\% credible intervals. A: Model 1 includes stepwise constant covariates only, animicrobial exposure and hospitalisation. $\\lambda$ is the baseline hazard and $\\beta$ the log hazard ratio of ESBL-E acquisition, $\\mu$ the baseline hazard and $\\alpha$ the log hazard ratio of ESBL-E loss. B: Model 2 adds a post-exposure effect of antimicrobial exposure, parameterised by $\\gamma$ as described in the text. C: Model 3 adds stepwise constant covariates for TB therapy (tb) and cotrimoxazole (cotri) with all other antimicrobial exposure captured in the abx variable, which has a post exposure effect as before. D: Model 4 seperates the effect of antimicrobial exposure into the component agents, with post exposure effects for all except cotrimoxazole and TB therapy.  In most models 95\\% credible intervals of $\\alpha$[hosp] and $\\beta$[hosp] do not cross zero and are positive, suggesting that hospitaliation acts to both increase rate of ESBL-E acquisition and loss; for antimicrobial exposure, on the other hand, only the 95\\% for antimicrobial $\\alpha$ values consistently do not cross zero, and are negative, suggesting that the effect of antimicrobial exposure is to reduce the rate of ESBL-E loss. It is also clear that adding parameters to the model increases the uncertainty in the estimates (e.g. compare model 2, B, to model 4, D).",  fig.height = 10, fig.width=8, out.height = '70%', fig.align = 'center'}
 
@@ -535,11 +539,130 @@ kable(dplyr::select(s, vars, stri), "latex", booktabs = TRUE,
 
 
 ```
-### Exploring bacterial species differences in carriage dynamics
 
-### Exploring genotypic differences in carriage dynamics
+\clearpage
 
-### _In silico_ testing of different antibacterial and hospitalisation scenarios
+### Exploring bacterial species and gentotype differences in carriage dynamics
+
+Next, I explored the dynamics of carriage of ESBL-E species and _E. coli_ genotype, by refitting model 2 but considering the colonised/uncolonised states to be, in turn, presence or absence of _E. coli_, _K. pneumoniae_ or any of the top six most prevalent _E. coli_ genotypes (as defined by the combination of ESBL containing contig cluster and _E. coli_ hierBAPS cluster [Chapter xx]), and refitting the model for each one. All 993 within-participant sample-pair comparisons were used to fit the _E. coli_ and _K. pneumoniae_ models, but because sample collection continued after the sequenced _E. coli_ were shipped, all samples collected after this time were excluded. 585 samples from 251 participants were therefore included in the genotype models.
+
+The parameter estimates for these eight models (alongside the original ESBL-E presence/absence model) are shown in figure \@ref(fig:bact-gen-mod-params). In general, there was more uncertainty in the parameter estimates for the new models, as might be expected as there are fewer carriage events, and fewer samples in the case of the genotype models. The only significant parameter difference between the models was in the $\lambda$ parameter, the baseline hazard of state acquisition. The magnitude of the difference was large; for example the median (95% CI) $\lambda_{ESBL}$ estimate of 0.10 (0.07-0.15) is almost three orders of magnitude larger than the estimate of $\lambda_{6.CTXM.27}$, 0.002 (0.001- 0.003). These values would correspond to a mean (95% CI) time in the uncolonised state of 10 (6-14) days for the ESBL-E model versus 500 (333-1000) days for the genotype model, assuming all other covariates were zero. The hazard rate of state loss, $\mu$ was similar, however. 
+
+```{r bact-gen-mod-params, echo = F, warning = F, message = F,fig.scap="Parameter estimates from models of bacterial species and genotype carriage", out.extra='', fig.cap = "Parameter estimates from two state models predicting species and E. coli genotype carriage, compared to original model, which predicted carriahe of any ESBL-E. A: All parameters, showing that the only significant difference between the models is the parameter $\\lambda$ (the hazard of acquisition), with an order of magnitude difference between the hazard of ESBL acquisition versus the acqusition of a particular genotype. B: $\\lambda$ parameter only for genotype models, showing that the estimates are similar for each genotype. ",  fig.height = 10, fig.width=6,out.height = '70%',fig.align = 'center'}
+
+mods.sum <- list()
+
+m.esco.fit <- readRDS("chapter_9/stan_models/model_2_esco/stanfit_m2_esco.rds")
+
+
+mods.sum[[1]] <- as.data.frame(summary(m.esco.fit, pars = c("alphas", "betas","lambda", "mu", "gammas" ))$summary)
+mods.sum[[1]]$vars <- rownames(mods.sum[[1]])
+mods.sum[[1]]$model <- "E. coli"
+  
+m.klpn.fit <- readRDS("chapter_9/stan_models/model_2_klpn/stanfit_m2_klpn.rds")
+
+mods.sum[[2]] <- as.data.frame(summary(m.klpn.fit, pars = c("alphas", "betas","lambda", "mu", "gammas" ))$summary)
+mods.sum[[2]]$vars <- rownames(mods.sum[[1]])
+mods.sum[[2]]$model <- "K. Pneumoniae"
+
+m.1.ctxm15.16 <- readRDS("chapter_9/stan_models/model_2_1_ctxm15_16/stanfit_m2_1_ctxm15_16.rds")
+
+mods.sum[[3]] <- as.data.frame(summary(m.1.ctxm15.16, pars = c("alphas", "betas","lambda", "mu", "gammas" ))$summary)
+mods.sum[[3]]$vars <- rownames(mods.sum[[1]])
+mods.sum[[3]]$model <- "1.ctxm15.16"
+
+
+m.6.ctxm15.27 <- readRDS("chapter_9/stan_models/model_2_6_ctxm27_1/stanfit_m2_6_ctxm27_1.rds")
+
+mods.sum[[4]] <- as.data.frame(summary(m.6.ctxm15.27, pars = c("alphas", "betas","lambda", "mu", "gammas" ))$summary)
+mods.sum[[4]]$vars <- rownames(mods.sum[[1]])
+mods.sum[[4]]$model <- "6.ctxm15.27"
+
+m.8.ctxm15.27 <- readRDS("chapter_9/stan_models/model_2_8_ctxm27_1/stanfit_m2_8_ctxm27_1.rds")
+
+mods.sum[[5]] <- as.data.frame(summary(m.8.ctxm15.27, pars = c("alphas", "betas","lambda", "mu", "gammas" ))$summary)
+mods.sum[[5]]$vars <- rownames(mods.sum[[1]])
+mods.sum[[5]]$model <- "8.ctxm15.27"
+
+m.9.ctxm15.62 <- readRDS("chapter_9/stan_models/model_2_9_ctxm15_62/stanfit_m2_9_ctxm15_62.rds")
+
+mods.sum[[6]] <- as.data.frame(summary(m.9.ctxm15.62, pars = c("alphas", "betas","lambda", "mu", "gammas" ))$summary)
+mods.sum[[6]]$vars <- rownames(mods.sum[[1]])
+mods.sum[[6]]$model <- "9.ctxm15.62"
+
+m.23.ctxm15.57 <- readRDS("chapter_9/stan_models/model_2_23_ctxm15_57/stanfit_m2_23_ctxm15_57.rds")
+
+mods.sum[[7]] <- as.data.frame(summary(m.23.ctxm15.57, pars = c("alphas", "betas","lambda", "mu", "gammas" ))$summary)
+mods.sum[[7]]$vars <- rownames(mods.sum[[1]])
+mods.sum[[7]]$model <- "23.ctxm15.57"
+
+m.39.ctxm15.57 <- readRDS("chapter_9/stan_models/model_2_39_ctxm15_22/stanfit_m2_39_ctxm15_22.rds")
+
+mods.sum[[8]] <- as.data.frame(summary(m.39.ctxm15.57, pars = c("alphas", "betas","lambda", "mu", "gammas" ))$summary)
+mods.sum[[8]]$vars <- rownames(mods.sum[[1]])
+mods.sum[[8]]$model <- "39.ctxm15.57"
+
+fit_mod2 <- readRDS("chapter_9/stan_models/model_2/stanfit_m2.rds")
+
+mods.sum[[9]] <- as.data.frame(summary(fit_mod2, pars = c("alphas", "betas","lambda", "mu", "gammas" ))$summary)
+mods.sum[[9]]$vars <- rownames(mods.sum[[1]])
+mods.sum[[9]]$model <- "ESBL"
+
+
+mods.sum <- do.call(rbind, mods.sum)
+
+mods.sum$model<- factor(mods.sum$model, levels = rev(c("ESBL", "E. coli",
+                                                   "K. Pneumoniae",
+                                                   grep("ctxm", unique(mods.sum$model), 
+                                                        value = TRUE))))
+
+mods.sum$vars <- recode_factor(mods.sum$vars,
+                               `mu` = "mu",
+                               `lambda` = "lambda",
+                               `alphas[1]` = "alpha[abx]",
+                               `alphas[2]` = "alpha[hosp]",
+                               `betas[1]` = "beta[abx]",
+                               `betas[2]` = "beta[hosp]",
+                               `gammas[1]` = "gamma"
+                               )
+mods.sum %>% #filter(grepl("ctxm", model) | model == "ESBL_mod2") %>%
+ggplot(aes(model, `50%`, ymin = `2.5%`, ymax = `97.5%`)) +
+  geom_point() + geom_errorbar(width = 0) + theme_bw() + coord_flip() + facet_wrap(~vars, scales = "free_x", ncol = 2) +
+  ylab("Parameter value") +
+  xlab("Model") +
+  theme(panel.spacing.x = unit(1, "lines")) -> p1
+
+mods.sum %>% filter(grepl("ctxm", model), vars %in% c("lambda")) %>%
+  ggplot(aes(model, `50%`, ymin = `2.5%`, ymax = `97.5%`)) +
+  geom_point() + geom_errorbar(width = 0) + theme_bw() + coord_flip() + facet_wrap(~vars, scales = "free_x", ncol = 2) +
+  ylab("Parameter value") +
+  xlab("Model") +
+  theme(panel.spacing.x = unit(1, "lines")) -> p2
+
+ggarrange(p1,ggarrange(NULL,p2,NULL, widths = c(0.4,1,0.4), 
+                       ncol = 3, nrow = 1, labels = c(NA,"B", NA)),
+          ncol = 1, nrow = 2, heights = c(4,1), labels = c("A",NA))
+
+
+```
+
+### Simulation of different antibacterial and hospitalisation scenarios
+
+Finally, to better understand the relative roles of antimicrobial exposure and hospitalisation in driving ESBL-E carriage, I simulated the probability of ESBL-E colonisation as antibacterial and hospital exposure changed from 1 to 20 days, assuming a 50% baseline probability of ESBL-E colonisation (Figure \@ref(fig:ESBL-simul)) and both with and without cotrimoxazole preventative therapy (CPT). Hospitalisation seems to be the primary determinent of the rapid initial increase in carriage probability, with a lesser effect of antimicrobial exposure, and CPT seems to be the primary driver of an increased long-term carriage probability. In this mode, TB therapy and CPT are included in the composite "antibacterial" variable, so these conclusions would be equally valid for TB therapy.
+
+```{r ESBL-simul, echo = F, warning = F, message = F,fig.scap= "Simulations of different antibacterial and hospitalisation scenarios", out.extra='', fig.cap = "Simulations of different antibacterial and hospitalisation scenarios. CPT = Cotrimoxazole preventative therapy. Plots show estimated probability of being in the ESBL+ state for given covariate values as a function of time, assuming a baseline 50\\% probability of ESBL-E colonisation. Antimicrobial exposure ranges across columns from 1 to 20 days, and hospitalisation across rows from 1 to 20 days. Hospitaliation is clearly the primary driver of rapid initial increase in probability, wheras antimicrobial exposure in the form of CPT is the primary deteriminent of increased long-term carriage probability.",  fig.height = 8, fig.width=10,,fig.align = 'center'}
+
+outsum <- read.csv("chapter_9/simulations.csv", stringsAsFactors = FALSE)
+
+outsum$hosp_days_str <- factor(outsum$hosp_days_str, levels = unique(outsum$hosp_days_str[order(outsum$hosp_days)]))
+outsum$abx_days_str <- factor(outsum$abx_days_str, levels = unique(outsum$abx_days_str[order(outsum$abx_days)]))
+
+ggplot(outsum, aes(time, median, ymin = lq, ymax = uq, group = abx_cpt, linetype = as.factor(abx_cpt))) +
+  geom_line() + geom_ribbon(alpha = 0.2, color = NA) + facet_grid(hosp_days_str ~ abx_days_str) + theme_bw() + theme(legend.title = element_blank(), panel.spacing = unit(1, "line")) + scale_linetype_manual(values = c("dotted", "solid")) + xlab("Time (days") + ylab("Pr(ESBL)")
+
+
+```
+
 
 ## Discussion
 
