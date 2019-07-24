@@ -381,8 +381,8 @@ predicted <- log_lik_mod1.df.long %>% group_by(arm, name) %>% dplyr::summarise(n
                                                             prop = n.esbl/n) 
 
 predicted %>% 
-  ungroup() %>% mutate(arm = as.character(arm),
-                       arm = recode(arm, `1` = "Arm 1", `2` = "Arm 2", `3` = "Arm 3")) %>%
+  ungroup() %>% dplyr::mutate(arm = as.character(arm),
+                       arm = dplyr::recode(arm, `1` = "Arm 1", `2` = "Arm 2", `3` = "Arm 3")) %>%
 ggplot(aes(prop, fill = as.factor(arm), group = arm)) + 
   geom_density(alpha = 0.5) +
   geom_vline(data = actuals, aes(xintercept = prop, color = as.factor(arm)), linetype = "dashed") +
@@ -408,7 +408,7 @@ predicted_m2 <- log_lik_mod2.df.long %>% group_by(arm, name) %>% dplyr::summaris
                                                                                prop = n.esbl/n) 
 
 predicted_m2 %>% 
-  ungroup() %>% mutate(arm = as.character(arm),
+  ungroup() %>% dplyr::mutate(arm = as.character(arm),
     arm = recode(arm, `1` = "Arm 1", `2` = "Arm 2", `3` = "Arm 3")) %>%
   ggplot(aes(prop, fill = as.factor(arm), group = arm)) + 
   geom_density(alpha = 0.5) +
@@ -431,7 +431,7 @@ predicted_m3 <- log_lik_mod3.df.long %>% group_by(arm, name) %>% dplyr::summaris
                                                                                   prop = n.esbl/n) 
 
 predicted_m3 %>% 
-  ungroup() %>% mutate(arm = as.character(arm),
+  ungroup() %>% dplyr::mutate(arm = as.character(arm),
                        arm = recode_factor(arm, `1` = "Arm 1", `2` = "Arm 2", `3` = "Arm 3")) %>% 
   ggplot(aes(prop, fill = as.factor(arm), group = arm)) + 
   geom_density(alpha = 0.5) +
@@ -457,7 +457,7 @@ predicted_m4 <- log_lik_mod4.df.long %>% group_by(arm, name) %>% dplyr::summaris
                                                                                   prop = n.esbl/n) 
 
 predicted_m4 %>% 
-  ungroup() %>% mutate(arm = as.character(arm),
+  ungroup() %>% dplyr::mutate(arm = as.character(arm),
                        arm = recode_factor(arm, `1` = "Arm 1", `2` = "Arm 2", `3` = "Arm 3")) %>% 
   ggplot(aes(prop, fill = as.factor(arm), group = arm)) + 
   geom_density(alpha = 0.5) +
