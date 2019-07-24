@@ -1,0 +1,43 @@
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@farm4-os0000158>
+Subject: Job 1208476: </software/R-3.5.3/bin/R CMD BATCH run_stanmod2.R> in cluster <farm4> Done
+
+Job </software/R-3.5.3/bin/R CMD BATCH run_stanmod2.R> was submitted from host <farm4-head1> by user <jl25> in cluster <farm4> at Tue Jul 23 16:48:27 2019.
+Job was executed on host(s) <4*farm4-os0000158>, in queue <long>, as user <jl25> in cluster <farm4> at Tue Jul 23 22:56:14 2019.
+</nfs/users/nfs_j/jl25> was used as the home directory.
+</nfs/users/nfs_j/jl25/stan/model_2_9_ctxm15_62> was used as the working directory.
+Started at Tue Jul 23 22:56:14 2019.
+Terminated at Wed Jul 24 03:32:29 2019.
+Results reported at Wed Jul 24 03:32:29 2019.
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/software/R-3.5.3/bin/R CMD BATCH run_stanmod2.R
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   48948.36 sec.
+    Max Memory :                                 1921 MB
+    Average Memory :                             325.05 MB
+    Total Requested Memory :                     4000.00 MB
+    Delta Memory :                               2079.00 MB
+    Max Swap :                                   3330 MB
+    Max Processes :                              10
+    Max Threads :                                11
+    Run time :                                   16574 sec.
+    Turnaround time :                            38642 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <Rlog.e> for stderr output of this job.
+
