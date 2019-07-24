@@ -81,14 +81,17 @@ ggplot(aes(model, `50%`, ymin = `2.5%`, ymax = `97.5%`)) +
   geom_point() + geom_errorbar(width = 0) + theme_bw() + coord_flip() + facet_wrap(~vars, scales = "free_x", ncol = 2) +
   ylab("Parameter value") +
   xlab("Model") +
-  theme(panel.spacing.x = unit(1, "lines"))
+  theme(panel.spacing.x = unit(1, "lines")) -> p1
 
-plot(m.esco.fit, pars = c("alphas", "betas"))
-plot(m.klpn.fit, pars = c("alphas", "betas"))
+mods.sum %>% filter(grepl("ctxm", model), vars %in% c("lambda")) %>%
+  ggplot(aes(model, `50%`, ymin = `2.5%`, ymax = `97.5%`)) +
+  geom_point() + geom_errorbar(width = 0) + theme_bw() + coord_flip() + facet_wrap(~vars, scales = "free_x", ncol = 2) +
+  ylab("Parameter value") +
+  xlab("Model") +
+  theme(panel.spacing.x = unit(1, "lines")) -> p2
 
-plot(m.esco.fit, pars = c("lambda", "mu"))
-plot(m.klpn.fit, pars = c("lambda", "mu"))
+ggarrange(p1,ggarrange(NULL,p2,NULL, widths = c(0.4,1,0.4), 
+                       ncol = 3, nrow = 1, labels = c(NA,"B", NA)),
+          ncol = 1, nrow = 2, heights = c(4,1), labels = c("A",NA))
 
-plot(m.esco.fit, pars = c("gammas"))
-plot(m.klpn.fit, pars = c("gammas"))
 
