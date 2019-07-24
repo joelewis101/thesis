@@ -373,7 +373,7 @@ actuals <- stan.df %>%
                    n = length(ESBL_stop),
                    prop = n.esbl/n) %>%
   ungroup() %>%
-  mutate(arm = as.character(arm),
+  dplyr::mutate(arm = as.character(arm),
          arm = recode(arm, `1` = "Arm 1", `2` = "Arm 2", `3` = "Arm 3")) 
   
 
