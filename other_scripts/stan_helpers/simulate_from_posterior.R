@@ -16,18 +16,13 @@ fit_mod2 <- readRDS("chapter_9/stan_models/model_2/stanfit_m2.rds")
 
 p.params <- rstan::extract(fit_mod2)
 p.params[1:5] -> p.params
-as.data.frame(p.params)
+as.data.frame(p.params) -> p.params
 
 library(tidyverse)
 library(rstan)
 library(deSolve)
 expose_stan_functions("other_scripts/stan_model/ESBLmod_finalV1.0_rk45.stan")
 
-ode(y = c(df$p0[i], df$p1[i]), 
-    t = c(0, df$t[i]),
-    func = ode_finalstateprob, 
-    parms = c(modelparms, list(cov_mat =as.matrix(df[i,1:6]), covs_type = c(3,2)))
-)
 
 ode_finalstateprob <- function(t, state, parameters) {
   coefs <- return_time_varying_coefs_exp_flat (parameters$cov_mat, t, parameters$covs_type, parameters$gammas)
@@ -39,7 +34,7 @@ ode_finalstateprob <- function(t, state, parameters) {
 }
 
 iterate_over_posterior_parms <- function(p.params, t, cov_mat, states, pid) {
-  pmap(p.params, ~ode(y = states, t = t, func = ode_finalstateprob, 
+  purrr::pmap(p.params, ~ode(y = states, t = t, func = ode_finalstateprob, 
                       parms = list(cov_mat = as.matrix(cov_mat), covs_type = c(3,2),
                                    alphas = c(..1 ,..2),
                                    betas = c(..3,..4), 
@@ -56,7 +51,7 @@ iterate_over_posterior_parms <- function(p.params, t, cov_mat, states, pid) {
 day_cut <- 5
 
 
-extract(fit_mod2, pars = c("alphas", "betas", "gammas", "lambda", "mu")) -> p.params
+rstan::extract(fit_mod2, pars = c("alphas", "betas", "gammas", "lambda", "mu")) -> p.params
 p.params <- p.params[1:5]
 as.data.frame(p.params) -> p.params
 
@@ -64,22 +59,39 @@ t <- seq(1,100,day_cut)
 
 sim.df <- data.frame(pid = c(1:50), start_state = rep(1,50), abx_cpt = c(rep(0,25),rep(1,25)), tb_start = rep(-999,50), hosp_days = rep(rep(c(1,5,10,15,20), 5),2), abx_days = rep(rep(c(1,5,10,15,20), each = 5),2))
 
+
+
+
+
+
 sim.df$p0 <- as.numeric(sim.df$start_state ==0)
 sim.df$p1 <- as.numeric(sim.df$start_state ==1)
 sim.df$abx_start <- 0
 sim.df$abx_stop <- sim.df$abx_start + sim.df$abx_days
 sim.df$abx_stop <- ifelse(sim.df$tb_start == -999,yes = sim.df$abx_stop , no = 1000 )
-sim.df$abx_stop <- ifelse(sim.df$abx_cpt== 0,yes = sim.df$abx_stop , no = 1000 )
+
 sim.df$prev_abx <- 999
+sim.df$abx_start[sim.df$abx_days == 1] <- -999
+sim.df$abx_stop[sim.df$abx_days == 1] <- -999
+sim.df$abx_days[sim.df$abx_days == 1] <- 0
+sim.df$abx_days[sim.df$abx_days == 1] <- 0
+sim.df$abx_stop <- ifelse(sim.df$abx_cpt== 0,yes = sim.df$abx_stop , no = 1000 )
+
 sim.df$hosp_start <- 0
 sim.df$hosp_stop <- sim.df$hosp_days
 sim.df$prev_hosp <- 999
+sim.df$hosp_start[sim.df$hosp_days == 1] <- -999
+sim.df$hosp_stop[sim.df$hosp_days == 1] <- -999
+sim.df$hosp_days[sim.df$hosp_days == 1] <- 0
+sim.df$hosp_days[sim.df$hosp_days == 1] <- 0
 
 
 sim.df$p0 <- 0.5
 sim.df$p1 <- 0.5
 
-pmap(sim.df[,c( "p0", "p1","abx_start", "abx_stop", "prev_abx",
+
+
+purrr::pmap(sim.df[,c( "p0", "p1","abx_start", "abx_stop", "prev_abx",
               "hosp_start", "hosp_stop", "prev_hosp","pid")],
      ~iterate_over_posterior_parms(p.params = p.params  ,t = t,
                                    cov_mat = c(..3,..4,..5,..6,..7,..8), states  =c(..1,..2),
@@ -107,5 +119,8 @@ ggplot(outsum, aes(time, median, ymin = lq, ymax = uq, group = abx_cpt, linetype
   geom_line() + geom_ribbon(alpha = 0.2, color = NA) + facet_grid(hosp_days_str ~ abx_days_str) + theme_bw() + theme(legend.title = element_blank(), panel.spacing = unit(1, "line")) + scale_linetype_manual(values = c("dotted", "solid")) + xlab("Time (days") + ylab("Pr(ESBL)")
 
 # color = as.factor(abx_cpt), fill = as.factor(abx_cpt),
+
+ggplot(outsum, aes(time, median, ymin = lq, ymax = uq, group = abx_cpt, linetype = as.factor(abx_cpt))) +
+  geom_line() + geom_ribbon(alpha = 0.2, color = NA) + facet_grid(hosp_days ~ abx_days) + theme_bw() + theme(legend.title = element_blank(), panel.spacing = unit(1, "line")) + scale_linetype_manual(values = c("dotted", "solid")) + xlab("Time (days") + ylab("Pr(ESBL)")
 
   
