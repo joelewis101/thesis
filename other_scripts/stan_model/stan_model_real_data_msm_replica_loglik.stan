@@ -1,8 +1,8 @@
-// Stan model for msm style interval censored model, on real data, no exponential function
+// Stan model for msm style interval censored model, stepwise constant covariates
       
       functions {
       
-      // Differential state equations fer solving    
+      // Differential state equations for solving    
       
       real[] twostateODE(real t,        // time
       real[] y,      // state
