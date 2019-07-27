@@ -322,7 +322,7 @@ hourly$assess_type[hourly$pid == "DAS12505" & hourly$assess_time == "11:00"] <- 
 
 #print("checking for missing assess_type...")
 #print("should be none!")
-#print(subset(hourly, is.na(assess_type)))
+print(subset(hourly, is.na(assess_type)))
 #cont <- readline("Continue?")
 #if (cont == "N") {stop()}
 
@@ -374,6 +374,9 @@ hourly$discharged[is.na(hourly$discharged) & hourly$died == 1] <- 0
 # rationalise antibiotic names and times, one by one. Each time, check teleform form to make sure OK
 
 
+# remove diazepam completely
+
+
 
 # I've checked all the below against the scans
 
@@ -389,6 +392,12 @@ hourly$amicro1[hourly$pid == "DAS1439G" & hourly$assess_type == 1]<- NA
 hourly$amicro1[hourly$pid == "DAS1176U" & hourly$assess_type == 3]<- "CEFTRIAXONE"
 hourly$amicro1[hourly$pid == "DAS1275O" & hourly$assess_type == 5] <- NA
 hourly$amicro1[hourly$pid == "DAS1197K" & hourly$assess_type == 2] <- "CEFTRIAXONE"
+#here
+hourly$amicro1[hourly$pid == "DAS14790" & hourly$assess_type == 5] <- "CEFTRIAXONE"
+hourly$amicro1[hourly$pid == "DAS1179O" & hourly$assess_type == 3] <- "CEFTRIAXONE"
+hourly$amicro1[hourly$pid == "DAS1184U" & hourly$assess_type == 4] <- "CEFTRIAXONE"
+hourly$amicro1[hourly$pid == "DAS12097" & hourly$assess_type == 3] <- "CEFTRIAXONE"
+hourly$amicro1[hourly$pid == "DAS12353" & hourly$assess_type == 4] <- "CEFTRIAXONE"
 
 
 #these need checking
@@ -396,7 +405,7 @@ hourly$amicro1[hourly$pid == "DAS1197K" & hourly$assess_type == 2] <- "CEFTRIAXO
 hourly$amicro1[hourly$pid == "DAS1277K" & hourly$assess_type == 6] <- NA
 hourly$amicro1[hourly$pid == "DAS14870" & hourly$assess_type == 6] <- NA
 hourly$amicro1[hourly$pid == "DAS1205F" & hourly$assess_type == 1] <- NA
-hourly$amicro1[hourly$pid == "DAS14790" & hourly$assess_type == 5] <- NA
+#hourly$amicro1[hourly$pid == "DAS14790" & hourly$assess_type == 5] <- NA
 hourly$amicro1[hourly$pid == "DAS1143B" & hourly$assess_type == 2] <- NA
 
 
@@ -405,10 +414,19 @@ hourly$amicro1[hourly$amicro1 == "AUGMENTINE"] <- "AUGMENTIN"
 hourly$amicro1[hourly$amicro1 == "AUGUMENTINE"] <- "AUGMENTIN"
 hourly$amicro1[hourly$amicro1 == "AUGUMENTIN"] <- "AUGMENTIN"
 hourly$amicro1[hourly$amicro1 == "CEFTRIXONE"] <- "CEFTRIAXONE"
+hourly$amicro1[hourly$amicro1 == "CEFTRIAZONE"] <- "CEFTRIAXONE"
+
 hourly$amicro1[hourly$amicro1 == "CIPROFLOXAXINE"] <- "CIPROFLOXACIN"
 hourly$amicro1[hourly$amicro1 == "CIPROFLOXACILLIN"] <- "CIPROFLOXACIN"
 hourly$amicro1[hourly$amicro1 == "CIPRO"] <- "CIPROFLOXACIN"
+
+hourly$amicro_time1[hourly$amicro1 == "DIAZEPUM"] <- NA
+hourly$amicro_route1[hourly$amicro1 == "DIAZEPUM"] <- NA
+hourly$amicro_dose1[hourly$amicro1 == "DIAZEPUM"] <- NA
+hourly$amicro_unit1[hourly$amicro1 == "DIAZEPUM"] <- NA
 hourly$amicro1[hourly$amicro1 == "DIAZEPUM"] <- NA
+
+
 hourly$amicro1[hourly$amicro1 == "METRONIDAZOLER"] <- "METRONIDAZOLE"
 
 
@@ -998,6 +1016,7 @@ hourly$amicro1_datetime_str <- paste0(hourly$assess_date, " ", hourly$amicro_tim
 hourly$amicro1_datetime <- parse_datetime(hourly$amicro1_datetime_str, format = "%d-%b-%Y %H:%M")
 hourly$amicro2_datetime_str <- paste0(hourly$assess_date, " ", hourly$amicro_time2)
 hourly$amicro2_datetime <- parse_datetime(hourly$amicro2_datetime_str, format = "%d-%b-%Y %H:%M")
+
 
 cat("Done!")
 cat("First 6hr forms now in hourly.  \n  ")
