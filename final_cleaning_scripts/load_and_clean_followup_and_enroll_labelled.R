@@ -86,6 +86,13 @@ enroll$recieved_prehosp_ab[enroll$recieved_prehosp_ab == FALSE] <- "No"
 enroll$timeaarrievhosp[enroll$pid == "DAS1205F"] <- "09:30:00"
 enroll$t0obstime[enroll$pid == "DAS1205F"] <- "09:30:00"
 
+# add missing lactates
+
+enroll$lactate_value[enroll$pid == "DAS1166Y"] <- 2.9
+enroll$lactate_value[enroll$pid == "DAS1167W"] <- 14.1
+enroll$lactate_value[enroll$pid == "DAS1168U"] <- 1.7
+
+
 cat("Enrollment df now in enroll.  \n  ")
 cat("Followup df now in followup.  \n  ")
 cat("If you wanna merge in HIV tests for composite HIV variable  \n  ")
