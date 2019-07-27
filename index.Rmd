@@ -1,5 +1,5 @@
 --- 
-title: "Developing an Antimicrobial Strategy for Sepsis in Malawi"
+title: "Causes and consequences of adult sepsis in Blantyre, Malawi"
 subtitle:  | 
   |  -
   |  
