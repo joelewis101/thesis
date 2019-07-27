@@ -15,16 +15,18 @@ require(lubridate)
 
 # get it to long
 
- bind_rows( select(hourly,pid, amicro1, amicro1_datetime, amicro_route1),
-            select(hourly,pid, amicro2, amicro2_datetime, amicro_route2) %>% 
+ bind_rows( dplyr::select(hourly,pid, amicro1, amicro1_datetime, amicro_route1),
+            dplyr::select(hourly,pid, amicro2, amicro2_datetime, amicro_route2) %>% 
               dplyr::rename( pid = pid, amicro1= amicro2, amicro1_datetime = amicro2_datetime, amicro_route1 = amicro_route2 )
             ) -> df
            
            
         #   %>% pivot_longer(names_to = "B")
 
+ df$amicro1[df$amicro1 == ""] <- NA
  subset(df, is.na(amicro1) & !is.na(amicro1_datetime))
- # none are missing ab
+
+ # none
  
  df.abs <- subset(df, amicro1 != "ARTESUNATE" & amicro1 != "FLUCONAZOLE")
  
@@ -41,20 +43,16 @@ require(lubridate)
  
  # how many have more than 1 ab
  
- df.abs %>% group_by(pid) %>% tally() %>% filter(n > 1)
+ df.abs %>% dplyr::group_by(pid) %>% tally() %>% filter(n > 1)
  
- # just 1
- # DAS11553 - both ceftriaxone
- 
- # so we can just lose the latest there
- 
- df.abs <- subset(df.abs, !(pid == "DAS11553" & amicro1_datetime =="2017-03-06 14:30:00"))
- 
+# none
  # for antimalarials
  
  df.mal %>% group_by(pid) %>% tally() %>% filter(n > 1)
  
- # get enroll, suset to e1,4
+ #  none
+ 
+ # get enroll, suset to e1
  
  e1.4 <- subset(enroll, arm == 1)
  
@@ -559,7 +557,7 @@ df.fung$first_ab <- apply(
   get_ab
 )
 
-df.fung$arrivehosp_datetime[df.abs$pid == "DAS13990"] <- update(df.fung$arrivehosp_datetime[df.abs$pid == "DAS13990"], year = 2018)
+df.fung$arrivehosp_datetime[df.fung$pid == "DAS13990"] <- update(df.fung$arrivehosp_datetime[df.fung$pid == "DAS13990"], year = 2018)
 
 df.fung$earliest_arr_time <- apply(df.fung[3:5], 1, min)
 df.fung$earliest_arr_time <- parse_datetime(df.fung$earliest_arr_time )
