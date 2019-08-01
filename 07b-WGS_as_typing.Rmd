@@ -1,0 +1,1188 @@
+# Using whole genome sequencing as a high-resolution typing tool to track ESBL-E carriage
+\chaptermark{WGS to track ESBL-E carriage}
+
+``` {r ch7-setup, include = F}
+
+wd <- "chapter_7/"
+
+# and packages
+library(plyr)
+library(tidyverse)
+library(reshape2)
+library(knitr)
+library(kableExtra)
+library(grid)
+library(ggpubr)
+library(ggtree)
+library(ape)
+library(phytools)
+library(RColorBrewer)
+library(scales)
+library(cowplot)
+library(pheatmap)
+library(viridis)
+library(ggraph)
+library(igraph)
+library(gggenes)
+library(IRanges)
+
+
+ parse_checkm_lines <- function(s, n) {
+  strsplit(s, " ") -> stemp
+  stemp <- stemp[[1]][stemp[[1]] != ""] 
+  stemp <- c(stemp[1], paste0(stemp[2],"_", stemp[3]), stemp[4:15])
+  names(stemp) <- n
+  return(stemp)
+ }
+
+
+output = "latex"
+source("other_scripts/load_metadata.R")
+source("other_scripts/function_parse_cdhitest.R")
+source("other_scripts/parse_blast_op_IRranges.R")
+
+tree <- read.tree(paste0(wd, "core_genome_tree/core_alnD2ESCO_snp_sites.aln.treefile"))
+midpoint.root(tree) -> tree
+
+```
+
+## Chapter overview
+
+## Introduction and chapter aims
+
+## Methods
+
+The rhierbaps v1.1.0 package in R[@Cheng2013] was used to cluster the core genome pseudosequence into sequence clusters (SCs). Two levels were used and these level 2 clusters used to test associations (see statistical analysis, below). To track putative mobile genetic elements ESBL-gene containing contigs were identified using BLASTn v2.7.0[@Altschul1990] of all contigs against the SRST2 database and then contigs containing any given ESBL gene  were grouped by the ESBL gene they contained (for example, all $bla_{CTXM-15}$ gene-containing clusters were grouped together), and each group clustered using cd-hit v4.6[@Li2006] to produce mutually exclusive ESBL-gene-containing contig clusters for each identified ESBL gene. Henceforth, these clusters will be referred to as ESBL-clusters, for brevity. In order to attempt to determine the biological significance of the identified ESBL-clusters (i.e. what kind of MGE element they are likely to represent), basic statistics were plotted (number of samples contained withing each cluster, length of longest contig in cluster in kbases, length distribution of all contigs is cluster relative to longest contig and distribution of sequence identity compared to the longest contig in the cluster). Presence of insertion sequences (i.e compound transposons), AMR determinants and plasmid replicons were identified by using BLAST with default settings of each ESBL-cluster representative sequence (as determined by cd-hit i.e one, the longest, for each ESBL-cluster) against the insertion sequence finder (ISfinder) database and the SRST2 database, filtering such that sequence identify was greater or equal to 95%, taking the top hit (as determined by bitscore) for any given location if there were two overlapping hits, and visualising the results in ggenes v0.3.2. To assess lineage association, the ESBL-clusters were mapped back to the core gene phylogeny. 
+
+To explore hospital or community associations of any given _E. coli_ clade, the location of isolation was first plotted against the phylogenetic tree; location of isolation was classified as hospital, community, or recent hospital discharge (defined as a date of isolation within 2 weeks of hospital discharge). This latter category was used because it is possible that a patient could acquire an ESBL-E clone in hospital but only be sampled once leaving hospital; using only hospital isolated and community isolated categories could therefore introduce bias. Hospital or community association of each sequence cluster was assessed using a Fisher's exact test of proportion of hospital associated samples (defined as sum of hospital isolated and recent hospital discharge) for the given sequence cluster as compared to proportion of hospital associated samples in the remainder of the samples, with a Bonferroni correction for multiple comparisons. p < 0.05 was again considered statistically significant.
+
+To compare within-patient to between-patient conservation of bacteria (as represented by core genome alignment and sequence cluster) and ESBL-containing MGE (as represented by the ESBL-clusters) several approaches were taken. Firstly, I assessed whether either sequence cluster or ESBL-cluster were conserved within an individual at all. I hypothesised that any within-patient correlation is likely to be a function of time: samples closer together in time may be more likely to be similar. To assess if this was the case for bacteria, pairwise core genome pseudosequence SNP distance was was calculated using snp-dists v0.4 (https://github.com/tseemann/snp-dists) for all samples and plotted against the time difference (in days) between samples, within and between patients, and with a smoothed curve fitted using a general additive model (GAM) with cubic splines. Because of significant overplotting, this was also plotted as a 2D density plot. Based on these plots, the within and between patient SNP distances were compared in two post-hoc defined groups binned by time distance between the samples (50 days or less vs. more than 50 days, these cutoffs determined from inspection of the pairwsie SNP distance vs time plots), and distributions compared with Kruskal-Wallace tests.
+
+I then compared the within patient temporal clustering of ESBL-clusters and sequence clusters, by estimating the proportion of within-patient samples that contain the same ESBL-cluster or sequence cluster, as a function of time; essentially a temporal auto-correlation function. To estimate this, I considered pairwise comparison of all within-patient samples. For any given time between samples, $t$ I defined a window of +/-5 days and estimated the probabilities as the number of all within-patient sample pairs in the window $[t - 5, t+5]$ that contained the same sequence cluster or ESBL-cluster divided by the total number of all within-patient sample pairs within that time window. Exact binomial confidence intervals for these proportions were generated and probabilities plotted as a function of time. In order to estimate the probability of two samples containing the same sequence cluster of contig-cluster purely by chance, 1000 sample pairs were randomly drawn from all samples with replacement and the proportion of these samples that contained the same sequence cluster or ESBL-cluster calculated.
+
+Finally, to inform the question as to what the likely unit of transmission in this system is, I assessed what was most conserved within patients, in pairwise sample comparison: bacteria (as represented by core gene sequence cluster), ESBL-containing MGE (as represented by ESBL-cluster), or both. Simple proportions in all-against-all pairwise comparison - stratified by whether between-patient or within-patient - were calculated: the proportion of samples that contain the same core gene sequence cluster only, the proportion of samples contain the same ESBL-cluster only, and the proportion that contain both sequence cluster and ESBL-cluster. Proportions were compared between within and between-patient strata in these three groups using Fisher's exact test, with p < 0.05 considered statistically significant.
+
+
+## Results
+
+
+### Testing metadata associations: SNP distance, hierBAPS sequence clusters and ESBL-clusters
+
+Finally, in order to test metadata associations of bacterial lineages or MGE, I used several techniques: considering core gene SNP distance between isolates to infer continuous carriage and/or transmission events, and clustering core gene pseudosequences and ESBL-containing contigs into mutually exclusive groups which can then be used to test associations. Below, I first describe the outcomes of the clustering algorithms used, before describing tests of association with metadata. 
+
+#### Hierarchical BAPS clustering of core gene pseudosequences
+
+The hierarchical BAPS algorithm clustered the core gene alignments into 15 level one (top level) clusters, denoted sequence clusters A-O, and a total of 48 level two (lower level) clusters, denoted sequence clusters 1-48 that were almost exclusively monophyletic and often corresponded closely to the multilocus sequence types (STs, Figure \@ref(fig:wgs-hierbaps-plot-tree)A). Intracluster pairwise SNP distance varied (Figure \@ref(fig:wgs-hierbaps-plot-tree)B) but the clusters were often reasonably clonal: SC6, SC8 and SC23, for example (the three largest clusters) had median (IQR) intragroup pairwise SNP distance of 62 (34-97), 326 (18-378) and 18 (11-24) respectively.
+
+```{r wgs-hierbaps-plot-tree, echo = F, warning = F, message = F, fig.scap="Core gene hierBAPS clusters", out.extra='', fig.cap="A: Core gene hierarchical BAPS clusters mapped back to phylogeny. Heatmap shows level 2 (lower level) with colour denoting level 1 (top level) cluster membership. B: Intracluster pairwise SNP distance for level 2 sequence clusters. Axis restricted to 0-1500 SNPs and as result SC17 (median 6881 SNPs), SC29 (median 2970 SNPs), SC31 (median 2970 SNPs) and SC44 (median 12322 SNPs) boxes are not shown. Boxplots show median and IQR, whiskers show 1.5 times IQR, and outliers are points falling beyond whiskers.", fig.width = 6, fig.height = 6}
+
+readRDS(paste0(wd, "hierbaps/D2ESCO_core_snp_hbaps_clusts.rda")) -> hb.results
+
+hbdf <- hb.results$partition.df
+sub("_1#", "_1_",hbdf$Isolate) -> hbdf$Isolate
+sub("_2#", "_2_",hbdf$Isolate) -> hbdf$Isolate
+
+rownames(hbdf) <- hbdf$Isolate
+names(hbdf)[2:3] <- c("BAPS.l1", "BAPS.l2")
+
+hbdf$BAPS.l1 <- as.factor(hbdf$BAPS.l1)
+hbdf$BAPS.l1 <- LETTERS[hbdf$BAPS.l1]
+hbdf$BAPS.l2 <- as.factor(hbdf$BAPS.l2)
+
+dcast(hbdf, Isolate ~ BAPS.l2, value.var = "BAPS.l1") -> hbdf.cast
+hbdf %>% group_by(BAPS.l2) %>% summarise(n = n()) -> BAPSl2.freq
+
+hbdf.cast[c("Isolate", as.character(BAPSl2.freq$BAPS.l2[order(BAPSl2.freq$n, decreasing = T)])) ] -> hbdf.cast
+
+rownames(hbdf.cast) <- hbdf.cast$Isolate
+sapply(hbdf.cast[2:ncol(hbdf.cast)], as.factor) -> hbdf.cast[2:ncol(hbdf.cast)]
+hbdf.cast[is.na(hbdf.cast)] <- "Z"
+
+cols2 <- c(brewer.pal(n=5, "Dark2"), brewer.pal(n=10, "Set3") , "lightgrey")
+names(cols2) <- c(LETTERS[1:15], "Z")
+
+ggtree(tree) %>% gheatmap(select(hbdf.cast, -Isolate), width = 3, 
+                          colnames_position = "top", font.size = 2, colnames_angle = 90,
+                          color = NA, colnames_offset_y = 10) +
+  scale_fill_manual(breaks = LETTERS[1:15], values = cols2) + annotate("text", x= 0.4, y =510, label = "HierBAPS level 2 cluster") -> tr
+
+
+## 
+
+
+read_csv (paste0(wd, "core genome snp dist/snp-sites-snp-dist.csv") ) -> snp.dists
+
+names(snp.dists)[1] <- "lane"
+snpdists.df <- melt(snp.dists)
+names(snpdists.df)[1:2] <- c("Var1", "Var2") 
+
+snpdists.df$Var1 <- sub("_1#", "_1_", snpdists.df$Var1)
+snpdists.df$Var1 <- sub("_2#", "_2_", snpdists.df$Var1)
+snpdists.df$Var2 <- sub("_1#", "_1_", snpdists.df$Var2)
+snpdists.df$Var2 <- sub("_2#", "_2_", snpdists.df$Var2)
+snpdists.df$key <- apply(snpdists.df[1:2], 1, function(x)paste(sort(x), collapse='')) 
+subset(snpdists.df, !duplicated(snpdists.df$key))  -> snpdists.df
+subset(snpdists.df, Var1 != Var2) -> snpdists.df
+
+snpdists.df <- select(snpdists.df, -key) 
+
+merge(snpdists.df, hbdf, by.x = "Var1", by.y = "Isolate", all.x = T) -> snpdists.df
+names(snpdists.df)[c(4,5)] <- c("BAPS.l1.1", "BAPS.l2.1")
+
+merge(snpdists.df, hbdf, by.x = "Var2", by.y = "Isolate", all.x = T) -> snpdists.df
+names(snpdists.df)[c(6,7)] <- c("BAPS.l1.2", "BAPS.l2.2")
+
+within_l2_snpdist.df <- subset(snpdists.df, (BAPS.l2.1 == BAPS.l2.2))
+
+
+ggplot(within_l2_snpdist.df, aes(x= fct_infreq(BAPS.l2.1), y = value)) + 
+  geom_boxplot(alpha = 0.5, outlier.size = 0.1) + coord_cartesian(ylim = c(0,1500)) + theme_bw() + xlab("HierBAPS level 2 cluster") + ylab("No. SNPs")  + theme(axis.text.x = element_text(size = 6))  -> bp
+
+# geom_jitter(alpha = 0.3, size = 0.1) + 
+ggarrange(tr, NULL, bp, ncol = 1, nrow = 3, labels = c("A", "B", NA), heights = c(2,0.1, 0.8))
+```
+
+#### ESBL-clusters
+
+The 473 samples contained 486 ESBL genes (Figure \@ref(fig:wgs-contig-map-to-tree)A); 5 genes only occurred once in the collection and so no attempt was made to cluster them. Of the remaining 481 genes pairs, BLAST failed to identify the ESBL-gene containing contig in 2 samples (one in which _ARIBA_ had identified $bla-{CTXM-15}$ one $bla_{CTXM-27}$), but identified the remaining 479 ESBL genes on 478 contigs, with perfect agreement with _ARIBA_ as to which AMR gene was present in which sample. Only one contig carried two ESBL genes: $bla_{CTXM-3}$ and $bla_{CTXM-15}$; the remaining 477 contigs contained one. The _cd-hit_ algorithm grouped the 477 unique contigs into 99 clusters (Figure \@ref(fig:wgs-contig-map-to-tree)B). In total, over 90% of the ESBL-genes (432/479 [90%]) were contained in the 52 largest contig clusters.
+
+The _cd-hit_ algorithm selects one member of a cluster (the longest) as the representative. The structure of these representative contigs was explored in an attempt to understand type of MGE they were likely to represent. The length of the representative clusters was very variable, ranging from 1.8kbp to 905.8kbp, with median (IQR) 46.1kbp (11.1-215.5kbp). The other cluster members were usually fragments of these representative contigs with varying sizes - a median (IQR) 60% (36-100%) of the representative contig length - but had high sequence identity, median (IQR) 100.0% (99.7-100.0%) (Figure \@ref(fig:wgs-contig-stats-plot) in the appendix to this chapter).
+
+I then explored the insertion sequence (IS), AMR gene and plasmid replicon content of the representative contig for each cluster using BLAST against the SRST2, ISfinder and Plasmidfinder databases (Figures  \@ref(fig:wgs-contig-ggenes-plot1) and \@ref(fig:wgs-contig-ggenes-plot2) in the appendix to this chapter). Every ESBL gene was closely associated with at least one IS, commonly ISEcp1, IS26 and IS903B. IS26 was frequently associated with an apparent 108bp fragment of a _catB4_ chloramphenicol resistance determinant. Some ESBL-genes were associated with particular IS; $bla_{CTXM-15}$, $bla_{CTXM-9}$ and $bla_{CTXM-1}$, for example were very commonly associated with ISEcp1, whereas $bla_{SHV-12}$ was associated with IS26. ESBL genes were not infrequently associated with other resistance determinants, including commonly $bla_{CTXM-15}$ with $bla_{TEM-95}$. Plasmid replicons were occasionally identified, including an IncFIB plasmid carrying $bla_{CTXM-15}$ and an IncQ1 plasmid carrying $bla_{CTXM-27}$. It is clear that the same configuration of AMR genes and IS are seen across different contigs, despite a varying backbone, implying historical transposition events. Finally, to assess lineage associations of the identified ESBL-clusters, I mapped the clusters back to the tree, and found that there was a strong lineage association (Figure \@ref(fig:wgs-contig-map-to-tree)C).
+
+```{r wgs-conig-setup, echo = F, warning = F, message = F}
+
+
+fileses <- list.files(paste0(wd, "contig_cluster/results"))
+fileses <- grep(".clstr", fileses, value = T)
+
+out <- list()
+for (i in 1:length(fileses)) {
+  #strsplit(fileses[[i]], "\\.")[1][[1]][[1]]
+  #print(gene)
+  outtemp <- parse_cd_hit_est_output_to_df(
+    paste0(wd,"contig_cluster/results/",fileses[i])) 
+  outtemp$gene <- strsplit(fileses[[i]], "\\.")[1][[1]][[1]]
+  out[[i]] <- outtemp
+  
+}
+
+df <- do.call(rbind, out)
+
+df$clust.id <- paste0(df$gene, ".", df$cluster)
+
+
+df.sum <- df %>% group_by(gene,clust.id) %>% summarise(n= n()) %>% 
+  arrange(desc(n)) %>% mutate(cumsum = cumsum(n),
+                        max = max(cumsum))
+
+df.sum$prop <- df.sum$cumsum / df.sum$max
+
+df.sum$clust.id <- factor(df.sum$clust.id, levels = df.sum$clust.id[order(df.sum$cumsum)]) 
+df.sum$gene <- factor(df.sum$gene, levels = unique(df.sum$gene[order(df.sum$cumsum, decreasing = T)]))
+
+#length(unique(df$clust.id))
+
+
+#cum prop by gene
+
+plotlablookup <- df %>% group_by(gene) %>% summarise(n_clust_bygene = max(cluster) + 1)
+
+
+plotlablookup$plotlab <- paste0(plotlablookup$gene, " (",plotlablookup$n_clust_bygene, " clusters)" )
+
+df.sum <- merge(df.sum, plotlablookup)
+
+df.sum$gene <- factor(df.sum$gene, levels = levels(fct_infreq(df$gene)))
+df.sum$plotlab <- factor(df.sum$plotlab, levels = unique(df.sum$plotlab[order(df.sum$gene) ]) )
+
+df.sum$gene <- factor(df.sum$gene, levels = unique(as.character(df$gene)[order(as.character(df$gene)) ]))
+
+
+ggplot(df.sum, aes(clust.id, n, fill = gene)) + geom_col() + facet_wrap(~plotlab, scales = "free", ncol = 4) +  theme_bw() +
+  theme(axis.text.x = element_blank() , panel.grid = element_blank(), legend.position = "none") + labs(x = "", y = "Contigs per cluster") -> p1
+
+ggplot(df, aes(fct_rev(fct_infreq(gene)), fill = gene)) + geom_bar() + coord_flip() + theme_bw() + theme(legend.position = "none", panel.grid = element_blank()) + labs(y= "Frequency", x = "") -> p2
+
+ggarrange(ggarrange(NULL,p2, NULL, heights = c(0.1, 1, 0.1), ncol =1, nrow = 3),p1, ncol = 2, nrow = 1, widths = c(0.6,2), labels = c("A", "B")) -> cluster.sizes.plot
+
+### contig stats
+
+df %>% group_by(clust.id) %>% mutate(n_clust = n(), max_clust_length = max(as.numeric(length))) -> df
+
+df$sample.id <- paste0(df$clust.id, ".", df$id)
+
+df$prop_of_max_length <- as.numeric(df$length) / df$max_clust_length
+#df$max_clust_length <- as.numeric(ma)
+df$clust.id <- factor(df$clust.id, levels = unique(df$clust.id[order(df$max_clust_length)]))
+
+df.clust.rep <- subset(df,identity == "*")
+
+df.clust.rep$clust.id <- factor(df.clust.rep$clust.id, levels = df.clust.rep$clust.id[rev(order(df.clust.rep$max_clust_length))] )
+
+df$clust.id <- factor(df$clust.id, levels = df.clust.rep$clust.id[rev(order(df.clust.rep$max_clust_length))] )
+
+ggplot(df.clust.rep,  aes(clust.id, as.numeric(length)/1000, fill = gene)) + geom_col()  + theme_bw() + theme(axis.text.x = element_text(size = 4, angle = 90, vjust = 0.5), axis.title.x = element_blank(), legend.title = element_blank()) + labs(y = "Max length (kbp)") -> p3
+
+#ggplot(df.clust.rep,  aes(fct_rev(fct_reorder(clust.id,max_clust_length)), fill = gene)) + geom_bar()  + theme_bw() + theme(axis.text.x = element_text(size = 4, angle = 90), legend.position = "none") + labs(x= "Cluster ID", y = "Length of representative member(bp)")
+
+ggplot(df,  aes(clust.id, prop_of_max_length, fill = gene)) +  geom_boxplot(outlier.size = 0.3)  +  theme_bw() + theme(axis.text.x = element_text(size = 4, angle = 90, vjust = 0.5), axis.title.x = element_blank(), legend.title = element_blank()) + labs(y = "Length (as % of max)")  -> p4
+
+df.clusts <- subset(df, identity == "*") 
+df$identity[df$identity == "*"] <- 100
+ggplot(df,  aes(clust.id, as.numeric(identity)/100, fill = gene)) +  geom_boxplot(outlier.size = 0.3)  +  theme_bw()+ theme(axis.text.x = element_text(size = 4, angle = 90, vjust = 0.5), axis.title.x = element_blank(), legend.title = element_blank()) + labs(y = "Sequence identity")  -> p5
+
+
+ggplot(unique(select(df,clust.id,n_clust,max_clust_length, gene)),  aes(clust.id, n_clust, fill = gene)) +  geom_col() +  theme_bw()+ theme(axis.text.x = element_text(size = 4, angle = 90, vjust = 0.5), axis.title.x = element_blank(), legend.title = element_blank()) + labs(y = "Cluster size") -> p6
+
+#ggarrange(ggarrange(p2,p1, ncol = 2, nrow = 1, widths = c(0.5,2), labels = c("A", "B")),
+ #                 p6,p3,p4,p5, ncol = 1, nrow = 5, labels = c(NA,"C", "D","E", "F") )
+
+
+
+```
+
+```{r wgs-contig-stats-makeplot , echo = F, warning = F, message = F}
+
+  ggarrange(
+  ggarrange( NULL,NULL,NULL,NULL, labels = c("A","B","C","D"), ncol = 1, nrow = 4),     ggarrange(p6,p3,p4,p5, ncol = 1, nrow = 4 ,common.legend = TRUE, legend = "right")
+  , ncol = 2, nrow = 1, widths = c(0.1, 1.5)) -> contig.stats.plot
+
+```
+
+```{r wgs-contig-ggenes-plot1-setup, echo = F, warning = F, message = F, include = F}
+
+df.is <- read.csv(paste0(wd, "contig_cluster/results/BLAST_contigs_to_n/allAMRcontigs.blast.IS.csv"),
+               stringsAsFactors = F, header = F)
+
+
+names(df.is) <-   c("qseqid", "sseqid","pident", "length", 
+                 "mismatch","gapopen", "qstart", "qend" , 
+                 "sstart","send", "evalue", "bitscore")
+ddply(df.is, "qseqid", parse_blast_op_one_contig) -> df2
+df2$type <- "IS"
+sapply(df2$sseqid, function(x) strsplit(x, "_")[[1]][[1]]) -> df2$sseqid
+df.amr <- read.csv(paste0(wd, "contig_cluster/results/BLAST_contigs_to_n/allAMRcontigs.blast.SRST2.csv"),
+                   stringsAsFactors = F, header = F)
+names(df.amr) <-   c("qseqid", "sseqid","pident", "length", 
+                 "mismatch","gapopen", "qstart", "qend" , 
+                 "sstart","send", "evalue", "bitscore")
+apply(df.amr, 1, function(x) strsplit(x[2], "__")[[1]][[3]]) -> df.amr$sseqid
+ddply(df.amr, "qseqid", parse_blast_op_one_contig) -> df.amr.2
+df.amr.2$type <- "AMR.gene"
+df.pl <- read.csv(paste0(wd, "contig_cluster/results/BLAST_contigs_to_n/allAMRcontigs.blast.pfinder.csv"),
+                  stringsAsFactors = F, header = F)
+names(df.pl) <-   c("qseqid", "sseqid","pident", "length", 
+                     "mismatch","gapopen", "qstart", "qend" , 
+                     "sstart","send", "evalue", "bitscore")
+ddply(df.pl, "qseqid", parse_blast_op_one_contig) -> df.pl.2
+df.pl.2$type <- "plasmid"
+
+apply(df.pl.2[2],1, function(x) strsplit(x,"_1")[[1]][[1]] ) -> df.pl.2[2]
+apply(df.pl.2[2],1, function(x) strsplit(x,"\\(")[[1]][[1]] ) -> df.pl.2[2]
+apply(df.pl.2[2],1, function(x) strsplit(x,"_")[[1]][[1]] ) -> df.pl.2[2]
+
+df.f <- rbind(df2, df.amr.2, df.pl.2)
+
+
+
+#df.clusts <- subset(df, identity == "*") 
+
+sub("ctxm", "CTX-M-", df.clusts$gene) -> df.clusts$gene
+sub("shv", "SHV-", df.clusts$gene) -> df.clusts$gene
+sub("tem", "TEM-", df.clusts$gene) -> df.clusts$gene
+paste0(".", df.clusts$contig) ->df.clusts$contig
+
+merge(df.f, select(df.clusts, contig, gene, clust.id, n_clust), by.x = "qseqid", by.y = "contig", all.x =T ) -> df.f
+#sub("_unknown","", df.f$sseqid) -> df.f$sseqid
+
+## get ready to plot genes
+
+
+df.f$direc <- TRUE
+df.f$direc[df.f$sstart > df.f$send] <- FALSE
+
+
+df.f15 <- subset(df.f, gene == "CTX-M-15")
+
+# how many to plot
+
+(unique(df.f15 %>% select(clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+#print(contigs_n %>% dplyr::slice(1:20))
+
+# top 20 cover 78% of CTXM15
+# top 10 cover 62%
+
+ctxm15.1_10 <- df.sum %>% filter(gene == "ctxm15") %>% arrange(desc(n)) %>% dplyr::slice(1:20)
+c#txm15.11_20 <- df.sum %>% filter(gene == "ctxm15") %>% dplyr::slice(11:20)
+
+levels.df.f15 <- unique(select(df.f15, qseqid, n_clust))
+
+df.f15$clust.id <- factor(df.f15$clust.id, levels = unique(df.f15$clust.id[order(df.f15$n, decreasing = T)]))
+df.f15$qseqid <- factor(df.f15$qseqid, levels = levels.df.f15$qseqid[order(levels.df.f15$n_clust)])
+
+ddply(df.f15, "qseqid", flip_one_contig, df.clusts) -> df.f15
+ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
+
+df.f15.1 <- subset(df.f15, clust.id %in% ctxm15.1_10$clust.id )
+(unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+
+df.f15.1$clust.id <- as.character(df.f15.1$clust.id )
+df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
+
+subset(df.f15.1, pident >= 95) -> df.f15.1
+#subset(df.f15.1, !(pident != 100 & type == "AMR.gene") ) -> df.f15.1
+
+
+#levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
+#df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
+
+df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
+
+df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
+#names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
+
+dummies1 <- make_alignment_dummies(
+  df.f15.1,
+  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
+  on = "CTX-M-15")
+
+dummies1$direc <- TRUE
+dummies1$type <- NA
+
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
+
+#df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
+
+#cols <- (hue_pal()(9)[c(1,2,4,6)])
+#cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
+cat("meh1.02")
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) + geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+    geom_blank(data = dummies1) +
+  facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
+  #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
+  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_discrete(name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c15
+
+
+
+
+df.f15 <- subset(df.f, gene == "CTX-M-27")
+
+# how many to plot
+
+(unique(df.f15 %>% select(clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+#print(contigs_n %>% dplyr::slice(1:20))
+
+# top 20 cover 78% of CTXM15
+# top 10 cover 62%
+
+#ctxm15.1_10 <- df.sum %>% filter(gene == "ctxm15") %>% arrange(desc(n)) %>% dplyr::slice(1:20)
+#c#txm15.11_20 <- df.sum %>% filter(gene == "ctxm15") %>% dplyr::slice(11:20)
+
+levels.df.f15 <- unique(select(df.f15, qseqid, n_clust))
+
+df.f15$clust.id <- factor(df.f15$clust.id, levels = unique(df.f15$clust.id[order(df.f15$n, decreasing = T)]))
+df.f15$qseqid <- factor(df.f15$qseqid, levels = levels.df.f15$qseqid[order(levels.df.f15$n_clust)])
+
+ddply(df.f15, "qseqid", flip_one_contig, df.clusts) -> df.f15
+ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
+
+df.f15.1 <- subset(df.f15, gene == "CTX-M-27" )
+(unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+
+df.f15.1$clust.id <- as.character(df.f15.1$clust.id )
+df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
+
+subset(df.f15.1, pident >= 95) -> df.f15.1
+#subset(df.f15.1, !(pident != 100 & type == "AMR.gene") ) -> df.f15.1
+
+
+#levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
+#df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
+
+df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
+
+df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
+#names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
+
+dummies1 <- make_alignment_dummies(
+  df.f15.1,
+  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
+  on = "CTX-M-27")
+
+dummies1$direc <- TRUE
+dummies1$type <- NA
+
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
+
+#df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
+
+#cols <- (hue_pal()(9)[c(1,2,4,6)])
+#cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
+
+# fudge to stop overplotting
+
+df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
+
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+    geom_blank(data = dummies1) +
+  facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
+  #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
+  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3), name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c27
+
+df.f15 <- subset(df.f, gene == "SHV-12")
+
+# how many to plot
+
+(unique(df.f15 %>% select(clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+#print(contigs_n %>% dplyr::slice(1:20))
+
+# top 20 cover 78% of CTXM15
+# top 10 cover 62%
+
+#ctxm15.1_10 <- df.sum %>% filter(gene == "ctxm15") %>% arrange(desc(n)) %>% dplyr::slice(1:20)
+#c#txm15.11_20 <- df.sum %>% filter(gene == "ctxm15") %>% dplyr::slice(11:20)
+
+levels.df.f15 <- unique(select(df.f15, qseqid, n_clust))
+
+df.f15$clust.id <- factor(df.f15$clust.id, levels = unique(df.f15$clust.id[order(df.f15$n, decreasing = T)]))
+df.f15$qseqid <- factor(df.f15$qseqid, levels = levels.df.f15$qseqid[order(levels.df.f15$n_clust)])
+
+ddply(df.f15, "qseqid", flip_one_contig, df.clusts) -> df.f15
+ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
+cat("meh1.05")
+df.f15.1 <- subset(df.f15, gene == "SHV-12" )
+(unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+
+df.f15.1$clust.id <- as.character(df.f15.1$clust.id )
+df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
+
+subset(df.f15.1, pident >= 95) -> df.f15.1
+#subset(df.f15.1, !(pident != 100 & type == "AMR.gene") ) -> df.f15.1
+
+
+#levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
+#df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
+
+df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
+
+df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
+#names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
+
+dummies1 <- make_alignment_dummies(
+  df.f15.1,
+  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
+  on = "SHV-12")
+
+dummies1$direc <- TRUE
+dummies1$type <- NA
+
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
+
+#df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
+
+#cols <- (hue_pal()(9)[c(1,2,4,6)])
+#cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
+
+# fudge to stop overplotting
+
+#df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
+
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+    geom_blank(data = dummies1) +
+  facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
+  #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
+  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.s12
+
+
+df.f15 <- subset(df.f, gene == "CTX-M-14")
+
+# how many to plot
+
+(unique(df.f15 %>% select(clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+#print(contigs_n %>% dplyr::slice(1:20))
+
+# top 20 cover 78% of CTXM15
+# top 10 cover 62%
+
+#ctxm15.1_10 <- df.sum %>% filter(gene == "ctxm15") %>% arrange(desc(n)) %>% dplyr::slice(1:20)
+#c#txm15.11_20 <- df.sum %>% filter(gene == "ctxm15") %>% dplyr::slice(11:20)
+cat("meh1.1")
+levels.df.f15 <- unique(select(df.f15, qseqid, n_clust))
+
+df.f15$clust.id <- factor(df.f15$clust.id, levels = unique(df.f15$clust.id[order(df.f15$n, decreasing = T)]))
+df.f15$qseqid <- factor(df.f15$qseqid, levels = levels.df.f15$qseqid[order(levels.df.f15$n_clust)])
+
+ddply(df.f15, "qseqid", flip_one_contig, df.clusts) -> df.f15
+ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
+
+df.f15.1 <- subset(df.f15, gene == "CTX-M-14" )
+(unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+
+df.f15.1$clust.id <- as.character(df.f15.1$clust.id )
+df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
+
+subset(df.f15.1, pident >= 95) -> df.f15.1
+#subset(df.f15.1, !(pident != 100 & type == "AMR.gene") ) -> df.f15.1
+
+
+#levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
+#df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
+
+df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
+
+df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
+#names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
+
+dummies1 <- make_alignment_dummies(
+  df.f15.1,
+  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
+  on = "CTX-M-14")
+
+dummies1$direc <- TRUE
+dummies1$type <- NA
+
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
+
+#df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
+
+#cols <- (hue_pal()(9)[c(1,2,4,6)])
+#cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
+
+# fudge to stop overplotting
+
+#df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
+
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+    geom_blank(data = dummies1) +
+  facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
+  #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
+  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c14
+
+cat("meh1.4")
+#### ctxm-9
+
+df.f15 <- subset(df.f, gene == "CTX-M-9")
+
+# how many to plot
+
+(unique(df.f15 %>% select(clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+levels.df.f15 <- unique(select(df.f15, qseqid, n_clust))
+
+df.f15$clust.id <- factor(df.f15$clust.id, levels = unique(df.f15$clust.id[order(df.f15$n, decreasing = T)]))
+df.f15$qseqid <- factor(df.f15$qseqid, levels = levels.df.f15$qseqid[order(levels.df.f15$n_clust)])
+
+ddply(df.f15, "qseqid", flip_one_contig, df.clusts) -> df.f15
+ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
+
+df.f15.1 <- subset(df.f15, gene == "CTX-M-9" )
+(unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+
+df.f15.1$clust.id <- as.character(df.f15.1$clust.id )
+df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
+
+subset(df.f15.1, pident >= 95) -> df.f15.1
+#subset(df.f15.1, !(pident != 100 & type == "AMR.gene") ) -> df.f15.1
+
+
+#levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
+#df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
+
+df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
+
+df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
+#names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
+
+dummies1 <- make_alignment_dummies(
+  df.f15.1,
+  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
+  on = "CTX-M-9")
+
+dummies1$direc <- TRUE
+dummies1$type <- NA
+
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
+
+#df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
+
+#cols <- (hue_pal()(9)[c(1,2,4,6)])
+#cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
+
+# fudge to stop overplotting
+
+df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
+
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+    geom_blank(data = dummies1) +
+  facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
+  #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
+  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c9
+
+####
+####
+
+# CTXM 3
+
+df.f15 <- subset(df.f, gene == "CTX-M-3")
+df.f15$sseqid[df.f15$sseqid == "CTX-M-15"] <- "CTX-M-3"
+
+# how many to plot
+
+(unique(df.f15 %>% select(clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+levels.df.f15 <- unique(select(df.f15, qseqid, n_clust))
+
+df.f15$clust.id <- factor(df.f15$clust.id, levels = unique(df.f15$clust.id[order(df.f15$n, decreasing = T)]))
+df.f15$qseqid <- factor(df.f15$qseqid, levels = levels.df.f15$qseqid[order(levels.df.f15$n_clust)])
+
+ddply(df.f15, "qseqid", flip_one_contig, df.clusts) -> df.f15
+ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
+
+df.f15.1 <- subset(df.f15, gene == "CTX-M-3" )
+(unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+
+df.f15.1$clust.id <- as.character(df.f15.1$clust.id )
+df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
+
+subset(df.f15.1, pident >= 95) -> df.f15.1
+#subset(df.f15.1, !(pident != 100 & type == "AMR.gene") ) -> df.f15.1
+
+
+#levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
+#df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
+
+df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
+
+df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
+#names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
+
+dummies1 <- make_alignment_dummies(
+  df.f15.1,
+  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
+  on = "CTX-M-3")
+
+dummies1$direc <- TRUE
+dummies1$type <- NA
+
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
+
+#df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
+
+#cols <- (hue_pal()(9)[c(1,2,4,6)])
+#cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
+
+# fudge to stop overplotting
+
+#df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
+
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+    geom_blank(data = dummies1) +
+  facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
+  #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
+  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c3
+
+####
+####
+
+# CTXM 16
+
+df.f15 <- subset(df.f, gene == "CTX-M-16")
+#df.f15$sseqid[df.f15$sseqid == "CTX-M-15"] <- "CTX-M-3"
+
+# how many to plot
+
+(unique(df.f15 %>% select(clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+levels.df.f15 <- unique(select(df.f15, qseqid, n_clust))
+
+df.f15$clust.id <- factor(df.f15$clust.id, levels = unique(df.f15$clust.id[order(df.f15$n, decreasing = T)]))
+df.f15$qseqid <- factor(df.f15$qseqid, levels = levels.df.f15$qseqid[order(levels.df.f15$n_clust)])
+
+ddply(df.f15, "qseqid", flip_one_contig, df.clusts) -> df.f15
+ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
+
+df.f15.1 <- subset(df.f15, gene == "CTX-M-16" )
+(unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+cat("meh1.8")
+df.f15.1$clust.id <- as.character(df.f15.1$clust.id )
+df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
+
+subset(df.f15.1, pident >= 95) -> df.f15.1
+#subset(df.f15.1, !(pident != 100 & type == "AMR.gene") ) -> df.f15.1
+
+
+#levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
+#df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
+
+df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
+
+df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
+#names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
+
+dummies1 <- make_alignment_dummies(
+  df.f15.1,
+  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
+  on = "CTX-M-16")
+
+dummies1$direc <- TRUE
+dummies1$type <- NA
+
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
+
+#df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
+
+#cols <- (hue_pal()(9)[c(1,2,4,6)])
+#cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
+
+# fudge to stop overplotting
+
+#df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
+
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+    geom_blank(data = dummies1) +
+  facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
+  #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
+  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c16
+
+####
+####
+
+# CTXM 1
+
+df.f15 <- subset(df.f, gene == "CTX-M-1")
+#df.f15$sseqid[df.f15$sseqid == "CTX-M-15"] <- "CTX-M-3"
+
+# how many to plot
+
+(unique(df.f15 %>% select(clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+levels.df.f15 <- unique(select(df.f15, qseqid, n_clust))
+
+df.f15$clust.id <- factor(df.f15$clust.id, levels = unique(df.f15$clust.id[order(df.f15$n, decreasing = T)]))
+df.f15$qseqid <- factor(df.f15$qseqid, levels = levels.df.f15$qseqid[order(levels.df.f15$n_clust)])
+
+ddply(df.f15, "qseqid", flip_one_contig, df.clusts) -> df.f15
+ddply(df.f15, "qseqid", trim_one_contig, 10000) -> df.f15
+
+df.f15.1 <- subset(df.f15, gene == "CTX-M-1" )
+(unique(df.f15.1 %>% select(qseqid, clust.id, n_clust))) %>% arrange(desc(n_clust)) -> contigs_n
+
+
+df.f15.1$clust.id <- as.character(df.f15.1$clust.id )
+df.f15.1$qseqid <- as.character(df.f15.1$qseqid)
+
+subset(df.f15.1, pident >= 95) -> df.f15.1
+#subset(df.f15.1, !(pident != 100 & type == "AMR.gene") ) -> df.f15.1
+
+
+#levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
+#df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
+
+df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
+
+df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
+#names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
+
+dummies1 <- make_alignment_dummies(
+  df.f15.1,
+  aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
+  on = "CTX-M-1")
+
+dummies1$direc <- TRUE
+dummies1$type <- NA
+
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-95"
+
+#df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
+
+#cols <- (hue_pal()(9)[c(1,2,4,6)])
+#cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
+
+# fudge to stop overplotting
+
+#df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
+
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+    geom_blank(data = dummies1) +
+  facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
+  #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
+  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c1
+
+ggarrange(p.c15, p.c27, p.s12, nrow = 3, ncol = 1, heights = c(2,1,0.5), labels = c("A", "B", "C")) -> contigs1.plot
+
+cat("meh2")
+```
+
+```{r wgs-contig-ggenes-plot2-setup, echo = F, warning = F, message = F}
+
+ggarrange(p.c14, p.c9, p.c3 , p.c16, p.c1, nrow = 5, ncol = 1, heights = c(.5,.7,.2,.2,.2),labels = c("A", "B", "C", "D", "E")) -> contigs.plot2
+
+```
+
+```{r wgs-contig-map-to-tree, echo = F, warning = F, message = F, fig.cap="A: Frequency distribution of ESBL genes in included samples. B: Frequency distribution of samples per ESBL-cluster, stratified by gene. C: ESBL-cluster membership mapped back to phylogeny.", out.extra='', fig.scap="ESBL-clusters mapped back to phylogeny", fig.width = 8, fig.height = 8}
+
+df.onehot <- dcast(select(df, Lane, clust.id ), Lane ~ clust.id, fun.aggregate = base::length)
+
+rownames(df.onehot) <- df.onehot$Lane
+
+
+df.onehot[c("Lane", names(apply(df.onehot[-1],2, sum)[order(apply(df.onehot[-1],2, sum), decreasing = T)]))] -> df.onehot
+
+sapply(df.onehot[-1], as.character) -> df.onehot[-1]
+
+
+ggtree(tree) %>% gheatmap(df.onehot[-1],  font.size = 1.5,
+                          colnames_position = "top", colnames_angle = 90, colnames_offset_y = 30,
+                          width = 3, color = NA) + scale_fill_manual(values = c("lightgrey", "black", "white")) + theme(legend.position = "none") + annotate("text", x= 0.4, y =540, label = "ESBL contig cluster") -> cont.tree
+
+
+ggarrange(cluster.sizes.plot, cont.tree, ncol = 1, nrow =2 ,labels = c(NA, "C"), heights = c(1, 2))
+
+
+```
+
+#### Assessing for healthcare-associated lineages
+
+Having clustered bacteria and MGE using _hierBAPS_ and _cd-hit_ respectively, I then mapped the location of sample collection back to the phylogeny and used the _hierBAPS_ SCs to assess for healthcare associated lineages (Figure \@ref(fig:wgs-hospvscommunity-map-to-tree). In general, healthcare-associated isolates were distributed throughout the tree and across all SCs, rather than there being a clear hospital-associated lineage. The exception to this was SC23, corresponding to MLST 410, which was slightly more likely to be healthcare associated. When comparing the proportion of healthcare associated samples within each SC to the remained of samples, SC23 had a statistically significantly increased proportion of healthcare associated samples on Fisher's exact test (p = 6.3x10^-4^, threshold of significance following Bonferroni correction 1.0x10^-3^), though it was by no means health-facility restricted: 50% (21/42) of SC23 samples were isolated in the community.
+
+```{r wgs-hospvscommunity-map-to-tree, echo = F, warning = F, message = F, fig.cap="A: Location of sample isolation mapped back to phylogeny B: Distribution of location of sample isolation stratified by hierBAPS cluster. In each case, community isolates include those cultured from samples collected on the first day of hospital admissison, in-hospital isolates are from patients who have been hospitalised > 24 hrs and recent discharge isolates are from patients who have been discharged from hospital within the last 2 weeks. Sequence cluster 23, highlighted in red, showed a statistically sigificant association with hospitalisation (see text).", out.extra='', fig.scap="Healthcare association of isolates mapped to phylogeny", fig.width = 8, fig.height = 5.5}
+
+
+sample_ids$isolated_in <- "Community"
+
+sample_ids$isolated_in[(sample_ids$data_date < (sample_ids$hospoutcomedate + 14)) & sample_ids$arm !=3] <- "Hospital - recent dc"
+sample_ids$isolated_in[(sample_ids$data_date < (sample_ids$hospoutcomedate)) & sample_ids$arm !=3] <- "In-Hospital"
+
+sample_ids$isolated_in[sample_ids$visit ==0] <- "Community"
+
+sample_ids$Lane <- sub("#","_",sample_ids$Lane)
+
+rownames(sample_ids) <- sample_ids$Lane
+
+col <- c(hue_pal()(3), "white", "lightgrey","black", "white")
+names(col) <- c("1","2","3","Community","Hospital - recent dc", "In-Hospital",  "NA")
+
+
+col <- c(hue_pal()(3), "grey86", "grey45", "black", "white")
+names(col) <- c("1","2","3","Community","Hospital - recent dc", "In-Hospital",  "NA")
+
+ggtree(tree) %>%
+  gheatmap(select(sample_ids, isolated_in), width = 0.2, color = NA, colnames = F) +
+  scale_fill_manual(values = col,labels = c( "Community","Hospital - recent dc", "In-Hospital","")) +
+  geom_hilight(node = 727, fill = "red") + theme(legend.position = "none") -> p1
+
+
+subset(sample_ids, Lane %in% tree$tip.label) -> sample_ids
+sample_ids <- merge(sample_ids, hbdf, by.x = "Lane", by.y = "Isolate", all.x = T)
+
+fudgedat <- data.frame( BAPS.l2 = as.character(23), count = nrow(subset(sample_ids, BAPS.l2 == 23)), isolated_in = "fudge")
+
+ggplot(sample_ids, aes(fct_rev(fct_infreq(BAPS.l2)), fill = isolated_in)) + 
+    geom_bar(colour = "black") + coord_flip() + xlab("level 2 BAPS clusters") + ylab("Count") +
+    theme_bw() + 
+  theme(legend.position = "right") + scale_fill_manual(values = col, name = element_blank()) +
+  geom_col(data = fudgedat, aes(BAPS.l2, count), fill = "red", alpha = 0.3) -> p2
+
+ggarrange(p1,p2, ncol = 2, labels = c("A", "B"), widths = c(0.6, 1))
+```
+
+#### Assessing for within-patient conservation of lineage or MGE
+
+To answer the question as to what elements (bacteria or MGE) are conserved within individuals across time I first compared all-against-all pairwise SNP distance between and within patients; first as a scatter plot, and then, because of significant overplotting, as a density plot (Figure \@ref(fig:wgs-within-vs-between-snpdist)). This suggested that there are a cluster of points close to the origin in the within-patient plot that are not seen in the between-patient plot: before approximately 50 days, there are more similar within-patient isolates than seen in the between-patent isolates. Dichotomising time at 50 days (based on inspection of the density plots) and performing a Kruskal-Wallace test found a statistically significant difference between the before 50 day and after 50 day pairwise SNP distance distribution in the within patient stratum (p = 0.008) but not in the between-patient stratum (p = 0.07). After 50 days, the distribution of between- and within- patent SNP distances are similar (p = 0.45). However it is clear from the plots that even at small $t$ and within-participant, there is significant diversity is the SNP distances, and that some isolates close together in time, within the same participant, are only distantly related.
+
+Having confirmed that there is a signal for within-participant temporal conservation of ESBL-E, I then sought to determine if the sequence clusters and ESBL-clusters were similarly conserved over time, and if so, which was the more conserved. The proportion of pairwise within-patient samples that contained the same ESBL-cluster and sequence cluster were significantly greater than would be expected by chance when the time between the samples is less than 35 days for sequence cluster and 32 days for ESBL-cluster (Figure \@ref(fig:wgs-rollprop)A). After this time, the lower confidence interval of the sequence cluster and ESBL-cluster curve crossed the proportion of samples that would be expected to be the same by chance, suggesting that, after 35 or 32 days, the chance of any two within-patient samples having the same sequence cluster or ESBL-cluster (respectively) is the same as if the two samples were randomly picked from the data set without regard to patient. The two curves have a very similar appearance; to address the question of which element is most conserved within an individual - sequence cluster, ESBL-cluster, or both - I performed an all-against-all pairwise comparison of which elements were conserved (Figure (Figure \@ref(fig:wgs-rollprop)C), and found that only ESBL-cluster and sequence cluster together are conserved within patients at a significantly greater proportion than between patients (p = 1.1 x10^-12^).
+
+```{r, wgs-within-vs-between-snpdist, echo = F, warning = F, message = F, fig.cap="Within and between participant pairwise SNP distances. A: Scatterplot of pairwise SNP distances as a function of time with GAM model fitted curve. B: Pairwise SNP distance as function of time as a 2D density plot, showing cluster of isolates close to origin that are close together in time and SNP-distance. C: Pairwsise SNP distance distribution before and after 50 days, within and between patients, showing statistically significant descreas ein pairwise SNP distance within patients before 50 days. After 50 days, between- and within- patient distributuions are similar.", out.extra='', fig.scap="Within- and between pairwise SNP distance of isolates", fig.width = 8, fig.height = 5}
+
+subset(data.frame(table(sample_ids$Supplier.Name)), Freq > 1)$Var1 -> doubles
+select(subset(sample_ids, Supplier.Name %in% doubles), Lane, Supplier.Name) -> doubles.lanes
+
+doubles.lanes[order(as.character(doubles.lanes$Supplier.Name)),] -> doubles.lanes
+
+drop <- doubles.lanes[-seq(1, 14, 2),]$Lane
+
+sample_ids <- subset(sample_ids, !(Lane %in% drop))
+
+## add metadata to SNP dists
+
+
+snpdists.df <- merge(snpdists.df, select(sample_ids, Lane, pid, data_date), by.x = "Var1", by.y = "Lane")
+names(snpdists.df)[names(snpdists.df) == "pid"] <- "pid.1"
+names(snpdists.df)[names(snpdists.df) == "data_date"] <- "data_date.1"
+
+snpdists.df <- merge(snpdists.df, select(sample_ids, Lane, pid, data_date), by.x = "Var2", by.y = "Lane")
+names(snpdists.df)[names(snpdists.df) == "pid"] <- "pid.2"
+names(snpdists.df)[names(snpdists.df) == "data_date"] <- "data_date.2"
+
+snpdists.df$category <- NA
+
+snpdists.df$category[snpdists.df$pid.1 == snpdists.df$pid.2] <- "Within Patient"
+snpdists.df$category[snpdists.df$pid.1 != snpdists.df$pid.2] <- "Between Patient"
+
+snpdists.df$t <- abs(as.numeric(snpdists.df$data_date.1 - snpdists.df$data_date.2))
+
+ggplot(subset(snpdists.df,!is.na(pid.1) & !is.na(pid.2)), aes(t, value)) + geom_point(alpha = 0.2, size = 0.5) + coord_cartesian(xlim = c(0,200)) + 
+  geom_smooth() + theme_bw() + scale_fill_viridis(option = "magma") + 
+  xlab("Pairwise time difference (days)") +
+  ylab("SNP distance") +   facet_grid(~ category) + ylim(c(0,30000)) -> q1
+
+ggplot(subset(snpdists.df,!is.na(pid.1) & !is.na(pid.2)), aes(t, value)) + stat_density_2d(aes(fill = ..density..), contour = FALSE, geom= "tile") + coord_cartesian(xlim = c(0,200)) +  
+  facet_grid(~ category) +theme_bw() + scale_fill_viridis(option = "plasma") + 
+  xlab("Pairwise time difference (days)") +
+  ylab("SNP distance") + theme(legend.position = 'none') + ylim(c(0,30000)) -> q2
+
+
+snpdists.df$category2 <- "< 51 days"
+
+snpdists.df$category2[snpdists.df$t > 50] <- "51+ days"
+ggplot(subset(snpdists.df, !is.na(category)), aes(x=category2, y= value) ) +  geom_jitter(alpha = 0.2, size = 0.5) + geom_boxplot(alpha = 0.8) +
+  facet_wrap(~ category) + theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + ylab("SNP distance") +
+  xlab("") + stat_compare_means(method = "kruskal", size = 3, label.y = 31000, label.x = 1.2, aes(label = paste0("p = ", ..p.format..))) -> q3
+
+ggarrange(ggarrange(q1,q2, ncol = 1, nrow = 2 , labels = c("A", "B")), ggarrange(NULL, q3, NULL, ncol = 1, nrow = 3, heights = c(0.2,3,1,0.2),labels = c(NA , "C", NA)) , ncol = 2, nrow = 1, widths = c(1.3,1))
+
+```
+
+```{r, wgs-rollprop, echo = F, message=F, warning=F, echo = F, warning = F, message = F, fig.cap="Probability of any two samples from within a given participant containing the same ESBL-cluster (A, left panel) or being a member of the same hierBAPS cluster (A, right panel). Time is windowed at +/- 5 days around the time indicated on the x axis. Dotted line is the probability that two samples would belong the the same group by chance, constructed by randomly sampling 1000 sample pairs. B: proportion of samples that contain the same herBAPS cluster alone, or ESBL-cluster alone, or both, demonstrating that the ESBL cluster-hierBAPS cluster pairing is the most conserved of the three. ", out.extra='', fig.scap="Within-patient ESBL-cluster and hierBAPS clustering as a function of time", fig.width = 7, fig.height = 5}
+
+# make the df for assessnig contig cluster.
+# we'll accept *any* conserved cluster (f ther are more than 1) as a match
+
+contigs <- melt(select(df, Lane, clust.id))
+contigs %>% group_by(Lane) %>% mutate(id = paste0("contig", row_number())) -> contigs
+dcast(contigs, Lane ~ id, value.var = "clust.id") -> contigs
+sample_ids <- merge(sample_ids, contigs, all.x = T)
+
+# make crossed df
+
+
+sid_cross <- merge(dplyr::select(sample_ids, pid, Lane, data_date, BAPS.l2, contig1, contig2, contig3), 
+                   dplyr::select(sample_ids, pid, Lane, data_date, BAPS.l2,  contig1, contig2, contig3), by = "pid")
+sid_cross <- subset(sid_cross, Lane.x != Lane.y)
+apply(select(sid_cross, Lane.x, Lane.y), 1, function(x) paste(sort(x), collapse = "")) -> sid_cross$key
+subset(sid_cross, !duplicated(key) ) -> sid_cross
+sid_cross$t <- abs(as.numeric(sid_cross$data_date.y - sid_cross$data_date.x))
+
+sid_cross$same_BAPscl <- sid_cross$BAPS.l2.x == sid_cross$BAPS.l2.y
+
+sid_cross$same_contig <- NA
+for (i in 1:nrow(sid_cross)) {
+  c1 <- sid_cross[i,5:7]
+  c2 <- sid_cross[i,11:13]
+  sid_cross$same_contig[i] <- any( (c1 %in% c2) & (!is.na(c1) & !is.na(c2)))
+}
+
+
+
+prop.baps <- data.frame( t = seq(0,220,1))
+prop.baps$e <- NA
+prop.baps$n <- NA
+prop.cont <- prop.baps
+wind <- 10
+
+for (i in 1:nrow(prop.baps)) {
+  temp <- subset(sid_cross, t > (prop.baps$t[i] - wind) & t < (prop.baps$t[i] + wind  ))
+  prop.baps$e[i] <- sum(temp$same_BAPscl)
+  prop.baps$n[i] <- length(temp$same_BAPscl)
+  prop.cont$e[i] <- sum(temp$same_contig)
+  prop.cont$n[i] <- length(temp$same_contig)
+}
+prop.baps$type <- "hierBAPS cluster"
+prop.cont$type <- "ESBL-cluster"
+
+rollprop <- rbind(prop.baps, prop.cont)
+  
+rollprop$prop <- apply(rollprop[1:3], 1, function(x) binom.test(x[2], x[3])$estimate)
+rollprop$lci <- apply(rollprop[1:3], 1, function(x) binom.test(x[2], x[3])$conf.int[1])
+rollprop$uci <- apply(rollprop[1:3], 1, function(x) binom.test(x[2], x[3])$conf.int[2])
+
+
+# null line
+
+null1 <- sample_n(select(sample_ids, pid, t, BAPS.l2, contig1, contig2,contig3, data_date), 1000 , replace = T)
+names(null1) <- paste0(names(null1), ".x")
+null2 <- sample_n(select(sample_ids, pid, t, BAPS.l2, contig1, contig2,contig3, data_date), 1000 , replace = T)
+names(null2) <- paste0(names(null2), ".y")
+null <- cbind(null1, null2)
+
+null$same_BAPscl <- null$BAPS.l2.x == null$BAPS.l2.y
+
+null$same_contig <- NA
+for (i in 1:nrow(null)) {
+  c1 <- null[i,4:6]
+  c2 <- null[i,11:13]
+  null$same_contig[i] <- any((c1 %in% c2) & (!is.na(c1) & !is.na(c2)))
+}
+
+null$t <- abs(as.numeric(null$data_date.y - null$data_date.x))
+
+#prop.baps <- data.frame( t = seq(0,220,1))
+#prop.baps$e <- NA
+#prop.baps$n <- NA
+
+#prop.cont <- prop.baps
+#for (i in 1:nrow(prop.baps)) {
+#  prop.baps$e[i] <- sum(temp$same_BAPscl)
+# prop.baps$n[i] <- length(temp$same_BAPscl)
+#  prop.cont$e[i] <- sum(temp$same_contig)
+#  prop.cont$n[i] <- length(temp$same_contig)
+#}
+
+nullprop <- data.frame(type = c("hierBAPS cluster","ESBL-cluster"),
+                       e =  c(sum(null$same_BAPscl), sum(null$same_contig)),
+                       n = c(length(null$same_BAPscl), length(null$same_contig)))
+
+#  prop.cont$e[i] <- sum(temp$same_contig)
+#  prop.cont$n[i] <- length(temp$same_contig)
+
+
+
+nullprop$prop <- apply(nullprop[2:3], 1, function(x) binom.test(x[1], x[2])$estimate)
+nullprop$lci <- apply(nullprop[2:3], 1, function(x) binom.test(x[1], x[2])$conf.int[1])
+nullprop$uci <- apply(nullprop[2:3], 1, function(x) binom.test(x[1], x[2])$conf.int[2])
+
+
+
+ggplot(rollprop, aes(t, prop, group = type)) + geom_line() + 
+    geom_ribbon(aes(ymin = lci, ymax = uci), alpha = 0.3, color = NA) + 
+    coord_cartesian(xlim = c(0,100), ylim  = c(0,0.4)) + 
+    geom_hline(data = nullprop, aes(yintercept = prop,group = type), linetype = "dashed") + 
+  theme_bw() + facet_wrap(~ type) + theme(legend.position = "none") + xlab("Time (days)") + ylab("Proportion") -> p10
+
+# for bar chart need to cross all
+
+
+base::merge(dplyr::select(sample_ids, pid, Lane, data_date, contig1,contig2, contig3, BAPS.l2),
+         dplyr::select(sample_ids, pid, Lane, data_date, contig1,contig2, contig3, BAPS.l2), by = NULL) -> crossall
+
+crossall <- subset(crossall, Lane.x != Lane.y)
+apply(select(crossall, Lane.x, Lane.y), 1, function(x) paste(sort(x), collapse = "")) -> crossall$key
+subset(crossall, !duplicated(key) ) -> crossall
+
+
+for (i in 1:nrow(crossall)) {
+  c1 <- crossall[i,4:6]
+  c2 <- crossall[i,11:13]
+  crossall$same_contig[i] <- any((c1 %in% c2) & (!is.na(c1) & !is.na(c2)))
+}
+crossall$same_hierb <- crossall$BAPS.l2.x == crossall$BAPS.l2.y
+
+crossall$same_pt <- crossall$pid.x == crossall$pid.y
+
+
+crossall %>% group_by(same_pt) %>% dplyr::summarise(same_hierb.only = sum(same_hierb == TRUE & same_contig == FALSE),
+                                             same.clu.only = sum(same_hierb == FALSE & same_contig == TRUE),
+                                             same.both = sum(same_hierb == TRUE & same_contig == TRUE),
+                                             neither = sum(same_hierb == FALSE & same_contig == FALSE),
+                                             tots = n()) %>% filter(!is.na(same_pt)) -> crossall.sum
+melt(crossall.sum) -> df.m
+
+df.m$same_pt[df.m$same_pt == "FALSE"] <- "Between patient"
+df.m$same_pt[df.m$same_pt == "TRUE"] <- "Within patient"
+
+df.m$value_norm <- df.m$value
+df.m$value_norm[df.m$same_pt == "Within patient"] <- df.m$value_norm[df.m$same_pt == "Within patient"] / max(subset(df.m, same_pt == "Within patient")$value)
+df.m$value_norm[df.m$same_pt == "Between patient"] <- df.m$value_norm[df.m$same_pt == "Between patient"] / max(subset(df.m, same_pt == "Between patient")$value)
+
+df.m$variable <- as.character(df.m$variable)
+df.m$variable[df.m$variable == "same_hierb.only"] <- "Same hierBAPS-clusetr only"
+df.m$variable[df.m$variable == "same.clu.only"] <- "Same ESBL-cluster only"
+df.m$variable[df.m$variable == "same.both"] <- "Same ESBL and hierBAPS cluster"
+
+df.m$variable <- factor(df.m$variable, levels = rev(c("Same ESBL and hierBAPS cluster","Same ESBL-cluster only" ,"Same hierBAPS-clusetr only", "neither"  )))
+
+#Calculate fishers
+
+mat.both <- matrix(c(1978, 33,107488 - 1978 ,392 - 33), nrow = 2,
+                      dimnames =
+                          list(c("Between pt", "Within pt"),
+                               c("Same", "Not")))
+
+
+mat.bug <- matrix(c(3305, 15,107488 - 3305 ,392 - 15), nrow = 2,
+                      dimnames =
+                          list(c("Between pt", "Within pt"),
+                               c("Same", "Not")))
+
+mat.mge <- matrix(c(1711, 6,107488 - 1711 ,392 - 6), nrow = 2,
+                      dimnames =
+                          list(c("Between pt", "Within pt"),
+                               c("Same", "Not")))
+
+
+ggplot(subset(df.m,variable != "tots" & variable != "neither"), aes(variable, value_norm, fill = same_pt)) + geom_col(position = "dodge")  +
+coord_flip() + guides(fill = guide_legend(reverse = TRUE)) +
+  theme(legend.title = element_blank()) + ylab("Proportion") + xlab("") +
+  annotate(geom = "segment", y = 0.09, yend = 0.09, x = 2.7, xend = 3.3) + 
+  annotate(geom = "segment", y = 0.09, yend = 0.09, x = 1.7, xend = 2.3) +
+  annotate(geom = "segment", y = 0.09, yend = 0.09, x = 0.7, xend = 1.3) +
+    annotate(geom = "text", y = 0.11, x = 3.0, label = "p < 0.001", size = 3) + 
+  annotate(geom = "text", y = 0.11, x = 2.0, label = "p = 1.0", size = 3) +
+  annotate(geom = "text", y = 0.11, x = 1.0, label = "p = 0.38", size = 3) + 
+   ylim(c(0,0.12)) + theme_bw() + scale_fill_manual(name = "", values = hue_pal()(2)) -> p11
+# so only smae both baps and gene cluster is increased in within-patient samples
+# + ylim(c(0,0.11))
+  
+ggarrange(p10, p11, ncol = 1, nrow = 2, labels = c("A", "B"), heights = c(1.2,1))
+
+```
+
+
+
+## Discussion
+
+
+### Drivers of ESBL-E carriage: true acquisition versus enrichment
+
+The diversity of healthcare associated isolates was largely contained within the diversity of community isolates, rather than apparent hospital acquisitions being restricted to a single clade or clone. The exception to this was SC23, which corresponded to ST410, and was more likely to be healthcare associated. This could be consistent with the hypothesis that it is a recently arrived high-risk clone, which may be, at least initially, hospital-associated. Even so, it is clearly not hospital restricted, with half of the ST410 isolates being isolated form the community. This result could be explained by two hypotheses: first, that these are true transmission events that are occurring within the hospital, and that the diversity of ESBL _E. coli_ within the hospital is the same as the community; or, second, that these "hospital acquisitions" are actually minority variant _E. coli_ present in the microbiota (and therefore acquired in the community) at a low abundance and hence not detected by culture, and enriched for with antimicrobial exposure in hospital. This latter hypothesis is perhaps supported by the fact that the antimicrobial-exposed group of patients in this study have an early and rapid increase in ESBL-E carriage prevalence that is not seen in the antimicrobial-unexposed group. Distinguishing between these two hypotheses is important as they would each require a different intervention: hospital infection control in the former case, or strategies to protect the microbiota from the deleterious effect of broad spectrum antimicrobials (such as pre- or probiotics, or oral $\beta$-lactamases) in the latter. 
+
+By forming sequence clusters and ESBL-clusters, I was able to demonstrate that both bacteria and MGE are conserved together, within-patient, over time. Some previous longitudinal studies of ESBL-E found that _E. coli_ STs tended to vary over time but that in many cases ESBL gene and plasmid replicon remained the same, which could be due to a conserved MGE transferring between bacteria[@VanDuijkeren2018]. Given my findings, this is unlikely to be the case. Though not directly addressed in this study it is possible to speculate therefore that the unit of transmission of ESBL between patients is likely to be the bacterium rather than, for example, horizontal gene transfer of ESBL genes on plasmids or transposons. The within-patient correlation of SC and ESBL-cluster lasts only for 32-35 days; two samples from a single patient more than 35 days apart are as likely to contain the same SC/ESBL cluster as two samples from two different patients. This implies either an exogenous re-exposure or some other endogenous mechanism whereby the dominant ESBL strain is replaced by a minority variant from within the microbiota. Of note, the timescale of SC replacement - occurring after 35 days - is consistent with the mean time taken to revert to the ESBL-negative state from ESBL-positive from the longitudinal Markov models (26 [95% CI 12-58] days), perhaps lending support to the re-exposure hypothesis. It is important to note also that even at a maximum (i.e. with samples that are days apart), only around 20% of within-patient samples contain the same SC/ESBL-cluster. This is many times more than would be expected by chance, but still implies that at any time point there is significant diversity of ESBL _E. coli_ strains, that have been missed by only taking forward one colony pick for sequencing. This is consistent with studies that have performed multiple colony picks on stool samples enriched for ESBL-E, and have found widespread diversity of STs and ESBL genes[@Stoesser2015].
+
+
+### Limitations
+
+
+I selected a global collection of _E. coli_ based on what was available but, as described above and in common with many analyses of this type, this is a biased collection. This must be borne in mind when interpreting the global phylogeny. There are inherent limitations in the short-read Illumina sequencing that was carried out: assembly of areas with multiple nucleotide repeats (as found in plasmids and transposable elements in particular) is difficult or impossible, making it impossible to fully characterise the MGE in this dataset upon which the AMR genes are carried. I have attempted to address this difficulty by defining ESBL-clusters as a proxy for MGE, but this is by its nature flawed. Some of the assembled contigs are short and likely represent transposons; the same transposons have likely inserted into multiple plasmids in the past and as such, these short contigs may cluster with other sequences that would be seen to be very different, were a full assembly available. In addition, the biological significance of these ESBL-clusters is not clear. It is not possible to say with certainty what they represent (e.g. plasmid) as they are only fragments. Nevertheless, the fact that I have seen within-patient associations of the ESBL-clusters lends some support to their use, as erroneous clustering would be expected to bias any associations towards to null.
+
+## Conclusions and further work
+
+It is possible that apparent constant colonisation actually represents frequent re-exposure on the timescale of around 35 days, and that apparent hospital acquisitions, are, in fact, unmasking events due to enrichment of the microbiota for ESBL-E by antimicrobial exposure.
+
+Many questions remain unanswered and further work is necessary. Shotgun metagenomic sequencing of stool would allow testing of the competing acquisition and unmasking hypotheses of rapid increase in ESBL-E prevalence by defining the microbiota and total AMR gene content pre-, during and post- antimicrobial exposure, as well as providing an opportunity to explore the role of the microbiota to colonisation resistance to ESBL-E. Long read sequencing would allow a proper characterisation of the MGE that carry ESBL genes in the Malawian context, giving the resolution necessary to truly track MGE within and between patients and strains, as well as to address questions of expression of genes such as _catB4_ that seem to correlate poorly with phenotype, by examining e.g. promoter regions. Short-read sequencing of the _Klebsella pneumoniae_ isolates from this study would allow a comparison between the mechanisms of AMR and MGE prevalent in this species as compared to _E. coli_, and assess the extent to which horizontal gene transfer between the two is driving ESBL spread in Blantyre. Collating publicly available ST167 and ST410 genomes would allow the construction of a phylogeny that would allow insight into the epidemiology of these putative recently arrived high risk clones. Finally, incorporating the resolution afforded by sequencing into the longitudinal Markov models may provide new insights in to the dynamics of ESBL-E carriage. This is the subject of the next chapter.
+
+
+
+```{r wgs-contig-stats-plot, echo = F, warning = F, message = F, fig.scap="Summary statistics for ESBL-contig clusters", out.extra='', fig.cap="Summary statistics for 99 ESBL-containing contig clusters as deterined by \\textit{cd-hit}. A: Number of contigs per cluster. B: Length (kbp) of longest sample in each cluster. This is defined as the cluster representative sample by \\textit{cd-hit} to which all other samples are compared for the purposes of length and sequence identity. C: Distribution of contig lengths by cluster expressed as a proportion of longest contig length. D: Distribution of sequence identity of cluster members compared to representative member, by cluster.", fig.width = 6, fig.height = 7}
+
+contig.stats.plot
+
+```
+
+```{r wgs-contig-ggenes-plot1, echo = F, warning = F, message = F, fig.scap="AMR genes, IS and plasmid replicon content of ESBL-clusters, part 1", out.extra='', fig.cap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster, stratified by by ESBL gene and ordered by number of samples of cluster. IS26 is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS26 element. A: \\textit{blaCTXM15}, B: \\textit{blaCTXM27} , C: \\textit{blaSHV12}. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", fig.width = 13, fig.height = 15}
+
+contigs1.plot
+
+```
+
+```{r wgs-contig-ggenes-plot2, echo = F, warning = F, message = F, fig.cap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster, stratified by by ESBL gene and ordered by number of samples in cluster. IS26 is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS26 element. A: \\textit{blaCTXM14}, B: \\textit{blaCTXM9} , C: \\textit{blaCTXM3}, D: \\textit{blaCTXM16}, E: \\textit{blaCTXM1}. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", out.extra='', fig.scap="AMR genes, IS and plasmid replicon content of ESBL-clusters, part 2", fig.width = 12, fig.height = 15}
+
+contigs.plot2
+
+```
+
