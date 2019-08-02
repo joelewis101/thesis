@@ -1,4 +1,4 @@
-# Longitudinal models of ESBL-E carriage
+# Longitudinal Markov models of ESBL-E carriage
 
 \chaptermark{Modelling ESBL-E carriage}
 
