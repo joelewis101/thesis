@@ -2,7 +2,7 @@
 
 \chaptermark{ESBL-E carriage}
 
-```{r ch4-setup, include = F}
+```{r ch5-setup, include = F}
 
 library(plyr)
 library(tidyverse)
