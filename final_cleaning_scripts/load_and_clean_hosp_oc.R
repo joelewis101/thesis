@@ -29,9 +29,9 @@ sub("00:00:00", "17:00:00", oc$hospoutcometime) -> oc$hospoutcometime
 oc$hoc.datetime <- parse_datetime(paste0(sub(" 00:00:00", "", oc$hospoutcomedate), " ", oc$hospoutcometime), "%d%b%Y %H:%M:%S")
 extra_deaths <- subset(oc, hospoutcome == 3)
 
-extra_deaths %>% group_by(pid) %>% slice(which.min(hoc.datetime)) -> extra_deaths
+extra_deaths %>% group_by(pid) %>% dplyr::slice(which.min(hoc.datetime)) -> extra_deaths
 
-oc %>% group_by(pid) %>% slice(which.min(hoc.datetime)) -> oc
+oc %>% group_by(pid) %>% dplyr::slice(which.min(hoc.datetime)) -> oc
 
 subset(extra_deaths, !(pid %in% subset(oc, hospoutcome == 3)$pid)) -> extra_deaths
 
