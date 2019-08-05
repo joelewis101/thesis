@@ -25,6 +25,7 @@ library(FactoMineR)
 library(factoextra)
 library(epitools)
 library(glue)
+library(MatchIt)
 
 wd <- "chapter_4/"
 output = "latex"

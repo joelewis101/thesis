@@ -24,6 +24,8 @@ library(brms)
 library(FactoMineR)
 library(factoextra)
 library(epitools)
+library(broom)
+library(glue)
 
 wd <- "chapter_4/"
 output = "latex"
