@@ -683,7 +683,7 @@ lims_dates_censored %>% filter(!pid %in% c("DAS1441S",
 
 fit1.c <- survfit(Surv(time = tstart, time2 = tstop, event = ESBL, type = "mstate") ~ arm, data = l.c, id = pid, istate = init.state)
 
-pull_state_occ_from_surv_obj(fit1) -> pstate.c
+pull_state_occ_from_surv_obj(fit1.c) -> pstate.c
 
 ggplot(pstate.c, aes(x = t, y = `p(ESBL.pos)`, colour = arm)) + 
   geom_line() + 
