@@ -532,7 +532,7 @@ names(newdata)[3] <- "esco_prob_esbl"
 ggplot(invasive, aes(year_of_samples_start, esco_prob_esbl)) + geom_point(aes(size = invasive_n_ESCO), alpha = 0.7) +
   geom_line(data = newdata) + 
   geom_ribbon(data = newdata, aes(ymin = lwr, ymax = upr), alpha = 0.3) + 
-#  theme_bw() +
+  theme_bw() +
   ylab("E. coli") +
   xlab("Year") +
   labs(size = "Study size") -> p1
@@ -583,7 +583,7 @@ names(newdata2)[3] <- "klpn_prob_esbl"
 ggplot(invasive, aes(year_of_samples_start, klpn_prob_esbl)) + geom_point(aes(size = invasive_n_kleb), alpha = 0.7) +
   geom_line(data = newdata2) + 
   geom_ribbon(data = newdata2, aes(ymin = lwr, ymax = upr), alpha = 0.3) + 
-#  theme_bw() +
+  theme_bw() +
   ylab("K. pneumoniae") +
   xlab("Year") +
   labs(size = "Study size") -> p2
@@ -880,7 +880,7 @@ The aetiology of sepsis in sSA is poorly defined, hence optimal antimicrobial st
 
 Certainly, ESBL-E are endemic in sSA and are a problem of serious public health concern; sSA has rates of ESBL-E in invasive disease that are comparable to the highest in the world and ESBL-E gut mucosal carriage in healthy populations across the continent is common. Whilst it is clear that health care facilities are strongly associated with ESBL-E acquisition, a deeper understanding of the determinants and sources of acquisition, and carriage duration is lacking. In order to understand the role of health facilities in driving the ESBL-E pandemic, a high quality longitudinal ESBL-E carriage data from both healthy and sick (health facility exposed) populations are required.
 
-I propose that optimising the management of severe febrile illness can tackle two problems: reduce over prescription of broad spectrum antimicrobials and improve outcomes in critically unwell patients. This may seem counter-intuitive: why target the very unwell with an antimicrobial stewardship intervention? However I hypothesise that the "step-up" way in which we approach antimicrobial therapy in the immunosuppressed in resource limited settings is flawed, is driving the twin problems of poor sepsis outcomes and AMR, and may represent a low hanging fruit to tackle both problems. IN a setting where so much management is empiric, current management begins with broad spectrum antibacterials and adds in further therapies - TB therapy, PCP therapy, or antifungals - based on non-response. This is the management that is codified in the WHO guidance for treating critically unwell TB suspects, but I suggest that it results in prolonged antibacterial exposure and delay in definitive treatment. We can imagine an alternate therapy, whereby we start broad, and rapidly narrow the spectrum of therapy based on the results of investigations. But such a strategy requires data; what are the causes of sepsis in sSA that we should target? How should we rationalise therapy What are the determinants of AMR acquisition in sepsis survivors and how can we mitigate against acquisition? It is the aim of this thesis to provide data to inform novel antimicrobial strategies for sepsis in Malawi and similar high-HIV high-TB prevalence settings throughout sSA. 
+I propose that optimising the management of severe febrile illness can tackle two problems: reduce over prescription of broad spectrum antimicrobials and improve outcomes in critically unwell patients. This may seem counter-intuitive: why target the very unwell with an antimicrobial stewardship intervention? However I hypothesise that the "step-up" way in which we approach antimicrobial therapy in the immunosuppressed in resource limited settings is flawed, is driving the twin problems of poor sepsis outcomes and AMR, and may represent a low hanging fruit to tackle both problems. In a setting where so much management is empiric, current management begins with broad spectrum antibacterials and adds in further therapies - TB therapy, PCP therapy, or antifungals - based on non-response. This is the management that is codified in the WHO guidance for treating critically unwell TB suspects, but I suggest that it results in prolonged antibacterial exposure and delay in definitive treatment. We can imagine an alternate therapy, whereby we start broad, and rapidly narrow the spectrum of therapy based on the results of investigations. But such a strategy requires data; what are the causes of sepsis in sSA that we should target? How should we rationalise therapy? What are the determinants of AMR acquisition in sepsis survivors and how can we mitigate against acquisition? It is the aim of this thesis to provide data to inform novel antimicrobial strategies for sepsis in Malawi and similar high-HIV high-TB prevalence settings throughout sSA. 
 
 ### Specific aims
 The specific aims of this thesis are:
