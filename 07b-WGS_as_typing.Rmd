@@ -1,4 +1,4 @@
-# Whole genome sequencing as a high-resolution typing tool to track longitudinal ESBL-E colonisation
+# Whole genome sequencing to track longitudinal ESBL-E colonisation
 
 \chaptermark{WGS to track ESBL-E colonisation}
 
