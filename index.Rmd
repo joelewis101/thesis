@@ -9,14 +9,15 @@ subtitle:  |
 output: bookdown::pdf_book
 fontsize: 11pt
 geometry: margin = 1.2in
-lof: yes
-lot: yes
+lof: False
+lot: False
 documentclass: book
 bibliography: ["/Users/joelewis/Documents/bib/library.bib"]
 csl: bmj.csl
 biblio-style: apalike
 link-citations: yes
 description: "Joe's thesis. Yikes!"
+toc: False
 header-includes:
    \usepackage{array}
    \usepackage{threeparttablex}
@@ -31,11 +32,23 @@ header-includes:
    \onehalfspacing
    
 ---
----
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Preface {-}
+```{r child = 'misc_rmds/dedication.Rmd'}
+```
 
-Joe's thesis 
+```{r child = 'misc_rmds/abstract.Rmd'}
+```
+
+```{r child = 'misc_rmds/ackn.Rmd'}
+```
+
+
+```{=latex}
+\tableofcontents
+\listoffigures
+\listoftables
+```
+
