@@ -616,9 +616,9 @@ amr.melt$class[grepl("NDM", amr.melt$variable) ] <- "Carbapenems"
 amr.melt <- subset(amr.melt, variable != "MrdA")
 amr.melt <- subset(amr.melt, variable != "LAP_2")
 
-amr.melt$class[grepl("Mph", amr.melt$variable) ] <- "Tetracyclines"
+amr.melt$class[grepl("Mph", amr.melt$variable) ] <- "Macrolides"
 amr.melt$class[grepl("Mef", amr.melt$variable) |
-                grepl("Erm", amr.melt$variable)  ] <- "Tetracyclines"
+                grepl("Erm", amr.melt$variable)  ] <- "Macrolides"
 
 amr.melt$class[grepl("Fos", amr.melt$variable) ] <- "Fosfomycin"
 
@@ -917,11 +917,11 @@ knitr::include_graphics(paste0(wd,"aminoglycoside_plot.pdf"))
 
 Presence of chloramphenicol resistance determinants was common; 248/473 (52%) of isolates contained at least one chloramphenicol resistance gene (Figure \@ref(fig:wgs-amr-sum)), usually 1 (210/248 [85%]), less commonly 2 (37/248 [15%]) or 3 (1/248 [<1%]). The most commonly identified gene was _catB4_,  but presence of _catB4_ was not associated with phenotypic chloramphenicol resistance (OR 0.9 [95% CI 0.6-1.4], p = 0.65). In comparison, presence of any other chloramphenicol resistance gene was associated with phenotypic resistance (OR 2.5 [95% CI 1.6-3.9], p < 0.001 for a composite variable of all other genes). The reason for this is not clear, but in addition partially assembled _catB4_ genes were very common; of the 328 isolates in which there was no fully assembled _catB4_, 93% (306/323) were reported by ARIBA to contain a partially assembled _catB4_ gene. In many cases, these partial genes seemed to be truncated by an IS26 insertion sequence (see Chapter 8).
 
-#### Co-trimoxazole, tetracycline and other resistance determinants
+#### Co-trimoxazole, tetracycline, macrolide and other resistance determinants
 
 Almost all isolates contained either a trimethoprim resistance (459/473 [97%]) or a sulphonamide resistance gene (468/473 [99%]); only 3/473 isolates did not contain either. Trimethoprim resistance genes were all of the _dfrA_ family; _sulII_ was the commonest sulphonamide resistance determinant (Figures \@ref(fig:wgs-amr-sum) and \@ref(fig:wgs-amr-chlor-cotrim)B). Phenotypic cotrimoxazole resistance was also near-ubiquitous, in 96% (433/448) of those isolates in which antimicrobial sensitivity testing was done.
 
-Tetracycline resistance genes were also very common, identified in 422/473 (89%) of isolates, most commonly _mphA_ (324/473 [68%] of isolates), followed by _tetB_ (262/473 [55%] of isolates) and _tetA_ (193/473 [41%] of isolates). No antimicrobial sensitivity testing was carried out for any agent of the tetracycline class. Resistance determinants for rifampicin (_arr2_ and _arr3_) were rarely identified, in 2 isolates and the _sat2_ gene, conferring resistance to streptothricin (a nucleoside antibiotic with no clinical compounds in use) was seen in 69/473 [15%] of isolates; the significance of this is unknown. Finally, the fosfomycin resistance determinant _fosA_ was seen in 28/473 [6%] of isolates, despite this antimicrobial being unavailable in Malawi. It was not restricted to any one clade (Figure \@ref(fig:amr-map-to-tree)).
+Tetracycline and macrolide resistance genes were also very common: tetracycline resistance determinents were identified in 411/473 (86%) of isolates, most commonly _tetB_ (262/473 [55%] of isolates) and _tetA_ (193/473 [41%] of isolates). Macrolide resistance determinents were detected in 325/473 (69%); all isolates carried _mphA_ most commonly alone but rarely with _ermB_ (9 isolates) or _mefB_ (1 isolate). No antimicrobial sensitivity testing was carried out for any agent of the tetracycline or macrolide class. Resistance determinants for rifampicin (_arr2_ and _arr3_) were rarely identified, in 2 isolates and the _sat2_ gene, conferring resistance to streptothricin (a nucleoside antibiotic with no clinical compounds in use) was seen in 69/473 [15%] of isolates; the significance of this is unknown. Finally, the fosfomycin resistance determinant _fosA_ was seen in 28/473 [6%] of isolates, despite this antimicrobial being unavailable in Malawi. It was not restricted to any one clade (Figure \@ref(fig:amr-map-to-tree)).
 
 ```{r wgs-amr-chlor-cotrim-setup, include= FALSE}
 
@@ -969,7 +969,7 @@ ggarrange(hm1,NULL,hm2, ncol = 3, nrow = 1, labels = c("A",NA,"B"), widths = c(1
 ggsave(paste0(wd,"chor_cotrim_plot.pdf"), plot = parrange, width = 7, height = 4, units = "in")
 ```
 
-```{r wgs-amr-chlor-cotrim, echo = F, warning = F, message = F, fig.scap="Chloramphenicol and cotrimoxazole resistance mutations and phenotypic resistance", out.extra='', fig.cap="Heatmap showning phenotypic chloramphenicol (A) and cotrimoxazole (B) resistance and identified resistance genes that could be expected to confer resistance to these agents. Each row is one sample, red = presence, blue = absence"}
+```{r wgs-amr-chlor-cotrim, echo = F, warning = F, message = F, fig.scap="Chloramphenicol and cotrimoxazole resistance mutations and phenotypic resistance", out.extra='', fig.cap="Heatmap showning phenotypic chloramphenicol (A) and cotrimoxazole (B) resistance and identified resistance genes that could be expected to confer resistance to these agents. Each row is one sample, red = presence, blue = absence. Both heatmaps are row and column clustered."}
 
 knitr::include_graphics(paste0(wd,"chor_cotrim_plot.pdf"))
 
