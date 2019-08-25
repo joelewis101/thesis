@@ -163,7 +163,7 @@ e1 <- subset(enroll, arm == 1)
 
 ## Chapter overview
 
-In this chapter, I present a clinical and microbiological description of sepsis in Blantyre, Malawi. As expected, participants are young relative to high income settings and there is a high prevalence of HIV-infection. 28-day case-fatality is 18% (95% CI 13-26%) but continues to rise throughout the study period to 31% (95% CI 25-38%) by 180 days and is higher in the HIV-infected in a time-to event analysis, seemingly driven by late (> 2 week) deaths. Participants had been unwell for some time (median 7 days) prior to presentation. Microbiological testing identified an aetiological agent for 51% of the cohort: _Mycobacterium tuberculosis_ is the commonest cause identified, in 34% of all participants, usually manifesting as disseminated mycobacterial disease diagnosed by urinary lipoarabinomannan testing. Bloodstream infection was next most prevalent (11%), followed by malaria caused by _Plasmodium falciparum_ (9%). I use logistic regression to identify determinants of 28-day mortality.  Time to antibacterial therapy and volume of intravenous fluid administered show no significant association with mortality; however, receipt of antituberculous showed an independent association with survival to 28 days (aOR 0.17 for death [95% CI 0.03-0.74]). The logistic regression models used to provide these estimates of effect size had some problems, which could result in biased estimates: some predictors perfectly predicted outcome and so were excldued from the model (called seperation); and the number of predictors included meant that the model is likely overparameterised.
+In this chapter, I present a clinical and microbiological description of sepsis in Blantyre, Malawi. As expected, participants are young relative to high income settings and there is a high prevalence of HIV-infection. 28-day case-fatality is 18% (95% CI 13-26%) but continues to rise throughout the study period to 31% (95% CI 25-38%) by 180 days and is higher in the HIV-infected in a time-to event analysis, seemingly driven by late (> 2 week) deaths. Participants had been unwell for some time (median 7 days) prior to presentation. Microbiological testing identified an aetiological agent for 51% of the cohort: _Mycobacterium tuberculosis_ is the commonest cause identified, in 34% of all participants, usually manifesting as disseminated mycobacterial disease diagnosed by urinary lipoarabinomannan testing. Bloodstream infection was next most prevalent (11%), followed by malaria caused by _Plasmodium falciparum_ (9%). I use logistic regression to identify determinants of 28-day mortality.  Time to antibacterial therapy and volume of intravenous fluid administered show no significant association with mortality; however, receipt of antituberculous showed an independent association with survival to 28 days (aOR 0.17 for death [95% CI 0.03-0.74]). The logistic regression models used to provide these estimates of effect size had some problems, which could result in biased estimates: some predictors perfectly predicted outcome (i.e. seperation occured) and so were excldued from the model; and the number of predictors included meant that the model is likely overparameterised.
 
 ## Introduction and chapter aims
 
@@ -346,7 +346,7 @@ kable(select(e1.sum,`levels`,value), "latex", booktabs =T,
       row.names = F, longtable = T, escape = F, col.names = c("Variable","Value"), caption = "Participant Characteristics" ) %>%
   kable_styling(full_width = F,latex_options = c("repeat_header")) %>%
   group_rows(index = kstring) %>%
-  footnote(general = "ART = Antiretroviral therapy, CPT = Co-trimoxazole preventative therapy, EFV: Efavirenz, 3TC: Lamivudine, TDF: Tenofovir. Numeric values are median (IQR)) unless otherwise stated.", symbol = c("ART status includes HIV reactive only as denominator", "Missing CPT data for two participants. ") ,threeparttable = T, fixed_small_size = T)
+  footnote(general = "ART = Antiretroviral therapy, CPT = Co-trimoxazole preventative therapy, EFV: Efavirenz, 3TC: Lamivudine, TDF: Tenofovir. Numeric values are median (IQR)) or proportions with exact binomial 95% confidence intervals unless otherwise stated.", symbol = c("ART status includes HIV reactive only as denominator", "Missing CPT data for two participants. ") ,threeparttable = T, fixed_small_size = T)
 
 
 
@@ -424,7 +424,7 @@ kable(select(e1.sum.2,`levels`,value), "latex", booktabs =T,
   kable_styling( full_width = F, latex_options = c("repeat_header", "hold_position")) %>%
   group_rows(index = kstring2) %>%
   add_indent(c(2,3,4,5,6, 8:21)) %>%
-  footnote(general = "LA = Lumefantrine-artemether, SP = Sulfamethoxazole-pyrimethamine, MWK = Malawian Kwacha. Numeric values are median (IQR)) unless otherwise stated." ,threeparttable = T, fixed_small_size = T)
+  footnote(general = "LA = Lumefantrine-artemether, SP = Sulfamethoxazole-pyrimethamine, MWK = Malawian Kwacha. Numeric values are median (IQR)) or proportions with exact binomial 95% confidence intervals unless otherwise stated." ,threeparttable = T, fixed_small_size = T)
 
 ```
 
@@ -512,7 +512,7 @@ kable(select(e1.sum.3,`levels`,value), "latex", booktabs =T,
   kable_styling("striped", full_width = F, latex_options = c("repeat_header", "hold_position")) %>%
   group_rows(index = kstring3) %>%
   add_indent(c(8:10)) %>%
-  footnote(general = "GCS = Glasgow coma scale, BP = Blood pressure, MAP = Mean arterial blood pressure. Numeric values are median (IQR)) unless otherwise stated." , symbol = "CD4 count includes only HIV-infected participants; 2 values were missing.", threeparttable = T, fixed_small_size = T)
+  footnote(general = "GCS = Glasgow coma scale, BP = Blood pressure, MAP = Mean arterial blood pressure. Numeric values are median (IQR)) or proportions with exact binomial 95% confidence intervals unless otherwise stated." , symbol = "CD4 count includes only HIV-infected participants; 2 values were missing.", threeparttable = T, fixed_small_size = T)
 
 ```
 
@@ -520,11 +520,11 @@ kable(select(e1.sum.3,`levels`,value), "latex", booktabs =T,
 
 ### Aetiology
 
-In total, 51% (114/225) of the 225 participants had at least one infectious agent identified (Table \@ref(tab:sep-diag)), most commonly disseminated mycobacterial infection (76/225 [34%]) followed by culture confirmed bacterial or fungal bloodstream infection (24/225 [11%]) and _Plasmodium falciparum_ malaria (21/225 [9%]). Table \@ref(tab:sep-tests) shows the availability of test and proportion of positive tests across the cohort, stratified by HIV status. 2/225 patients (1%) had a missing aerobic blood culture; the remaining 223 patients had a total of 259 blood cultures performed. 15/259 (6%) blood cultures grew at least one contaminant, but 26 blood cultures from 24 patients were positive for a total of 28 pathogenic bacteria (Figure \@ref(fig:sep-bc-plot)): _Salmonella enterica_ Serovar Typhi was the most commonly isolated bacterial pathogen. Of note 8/9 participants from whom _S._ Typhi was isolated were HIV noninfected, with one untested. Of the 18 Gram-negative bacteria isolated, 3/18 (17%) were cefpodoxime resistant on AST via disc diffusion testing, and likely ESBL producers: one _K. pneumoniae_ and one _E. coli_ (both from the same blood culture and same patient) and one _Acinetobacter baumannii_. Both _Staphyloccus aureus_ isolates were oxacillin sensitive. The one _Streptococcus pneumoniae_ cultured was penicillin intermediate on AST. There was no significant difference in proportion with positive blood culture in those who self reported receipt of prehospital antibacterials versus those who did not (7/52 [13%] BSI in those reporting prehospital antibacterials vs 17/154 [11%] not, p = 0.14).
+In total, 51% (114/225) of the 225 participants had at least one infectious agent identified (Table \@ref(tab:sep-diag)), most commonly disseminated mycobacterial infection (76/225 [34%]) followed by culture confirmed bacterial or fungal bloodstream infection (24/225 [11%]) and _Plasmodium falciparum_ malaria (21/225 [9%]). Table \@ref(tab:sep-tests) shows the availability of test and proportion of positive tests across the cohort, stratified by HIV status. 2/225 patients (1%) had a missing aerobic blood culture; the remaining 223 patients had a total of 259 blood cultures performed. 15/259 (6%) blood cultures grew at least one contaminant, but 26 blood cultures from 24 patients were positive for a total of 28 pathogenic bacteria (Figure \@ref(fig:sep-bc-plot)): _Salmonella enterica_ Serovar Typhi was the most commonly isolated bacterial pathogen. Of note 8/9 participants from whom _S._ Typhi was isolated were HIV noninfected, with one untested. Of the 18 Gram-negative bacteria isolated, 3/18 (17%) were cefpodoxime resistant on AST via disc diffusion testing, and likely ESBL producers: one _K. pneumoniae_ and one _E. coli_ (both from the same blood culture and same patient) and one _Acinetobacter baumannii_. Both _Staphyloccus aureus_ isolates were oxacillin sensitive. The one _Streptococcus pneumoniae_ cultured was penicillin intermediate on AST. There was no significant difference in proportion with positive blood culture in those who self reported receipt of prehospital antibacterials versus those who did not (7/52 [13%] BSI in those reporting prehospital antibacterials vs 17/154 [11%] not, difference in proportion 2% [95% CI -9-14%]).
 
-Lumbar puncture and CSF culture was carried out in 44 participants: 5/44 (11%) of samples grew a containment and no pathogenic bacteria were recovered from any sample. 4/44 (9%) had a detectable cryptococcal antigen (CRAG) in CSF. Malaria testing was missing for 6/225 (3%) of participants, but of the remainder, a positive malaria test was more likely in the HIV-uninfected (12/69 [17%] vs 6/138 [4%], p = 0.01 on pairwise Fisher's exact test). Positive aerobic blood culture showed no statistically significant association with HIV, nor did positive CSF testing, though in the latter case numbers were small and all positive tests (all positive CRAG) were in fact in the HIV-infected (Table \@ref(tab:sep-tests)).
+Lumbar puncture and CSF culture was carried out in 44 participants: 5/44 (11%) of samples grew a containment and no pathogenic bacteria were recovered from any sample. 4/44 (9%) had a detectable cryptococcal antigen (CRAG) in CSF. Malaria testing was missing for 6/225 (3%) of participants, but of the remainder, a positive malaria test was more likely in the HIV-uninfected (12/69 [17%] vs 6/138 [4%], difference in proportion 13% [95% CI 2-24%]). Positive aerobic blood culture showed no statistically significant association with HIV, nor did positive CSF testing, though in the latter case numbers were small and all positive tests (all positive CRAG) were in fact in the HIV-infected (Table \@ref(tab:sep-tests)).
 
-Testing for TB, with the exception of sputum Xpert testing, was restricted to HIV-infected participants. Sputum Xpert was carried out in 44/225 (20%) of participants, and was more commonly carried out in the HIV-infected: 35/143 [24%] of HIV-infected participants had sputum testing performed vs 8/70 (11%) of HIV uninfected (p = 0.07 by Fisher's exact test). 53 sputum samples were sent in total from the 44 patients, and 8/44 (18%) diagnoses of TB made, all except one in HIV-infected participants. One sample identified a rifampicin resistance gene, but the participant died before the result was available and so was not started on MDR-TB treatment; the remainder of infections were rifampicin-sensitive. 
+Testing for TB, with the exception of sputum Xpert testing, was restricted to HIV-infected participants. Sputum Xpert was carried out in 44/225 (20%) of participants, and was more commonly carried out in the HIV-infected: 35/143 [24%] of HIV-infected participants had sputum testing performed vs 8/70 (11%) of HIV uninfected (difference in proportions 13% [95% CI 2-24%]). 53 sputum samples were sent in total from the 44 patients, and 8/44 (18%) diagnoses of TB made, all except one in HIV-infected participants. One sample identified a rifampicin resistance gene, but the participant died before the result was available and so was not started on MDR-TB treatment; the remainder of infections were rifampicin-sensitive. 
 
 155 participants were eligible for urinary lipoarabinomannan (uLAM) and mycobacterial blood culture testing, being either HIV-infected (n=143) or of unknown HIV status (n=12). Urine was available for 145/155 (94%) of those eligible, and 74/145 (51%) of samples were positive for uLAM. 150/155 (97%) of eligible participants had blood samples collected and cultured for mycobacteria. 12/150 (8%) grew contaminants and are excluded from the denominators in Table \@ref(tab:sep-tests); of the remainder 8/138 (6%) grew mycobacteria, all _M. tuberculosis_.
 
@@ -540,10 +540,15 @@ a$no_diagnosis <- as.numeric(apply(a[3:8], 1,sum) == 0)
 
 melt(select(a, pid, hivstatus, tb, bc, malaria, csf, no_diagnosis), id.vars = c("pid", "hivstatus")) %>% dplyr::group_by(variable) %>% dplyr::summarise(n = dplyr::n(), positive = sum(value == 1)) -> t
 
-t$prop <-  paste0(t$positive, "/",  t$n, " (",
-                         format(round((t$positive*100/t$n), 0), nsmall = 0),
-                         "%)"
-)
+
+apply(t[2:3],1, function(x) paste0(x[2], "/",  x[1], " (",
+                         format(round((x[2]*100/x[1]), 0), nsmall = 0),
+                         "% [",
+                  format(round(binom.test(x[2],x[1])$conf.int[[1]] * 100, 0), nsmall = 0),
+                  "-",
+                  format(round(binom.test(x[2],x[1])$conf.int[[2]] * 100, 0), nsmall = 0),
+                   "])"
+      )) -> t$prop
 
 t$variable <- c("Tuberculosis", "Bloodstream infection", "Malaria", "Meningitis", "No diagnosis")
 
@@ -565,86 +570,95 @@ aetiol %>% dplyr::group_by(hivstatus, type, .drop = FALSE) %>% dplyr::summarise(
 
 aetiol %>% dplyr::group_by(type, .drop = FALSE) %>% dplyr::summarise(positive = sum(pathogen == 1), n = dplyr::n()) -> t2.tot
 
-t2$prop <-  paste0(t2$positive, "/",  t2$n, " (",
-                         round((t2$positive*100/t2$n), 0),
-                         "%)"
-)
 
-t2.tot$prop <-  paste0(t2.tot$positive, "/",  t2.tot$n, " (",
-                         round((t2.tot$positive*100/t2.tot$n), 0),
-                         "%)"
-)
+t2 <- filter(t2, n > 0)
+
+apply(as.data.frame(t2[,c(4,3)]),1, function(x) paste0(x[2], "/",  x[1], " (",
+                         format(round((x[2]*100/x[1]), 0), nsmall = 0),
+                         "% [",
+                  format(round(binom.test(x[2],x[1])$conf.int[[1]] * 100, 0), nsmall = 0),
+                  "-",
+                  format(round(binom.test(x[2],x[1])$conf.int[[2]] * 100, 0), nsmall = 0),
+                   "])"
+      )) -> t2$prop
+
+
+#t2.tot$prop <-  paste0(t2.tot$positive, "/",  t2.tot$n, " (",
+#                         round((t2.tot$positive*100/t2.tot$n), 0),
+#                         "%)"
+#)
+
+apply(as.data.frame(t2.tot[,c(3,2)]),1, function(x) paste0(x[2], "/",  x[1], " (",
+                         format(round((x[2]*100/x[1]), 0), nsmall = 0),
+                         "% [",
+                  format(round(binom.test(x[2],x[1])$conf.int[[1]] * 100, 0), nsmall = 0),
+                  "-",
+                  format(round(binom.test(x[2],x[1])$conf.int[[2]] * 100, 0), nsmall = 0),
+                   "])"
+      )) -> t2.tot$prop
+
 
 t2.tot$hivstatus <- "Total"
-bind_cols(subset(t2, hivstatus == "Reactive"), 
-          subset(t2, hivstatus == "Non reactive"),
-          subset(t2, hivstatus == "Unknown"),
-          t2.tot) -> t2
 
+#t2.f <- 
 
 t2.grand.tots <- a %>% 
   group_by(hivstatus) %>% 
   summarise(positive = sum(no_diagnosis ==0),
             n = length(no_diagnosis))
 
-rbind(
-  t2.grand.tots,
-  data.frame(hivstatus = "Total",
-             positive = sum(t2.grand.tots$positive),
-             n = sum(t2.grand.tots$n))
-) ->t2.grand.tots
+bind_rows(t2.grand.tots, data.frame(hivstatus = "Total", n = sum(t2.grand.tots$n), positive = sum(t2.grand.tots$positive), stringsAsFactors = F) ) -> t2.grand.tots
 
-t2.grand.tots$str <- paste0(t2.grand.tots$positive, "/", t2.grand.tots$n, " (",specify_decimal(t2.grand.tots$positive *100/t2.grand.tots$n, 0), "%)")
+apply(as.data.frame(t2.grand.tots[,c(3,2)]),1, function(x) paste0(x[2], "/",  x[1], " (",
+                         format(round((x[2]*100/x[1]), 0), nsmall = 0),
+                         "% [",
+                  format(round(binom.test(x[2],x[1])$conf.int[[1]] * 100, 0), nsmall = 0),
+                  "-",
+                  format(round(binom.test(x[2],x[1])$conf.int[[2]] * 100, 0), nsmall = 0),
+                   "])"
+      )) -> t2.grand.tots$prop
 
-t2.grand.tots.pval <- fisher.test(matrix(c(t2.grand.tots$positive[1:3], (t2.grand.tots$n[1:3] - t2.grand.tots$positive[1:3])), ncol = 2))$p.value
+t2.ntots <- select(t2.grand.tots,hivstatus,n)
+names(t2.ntots)[2] <- "prop"
+t2.ntots$prop <- as.character(t2.ntots$prop)
+t2.ntots$type <- "n_part"
+t2.grand.tots$type <- "total_diag"
 
-t2.grand.tots.pval <- specify_decimal(
-t2.grand.tots.pval,3)
-
-t2.grand.tots.pval[t2.grand.tots.pval == "0.000"] <- "<0.001"
-
-round(apply(t2[c(3,8,13,4,9,14)], 1, function(x) fisher.test( matrix(x, ncol = 2))$p.value),3) -> t2$p
-
-t2$prop1[grepl("NaN", t2$prop1)] <- "-"
-t2$p[grepl("NaN", t2$p)] <- "-"
-
-t2$type <- as.character(t2$type)
-
-t2 <- t2[c(5,6,4,1,2,3),]
-t2$type <- c("Urinary LAM", "Sputum Xpert", "TB blood culture", "Aerobic blood culture", "CSF culture or CRAG", "Malaria RDT")
-
-t2[c(2,5,10,15,19,21)] -> t2
-names(t2) <- c("Test", "Positive", "Negative", "Unknown","All", "p")
-
-t2.n <- e1 %>% dplyr::group_by(hivstatus, .drop = FALSE) %>% dplyr::summarise (n = dplyr::n())
-
-rbind(
-  data.frame(Test = "Number of participants", Positive = t2.n$n[t2.n$hivstatus == "Reactive"], 
-             Negative = t2.n$n[t2.n$hivstatus == "Non reactive"],
-             Unknown = t2.n$n[t2.n$hivstatus == "Unknown"],
-             All = sum(t2.n$n),
-             p = "-"),
-  t2
-) -> t2
+t2.grand.tots <- bind_rows(t2.grand.tots, t2.ntots)
+ 
+ #names(t2.grand.tots)[3] <- "prop"
+# t2.grand.tots$prop <- as.character(t2.grand.tots$prop)
+# t2.grand.tots$type <- "n_part"
+ 
+# t2.tot <- bind_rows(t2.tot, t2.grand.tots)
 
 
 
-rbind(t2,
-      data.frame(Test = "Total with diagnosis",
-                 Positive = t2.grand.tots$str[t2.grand.tots$hivstatus == "Reactive"],
-                 Negative = t2.grand.tots$str[t2.grand.tots$hivstatus == "Non reactive"],
-                 Unknown = t2.grand.tots$str[t2.grand.tots$hivstatus == "Unknown"],
-                 All = t2.grand.tots$str[t2.grand.tots$hivstatus == "Total"],
-                 p =  t2.grand.tots.pval)) -> t2
+bind_rows(subset(t2, hivstatus == "Reactive"), 
+          subset(t2, hivstatus == "Non reactive"),
+          subset(t2, hivstatus == "Unknown"),
+          t2.tot,
+          t2.grand.tots) -> t2
 
-kable(t2, "latex", booktabs =T, 
+t2 %>% dplyr::select(-positive,-n) %>% pivot_wider( names_from = "hivstatus", values_from = "prop") -> t2
+
+
+
+
+
+
+t2 <- t2[c(8,5,6,4,1,2,3,7),]
+t2$type <- c("Number of participants", "Urinary LAM", "Sputum Xpert", "TB blood culture", "Aerobic blood culture", "CSF culture or CRAG", "Malaria RDT", "Total with diagnosis")
+
+t2[is.na(t2)] <- "-"
+
+kable(select(t2,-Total), "latex", booktabs =T, 
       row.names = F, longtable = F,escape = T,caption = "Diagnostic tests performed and results, stratified by HIV status."  ) %>%
   kable_styling( full_width = F, latex_options = c("HOLD_position")) %>%
 group_rows(index=c(" " = 1, "TB diagnostics" = 3, "Other diagnostics" = 3)) %>%
-  add_header_above(c(" ", "HIV status" = 3, " ", " ")) %>%
-  column_spec(5, bold = TRUE) %>%
+  add_header_above(c(" ", "HIV status" = 3)) %>%
   row_spec(8, bold = TRUE) %>%
-  footnote(general = "LAM = Lipoarabinomannan, CSF = Cerebrospinal fluid, CRAG = Cryptococcal antigen, RDT = Rapid diagnostic test. p-values are Fisher's exact test across the three HIV status strata, and hence may be different from the pairwise Fisher's tests presented in the text. Urinary LAM and TB blood culture were not carried out in HIV negative participants.", threeparttable = T,  fixed_small_size = T) %>% landscape()
+  footnote(general = "LAM = Lipoarabinomannan, CSF = Cerebrospinal fluid, CRAG = Cryptococcal antigen, RDT = Rapid diagnostic test. Urinary LAM and TB blood culture were not carried out in HIV negative participants.", threeparttable = T,  fixed_small_size = T) %>% landscape()
 
 ```
 
@@ -850,7 +864,7 @@ los_str <- median_iqr_str(as.numeric(subset(los, hospoutcome ==1)$los))
 
 ```
 
-Median hospital stay was 4 (IQR 1-9) days. Case fatality rate was 18% (95% CI 13-23%) at 28 days, 24% (95% CI 18-30%) at 90 days and 31% (95% CI 25-38) at 180 days, and higher in HIV-infected participants at each time point (Table \@ref(tab:outcome-table)), though not statistically significant on pairwise Fisher's exact test (HIV-infected vs noninfected 19% vs 13%, [p = 0.14] at 28 days, 27% vs 17%, [p = 0.44] at 90 days and 36% vs 21% [p = 0.29] at 180 days). Kaplan-meier estimation of the survival function (Figure \@ref(fig:outcome-km-plots)) showed a precipitous decline in survivorship to around day 30 and cfr declined thereafter, to the end of the study period. Stratifying the analysis by HIV status revealed that early deaths (within the first 1-2 weeks) occur at similar rates in the two groups before the curves diverge; log-rank test suggested a significant difference in survival function between the two groups (p = 0.03). In view of the fact that a number of the HIV-infected participants were likely to be failing ART, only two were recorded as switching to second line therapy during the study period, though details of any interventions (e.g. ART adherence counselling) or HIV viral load testing carried out as part of routine care were not captured.
+Median hospital stay was 4 (IQR 1-9) days. Case fatality rate was 18% (95% CI 13-23%) at 28 days, 24% (95% CI 18-30%) at 90 days and 31% (95% CI 25-38) at 180 days, and higher in HIV-infected participants at each time point (Table \@ref(tab:outcome-table)), though not statistically significant: HIV-infected vs noninfected 19% vs 13% at 28 days (difference 6% [95% CI -6-13%] ), 27% vs 17% at 90 days (difference 10% [95% CI -4-22%]) and 36% vs 21% at 180 days (difference 15% [95% CI 0-30%]). Kaplan-meier estimation of the survival function (Figure \@ref(fig:outcome-km-plots)) showed a precipitous decline in survivorship to around day 30 and cfr declined thereafter, to the end of the study period. Stratifying the analysis by HIV status revealed that early deaths (within the first 1-2 weeks) occur at similar rates in the two groups before the curves diverge; log-rank test suggested a significant difference in survival function between the two groups (p = 0.03). In view of the fact that a number of the HIV-infected participants were likely to be failing ART, only two were recorded as switching to second line therapy during the study period, though details of any interventions (e.g. ART adherence counselling) or HIV viral load testing carried out as part of routine care were not captured.
 
 Health related quality of life measures, as assessed by EQ-5D-3L, are shown in Figure \@ref(fig:outcome-morbidity) for participants with sepsis and the community cohort as a comparator. Acutely, participants with sepsis reported were significantly disabled, reporting at least moderate impairment across all domains in the majority of cases, and over 90% of participants reporting at least moderate impairment in activities of daily living and experiencing at least moderate pain or discomfort. However, recovery following treatment in survivors was rapid. The mean EQ-5Q utility score (a measure of the weight compared to a health state compared to 1, perfect health) of healthy community controls was 0.910 (SD 0.102) at enrolment, significantly higher than participants with sepsis at enrolment (utility score 0.496 (SD 0.251), p = < 0.0001 versus community scores by t-test), but comparable to participants with sepsis at their 12 week assessment (0.913 (SD 0.147), p = 0.903 versus community enrolment scores).
 
@@ -1035,7 +1049,7 @@ theme_bw() +
 
 ### Determinants of mortality
 
-Bivariable associations of mortality are shown in Table \@ref(tab:bivariate-sev-mort-assoc) with variables grouped into putative host, severity, diagnosis and treatment variables. Variables associated with immunosuppression - CD4 count and haemoglobin - were associated with death in unadjusted analysis, as were well recognised markers of disease severity: shock, hypoxia, reduced conscious level, hyperlactataemia, and inability to ambulate, as were reduced venous bicarbonate and increased venous urea. A diagnosis of malaria was strongly associated with survival (0/21 died). Conversely, a diagnosis of meningitis was associated with mortality (Table \@ref(tab:bivariate-sev-mort-assoc)) though numbers were small (n = 4). Receipt of antibacterials, antifungals or antimalarials showed no association with mortality, though almost all participants received antibacterials and only a minority antimalarials and antifungals, so moderate effect sizes would be unlikely to be detected. However, receipt of antituberculous chemotherapy therapy was associated with survival: 8% (4/53) of participants receiving TB therapy died compared to 21% (35/169) who did not receive it (p = 0.04 by Fisher's exact test). 
+Bivariable associations of mortality are shown in Table \@ref(tab:bivariate-sev-mort-assoc) with variables grouped into putative host, severity, diagnosis and treatment variables. Variables associated with immunosuppression - CD4 count and haemoglobin - were associated with death in unadjusted analysis, as were well recognised markers of disease severity: shock, hypoxia, reduced conscious level, hyperlactataemia, and inability to ambulate, as were reduced venous bicarbonate and increased venous urea. A diagnosis of malaria was strongly associated with survival (0/21 died). Conversely, a diagnosis of meningitis was associated with mortality (Table \@ref(tab:bivariate-sev-mort-assoc)) though numbers were small (n = 4). Receipt of antibacterials, antifungals or antimalarials showed no association with mortality, though almost all participants received antibacterials and only a minority antimalarials and antifungals, so moderate effect sizes would be unlikely to be detected. However, receipt of antituberculous chemotherapy therapy was associated with survival: 8% (4/53) of participants receiving TB therapy died compared to 21% (35/169) who did not receive it (difference 13% [95% CI 3-24%]). 
 
 All of these associations are likely to be affected by confounding, so I constructed logistic regression models to attempt to produce unbiased effect estimates (Table \@ref(tab:log-reg-mod-tab). There were some difficulties with these models. Separation occurred when malaria and meningitis diagnoses were included - they perfectly predicted outcome, so parameter estimates become unstable - and so they were excluded from the model. Receipt of TB therapy remained strongly associated with survival (aOR 0.17 [95% CI 0.03-0.74]) as did higher haemoglobin (aOR 0.69 [95% CI 0.52-0.86] per 1g $dL^{-1}$ increase) and higher oxygen saturation (aOR 0.67 [95% CI 0.47-0.96] per 5% increase). Perhaps surprisingly, an _increased_ respiratory rate was associated with survival (aOR 0.35 (0.14-0.81) per 10 breaths min$^{-1}$ increase; less surprisingly, inability to stand on admission strongly predicted mortality (aOR 14.55 [95% CI 3.81-69.78]).
 

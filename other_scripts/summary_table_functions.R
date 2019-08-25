@@ -32,7 +32,11 @@ prop_str <- function(x, r= 0) {
                          N,
                          " (",
                          format(round((n*100/N), r), nsmall = r),
-                         "%)"
+                         "% [",
+                         format(round(binom.test(n,N)$conf.int[[1]] * 100, r), nsmall = r),
+                         "-",
+                         format(round(binom.test(n,N)$conf.int[[2]] * 100, r), nsmall = r),
+                         "])"
     )
       sortvar[[l]] <- n/N
   } 
