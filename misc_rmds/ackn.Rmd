@@ -1,12 +1,12 @@
 # Acknowledgements {-}
 
-This work would not have been possible without the assistance of many people. First and foremost I would like to thank the participants and guardians who agreed to take part.
+This work would not have been possible without the assistance of many people, not least the participants and guardians who agreed to take part. These people agreed to participate in research in the context of critical illness, and in what follows it must not be forgotten that many of them did not survive: I thank them all.
 
 I owe thanks to many people at MLW. The study team worked incredibly hard and were a joy to work with: Witness Mtambo, Gladys Namacha, Lucky Keyala, Grace Mwimaniwa, Tusekile Phiri, Madalistso Mphasa, Rachel Banda and Monica Matola. Administering the study would have been impossible without the help of Lumbani Makhaza, Linley Mvula and Clemens Masesa in the MLW data department. I am grateful to the support of the MLW microbiology laboratory and Brigitte Denis in particular.
 
-Numerous colleagues gave time to explain, or discuss (or both) multiple ideas that made their way in to this thesis: Jamie Rylance, David Barr, Rebecca Lester, Chris Jewell and Adam Roberts.
+Numerous colleagues gave time to explain, or discuss (or both) multiple ideas that made their way in to this thesis: Jamie Rylance, David Barr, Rebecca Lester, Adam Roberts, Brian Faragher and Chris Jewell. Jamie generously shared resources from studies in critical illness in Blantyre which contributed sigificantlty to the success of the work I present here. I owe particular thanks to Brian Faragher for insightful statistical review of chapters 3 and 4, and Chris Jewell for comments on the modelling work in chapter 8.
 
-I was lucky enough to spend time as a visiting worker at the Wellcome Sanger Instiute, and I thank all members of team 216 for making me feel welcome, but particularly Mat Beale and Nick Thomson, who has been supportive of this fellowship from its inception and always given me time in a (very) busy schedule. 
+I was lucky enough to spend time as a visiting worker at the Wellcome Sanger Instiute, and I thank all members of Team 216 for making me feel welcome, but particularly Mat Beale and Nick Thomson. Nick has been supportive of this fellowship from its inception and always given me time in a (very) busy schedule. 
 
 I thank my supervisors, Nick Feasey and Meilta Gordon for constant support, advice, and guidance.
 
