@@ -36,7 +36,7 @@ prop_str <- function(x, r= 0) {
                          format(round(binom.test(n,N)$conf.int[[1]] * 100, r), nsmall = r),
                          "-",
                          format(round(binom.test(n,N)$conf.int[[2]] * 100, r), nsmall = r),
-                         "])"
+                         "%])"
     )
       sortvar[[l]] <- n/N
   } 
@@ -76,7 +76,7 @@ prop_confint_str <- function(x, r= 0) {
     format(round(binom.test(n,N)$conf.int[[1]] * 100, r), nsmall = r),
     "-",
     format(round(binom.test(n,N)$conf.int[[2]] * 100, r), nsmall = r),
-    ")"
+    "%)"
   )
   return(out_str)
   
