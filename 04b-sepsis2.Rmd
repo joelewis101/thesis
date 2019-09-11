@@ -26,6 +26,7 @@ library(factoextra)
 library(epitools)
 library(glue)
 library(MatchIt)
+library(wBoot)
 
 wd <- "chapter_4/"
 output = "latex"
@@ -257,12 +258,11 @@ Because the exposures of interest are the therapies administered to the particip
 
 The relationship between time-to-antimicrobials and mortality was assessed, initially in bivariate associations using nonparametric locally estimates scatterplot smoothing (LOESS) regression which performs a rolling linear regression[@Cleveland1988] and estimates the probability of death by 28 days as a function of the predictor variables. Only for antibacterials were there sufficient data to construct regression models which used time to antibacterial therapy as a predictor for death by 28 days, alongside the other treatment variables and the first three FAMD dimensions. In view of possible nonlinear relationship between time to therapy and death apparent in the bivariate plots both linear and second-order polynomial models were fit. Coefficient estimates are presented, but because interpretation of polynomial coefficients is challenging, predicted probability plots with 95% credible intervals with the levels of the other covariates set to their mean values were plotted, using all the posterior draws to generate the median prediction and 95% credible intervals.
 
-Finally, to attempt to correct for confounding using a different method, a propensity-score matching approach was used to produce an unbiased estimate of the effect of receipt of TB therapy on 28-day mortality. Variables that had been identified as being associated with mortality from the models described above, along with variables that were associated with receipt of TB therapy apparent on bivariable analysis were included in a (maximum-likelihood fit) logistic regression model to generate a propensity score. Because HIV-uninfected participants did not have a CD4 count measured, a new dichotomous variable was used which was coded as 1 for HIV-infected participants with a CD4 count below 100 cells $\mu L^{-1}$ and 0 for everyone else. Participants were then matched 1:1 on this propensity score without calliper restriction using the _MatchIt_ package in R[@Ho2011] and the distribution of covariates in this new cohort examined using kernal density plots and histograms. Effect of TB therapy on mortality was then expressed as risk ratios, and subgroup analysis carried out to explore whether there was any effect modification of the apparent effect of TB therapy in advanced immunosuppression (defined as CD4 cell count below 100 $\mu L^{-1}$), or anaemia (defined as haemoglobin below 8g dL$^{-1}$) or confirmed TB.
+Finally, to attempt to correct for confounding using a different method, a propensity-score matching approach was used to produce an unbiased estimate of the effect of receipt of TB therapy on 28-day mortality. Variables that had been identified as being associated with mortality from the models described above, along with variables that were associated with receipt of TB therapy apparent on bivariable analysis were included in a (maximum-likelihood fit) logistic regression model to generate a propensity score. Because HIV-uninfected participants did not have a CD4 count measured, a new dichotomous variable was used which was coded as 1 for HIV-infected participants with a CD4 count below 100 cells $\mu L^{-1}$ and 0 for everyone else. The variables used to generate the propensity score were therfore: haemoglobin, HIV status, CD4 count, respiratory rate, ocygen saturations, inability to stand, diagnosis of BSI, diagnosis of TB, diagnosis of meningitis, diagnosis of malaria, bicarbonate, and heart rate. Participants were then matched 1:1 on this propensity score without calliper restriction using the _MatchIt_ package in R[@Ho2011] and the distribution of covariates in this new cohort examined using kernal density plots. Effect of TB therapy on mortality was then expressed as risk ratios, and subgroup analysis carried out to explore whether there was any effect modification of the apparent effect of TB therapy in advanced immunosuppression (defined as CD4 cell count below 100 $\mu L^{-1}$), or anaemia (defined as haemoglobin below 8g dL$^{-1}$) or confirmed TB.
 
 ## Results
 
-Bayesian logistic regression with weakly informative priors succeeding in fitting the models from Chapter 3; the inferences - particularly concerning the apparent association between TB therapy and survival - were largely unchanged, including after multiple imputation of missing data (Table \@ref(tab:bayes-lr-imp-tab)). Because of concerns about overfitting, dimensionality reduction with FAMD was carried out; the first four FAMD dimensions explained 42% of the variance in the dataset, a not inconsiderable amount for 21 predictor variables. The composition of FAMD dimensions one, two, three and four are shown in Figure \@ref(fig:famd-mods-contrib). FAMD dimensions 1 (explaining 14% of the total variane of the dataset) was composed primarily of variables that were associated with shock (urea, lactate, low MAP and bicarbonate, and creatinine) and HIV-associated immunosupression (HIV status and haemoglobin); FAMD dimension 2 was similar but included organ dyfunction criteria that were orthogonal to FAMD 1: low oxygen saturation and platelet count, and male sex. FAMD 3 was composed of absence of malaria, low GCS, high white cell count and inability to stand; FAMD 4 with young age, fever, and tachycardia. 
-
+Bayesian logistic regression with weakly informative priors succeeding in fitting the models from Chapter 3; the inferences - particularly concerning the apparent association between TB therapy and survival - were largely unchanged, including after multiple imputation of missing data (Table \@ref(tab:bayes-lr-imp-tab)). Because of concerns about overfitting, dimensionality reduction with FAMD was carried out; the first four FAMD dimensions explained 42% of the variance in the dataset, a not inconsiderable amount for 21 predictor variables. The composition of FAMD dimensions one, two, three and four are shown in Figure \@ref(fig:famd-mods-contrib). FAMD dimensions 1 (explaining 14% of the total variance of the dataset) was composed primarily of variables that were associated with shock (urea, lactate, low MAP and bicarbonate, and creatinine) and HIV-associated immunosupression (HIV status and haemoglobin); FAMD dimension 2 was similar but included organ dyfunction criteria that were orthogonal to FAMD 1: low oxygen saturation and platelet count, and male sex. FAMD 3 was composed of absence of malaria, low GCS, high white cell count and inability to stand; FAMD 4 with young age, fever, and tachycardia. 
 
 \renewcommand{\arraystretch}{0.8}
 ```{r bayes-lr-imp-tab, echo =F, warning=F, message=F}
@@ -687,9 +687,9 @@ kable(select(tta.tab, term, str), "latex", booktabs =T,
 
 ### Propensity score matching and subgroup analysis
 
-Finally, I used propensity score matching, a different method to attempt to generate unbiased estimates of the effect of receipt of TB therapy on mortality. First I examined bivariate associations of receipt of TB therapy (Table \@ref(tab:bivariate-sev-tb-rx) in the chapter appendix). Patients who received TB therapy were almost all HIV-infected (88% [46/52] vs 60% [95/161] in the no-TB therapy group, p < 0.001) with lower CD4 count (median 60 vs 123 cells $\mu$L\textsuperscript{-1}, p = 0.006) and Haemoglobin (median 9.7 vs 11.1 g dL\textsuperscript{-1}), and received more antimalarials (11% [6/53] vs 3% [6/172], p = 0.037) and IV fluids (median 1.5L vs 1.2L, p= 0.02), though most of these associations would be expected to pull an estimate of the mortality effect of TB therapy towards the null, rather than inflate an effect size. More patients with a positive diagnostic test for TB received TB therapy, as might be expected (53% [28/53] of those receiving TB therapy had a positive diagnostic test for TB, versus 28% [48/172] not receiving therapy, p = 0.001), though almost all the TB treatment was empiric, as the treating clinicians did not have access to urinary LAM results (which were batch processed on frozen urines) or mycobacterial blood culture results (which take up to 6 weeks to become positive). 
+Finally, I used propensity score matching, a different method to attempt to generate unbiased estimates of the effect of receipt of TB therapy on mortality. First I examined bivariate associations of receipt of TB therapy (Table \@ref(tab:bivariate-sev-tb-rx) in the chapter appendix). Patients who received TB therapy were almost all HIV-infected (88% [46/52] vs 60% [95/161], between group difference 28% [95% CI 15-41%]) with lower CD4 count (median 60 vs 123 cells $\mu$L\textsuperscript{-1}, between group difference 63 [15-142] cells $\mu$L\textsuperscript{-1}) and Haemoglobin (median 9.7 vs 11.1 g dL\textsuperscript{-1}, between group difference 1.4 [95% CI 0.5-29] g dL\textsuperscript{-1}), with higher heart rate (median 125 vs 120 min\textsuperscript{-1} difference 5 (1-13) \textsuperscript{-1}) and lower bicarbonate (18 vs 20 mmol L\textsuperscript{-1} difference 2 (0-3) mmol \textsuperscript{-1}) though most of these associations would be expected to pull an estimate of the mortality effect of TB therapy towards the null, rather than inflate an effect size. More patients with a positive diagnostic test for TB received TB therapy, as might be expected (53% [28/53] of those receiving TB therapy had a positive diagnostic test for TB, versus 28% [48/172] not receiving therapy, difference 25% (95% CI 9-41%)), though almost all the TB treatment was empiric, as the treating clinicians did not have access to urinary LAM results (which were batch processed on frozen urines) or mycobacterial blood culture results (which take up to 6 weeks to become positive). 
 
-Factors associated with receipt of TB therapy (HIV status, CD4 count, diagnosis of TB, receipt of antimalarial therapy and volume of IV fluid received) and factors associated with mortality from the models presented above (haemoglobin, respiratory rate, oxygen saturation,  inability to stand, bloodstream infection and diagnosis of malaria) were used as predictors in a logistic regression to predict receipt of TB therapy. Predictions from this model were used to generate a propensity score for each participant, and then each participant who received TB therapy was matched with one participant who did not to generate a new cohort, with better matching of covariates (Figure \@ref(fig:var-match-plots)). The propensity-score adjusted risk ratio of survival to 28 days in this cohort upon receipt of TB therapy was 1.25 (95% CI 1.04-1.51), similar to the unadjusted estimate (Figure \@ref(fig:mort-strat-tb-and-tb-rx)). Mortality benefit seemed higher in the immunosuppressed and anaemic in absolute terms, though with significant uncertainty in the estimates (\@ref(fig:mort-strat-tb-and-tb-rx)): RR 1.56 (95% CI 1.04-2.24) in those with haemoglobin below 8g dL$^{-1}$ compared to 1.11 (95% CI 0.92-1.34) above 8g dL$^{-1}$.
+Factors associated with receipt of TB therapy on univariate analysis (HIV status, CD4 count, haemoglobin, diagnosis of TB, heart rate, and bicarbonate) and factors associated with mortality from the models presented above (haemoglobin, respiratory rate, oxygen saturation, inability to stand, bloodstream infection and diagnosis of malaria) were used as predictors in a logistic regression to predict receipt of TB therapy. Predictions from this model were used to generate a propensity score for each participant, and then each participant who received TB therapy was matched with one participant who did not to generate a new cohort, with better matching of covariates (Figure \@ref(fig:var-match-plots)). The propensity-score adjusted risk ratio of survival to 28 days in this cohort upon receipt of TB therapy was 1.22 (95% CI 1.03-1.46), similar to the unadjusted estimate (Figure \@ref(fig:mort-strat-tb-and-tb-rx)). Mortality benefit seemed higher in the immunosuppressed and anaemic in absolute terms, though with significant uncertainty in the estimates (\@ref(fig:mort-strat-tb-and-tb-rx)): RR 1.59 (95% CI 1.02-2.50) in those with haemoglobin below 8g dL$^{-1}$ compared to 1.09 (95% CI 0.92-1.30) above 8g dL$^{-1}$; 1.42 (95% CI 1.04-1.93) in those with a CD4 cell count below 100 cells $\mu L^{-1}$ compared to 1.04 (95% CI 0.89-1.22) above. Mortality benefit was also higher in those with a confirmed diagnosis of TB: RR 1.30 (95% CI 1.00-1.70) in those with confirmed TB compared to 1.13 (95% CI 0.90-1.43) without.
 
 ```{r mort-strat-tb-and-tb-rx, echo =F, warning=F, message=F,fig.scap="Propenisty-score matched and subgroup analysis of effect of TB therapy on mortality.", out.extra='', fig.cap="Subgroup analysis of effect of TB therapy on mortality. A (Top) shows crude (unadjusted) risk ratio for survival to 28 days; RR > 1 favours TB therapy, RR < 1 favours no TB therapy. A significant effect is seen in the immunosupressed, anaemic, and to a lesser extent, those with a confirmed diagnosis of TB. B (Bottom) shows the same analysis for the propensity-score matched cohort, showing that the overall and subgroup effects are essentially unchanged.", fig.width=4 , fig.height =4  , fig.align = 'center'}
 
@@ -744,17 +744,17 @@ ggplot(t2, aes(str, or, ymin = lci, ymax = uci)) + geom_point() +
 df.temp$CD4.dic <- as.numeric(df.temp$CD4_Absolute < 100)
 df.temp$CD4.dic[is.na(df.temp$CD4.dic)] <- 0
 
-prs.df <- select(df.temp, d28_death, any_tb_rx,Haemoglobin, hivstatus, t0rr,t0spo2,ustand, Urea,bc ,tb ,csf ,malaria, CD4.dic, any_mal_rx, fluid_6hr, CD4_Absolute)
+prs.df <- select(df.temp, d28_death, any_tb_rx,Haemoglobin, hivstatus, t0rr,t0spo2,ustand, bc ,tb ,csf ,malaria, CD4.dic, CO2, t0hr, CD4_Absolute)
 
-c.caserows <- complete.cases(prs.df[-16])
+c.caserows <- complete.cases(prs.df[-15])
 
-prs.df.cc <- prs.df[complete.cases(prs.df[-16]),]
+prs.df.cc <- prs.df[complete.cases(prs.df[-15]),]
 
-prs.df.cc[-16] -> prs.df.cc
+prs.df.cc[-15] -> prs.df.cc
 
 
 
-mod_match <- matchit(any_tb_rx ~ Haemoglobin + hivstatus + CD4.dic + t0rr + t0spo2 + ustand + bc + tb + csf + malaria + Urea + any_mal_rx + fluid_6hr,
+mod_match <- matchit(any_tb_rx ~ Haemoglobin + hivstatus + CD4.dic + t0rr + t0spo2 + ustand + bc + tb + csf + malaria + CO2 + t0hr ,
                      method = "nearest", data = prs.df.cc, ratio = 1)
 
 match.data(mod_match) -> match.data
@@ -805,7 +805,7 @@ ggarrange(unadj, prop.sc, ncol = 1, nrow = 2, labels = c("A", "B"))
 
 I have presented, in this chapter, an analysis using a number of statistical techniques to further explore the associations of mortality in this cohort, and to address the difficulties encountered with the modelling strategies presented in Chapter 3. In addition I have presented an explicit hypothesised causal structure of death to facilitate a causal interpretation of the model parameters. In Chapter 3, maximum likelihood fitting of logistic regression models was likely biased because some predictors were perfectly associated with outcome, and were excluded - the phenomenon of separation. This was overcome using Bayesian logistic regression with weakly informative priors. As expected, malaria and meningitis were strongly associated with survival and death, respectively, but more importantly inferences from the model were largely unchanged once these strong predictors were included in the model. The strongly protective effect of TB therapy persisted. Unexpectedly, bloodstream infection showed a protective effect; given _S._ Typhi was the commonest bloodstream infection isolate, which is associated with a low mortality in the Blantyre context (2.5% since 2011[@Feasey2015a]), this is certainly plausible.
 
-To address the concern that a model with so many parameters might be overfit, I performed dimensionality reduction with FAMD and refit the models using transformed predictor variables. As might be expected in absolute terms the out of sample predictive accuracy (as measured by ELPD) improved, but by an amount much less than the error in the estimation of ELPD. This supports the inferences from the original model. In addition, the composition of the transformed FAMD variables provides some insight into the presentation of sepsis in Blantyre. Though the situation is clearly complex, the composition of the FAMD variables seems to suggest a number of different organ dysfunction syndromes: shock with HIV immunosupression (FAMD axis one); renal failure with low oxygen saturations (FAMD axis two); low GCS with high white cell count (FAMD axid three); and tachycaria and fever with young age (FAMD axis four). FAMD axes one is strongly associated with death, and FAMD axes two and three more weakly associated. *** collinearity of variables justifies this approach and confirms what we know about sepsis - organ dysfunction = bad, but seems to be more in the HIV infected - true effect of HIV would not necessarily correct for severity as these are mediator variable ?? ***
+To address the concern that a model with so many parameters might be overfit, I performed dimensionality reduction with FAMD and refit the models using transformed predictor variables. As might be expected in absolute terms the out of sample predictive accuracy (as measured by ELPD) improved, but by an amount much less than the error in the estimation of ELPD. This supports the inferences from the original model.In addition, the composition of the transformed FAMD variables provides some insight into the presentation of sepsis in Blantyre, and their effect on outcome. Though the situation is clearly complex, the composition of the FAMD variables seems to suggest a number of different organ dysfunction syndromes: shock with HIV immunosupression (FAMD axis one); renal failure with low oxygen saturations (FAMD axis two); low GCS with high white cell count (FAMD axid three); and tachycaria and fever with young age (FAMD axis four). FAMD axes one is strongly associated with death, and FAMD axes two and three more weakly associated. This is inkeeping with what is known about sepsis - that sepsis severity, defined by organ dysfunction is a major determinent of outcome - but provides a hint that organ dysfunction syndromes may cluster together and, in the case of FAMD 1, that the shock syndrome clusters with HIV status. The dataset is too small for such inferences to be drawn, but this clincally plausible: the presentation of pneumonia is different from meningitis, for example, and machine learning and clustering techniques applied to large datasets are beginning to identify different sepsis phenotypes. The clincial utility of this remains to be seen.
 
 As described in Chapter 3, time-to-antibacterials is thought to be one of the major modifiable determinants of death in sepsis in high-income settings, but in a crude (unadjusted) analysis there was no signal that this was the case in this cohort. I have expanded that analysis here, and adjusted for putative confounders, but the findings are unchanged. Fitting a logistic regression model and modelling time-to-antibacterials with a linear effect (and adjusting for confounders) found an adjusted odds ratio of 1.01 for death per hour delay with a 95% credible interval (95% CrI 0.98 - 1.04) that includes a clinically relevant effect size (i.e. the aOR of 1.04 [1.02-1.05] from the large observational study of sepsis care in New York[@Seymour2017]). There was a some suggestion from the raw data that a lengthy delay in antibacterials could be associated with an increase in mortality, perhaps with a late nonlinear effect; however the estimates from a nonlinear (second order polynomial) model had such high uncertainty that it is not possible to draw any firm conclusions. The analysis I present here, therefore, is consistent both with time-to-antibacterials having a similar effect on outcome as in high-income settings, and with no effect. Larger studies would be needed to distinguish these two scenarios. Similarly, uncertainties in estimates of effect of IV fluid administration are such that the estimates could contain a clinically relevant effect, and the analysis presented here does not advance the conclusions drawn in Chapter 3.
 
@@ -815,11 +815,11 @@ The protective effect of TB therapy remains significant and robust to correction
 
 I have used a number of techniques to account for confounding, but this will only address the included variables; it is very likely that there are unmeasured confounders, and these could seriously bias the conclusions drawn. This is certainly possible, but any confounder that acted to produce a spurious association between TB therapy and survival would have to be associated with both TB therapy and survival. It seems likely that the clinicians looking after the participants in this study would be more likely to treat sicker patients with TB therapy, and produce bias in the opposite direction. Nevertheless, unmeasured confounders are just that - unmeasured - and it is not possible to address this question with the data here, though this is of course true of any similar study. Given that almost all the participants who received TB therapy were HIV-infected, all conclusions regarding this should be largely be applied to people living with HIV; it is not clear (and perhaps unlikely) that the associations described here would also be present in the HIV-uninfected.
 
-I have made an attempt to put the modelling here in the framework of causal inference. If the hypothesised causal framework presented above was right and I had truly adjusted for all confounders, then the estimates of effect I present would be true causal effects. In fact this is unlikely: both because of unmeasured confounders, and that the causal pathways I have hypothesised are almost certainly a vast oversimplification. I have made choices about inclusion of variables both in the logistic regression and propensity score analysis which could also introduce bias.
+I have made an attempt to put the modelling here in the framework of causal inference. If the hypothesised causal framework presented above was right and I had truly adjusted for all confounders, then the estimates of effect I present would be true causal effects. In fact this is unlikely: both because of unmeasured confounders, and that the causal pathways I have hypothesised are almost certainly a oversimplification. I have made choices about inclusion of variables both in the logistic regression and propensity score analysis which could also introduce bias.
 
 ## Conclusions and further work
 
-In conclusion, the findings from the modelling work in Chapter 3 are largely unchanged when the models are expanded to address possible bias from excluding parameters due to separation, missing data bias, and overfitting. Malaria and meningitis are strongly associated with survival to and death by 28 days respectively; BSI seems to be associated with survival to 28 days. The association of receipt of TB therapy with survival persists, and is greater in those who are anaemic and immunosuppressed. This is a finding that deserves further exploration; the place of early TB therapy in the treatment of HIV-infected participants with sepsis is unknown, but the data presented here may contribute to the equipoise needed for clinical trials. 
+In conclusion, the findings from the modelling work in Chapter 3 are largely unchanged when the models are expanded to address possible bias from excluding parameters due to separation, missing data bias, and overfitting. I have identified major determinents of mortality in terms of causative pathogen, disease severity , and therapy delivered. Malaria and meningitis are strongly associated with survival to and death by 28 days respectively; BSI seems to be associated with survival to 28 days. Well-recognised markers of disease severity are associated with death: shock, hypoxia, and inability to stand. The FAMD analysis is suggestive that different types of organ dysfunction tend to cluster together. The major association between treatents recieved and survival is the receipt of TB therapy, in contrast to high income settings where time to antibacterials is the major determinent of survival. The association is stronger in those who are anaemic and immunosuppressed. This is a finding that deserves further exploration; the place of early TB therapy in the treatment of HIV-infected participants with sepsis is unknown, but the data presented here may contribute to the equipoise needed for clinical trials. 
 
 ## Appendix
 
@@ -827,15 +827,31 @@ Below I show bivariable associations of receipt of TB therapy and variable distr
 
 ```{r bivariate-sev-tb-rx, echo =F, warning=F, message=F}
 
-#df.temp$fluid_6hr <- df.temp$fluid_6hr / 1000
+###
 
-df.temp %>% select(-c(hivstatus, ptsex, ustand, hivonart, any_ab, any_fung_rx, any_mal_rx, malaria,  no_diagnosis, csf, bc, tb, pid, d28_death, time_to_tb_rx)) %>% pivot_longer(-any_tb_rx) %>% #filter(!is.na(d28_death)) %>%
-  dplyr::group_by(name) %>% dplyr::summarise(pval = kruskal.test(value ~ any_tb_rx)$p.value) -> pvals.tb
+df.temp %>% select(-c(hivstatus, ptsex, ustand, hivonart, any_ab, any_fung_rx, any_mal_rx,  time_to_mal_rx, malaria, tb, no_diagnosis, csf, bc, pid, d28_death, time_to_tb_rx, CD4.dic)) %>% pivot_longer(-any_tb_rx) %>% filter(!is.na(value)) %>% 
+  dplyr::group_by(name) %>% dplyr::summarise(bs = list(boot.two.per(value, any_tb_rx, median))) %>%
+  mutate(diff = map_dbl(bs, "Observed"),
+         diff.lci = map_dbl(bs, function(x) unlist((x["Confidence.limits"][[1]][[1]]))),
+          diff.uci = map_dbl(bs, function(x) unlist((x["Confidence.limits"][[1]][[2]])))) %>% select(-bs) -> pvals.tb
+  #dplyr::group_by(name) %>% dplyr::summarise(pval = kruskal.test(value ~ d28_death)$p.value) -> pvals
 
-df.temp %>% select(-c(hivstatus, ptsex, ustand, hivonart, any_ab, any_fung_rx, any_mal_rx,tb, no_diagnosis, csf, bc, malaria, pid,tb, d28_death, time_to_tb_rx)) %>% pivot_longer(-any_tb_rx) %>% # filter(!is.na(d28_death)) %>%
+
+#pvals <- pvals.bs
+
+pvals.tb$diff.str <- paste0(specify_decimal(pvals.tb$diff,1),
+                         " (", 
+                         specify_decimal(pvals.tb$diff.lci,1),
+                         " to ",
+                         specify_decimal(pvals.tb$diff.uci,1),
+                         ")"
+)
+
+df.temp %>% select(-c(hivstatus, ptsex, ustand, hivonart, any_ab, any_fung_rx, any_mal_rx,  tb, no_diagnosis, csf, bc, malaria, pid, d28_death, time_to_tb_rx, CD4.dic)) %>% pivot_longer(-any_tb_rx) %>% 
   dplyr::group_by(name, any_tb_rx) %>% dplyr::summarise( median = median(value, na.rm = T),
                                                              LQ = quantile(value, 0.25, na.rm = T),
                                                               UQ = quantile(value, 0.75, na.rm = T)) -> p.tb
+
 
 
 
@@ -850,48 +866,59 @@ p.tb %>% select(name, any_tb_rx, med_str) %>% pivot_wider(names_from = any_tb_rx
 p.tb <- merge(p.tb, pvals.tb, all.x = T)
 
 
-df.temp %>% dplyr::select( hivstatus, hivonart, ptsex, ustand, any_ab, any_fung_rx, any_mal_rx, any_tb_rx, bc, tb, malaria, csf, no_diagnosis) %>% pivot_longer(-any_tb_rx) %>% #filter(!is.na(d28_death)) %>%
-  dplyr::group_by(name, value) %>%
-  dplyr::summarise(tb_rx = sum(any_tb_rx == 1, na.rm = T), no_tb_rx = sum(any_tb_rx == 0, na.rm = T)) %>% filter(!is.na(value)) %>% group_by(name) %>%
-   group_by(name) %>% dplyr::summarise(pval = fisher.test(matrix(c(tb_rx, no_tb_rx), ncol =2))$p.value) -> p.catpvals.tb
+#df.temp %>% dplyr::select(d28_death, hivstatus, hivonart, ptsex, ustand, any_ab, any_fung_rx, any_mal_rx, any_tb_rx, bc, tb, malaria, csf, no_diagnosis) %>% #pivot_longer(-d28_death) %>% filter(!is.na(d28_death)) %>%
+#  dplyr::group_by(name, value) %>%
+#  dplyr::summarise(died = sum(d28_death == 1, na.rm = T), alive = sum(d28_death == 0, na.rm = T)) %>% filter(!is.na(value)) %>% group_by(name) %>%
+#   group_by(name) %>% dplyr::summarise(pval = fisher.test(matrix(c(died, alive), ncol =2))$p.value) -> p.catpvals
 
-df.temp %>% dplyr::select(hivstatus, hivonart, ptsex, ustand, any_ab, any_fung_rx, any_mal_rx, any_tb_rx, bc, tb, malaria, csf, no_diagnosis) %>% pivot_longer(-any_tb_rx) %>% # %>% filter(!is.na(d28_death)) %>%
+
+
+df.temp %>% dplyr::select(hivstatus, hivonart, ptsex, ustand, any_ab, any_fung_rx, any_mal_rx, any_tb_rx, bc, tb, malaria, csf, no_diagnosis) %>% pivot_longer(-any_tb_rx) %>% #filter(!is.na(d28_death)) %>%
   dplyr::group_by(name, any_tb_rx) %>% dplyr::summarise(`1` = sum(value == 1, na.rm = T), 
                                                         total = sum(!is.na(value)),
-                                                        prop = `1`/total) -> p.cat.tb
+                                                        prop = `1`/total) %>%
+                                                        group_by(name) %>%
+                                                        mutate(diff = prop.test(`1`, total)$estimate[[1]] - prop.test(`1`, total)$estimate[[2]],
+                                         diff.lci = prop.test(`1`, total)$conf.int[[1]],
+                                       diff.uci =prop.test(`1`, total)$conf.int[[2]])  -> p.cat.tb
 
 p.cat.tb$str <- paste0(
   p.cat.tb$`1`, "/", p.cat.tb$total,
   " (", specify_decimal(p.cat.tb$prop *100,0), "%)"
 )
 
+p.cat.tb$diff.str <- paste0(specify_decimal(p.cat.tb$diff *100,0),
+                         "% (", 
+                         specify_decimal(p.cat.tb$diff.lci*100,0),
+                         " to ",
+                         specify_decimal(p.cat.tb$diff.uci*100,0),
+                         "%)"
+)
 
-p.cat.tb %>% select(name, any_tb_rx, str) %>% pivot_wider(names_from = any_tb_rx, values_from = str) -> p.cat.tb
-p.cat.tb <- merge(p.cat.tb, p.catpvals.tb)
+
+
+
+p.cat.tb <- merge(p.cat.tb %>% select(name, any_tb_rx, str) %>% pivot_wider(names_from = any_tb_rx, values_from = str), 
+               p.cat.tb %>% select(name, diff, diff.lci, diff.uci,diff.str) %>% distinct)
 
 
 
 p.tb <- bind_rows(p.tb,p.cat.tb)
 
 p.tb$boldcol <- FALSE 
-p.tb$boldcol[p.tb$pval <= 0.05] <- TRUE
-
-p.tb$pval <- specify_decimal(p.tb$pval, 3)
-p.tb$pval[p.tb$pval == "0.000"] <- "<0.001"
+p.tb$boldcol[(p.tb$diff.lci >= 0 & p.tb$diff.uci > 0) | (p.tb$diff.lci < 0 & p.tb$diff.uci <= 0)] <- TRUE
 
 
-#p[match(c("calc_age", "ptsex", "hivstatus", "hivonart","CD4_Absolute", "Haemoglobin","screentemp", "t0hr", "t0sbp", "t0dbp", "t0map",
-#        "t0rr", "t0spo2","gcs", "ustand", "lactate_value" , "WCC", "Platelets", "NA.", "Potassium",
-#        "Chloride", "CO2", "Urea", "Creatinine", "bc", "tb", "malaria", "csf", "no_diagnosis",
-#        "any_ab", "time_to_abx", "any_fung_rx","time_to_fung_rx", "any_mal_rx", "time_to_mal_rx", "any_tb_rx","time_to_tb_rx", "fluid_6hr"), p$name),] -> p
+
+####
 
 p.tb[match(c("calc_age", "ptsex", "hivstatus", "hivonart","CD4_Absolute", "Haemoglobin","screentemp", "t0hr", "t0sbp", "t0dbp", "t0map",
         "t0rr", "t0spo2","gcs", "ustand", "lactate_value" , "WCC", "Platelets", "CO2", "Urea", "Creatinine", "bc", "tb", "malaria", "csf", "no_diagnosis",
         "any_ab", "time_to_abx", "any_fung_rx","time_to_fung_rx", "any_mal_rx", "time_to_mal_rx", "fluid_6hr"), p.tb$name),] -> p.tb
 
 
-p.tb <- p.tb[c("name", "1", "0", "pval", "boldcol")]
-names(p.tb) <- c("Variable", "TB treatment", "No TB treatment", "p", "boldcol")
+p.tb <- p.tb[c("name", "1", "0", "diff.str", "boldcol")]
+names(p.tb) <- c("Variable", "TB treatment", "No TB treatment", "Difference (95% CI)", "boldcol")
 
 boldrows <- which(p.tb$boldcol %in% TRUE)
 
@@ -937,22 +964,22 @@ p.tb$Variable[p.tb$Variable == "time_to_tb_rx"] <- "Time to Antimycobacterials (
 
 p.tb$Variable[p.tb$Variable == "fluid_6hr"] <- "IV fluid (ml)"
 
-sub("%", "\\\\%", p.tb$`TB treatment`) -> p.tb$`TB treatment`
-sub("%", "\\\\%", p.tb$`No TB treatment`) -> p.tb$`No TB treatment`
+gsub("%", "\\\\%", p.tb$`TB treatment`) -> p.tb$`TB treatment`
+gsub("%", "\\\\%", p.tb$`No TB treatment`) -> p.tb$`No TB treatment`
 
-sub("%", "\\\\%", p.tb$Variable) -> p.tb$Variable
-
+gsub("%", "\\\\%", p.tb$Variable) -> p.tb$Variable
+gsub("%", "\\\\%", p.tb$`Difference (95% CI)` ) -> p.tb$`Difference (95% CI)`
 
 
 kable(select(p.tb,-boldcol), "latex", booktabs =T, 
-      row.names = F, longtable = F, ,escape = F,caption = "Bivariable associations of receipt of TB treatment in sepsis" ) %>%
+      row.names = F, longtable = T, ,escape = F,caption = "Bivariable associations of receipt of TB treatment in sepsis", col.names = c("Variable", "TB treatment", "No TB treatment", "Difference (95\\\\% CI)" )) %>%
  kable_styling("striped", full_width = F, latex_options = c("repeat_header", "HOLD_position")) %>%
   row_spec(boldrows, bold = T) %>%
   pack_rows("Host Variables", 1,6, bold = F) %>% 
    pack_rows("Severity Variables", 7, 21, bold = F)  %>%
     pack_rows("Diagnosis", 22,26, bold = F) %>% 
    pack_rows("Treatment Received", 27, 33, bold = F)  %>%
-  footnote(general = "BP = Blood pressure, GCS = Glasgow coma scale. Numeric variables are presented as median (IQR) and categorical variables as proportions. P-values are from Kruskal-Wallace test for continuous variables and Fisher's exact test for categorical variables." , symbol = c("Participants with HIV status unknown not included in this row","Includes only HIV-infected participants"), threeparttable = T, fixed_small_size = T)
+  footnote(general = "BP = Blood pressure, GCS = Glasgow coma scale. Numeric variables are summarised as median (IQR) and categorical variables as proportions. Variable values in the two groups (those who receieved TB treatment versus not) are compared using difference of medians with 95% confidence interval (obtained by bootstrap resampling with 1000 replicates) or difference in proportions with Chi-squared 95\\\\% confidence intervals. Those variables for which the confidence intervals do not cross zero are shown in bold." , symbol = c("Participants with HIV status unknown not included in this row","Includes only HIV-infected participants"), threeparttable = T, fixed_small_size = T, escape = F) %>% landscape()
 
 ```
 
@@ -961,19 +988,17 @@ kable(select(p.tb,-boldcol), "latex", booktabs =T,
 recode(prs.df$any_tb_rx, `0` = "No TB treatment", `1` = "TB treatment") -> prs.df$any_tb_rx
 recode(match.data$any_tb_rx, `0` = "No TB treatment", `1` = "TB treatment") -> match.data$any_tb_rx
 
-prs.df[-16] %>% select(-d28_death,) %>% pivot_longer(-any_tb_rx) %>%
+prs.df[-15] %>% select(-d28_death,) %>% pivot_longer(-any_tb_rx) %>%
   mutate(name = recode_factor(name, any_mal_rx = "Malaria rx",
                               bc = "BSI",
                               CD4.dic = "CD4 < 100",
                               csf = "Meningitis",
-                              fluid_6hr = "Fluid (L)",
                               Haemoglobin = "Haemoglobin",
                               hivstatus = "HIV",
                               malaria = "Malaria",
                               t0rr = "RR",
                               t0spo2 = "SpO2",
                               tb = "TB",
-                              Urea = "Urea",
                               ustand = "Can't stand")) %>%
   ggplot(aes(value, group = as.factor(any_tb_rx), fill = as.factor(any_tb_rx))) +geom_density(alpha = 0.7) + facet_wrap(~ name, scales = "free") + theme_bw() + theme(legend.title = element_blank(), legend.position = "bottom") + xlab(element_blank()) + ylab(element_blank()) -> pa
 
@@ -982,14 +1007,12 @@ match.data %>% select(-d28_death, - distance, -weights, -Hb.dic) %>% pivot_longe
                               bc = "BSI",
                               CD4.dic = "CD4 < 100",
                               csf = "Meningitis",
-                              fluid_6hr = "Fluid (L)",
                               Haemoglobin = "Haemoglobin",
                               hivstatus = "HIV",
                               malaria = "Malaria",
                               t0rr = "RR",
                               t0spo2 = "SpO2",
                               tb = "TB",
-                              Urea = "Urea",
                               ustand = "Can't stand")) %>%
   ggplot(aes(value, group = as.factor(any_tb_rx), fill = as.factor(any_tb_rx))) +  geom_density(alpha = 0.7)  + facet_wrap(~ name, scales = "free") + theme_bw() + theme(legend.title = element_blank(), legend.position = "bottom") + xlab(element_blank()) + ylab(element_blank()) -> pb
 
