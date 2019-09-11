@@ -345,7 +345,7 @@ kstring[!names(kstring) %in% c( "Toilet facilities",
 
 kable(select(e1.sum,`levels`,value), "latex", booktabs =T, 
       row.names = F, longtable = T, escape = F, col.names = c("Variable","Value"), caption = "Participant Characteristics" ) %>%
-  kable_styling(full_width = F,latex_options = c("repeat_header")) %>%
+  kable_styling(full_width = F,latex_options = c("repeat_header"), font_size = 9) %>%
   group_rows(index = kstring) %>%
   footnote(general = "ART = Antiretroviral therapy, CPT = Co-trimoxazole preventative therapy, EFV: Efavirenz, 3TC: Lamivudine, TDF: Tenofovir. Numeric values are median (IQR)) or proportions with exact binomial 95% confidence intervals unless otherwise stated.", symbol = c("ART status includes HIV reactive only as denominator", "Missing CPT data for two participants. ") ,threeparttable = T, fixed_small_size = T)
 
@@ -422,7 +422,7 @@ gsub("%", "\\\\%", e1.sum.2$value) -> e1.sum.2$value
 
 kable(select(e1.sum.2,`levels`,value), "latex", booktabs =T, 
       row.names = F, longtable = F, escape = F, col.names = c("Variable","Value"), caption = "Prehospital healthcare seeking and antimicrobial exposure" ) %>%
-  kable_styling( full_width = F, latex_options = c("repeat_header", "hold_position")) %>%
+  kable_styling( full_width = F, latex_options = c("repeat_header", "hold_position"), font_size = 9) %>%
   group_rows(index = kstring2) %>%
   add_indent(c(2,3,4,5,6, 8:21)) %>%
   footnote(general = "LA = Lumefantrine-artemether, SP = Sulfamethoxazole-pyrimethamine, MWK = Malawian Kwacha. Numeric values are median (IQR)) or proportions with exact binomial 95% confidence intervals unless otherwise stated." ,threeparttable = T, fixed_small_size = T)
@@ -510,7 +510,7 @@ kstring3 <- make_kable_rowgroup_string(e1.sum.3)
 
 kable(select(e1.sum.3,`levels`,value), "latex", booktabs =T, 
       row.names = F, longtable = F, col.names = c("Variable","Value") ,escape = F,caption = "Admission physiology, haematology and biochemistry" ) %>%
-  kable_styling("striped", full_width = F, latex_options = c("repeat_header", "hold_position")) %>%
+  kable_styling("striped", full_width = F, latex_options = c("repeat_header", "hold_position"), font_size = 9) %>%
   group_rows(index = kstring3) %>%
   add_indent(c(8:10)) %>%
   footnote(general = "GCS = Glasgow coma scale, BP = Blood pressure, MAP = Mean arterial blood pressure. Numeric values are median (IQR)) or proportions with exact binomial 95% confidence intervals unless otherwise stated." , symbol = "CD4 count includes only HIV-infected participants; 2 values were missing.", threeparttable = T, fixed_small_size = T)
@@ -555,7 +555,7 @@ t$variable <- c("Tuberculosis", "Bloodstream infection", "Malaria", "Meningitis"
 
 kable(select(t, variable, prop), "latex", booktabs =T, 
       row.names = F, longtable = F, col.names = c("Diagnosis","Proportion of participants") ,escape = T,caption = "Number of diagnoses" ) %>%
-  kable_styling( full_width = F)# %>%
+  kable_styling( full_width = F, font_size = 9)# %>%
 #  footnote(general = "Tuberculsosis includes and positive tuberculosis diagnostic test; bloodstream infection includes any patient with at least one positive blood culture, excluding contaminants; meningitis includes any positive CSF culture, excluding contaminents, or positive cryptococcal antigen test in CSF ", threeparttable = T)
 
 
@@ -655,7 +655,7 @@ t2[is.na(t2)] <- "-"
 
 kable(select(t2,-Total), "latex", booktabs =T, 
       row.names = F, longtable = F,escape = T,caption = "Diagnostic tests performed and results, stratified by HIV status."  ) %>%
-  kable_styling( full_width = F, latex_options = c("HOLD_position")) %>%
+  kable_styling( full_width = F, latex_options = c("HOLD_position"), font_size= 9) %>%
 group_rows(index=c(" " = 1, "TB diagnostics" = 3, "Other diagnostics" = 3)) %>%
   add_header_above(c(" ", "HIV status" = 3)) %>%
   row_spec(8, bold = TRUE) %>%
@@ -789,7 +789,7 @@ kable(ab_sum_tbl, "latex", booktabs =T,
       row.names = F, longtable = F,escape = T,
       caption = "Door-to-antimicrobial times.",
       col.names = c("Antimicrobial class", "No. participants", "Median [IQR] time (hours)")) %>%
-  kable_styling( full_width = F) %>%
+  kable_styling( full_width = F, font_size = 9) %>%
   footnote(symbol = "10/63 participants who received antitubercular agents during admission were taking them prior to admission; they are excluded from the calculation of median door-to-antimicrobial time for this class. ", threeparttable = T, fixed_small_size = T)
 
 subset(e1, !(pid %in% subset(df.abs, first_ab != "none")$pid | pid %in% subset(df.mal, !is.na(first_ab))$pid  | 
@@ -924,7 +924,7 @@ kable(mort, "latex", booktabs =T,  row.names = F, longtable = F,escape = TRUE,
       caption = "Day 28, 90 and 180 mortality stratified by HIV status",
       col.names = c(" ", "n", "Mortality" , "n", "Mortality", "n", "Mortality","n", "Mortality" )) %>%
         add_header_above(c(" " = 1, "HIV+" = 2, "HIV-" = 2, "HIV Unknown" = 2, "Total" = 2)) %>%
-  kable_styling( full_width = F, latex_options = "scale_down") %>%
+  kable_styling( full_width = F, latex_options = "scale_down", font_size = 9) %>%
     column_spec(8, bold = T) %>% 
   column_spec(9, bold = T) %>%
   footnote(general = "n in this table indicates the number of patients with known vital status, contributing data at the given time point (i.e. not lost to follow up, withdrawn, or transferred out).", threeparttable = T, fixed_small_size = T)
@@ -1268,7 +1268,7 @@ gsub("%", "\\\\%", p$Difference) -> p$Difference
 
 kable(select(p,-boldcol), "latex", booktabs =T, 
       row.names = F, longtable = T, ,escape = F,caption = "Bivariate associations with death by 28 days" ) %>%
- kable_styling("striped", full_width = F, latex_options = c("repeat_header", "hold_position")) %>%
+ kable_styling("striped", full_width = F, latex_options = c("repeat_header", "hold_position"), font_size = 9) %>%
   row_spec(boldrows, bold = T) %>%
   pack_rows("Host Variables", 1,6, bold = F) %>% 
    pack_rows("Severity Variables", 7, 21, bold = F)  %>%
@@ -1418,7 +1418,7 @@ kable(select(lr_tab,-c(bold_mv, bold_uv, p.value_uv, p.value_mv )), "latex", boo
       row.names = F, longtable = F, ,escape = F,caption = "Unadjusted and adjusted odds ratios of death by 28 days" ,
         col.names = c("Variable", "OR (95\\% CI)", "aOR (95\\% CI)")) %>%
   add_header_above(c(" " = 1, "Univariable models" = 1, "Multivariable model" = 1)) %>%
- kable_styling("striped", full_width = F, latex_options = c("repeat_header")) %>%
+ kable_styling("striped", full_width = F, latex_options = c("repeat_header"), font_size = 9) %>%
   pack_rows("Host Variables", 1,5, bold = F) %>% 
    pack_rows("Severity Variables", 6, 18, bold = F)  %>%
     pack_rows("Diagnosis", 19,22, bold = F) %>% 

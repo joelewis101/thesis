@@ -563,7 +563,7 @@ exp.tab[is.na(exp.tab)] <- "-"
 
 kable(exp.tab, "latex", booktabs = TRUE,
       row.names = FALSE, escape = TRUE, col.names = c("Exposure", "Arm 1", "Arm 2", "Arm 3", "Arm 1", "Arm 2", "Arm 3", "Arm 1", "Arm 2", "Arm 3"),
-      caption = "Antimicrobial and hospital exposure stratified by arm") %>% kable_styling(full_width = FALSE, latex_options = "scale_down") %>%
+      caption = "Antimicrobial and hospital exposure stratified by arm") %>% kable_styling(full_width = FALSE, latex_options = "scale_down", font_size = 9) %>%
 #  pack_rows("Total", 1,1) %>%
 #  pack_rows("Hospitalisation", 2,2) %>%
  pack_rows("Exposures", 2,23) %>%
@@ -614,7 +614,7 @@ ESBLtab$visit <- c("Day 0", "Day 7", "Day 28","Day 90", "Day 180")
 
 kable(ESBLtab, "latex", booktabs = TRUE,
       row.names = FALSE, escape = TRUE, col.names = c("Visit",rep(c("n", "Any ESBL"),3)),
-      caption = "ESBL carriage stratified by arm and visit") %>% kable_styling(full_width = FALSE) %>%
+      caption = "ESBL carriage stratified by arm and visit") %>% kable_styling(full_width = FALSE, font_size = 9) %>%
 #  pack_rows("Total", 1,1) %>%
 #  pack_rows("Hospitalisation", 2,2) %>%
 # pack_rows("Exposures", 2,23) %>%
@@ -922,7 +922,7 @@ glm(ESBL ~ ., data = bl.esbl, family = 'binomial') -> mv.mod
       kable(select(bl.esbl.tab, -c(boldrows.mv, boldrows.uv)), "latex", booktabs = TRUE,
       row.names = FALSE, escape = FALSE, col.names = c("Variable","OR (95\\% CI)", "p-value", "aOR (95\\% CI)", "p-value"),
       caption = "Univariable and multivariable associations of ESBL colonisation at enrolment") %>% 
-        kable_styling(full_width = FALSE, latex_options = "hold_position") %>%
+        kable_styling(full_width = FALSE, latex_options = "hold_position", font_size = 9) %>%
        pack_rows("Demographics", 1,2, bold = FALSE) %>%
        pack_rows("Study Arm", 3,4, bold = FALSE) %>%
        pack_rows("HIV status", 5,8, bold = FALSE) %>%

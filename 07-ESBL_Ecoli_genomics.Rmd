@@ -235,7 +235,7 @@ pgroups %>% dplyr::filter(Lane %in% tree$tip.label) %>%
 kable(select(pgroup.sum, Phylogroup, n), "latex", booktabs = TRUE,
       row.names = FALSE, escape = TRUE,
       caption = "Phylogroup distribution of sequenced \\textit{E. coi} isolates.", linesep = "") %>%
-  kable_styling(full_width = FALSE) 
+  kable_styling(full_width = FALSE, font_size = 9) 
 
 
 ```
@@ -1103,7 +1103,7 @@ plasm %>% pivot_longer(-name) %>%
   arrange(desc(n)) -> plasm.sum
 
 kable(plasm.sum, "latex", longtable = T, booktabs = T, caption = "Frequency of identification of plasmid replicons", col.names = c("Plasmid replicon", "n")) %>%
-kable_styling(full_width = F, latex_options = c("repeat_header")) 
+kable_styling(full_width = F, latex_options = c("repeat_header"), font_size = 9) 
 
 
 ```

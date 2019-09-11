@@ -109,7 +109,7 @@ t1 <- read.csv(paste0(wd, "t1_inclusion_criteria.csv"), check.names = F, strings
 
 
 knitr::kable(t1, format = "latex", booktabs = T, longtable = T, caption = "Study inclusion criteria") %>%
-  kable_styling(full_width = F)  %>% 
+  kable_styling(full_width = F, font_size = 9)  %>% 
   column_spec(1, width = "10em") %>%
   column_spec(2, width = "25em") %>%
  footnote(general = "AETC = Adult Emergency and Trauma Centre")

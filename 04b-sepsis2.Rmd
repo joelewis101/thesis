@@ -346,7 +346,7 @@ kable(select(lr_mod,term,str_cc, str_imp), "latex", booktabs =T,
       row.names = F, longtable = F, escape = F,caption = "Unadjusted and adjusted odds ratios of death by 28 days in sepsis from Bayesian logistic regression, for complete case analysis (CCA) and following multiple imputation of missing data." ,
         col.names = c("Variable", "CCA", "Imputed")) %>%
   add_header_above(c(" " = 1, "aOR (95% CrI)" = 2)) %>%
- kable_styling("striped", full_width = F, latex_options = c("repeat_header", "hold_position", "scale_down")) %>%
+ kable_styling("striped", full_width = F, latex_options = c("repeat_header", "hold_position", "scale_down"), font_size = 9) %>%
   pack_rows("Host Variables", 1,4, bold = F) %>% 
    pack_rows("Severity Variables", 5, 17, bold = F)  %>%
     pack_rows("Diagnosis", 18,21, bold = F) %>% 
@@ -680,7 +680,7 @@ tta.tab[c(9:5,2:4),] -> tta.tab
 kable(select(tta.tab, term, str), "latex", booktabs =T, 
       row.names = F, longtable = FALSE, ,escape = F,caption = "Adjusted odds ratio of death by 28 days per hour delay in antibacterials" ,
         col.names = c("Variable", "aOR (95\\% CrI)")) %>%
- kable_styling("striped", full_width = F, latex_options = c("repeat_header", "hold_position")) %>%
+ kable_styling("striped", full_width = F, latex_options = c("repeat_header", "hold_position"), font_size = 9) %>%
   footnote(general = "The variables famd1,2 and 3 are the three transformed dimensions following dimensionality reduction using factor analysis of mixed data that account for the most variability in the dataset." , threeparttable = T, fixed_small_size = T) 
 
 ```
@@ -973,7 +973,7 @@ gsub("%", "\\\\%", p.tb$`Difference (95% CI)` ) -> p.tb$`Difference (95% CI)`
 
 kable(select(p.tb,-boldcol), "latex", booktabs =T, 
       row.names = F, longtable = T, ,escape = F,caption = "Bivariable associations of receipt of TB treatment in sepsis", col.names = c("Variable", "TB treatment", "No TB treatment", "Difference (95\\\\% CI)" )) %>%
- kable_styling("striped", full_width = F, latex_options = c("repeat_header", "HOLD_position")) %>%
+ kable_styling("striped", full_width = F, latex_options = c("repeat_header", "HOLD_position"), font_size = 9) %>%
   row_spec(boldrows, bold = T) %>%
   pack_rows("Host Variables", 1,6, bold = F) %>% 
    pack_rows("Severity Variables", 7, 21, bold = F)  %>%
