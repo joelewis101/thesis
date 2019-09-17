@@ -18,15 +18,15 @@ source("chapter_2/generate_study_flow_diagram.R")
 ```
 ## Chapter Overview
 
-This chapter gives an overview of the clinical study which underpins this thesis, and the laboratory procedures used in analysis. Computational procedures are largely detailed in the relevant chapters as are further specific details, where necessary.
+This chapter gives an overview of the clinical study which underpins this thesis, and the laboratory procedures used in analysis. Computational and statistical procedures are largely detailed in the relevant chapters as are further specific details, where necessary.
 
 ## Study site
 
 ### Malawi
 
-Malawi is a country of 17.5 million people in South-Eastern Africa[@NSOM]. It is one of the poorest countries in the world: it is a low income country under the World Bank classification, with a 2017 Gross National Income (GNI) per capita of \$320 in US dollars[@WorldBank], and was ranked 171st of 189 countries in 2017 by the human development index (HDI), a composite statistic of life expectancy, education and income per capita indicators[ (UNDP human development reports)]@UnitedNationsDevelopmentProgramme2018. In 2010, 71% of the population was estimated to survive on less than \$1.90 per day. Life expectancy at birth in 2017 was 63 years, and though significant progress is being made, neonatal and under-5 mortality remains high at 23 and 55 per 1000 live births, respectively. The population is largely rural (83% in 2017), with a young population (44% under the age of 15, 2017) and high fertility rate[@WorldBank]. Malaria is endemic, and there is an ongoing generalised HIV epidemic: adult HIV prevalence (age 15-49) was estimated to be 9.6% in 2017 (UNAIDS), though falling from a peak of 16.6% in 1999[@UNAIDS]. HIV antiretroviral therapy (ART) national scale up began in 2004 and in 2017 71% of eligible adults and children were estimated to be receiving ART[@UNAIDS]. It is classed by the WHO as a high-TB/high-HIV burden country, with an estimated TB incidence rate of 131 (95% CI 70-210) cases per 100000 population per year[WorldHealthOrganisation2018]. 
+Malawi is a country of 17.5 million people in South-Eastern Africa[@NSOM]. It is one of the poorest countries in the world: it is a low income country under the World Bank classification, with a 2017 Gross National Income (GNI) per capita of \$320 in US dollars[@WorldBank], and was ranked 171st of 189 countries in 2017 by the human development index (HDI), a composite statistic of life expectancy, education and income per capita indicators[@UnitedNationsDevelopmentProgramme2018]. In 2010, 71% of the population was estimated to survive on less than \$1.90 per day. Life expectancy at birth in 2017 was 63 years, and though significant progress is being made, neonatal and under-5 mortality remains high at 23 and 55 per 1000 live births, respectively. The population is largely rural (83% in 2017), with a young population (44% under the age of 15, 2017) and high fertility rate[@WorldBank]. Malaria is endemic, and there is an ongoing generalised HIV epidemic: adult HIV prevalence (age 15-49) was estimated to be 9.6% in 2017 (UNAIDS), though falling from a peak of 16.6% in 1999[@UNAIDS]. HIV antiretroviral therapy (ART) national scale up began in 2004 and in 2017 71% of eligible adults and children were estimated to be receiving ART[@UNAIDS]. It is classed by the WHO as a high-TB/high-HIV burden country, with an estimated TB incidence rate of 131 (95% CI 70-210) cases per 100,000 population per year[@WorldHealthOrganisation2018]. 
 
-It has a subtropical climate, with three main seasons: a warm wet season from November to April, a cooler dry winter period from May to August and a hot dry period from September to October. Blantyre city, the location of the study in this thesis, is the second city of Malawi with a population of 585000. It is located in Blantyre district, population 995000 in 2018[@NSOM], in the Shire highlands at an altitude of 1000m (Figure \@ref(fig:malawi-map)).
+It has a subtropical climate, with three main seasons: a warm wet season from November to April, a cooler dry winter period from May to August and a hot dry period from September to October. Blantyre city, the location of the study in this thesis, is the second city of Malawi with a population of 585,000. It is located in Blantyre district, population 995,000 in 2018[@NSOM], in the Shire highlands at an altitude of 1000m (Figure \@ref(fig:malawi-map)).
 
 ```{r malawi-map, warning = F,  echo = F, message = F, fig.scap="Map of study site", out.extra='', fig.cap = "Malawi, showing administrative boundaries (North, Central, and South regions), Lilongwe, the capital city and Blantyre, the study location. Source: openstreetmap.org, used under Creative Commons Attribution ShareAlike 2.0 licence CC-BY-SA", fig.align= 'center'}
 
@@ -63,7 +63,7 @@ ggmap(m2) +
 
 ### Queen Elizabeth Central Hospital
 
-Queen Elizabeth Central Hospital (QECH), located in Blantyre city, is the tertiary referral hospital for the Southern Region of Malawi. It has 1300 beds but often operates above capacity, and is the only site providing free inpatient healthcare to the adult population of Blantyre district. Since 2011 it has had a dedicated emergency department for adults, the Adult Emergency and Trauma Centre, staffed 24 hours a day. Since 2015 (and for the whole of the study period), attendees to the AETC must be referred from a primary health clinic. Adults attending the AETC are triaged by a nurse and then reviewed by a doctor or clinical officer; if admission under a speciality team (including medicine) is deemed appropriate then a patient will be reviewed by an intern or registrar from the admitting speciality and usually by a consultant within 24 hours. There is a 6-bed AETC resuscitation area in which oxygen concentrators, cardiac monitors and a defibrillator are available; none of these items are available in the rest of the AETC. 
+Queen Elizabeth Central Hospital (QECH), located in Blantyre city, is the tertiary referral hospital for the Southern Region of Malawi. It has 1300 beds but often operates above capacity, and is the only site providing free inpatient healthcare to the adult population of Blantyre district. Since 2011 it has had a dedicated emergency department for adults, the Adult Emergency and Trauma Centre (AETC), staffed 24 hours a day. Since 2015 (and for the whole of the study period), attendees to the AETC must be referred from a primary health clinic. Adults attending the AETC are triaged by a nurse and then reviewed by a doctor or clinical officer; if admission under a speciality team (including medicine) is deemed appropriate then a patient will be reviewed by an intern or registrar from the admitting speciality and usually by a consultant within 24 hours. There is a 6-bed AETC resuscitation area in which oxygen concentrators, cardiac monitors and a defibrillator are available; none of these items are available in the rest of the AETC. 
 
 There are two dedicated single-sex medical wards, each of approximately 60 beds, and one mixed-sex TB ward. Male and female high-dependency units (HDUs), each with a capacity of six beds, have oxygen concentrators (or, if available, oxygen cylinders) to deliver supplemental oxygen. The medical wards are staffed by two or three trained nurses and a variable number of nursing students. Basic nursing care is usually provided by a patients relative or friend, called a 'guardian.' Patients on the medical wards are reviewed twice-weekly by a consultant physician and then variably at other times by junior doctors, clinical officers or medical students depending on the availability of staff. Malawi national treatment guidelines suggest ceftriaxone for the treatment of sepsis requiring hospitalisation. 
 
@@ -71,7 +71,7 @@ There are two dedicated single-sex medical wards, each of approximately 60 beds,
 
 #### Malawi-Liverpool-Wellcome Clinical Research Programme
 
-The Malawi-Liverpool Wellcome Trust Clinical Research Programme (MLW) was established in 1995 and since them has been active in researching priority health issues in Malawi. It is an affiliate of the Malawi College of Medicine, and is based in the grounds of QECH in Blantyre. It runs an on-site microbiology laboratory which has provided an aerobic blood culture service to QECH since 1998, and also provides CSF microscopy and culture. Bacterial culture is carried out as per British Society of Antimicrobial Chemotherapy (BSAC) guidelines[@BritishSocietyforAntimicrobialChemotherapy2013] and the laboratory adheres to UK NEQAS external quality control. It is core funded by the Wellcome Trust. MLW operates the Malawi College of Medicine Tuberculosis Laboratory where sputum GeneXpert testing any mycobacterial blood culture were undertaken.
+The Malawi-Liverpool Wellcome Trust Clinical Research Programme (MLW) was established in 1995 and since them has been active in researching priority health issues in Malawi. It is an affiliate of the Malawi College of Medicine, and is based in the grounds of QECH in Blantyre. It runs an on-site microbiology laboratory which has provided an aerobic blood culture service to QECH since 1998, and also provides cerebrospinal fluid (CSF) microscopy and culture. Bacterial culture is carried out as per British Society of Antimicrobial Chemotherapy (BSAC) guidelines[@BritishSocietyforAntimicrobialChemotherapy2013] and the laboratory adheres to UK NEQAS external quality control. It is core funded by the Wellcome Trust. MLW operates the Malawi College of Medicine Tuberculosis Laboratory where sputum GeneXpert testing any mycobacterial blood culture were undertaken.
 
 #### Wellcome Trust Sanger Institute
 
@@ -83,13 +83,15 @@ The DASSIM (Developing an Antimicrobial Strategy for Sepsis in Malawi) study was
 
 ### Objectives
 
-The study was open for recruitment between 19 February 2017 and 2 October 2018; there were three arms. 
+The study was open for recruitment between 19 February 2017 and 2 October 2018; there were three arms: 
 
-1. Firstly, in order to define the aetiology of sepsis, adults with sepsis attending AETC were recruited as early as possible in their attendance to QECH following triage. 
+1. Adults with sepsis attending AETC, recruited as early as possible in their attendance to QECH following triage. 
 
-2. Secondly, in order to clearly define the relative effects of antimicrobial exposure versus hospital admission in ESBL-E acquisition and carriage, antibiotic unexposed adults attending AETC with no plan for antimicrobial administration were recruited. 
+2. Antibiotic unexposed adults attending AETC with no plan for antimicrobial administration.
 
-3. Finally, to define baseline flux of ESBL-E antibiotic-unexposed community members were recruited. 
+3. Antibiotic-unexposed community members.
+
+Arm 1 (sepsis) participants were recruited in order to clearly define the aetiology of sepsis; arm 2 to clearly define the relative effects of antimicrobial exposure versus hospital admission in ESBL-E acquisition and carriage; and arm 3 to define baseline flux of ESBL-E.
 
 ### Recruitment criteria
 
@@ -97,8 +99,8 @@ Detailed inclusion and exclusion criteria for each arm are given shown in Table 
 
 Exclusion criteria were the same for all arms of the study: Participants were not eligible for enrolment if:
 
-* They were unable to give informed consent and no guardian available to provide proxy consent
-* They spoke neither English nor Chichewa
+* They were unable to give informed consent and no guardian was available to provide proxy consent.
+* They spoke neither English nor Chichewa.
 * They lived > 30km from Blantyre city. 
 
 The antibiotic-unexposed inpatients and community members were matched on age (+/- 5yr) and sex to sepsis survivors (defined as patients surviving to 28 days). In addition community members were matched on location to sepsis survivors; putative households for recruitment were identified by random walk from the houses of surviving sepsis participants, with initial direction established by spinning a bottle on the floor.  
@@ -121,19 +123,19 @@ knitr::kable(t1, format = "latex", booktabs = T, longtable = T, caption = "Study
 
 #### Enrolment assessment 
 
-An overview of the study visit schedule is shown in Figure \@ref(fig:study-sampl-flow-diag). At enrolment, following informed written consent a baseline questionnaire administered to the patient (or the guardian if the participant was obtunded) to capture background demographic and clinical data, a Chichewa-language EQ-5D heath related quality of life questionnaire completed, and sample collection undertaken (see below). For hospitalised patients, enrolment aimed to be as soon after triage as possible. Data on therapies administered were captured by the study team including the time of administration of antimicrobial therapy and volumes of intravenous fluid administered, the latter visually confirmed by the study team member. Vital signs were measured by trained study nurses. All blood pressure measurements were made non-invasively with an automated cuff (Omron M2, Omron, Japan), oxygen saturations measured with a dedicated study pulse oximeter (Contec CM50, Contec Medical Systems, China), and temperature measured in the axilla with a digital thermometer (Omron FWH000, Omron, Japan).
+An overview of the study visit schedule is shown in Figure \@ref(fig:study-sampl-flow-diag). At enrolment, following informed written consent, a baseline questionnaire administered to the patient (or the guardian if the participant was obtunded) to capture background demographic and clinical data, a Chichewa-language EQ-5D-3L heath related quality of life questionnaire completed, and sample collection undertaken (see below). For hospitalised patients, enrolment aimed to be as soon after triage as possible. Data on therapies administered were captured by the study team including the time of administration of antimicrobial therapy and volumes of intravenous fluid administered, the latter visually confirmed by the study team member. Vital signs were measured by trained study nurses. All blood pressure measurements were made non-invasively with an automated cuff (Omron M2, Omron, Japan), oxygen saturations measured with a dedicated study pulse oximeter (Contec CM50, Contec Medical Systems, China), and temperature measured in the axilla with a digital thermometer (Omron FWH000, Omron, Japan).
 
 All treatment decisions were at the discretion of the participant's attending healthcare worker.
 
 #### Subsequent visits
 
-Hospitalised participants were reviewed daily Monday to Friday following admission whilst on the wards to capture details of therapies administered. The visit schedule for the study is shown in Figure \@ref(fig:study-sampl-flow-diag). Arm 1 (sepsis) and 2 (hospital inpatients) were reviewed by a study team member 7 and 28 days following enrolment, and at 3 and 6 months; community members were reviewed at 28 days and 6 months. At each visit, details of any antimicrobials or other therapies received and any health care facility contact were collected, and the Chichewa language EQ-5D was repeated. Samples were collected as below. 
+Hospitalised participants were reviewed daily Monday to Friday following admission whilst on the wards to capture details of therapies administered. The visit schedule for the study is shown in Figure \@ref(fig:study-sampl-flow-diag). Arm 1 (sepsis) and 2 (hospital inpatients) were reviewed by a study team member 7 and 28 days following enrolment, and at 3 and 6 months; community members were reviewed at 28 days and 6 months. At each visit, details of any antimicrobials or other therapies received and any health care facility contact were collected, and the Chichewa language EQ-5D-3L was repeated. Samples were collected as below. 
 
 These study visits occurred preferentially at QECH, but at the patient's home if it was difficult for them to attend the hospital. If patients missed a scheduled visit, then attempts were made to contact them by telephone. If these attempts were unsuccessful then attempts to visit them at home were undertaken by a member of the study team.
 
 #### Blood, urine, and stool, sputum and CSF collection 
 
-Blood was collected from arm 1 (sepsis) participants only on enrolment (Figure \@ref(fig:study-sampl-flow-diag) and at the 4-week visit. At baseline, blood was collected aseptically directly into collection tubes with a vacutainer device with the following order of draw and volumes: one BacT/Alert (BioMerieux, France) aerobic blood culture bottle (7-10ml), one BD BACTEC Myco/F Lytic mycobacterial culture bottle (3-5ml) (Beckton Dickinson, United States), one serum (10ml) and two EDTA (4ml, both Grenier Bio-One, Austria) samples. Finger prick for capillary blood was used for point of care diagnostics as described below. At the 4-week visit, 10mls of convalescent serum was collected. At baseline, urine was collected from all arm 1 (sepsis) participants into a sterile polypropylene universal container (Alpha Laboratories, UK) either by the participant themselves (if this was possible) or with the aid of a disposable bedpan.
+Blood was collected from arm 1 (sepsis) participants only on enrolment (Figure \@ref(fig:study-sampl-flow-diag)) and at the 4-week visit. At baseline, blood was collected aseptically directly into collection tubes with a vacutainer device with the following order of draw and volumes: one BacT/Alert (BioMerieux, France) aerobic blood culture bottle (7-10ml), one BD BACTEC Myco/F Lytic mycobacterial culture bottle (3-5ml) (Beckton Dickinson, United States), one serum (10ml) and two EDTA (4ml, both Grenier Bio-One, Austria) samples. Finger prick for capillary blood was used for point of care diagnostics as described below. At the 4-week visit, 10mls of convalescent serum was collected. At baseline, urine was collected from all arm 1 (sepsis) participants into a sterile polypropylene universal container (Alpha Laboratories, UK) either by the participant themselves (if this was possible) or with the aid of a disposable bedpan.
 
 At the enrolment visit and all other visits for all arms of the study stool was collected into a sterile polypropylene universal container (Alpha Laboratories, UK) with aseptic technique. If it was not possible for a patient to provide stool then a rectal swab was taken using a sterile rayon-tipped swab (Technical Service Consultants Ltd, UK) inserted into 2-3cm into the rectum, rotated for approximately 10 seconds and placed into Amies gel media for transport to the laboratory.
 
@@ -181,7 +183,7 @@ CSF, where available, was cultured onto blood, chocolate and Sabouraud agar and 
 
 #### Mycobacterial blood culture
 
-Blood in Myco/F Lytic bottles was cultured at 37C in and inspected daily for the first 14 days with a handheld UV Wood's lamp, and once every two days thereafter. Contents of the bottles were centrifuged (3000xg for 20 minutes) within 48hr of detection of fluorescence, examined by ZN and gram stain to exclude contamination, then inoculated into mycobacterial growth indicator tubes (MGIT, Becton Dickinson Diagnostic Systems, United States) for up to 6 weeks. Isolates were classified as _M. tuberculosis_ or nontuberculous Mycobacteria by microscopic cording and MPT-64 lateral flow assays (TAUNS Laboratories, Japan). 
+Blood in Myco/F Lytic bottles was cultured at 37C in and inspected daily for the first 14 days with a handheld UV Wood's lamp, and once every two days thereafter. Contents of the bottles were centrifuged (3000xg for 20 minutes) within 48hr of detection of fluorescence, examined by ZN and Gram stain to exclude contamination, then inoculated into mycobacterial growth indicator tubes (MGIT, Becton Dickinson Diagnostic Systems, United States) for up to 6 weeks. Isolates were classified as _M. tuberculosis_ or nontuberculous Mycobacteria by microscopic cording and MPT-64 lateral flow assays (TAUNS Laboratories, Japan). 
 
 After 8 weeks of culture of Myco/F Lytic bottles if no fluorescence was seen, then centrifugation and microscopy was carried out. If no organisms were seen, the culture was reported as "no growth."
 
@@ -217,11 +219,6 @@ knitr::include_graphics(paste0(wd, "/figures/chromagar.jpg"))
 knitr::include_graphics(paste0(wd, "/figures/combo_discs.png"))
 ```
 
-
-#### Acute and convalescent serologies
-
-_PHE stuff_
-
 ### Case definitions
 
 Bloodstream infection is defined as ant pathogenic organism isolated from at least one aerobic blood culture. Coagulase-negative _Staphylococci_, _bacillus spp._, _diptheroids_ and alpha-haemolytic _Streptococci_ other than _S. pneumoniae_  were considered as contaminants. Malaria was defined as a positive malaria rapid test. Meningitis was defined as either a positive CSF culture for a pathogenic organism - excluding the same contaminants as for bloodstream infection - or a positive cryptococcal antigen test on CSF. Tuberculosis was defined as any of positive sputum Xpert, positive urinary LAM at any grade, or positive mycobacterial blood culture. 
@@ -232,7 +229,7 @@ One of each morphologically distinct colony from ESBL-E selective culture was ta
 
 ## Statistical Analysis
 
-Details of analysis methods are given in the relevant chapters. All analyses were undertaken using R v3.6.0 and any Bayesian modelling using Markov Chain Monte Carlo (MCMC) methods using Stan v2.18 via the _rstan_ interface with R. This thesis was written using the bookdown package in R and the code to generate it as well as all analysis scripts are available at https://github.com/joelewis101/thesis. Unless otherwise states, all boxplots show median and IQR as boxes, 1.5 times IQR a whiskers and outliers (any points outside the whiskers) as points.
+Details of analysis methods are given in the relevant chapters. All analyses were undertaken using R v3.6.0 and any Bayesian modelling using Markov Chain Monte Carlo (MCMC) methods using Stan v2.18 via the _rstan_ interface with R. This thesis was written using the bookdown package in R and the code to generate it as well as all analysis scripts are available at https://github.com/joelewis101/thesis. Unless otherwise states, all boxplots show median and IQR as boxes, 1.5 times IQR as whiskers and outliers (any points outside the whiskers) as points.
 
 ## Study Team
 
