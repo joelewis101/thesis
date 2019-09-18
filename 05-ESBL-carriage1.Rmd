@@ -931,7 +931,7 @@ glm(ESBL ~ ., data = bl.esbl, family = 'binomial') -> mv.mod
        pack_rows("WaSH behaviour", 14,16, bold = FALSE) %>%
        pack_rows("Season", 17,17, bold = FALSE) %>%
   add_header_above(c(" " = 1, "Univariable" = 2, "Multivariable" = 2)) %>% 
-  footnote(general = "CPT = Cotrimoxazole preventative therapy, ART = antiretroviral therapy, WaSH = Water, sanitation and hygiene. Entries in bold are those for which 95\\% confidence intervals do not cross 1.", symbol = "Antibiotics includes TB therapy but excludes CPT.", threeparttable = T, fixed_small_size = T) 
+  footnote(general = "CPT = Cotrimoxazole preventative therapy, ART = antiretroviral therapy, WaSH = Water, sanitation and hygiene. Entries in bold are those for which 95% confidence intervals do not cross 1.", symbol = "Antibiotics includes TB therapy but excludes CPT.", threeparttable = T, fixed_small_size = T) 
       
 ```
 
