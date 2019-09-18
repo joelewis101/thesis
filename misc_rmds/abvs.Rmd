@@ -1,117 +1,231 @@
 # Abbreviations {-}
 
 3TC: Lamivudine
+
 AETC: Adult emergency and trauma centre
+
 AMR: Antimicrobial resistance
+
 aOR: Adjusted odds ratio
+
 API: Analytical profile index
+
 ARIBA: Antimicrobial resistance identification by assembly
+
 ART: Antiretroviral therapy
+
 AST: Antimicrobial sensitivity testing
+
 BAPS: Bayesian analysis of population structure
+
 BLAST: Basic local alignmeny search tool
+
 BLI: Beta lactamase inhibitor
+
 BP: Blood pressure
+
 BPS: Best practice statement
-BSAC: British society of antimicrobial chemotherapy
+
+BSAC: British Society for Antimicrobial Chemotherapy
+
 BSI: Bloodstream infection
+
 CCA: Complete case analysis
+
 CCDEP: Center for Disease Dynamics, Economics and Policy
+
 CD4: Cluster of differentiation 4
+
 CI: Confidence interval
-CoM: College of medicine
+
+CoM: College of Medicine
+
 COMREC: Malawi College of Medicine Research Ethics Committee
+
 CPT: Cotrimoxazole preventative therapy
+
 CRAG: Cryptococcal antigen
+
 CSF: Cerebrospinal fluid
+
 DAG: Directed acyclic graph
+
 DASSIM: Developing an antimicrobial strategy for sepsis in Malawi
+
 DBP: Diastolic blood pressure
+
 DNA: Deoxyribonucleic acid
+
 EDTA: Ethylenediaminetetraacetic acid
+
 EFV: Efavirenz
+
 EGDT: Early goal directed therapy
+
 ELPD: Expected log predictive density
+
 EPEC: Enteropathogenic _E. coli_
+
 ESBL-E: Extended-spectrum beta-lactamase producing Enterobacteriaceae
+
 ESBL: Extended-spectrum beta-lactam(ase)
-ESICM: European society of intensive care medicine
+
+ESICM: European Society of Intensive Care Medicine
+
 ETEC: Enterotoxigenic _E. coli_
+
 EU: European Union
+
 FAMD: Factor analysis of mixed data
+
 GCS: Glasgow coma scale
+
 GDP: Gross domestic product
+
 GEMS: Global enteric multicenter study
+
 GLMM: Generalised linear mixed model
+
 GNI: Gross national income
+
 HDI: Human development index
+
 HDU: High dependency unit
+
 HIV: Human immunodeficiency virus
+
 HR: Heart rate
+
 HRQoL: Health related quality of life
+
 IMAI: Integrated management of adolescent and adult illness
+
 IPC: Infection prevention and control
+
 IQR: Interquartile range
+
 IS: Insertion sequence
+
 ITU: Intensive therapy unit
-IV: intravenous
-LA = Lumefantrine-artemether
+
+IV: Intravenous
+
+LA: Lumefantrine-artemether
+
 LAM: lipoarabinomannan
+
 LOESS: Locally estimated scatterplot smoothing
-LSTM: Liverpool school of tropical medicine
+
+LSTM: Liverpool School of Tropical Medicine
+
 LTFU: Lost to follow up
+
 MAP: Mean arterial blood pressure
+
 MAT: Microagglutination test
+
 Mb: Megabases 
+
 MB: Megabytes
+
 MCA: Multiple correspondence analysis
+
 MCMC: Markov-chain Monte-Carlo
+
 MDR: Multidrug resistant
+
 MGE: Mobile genetic element
+
 MGIT: Mycobacterial growth indicator tube
+
 MLST: Multilocus sequence type
+
 MLW: Malawi-Liverpool-Wellcome clinical research programme
-mmHg: millimetres of mercury
-mRDT: malaria rapid diagnostic test
+
+mmHg: Millimetres of mercury
+
+mRDT: Malaria rapid diagnostic test
+
 MTB: Mycobacterium tuberculosis
+
 MWK: Malawian Kwacha
-NCBI: National center for biotechnology information
-NEQAS: National external quality assessment service
-NIHR: National institute for health research
+
+NCBI: National Center for Biotechnology Information
+
+NEQAS: National External Quality Assessment Service
+
+NIHR: National Institute for Health Research
+
 NUTS: No U-turn sampler
+
 OR: Odds ratio
+
 PaCO2: Partital pressure of carbon dioxide
+
 PaO2: Partial pressure of oxygen
+
 PCA: Principal component analysis
+
 PCP: Pneumocystis jiroveci pneumonia
+
 PCR: Polymerase chain reaction
+
 PLR: Passive leg raise
+
 QC: Quality control
-QECH: Queen Elizabeth central hospital
+
+QECH: Queen Elizabeth Central Hospital
+
 qSOFA: Quick SOFA
+
 QUAST: Quality assessment tool for genome assemblies
+
 RCT: Randomised controlled trial
+
 RDT: Rapid diagnostic test
+
 RR: Respiratory rate
+
 RR: Risk ratio/ respiratory rate
+
 SBP: Systolic blood pressure
+
 SC: Sequence cluster
+
 SD: Standard deviation
+
 SIRS: Systemic inflammatory response syndrome
+
 SNP: Single nucleotide polymorphism
+
 SOFA: Sequential organ failure assessment
+
 SP = Sulfamethoxazole-pyrimethamine
+
 SpO2: Capillary oxygen saturation
+
 SRST: Short read sequence typing
+
 sSA: Sub-Saharan Africa
+
 ST: Sequence type
+
 TB: Tuberculosis
+
 TDF: Tenofovir
+
 uLAM: Urinary lipoarabinomannan
+
 USA: United States of America 
+
 WCC: White cell count
+
 WGS: Whole genome sequencing
+
 WHO: World health organisation
+
 WSI: Wellcome Sanger institute
+
 ZN: Ziehl–Neelsen
+
 
