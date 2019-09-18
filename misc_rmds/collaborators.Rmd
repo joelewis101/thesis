@@ -1,0 +1,20 @@
+# Collaborators and co-workers {-}
+
+This thesis is the result of my own work. In some cases, work was done in collaboration with others. The roles of collaborators and co-workers in this project are detailed here.
+
+Screening, enrolment and follow up of study participants: Research nurses Lucy Keyala, Tusekile Phiri, Grace Mwaminawa, field workers Witness Mtambo and Gladys Namacha.
+
+Logistic support and sample portering: Monica Matola.
+
+Laboratory processing of stool, rectal swab, serum, urine and whole blood samples, stool culture, urinary LAM testing and DNA extractions: Madalitso Mphasa and Rachel Banda.
+
+Diagnostic bench microbiology of blood and CSF culture: MLW Microbiology Department.
+
+Sputum Xpert testing and mycobacterial blood culture: Malawi College of Medicine TB laboratory.
+
+Library preparation, whole genome sequencing, post sequencing archiving: Wellcome Sanger Institute pipeline and pathogen informatics team.
+
+Bioinformatics training and support with bioinformatic analysis: Mat Beale and Nick Thomson at the Wellcome Sanger Institute 
+
+Statistical support: Brian Faragher and Marc Henrion.
+

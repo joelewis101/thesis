@@ -1,0 +1,20 @@
+# Presentations and publications arising from thesis {-}
+\chaptermark{Presentations and publications}
+
+## Peer reviewed journal articles {-}
+
+Lewis JM, Henrion, M, Rylance J. _Validity of the qSOFA Score in Low- and Middle-Income Countries._ **JAMA** 2018;320(19):2038-2039
+
+Lewis JM, Feasey NA, Rylance J. _Aetiology and outcomes of sepsis in adults in sub-Saharan Africa: a systematic review and meta-analysis._ **Critical Care** 2019;23(1):212
+
+Barr D$^{*}$, Lewis JM$^{*}$, Feasey NA, Andrews B, Kelly P, Lakhi S et al. _Mycobacterium tuberculosis blood stream infection prevalence, diagnosis, and mortality hazard in HIV-positive adults: a systematic review and meta-analysis of individual patient data_ **Lancet Infectious Diseases** (under review)
+
+$^{*}$ Joint first author
+
+Lewis JM, Abouyannis M, Katha G, Nyirenda M, Chatsika, G, Feasey NA, Rylance J. _Population incidence and mortality of sepsis in an urban African setting 2013-2016_ **Clinical Infectious Diseases** (under review).
+
+Lewis JM, Lester R, Garner P, Feasey NA. _Gut mucosal colonisation with extended-spectrum beta-lactamase producing Enterobacteriaceae in sub-Saharan Africa: a systematic review and meta-analysis_ **Wellcome Open** (under review).
+
+## Oral presentations {-}
+
+## Posters {-}
