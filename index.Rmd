@@ -39,11 +39,15 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r child = 'misc_rmds/dedication.Rmd'}
 ```
 
+```{r child = 'misc_rmds/collaborators.Rmd'}
+```
+
 ```{r child = 'misc_rmds/abstract.Rmd'}
 ```
 
 ```{r child = 'misc_rmds/ackn.Rmd'}
 ```
+
 
 
 ```{=latex}
