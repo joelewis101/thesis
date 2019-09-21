@@ -16,11 +16,11 @@ September 2019.
 **Chapter 8**: Longitudinal Markov models of ESBL-E carriage  
 **Chapter 9**: Conclusions and further work  
 
-Chapter files are named by their number e.g. 01-intro.Rmd. Sessionifo and references are also .Rmd files.
+Chapter files are named by their number e.g. 01-intro.Rmd. Sessionifo and references are also .Rmd files named such that they are ordered at the end of the thesis.
 
 index.Rmd is the setup file with YAML heading and also calls the .Rmd files for the frontmatter, which are contained in the /misc_rmds folder.
 
-Cleaning scripts are in final_cleaning_scripts; chapter-specific materials (eg figures or .csvs of tables) are in the folders labelled (e.g.) chapter_1. The numbering of these is idiosyncratic (because chapter names and numbers changed during the proces of ), but are referenced in the .Rmd files for each chapter so it should be clear what is what.
+Cleaning scripts are in /final_cleaning_scripts; chapter-specific materials (eg figures or .csvs of tables) are in the folders labelled (e.g.) /chapter_1. The numbering of these is idiosyncratic (because chapter names and numbers changed during the proces of writing the thesis ), but are referenced in the .Rmd files for each chapter so it should be clear what is what.
 
 On the local machine there is is data/ folder, and data is stored on my local machine also elsewhere; this is not pushed to the repo for data protection reasons so a cloned repo will need some work before it generated the thesis. 
 
