@@ -1,7 +1,6 @@
-# Presentations and publications arising from thesis {-}
-\chaptermark{Presentations and publications}
+# Presentations and Publications {-}
 
-## Peer reviewed journal articles {-}
+## Peer reviewed journal articles related to or arising from thesis{-}
 
 Lewis JM, Henrion, M, Rylance J. _Validity of the qSOFA Score in Low- and Middle-Income Countries._ **JAMA** 2018;320(19):2038-2039
 
