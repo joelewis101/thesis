@@ -1,0 +1,24 @@
+# Appendix: R Session Information{-}
+
+To aid reproducability, the version numbers of all packages used in the generation of this thesis are reproduced here using the R _sessionInfo()_ command.
+
+```{r wrap-hook, echo = F, warning = F, }
+library(knitr)
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+
+```{r sessioninfo, echo =F, linewidth = 80}
+sessionInfo() -> a
+sub("Versions/","Versions/ ", a$BLAS) -> a$BLAS
+print(a)
+
+```
