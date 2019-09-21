@@ -8,12 +8,12 @@ September 2019.
 
 **Chapter 1**: Introduction  
 **Chapter 2**: Methods  
-**Chapter 3**: A clinical and microbiological description of sepsis in Blantyre, Malawi 
-**Chapter 4**: Modelling to identify determinants of sepsis mortality 
-**Chapter 5**: ESBL-E carriage in Malawian adults in health and disease
-**Chapter 6**: The genomic landscape of ESBL producing E. coli in Blantyre, Malawi
-**Chapter 7**: Whole genome sequencing to track longitudinal ESBL-E colonisation
-**Chapter 8**: Longitudinal Markov models of ESBL-E carriage
+**Chapter 3**: A clinical and microbiological description of sepsis in Blantyre, Malawi  
+**Chapter 4**: Modelling to identify determinants of sepsis mortality  
+**Chapter 5**: ESBL-E carriage in Malawian adults in health and disease  
+**Chapter 6**: The genomic landscape of ESBL producing E. coli in Blantyre, Malawi  
+**Chapter 7**: Whole genome sequencing to track longitudinal ESBL-E colonisation  
+**Chapter 8**: Longitudinal Markov models of ESBL-E carriage  
 **Chapter 9**: Conclusions and further work  
 
 Chapter files are named by their number e.g. 01-intro.Rmd. Sessionifo and references are also .Rmd files.
