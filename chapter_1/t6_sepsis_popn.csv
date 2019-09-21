@@ -1,6 +1,6 @@
 ﻿Study,Type,Year,Country,Inc. criteria,n,Male,Age,HIV infected,Median CD4
 Jacob 2009,Cohort,2006,Uganda,Severe sepsis,382,156/382 (41%),34.8  (11.2),320/382 (85%),52 (16-131)
-Jacob 2012,Before-after,2006,Uganda,Severe sepsisc,245,95/245 (39%),34 (28-41),207/245 (86%),43 (11-178)
+Jacob 2012,Before-after,2006,Uganda,Severe sepsis,245,95/245 (39%),34 (28-41),207/245 (86%),43 (11-178)
 ,,2008-09,,,426,207/426 (49%),34 (27-40),362/426 (85%),63 (15-178)
 Waitt 2015,Cohort,2008-09,Malawi,Sepsis,213,87/213 (41%),30 (25-39),161/213 (76%),NR
 Ssekitoleko  2011 (1),Cohort,2009,Uganda,Sepsis,96,193/418 (46%),35.1 (12.0),331/418b (83%),NR
