@@ -1,0 +1,3 @@
+bsub.py -q normal --threads 32 -o roarylog20181206.o -e roarylog20181206.e 20 roary roary -f /lustre/scratch118/infgen/team216/jl25/ESCO/assemblies/denovo/assemblyfind_5341/annotation/roary20180612 -s -e -p 32 /lustre/scratch118/infgen/team216/jl25/ESCO/assemblies/denovo/assemblyfind_5341/annotation/*.gff
+
+bsub -o gubbins20181206.o -e gubbins20181206.e -q basement -M8000 -R "select[mem>8000] rusage[mem=8000]" -n16 -R "span[hosts=1]"  'run_gubbins.py --threads 16 ESCO_lanes_excl_contam.txt_Escherichia_coli_str_K-12_substr_MG1655_v3_concatenated.aln'

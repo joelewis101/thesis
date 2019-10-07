@@ -1,0 +1,13 @@
+Looked at checkM and quast output - some assemblies seem contaminatedKraken thinks they are all escos
+Mat has suggested running metaBat
+
+In the meantime run prokka on the others to annotate
+
+./submit_prokka.sh assemblies_for_prokka.txt
+
+first one ran was 26141_1#153.contigs_spades.fa
+check dat schizzle!
+
+Metabat script is as per mat
+
+~mb29/bsub_scripts/run_MetaBat_on_contaminated_contigs.sh

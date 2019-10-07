@@ -1,0 +1,9 @@
+OK roray just taking too long
+
+Let's try an alignment with maaft
+
+bsub.py -q normal --threads 16 -o roarylog_mafft.o -e roarylog_mafft.e 20 roary roary -f /lustre/scratch118/infgen/team216/jl25/ESCO/assemblies/denovo/assemblyfind_5341/annotation/roary_maaft -s -e --mafft -p 16 /lustre/scratch118/infgen/team216/jl25/ESCO/assemblies/denovo/assemblyfind_5341/annotation/*.gff
+
+and
+
+bsub.py -q long --threads 16 -o roarylog_mafft_long.o -e roarylog_mafft_long.e 20 roary roary -f /lustre/scratch118/infgen/team216/jl25/ESCO/assemblies/denovo/assemblyfind_5341/annotation/roary_maaft_long -s -e --mafft -p 16 /lustre/scratch118/infgen/team216/jl25/ESCO/assemblies/denovo/assemblyfind_5341/annotation/*.gff

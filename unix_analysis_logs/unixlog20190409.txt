@@ -1,0 +1,105 @@
+classifying contigs fo real
+
+makeblastdb -in all_dassism_assemblies.fa -title dassim_assemblies -dbtype nucl -out dassim_assemblies
+
+
+blast
+
+blastn -db dassim_assemblies -query amr_genes/CTXM-15.fa -outfmt 10 > ctxm15contigs.csv
+
+pull contig names
+
+make sure we only have proper ones, as per ariba
+n = 318
+
+index with fastaindex
+
+fastaindex -f all_dassism_assemblies.fa -i all_dassism_assemblies.fa.index 
+
+fastafetch -f DAS1166Y.fa -i fastaindex.in -q ctxmcont.csv -F > ctxmcont.fa  
+
+submit cd-hit-est to cluster
+
+bsub -o cdhit.o%J -e cdhit.e%J -J cdhit -M4000 -R "select[mem>4000] rusage[mem=4000]" -n4 -R "span[hosts=1]" "/nfs/users/nfs_j/jl25/executables/cdhit/cd-hit-est -g 1 -i ctxm15_contigs.fa -o ctxm15.cdhit"  
+
+Had to make a new cd-hit-est with bigger max seq
+
+CTXM 27
+
+blastn -db dassim_assemblies -query amr_genes/CTXM-27.fa -outfmt 10 > ctxm27contigs.csv 
+
+restrict to those that are a true match and crossref with ariba
+n= 79
+
+fastafetch -f all_dassism_assemblies.fa -i all_dassism_assemblies.fa.index -q ctxm27/ctxm27contigs.txt -F > ctxm27/ctxm27contigs.fa 
+
+bsub -o cdhit27.o%J -e cdhit27.e%J -J cdhit27 -M2000 -R "select[mem>2000] rusage[mem=2000]" -n4 -R "span[hosts=1]" "/nfs/users/nfs_j/jl25/executables/cdhit/cd-hit-est -g 1 -i ctxm27contigs.fa -o ctxm27.cdhit"  
+
+###  SHV 12
+
+blastn -db dassim_assemblies -query amr_genes/SHV-12.fa -outfmt 10 > shv12contigs.csv
+
+
+fastafetch -f all_dassism_assemblies.fa -i all_dassism_assemblies.fa.index -q shv12/shv12contigs.txt -F > shv12/shv12contigs.fa 
+
+
+bsub -o cdhit12.o%J -e cdhit12.e%J -J cdhit27 -M2000 -R "select[mem>2000] rusage[mem=2000]" -R "span[hosts=1]" "/nfs/users/nfs_j/jl25/executables/cdhit/cd-hit-est -g 1 -i shv12contigs.fa -o shv12.cdhit"
+
+# CTXM-14
+
+blastn -db dassim_assemblies -query amr_genes/CTXM-14.fa -outfmt 10 > ctxm14contigs.csv
+
+fastafetch -f all_dassism_assemblies.fa -i all_dassism_assemblies.fa.index -q ctxm14/ctxm14contigs.txt -F > ctxm14/ctxm14contigs.fa  
+
+bsub -o cdhit14.o%J -e cdhit14.e%J -J cdhit14 -M2000 -R "select[mem>2000] rusage[mem=2000]" -R "span[hosts=1]" "/nfs/users/nfs_j/jl25/executables/cdhit/cd-hit-est -g 1 -i ctxm14contigs.fa -o ctxm14.cdhit"
+
+# CTXM9
+
+blastn -db dassim_assemblies -query amr_genes/CTXM-9.fa -outfmt 10 > ctxm9contigs.csv
+
+fastafetch -f all_dassism_assemblies.fa -i all_dassism_assemblies.fa.index -q ctxm9/ctxm9contigs.txt -F > ctxm9/ctxm9contigs.fa 
+
+ 
+bsub -o cdhit9.o%J -e cdhit9.e%J -J cdhit9 -M2000 -R "select[mem>2000] rusage[mem=2000]" -R "span[hosts=1]" "/nfs/users/nfs_j/jl25/executables/cdhit/cd-hit-est -g 1 -i ctxm9contigs.fa -o ctxm9.cdhit"
+
+# CTXM 3
+
+blastn -db dassim_assemblies -query amr_genes/CTXM-3.fa -outfmt 10 > ctxm3contigs.csv
+
+fastafetch -f all_dassism_assemblies.fa -i all_dassism_assemblies.fa.index -q ctxm3/ctxm3contigs.txt -F > ctxm3/ctxm3contigs.fa 
+
+bsub -o cdhit3.o%J -e cdhit3.e%J -J cdhit3 -M2000 -R "select[mem>2000] rusage[mem=2000]" -R "span[hosts=1]" "/nfs/users/nfs_j/jl25/executables/cdhit/cd-hit-est -g 1 -i ctxm3contigs.fa -o ctxm3.cdhit"
+
+# TEM-214
+
+blastn -db dassim_assemblies -query amr_genes/TEM-214.fa -outfmt 10 > tem214contigs.csv
+
+fastafetch -f all_dassism_assemblies.fa -i all_dassism_assemblies.fa.index -q tem214/tem214contigs.txt -F > tem214/tem214contigs.fa 
+
+bsub -o cdhit214.o%J -e cdhit214.e%J -J cdhit214 -M2000 -R "select[mem>2000] rusage[mem=2000]" -R "span[hosts=1]" "/nfs/users/nfs_j/jl25/executables/cdhit/cd-hit-est -g 1 -i tem214contigs.fa -o tem214.cdhit"
+
+# CTX-M 16
+
+blastn -db dassim_assemblies -query amr_genes/CTXM-16.fa -outfmt 10 > ctxm16contigs.csv
+
+fastafetch -f all_dassism_assemblies.fa -i all_dassism_assemblies.fa.index -q ctxm16/ctxm16contigs.txt -F > ctxm16/ctxm16contigs.fa 
+
+bsub -o cdhit16.o%J -e cdhit16.e%J -J cdhit16 -M2000 -R "select[mem>2000] rusage[mem=2000]" -R "span[hosts=1]" "/nfs/users/nfs_j/jl25/executables/cdhit/cd-hit-est -g 1 -i ctxm16contigs.fa -o ctxm16.cdhit"  
+
+# CTXM64
+
+blastn -db dassim_assemblies -query amr_genes/CTXM-64.fa -outfmt 10 > ctxm64contigs.csv
+
+fastafetch -f all_dassism_assemblies.fa -i all_dassism_assemblies.fa.index -q ctxm64/ctxm64contigs.txt -F > ctxm64/ctxm64contigs.fa 
+
+bsub -o cdhit64.o%J -e cdhit64.e%J -J cdhit64 -M2000 -R "select[mem>2000] rusage[mem=2000]" -R "span[hosts=1]" "/nfs/users/nfs_j/jl25/executables/cdhit/cd-hit-est -g 1 -i ctxm64contigs.fa -o ctxm64.cdhit"   
+
+# CTXM1
+
+blastn -db dassim_assemblies -query amr_genes/CTXM-1.fa -outfmt 10 > ctxm1contigs.csv
+
+fastafetch -f all_dassism_assemblies.fa -i all_dassism_assemblies.fa.index -q ctxm1/ctxm1contigs.txt -F > ctxm1/ctxm1contigs.fa  
+
+
+
+

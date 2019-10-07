@@ -1,0 +1,36 @@
+OK, so:
+
+I looked at the contaminated contigs after runnig metabat
+N50 increases in all cases - this is because mat’s metabat script ditches small comntigs
+In all cases, coverage AND contamination decrease,  - is this also just a small contig effect?
+
+Regardless, two questions:
+
+1) Why is this happening? I guess 2 x ESCOs in one sample? CHeck for heterozygosity in these samples
+
+2) What do we do with these samples - they can’t go into a core genome phylogeny cos will mess up Roary
+
+So, plan:
+
+1) Check these samples for heterozygosity
+2) Roary on annotations *excluding* these samples and build a core genome phylogeny
+3) Make a multiple alignment file and tree using maps to reference - will need to run Gubbins first to account for recombination
+
+*** Script records
+
+pf snp --type file --id ESCO_lanes.txt -p 
+
+To make the multiple alignment
+
+Gubbins
+
+bsub -q normal -M8000 -R "select[mem>8000] rusage[mem=8000]" -n16 -R "span[hosts=1]"  'run_gubbins.py --threads 16 ESCO_lanes.txt_Escherichia_coli_str_K-12_substr_MG1655_v3_concatenated.aln'
+
+It seems that some of the annotations didn’t work for some reason - and I messed up the log files so don’t know why.
+
+Rerun the annotations for those that failed with proper logfiles this time
+
+../submit_prokka.sh contigs_with_missing_annotation.txt /lustre/scratch118/infgen/team216/jl25/ESCO/assemblies/denovo/assemblyfind_5341
+
+From the /annotation directory
+

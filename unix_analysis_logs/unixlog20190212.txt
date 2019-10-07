@@ -1,0 +1,46 @@
+# Aim: 
+
+# wd is /lustre/scratch118/infgen/team216/jl25/ESCO/assemblies/denovo/assemblyfind_5341/classify_contigs/first_go
+
+1) Use BLAST+ to identify contigs containing eg CTX-M 15
+
+# Put DAS1096U contigs in 
+
+#ie 209, 296,210,211
+cat *.fa > DAS1096U.fa \
+#make balst db
+
+makeblastdb -in DAS1096U.fa -title db -dbtype nucl -out db
+
+#BLAST aginast CTXM15 (from CARD)
+
+blastn -db db -query res_genes/CTXM15.fa -outfmt 10 > ctxm15contigs.csv  
+# get contig names
+cat ctxm15contigs.csv | cut -d ',' -f 2 > ctxm15contigs.txt
+
+
+# use fastafetch to get fastas
+#make index
+fastaindex -f DAS1096U.fa -i fastaindex.in
+#get em 
+fastafetch -f DAS1166Y.fa -i fastaindex.in -q ctxmcont.csv -F > ctxmcont.fa   
+
+##
+
+
+2) cd-hit-est to cluster
+
+cd-hit-est -i ctxmcont.fa -o clust
+
+et voila 
+
+
+## MOve on to real thing
+
+Thre are a bunch of < 100% matches - on checking these are CTXM-3.
+
+Need to remove - done with R
+
+
+
+

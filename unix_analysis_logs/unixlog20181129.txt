@@ -1,0 +1,13 @@
+Prokka annotations seem to have worked 
+
+RUn Roary 
+
+bsub.py --threads 16 -o roarylog.o -e roarylog.e 20 roary create_pan_genome -p 16 /lustre/scratch118/infgen/team216/jl25/ESCO/assemblies/denovo/assemblyfind_5341/annotation/*.gff
+
+But Gubbins was killed after exceeding the time, looked like it was killed after max time on normal queue. Is this cos I accidentally included the contaminated lanes. I guess that would make it hard to build a tree and find recombinations
+
+So strip those contam ones
+
+rerun
+
+bsub --e gubbins.e -o gubbins.o -q normal -M8000 -R "select[mem>8000] rusage[mem=8000]" -n16 -R "span[hosts=1]"  'run_gubbins.py --threads 16 ESCO_lanes_excl_contam.txt_Escherichia_coli_str_K-12_substr_MG1655_v3_concatenated.aln'

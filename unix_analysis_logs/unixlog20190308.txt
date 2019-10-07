@@ -1,0 +1,17 @@
+So I am making an interim tree, whilst waiting for all the final sequences
+
+460 genomes - 4 velvet annotations. There will be more as the weird ones that failed come through - but tree topology is unlikely to change.
+
+trying to get a more reproducuble workflow
+
+provide file of lanes -> pf annotatio -> roary
+
+bsub.py -q long --threads 32 30 roary roary -f /lustre/scratch118/infgen/team216/jl25/final_analysis/20190308all_DASSIM_esco/annotationfind_included_lanes.txt/roary -s -e --mafft -p 32 /lustre/scratch118/infgen/team216/jl25/final_analysis/20190308all_DASSIM_esco/annotationfind_included_lanes.txt/*.gff
+
+and
+
+bsub.py -q long --threads 16 32 roary roary -f /lustre/scratch118/infgen/team216/jl25/final_analysis/20190309all_DASSIM_esco_plus_musicha/roary -s -e --mafft -p 20 /lustre/scratch118/infgen/team216/jl25/final_analysis/20190309all_DASSIM_esco_plus_musicha/*.gff
+
+try this - above takin tooooo long
+
+bsub.py -q long --threads 20 20 roary roary -f /lustre/scratch118/infgen/team216/jl25/final_analysis/20190308all_DASSIM_esco/annotationfind_included_lanes.txt/roary -s -e --mafft -p 20 /lustre/scratch118/infgen/team216/jl25/final_analysis/20190308all_DASSIM_esco/annotationfind_included_lanes.txt/*.gff

@@ -1,0 +1,10 @@
+roary again killed after reaching long queue limit
+boooo
+
+resubmitted with more cores - 24
+
+subsmitted alignments for plasmid: 
+
+bsub -o mafft.o -e mafft.e -J maaft -q normal -M6000 -R 'select[mem>6000] rusage[mem=6000]' "mafft --maxiterate 1000 /lustre/scratch118/infgen/team216/jl25/NDM/allfastas.fasta > /lustre/scratch118/infgen/team216/jl25/NDM/maaft_alignment.fasta"
+
+bsub -o muscle.o -e muscle.e -J musc -q normal -M6000 -R 'select[mem>6000] rusage[mem=6000]' "muscle -in /lustre/scratch118/infgen/team216/jl25/NDM/allfastas.fasta -out /lustre/scratch118/infgen/team216/jl25/NDM/alignment.fasta"

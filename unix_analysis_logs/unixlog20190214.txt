@@ -1,0 +1,22 @@
+# woooooo DASSIM 2 data
+
+set spades going 
+
+bacteria_assembly_and_annotation -t study -i 5510 -assembler spades 
+
+and
+
+~avt/Scripts/run_kraken/run_kraken.py -f read_filenames_1.txt -o kraken  
+
+I think QC runs automatically like once the reads hit the drive - let's wait and see
+
+
+### also - I'm still worried about misclassification of cd-hit-est
+
+try using accurate mode 
+
+# id different but DAS1096U still doesnt have one single thing
+I think I need to do ariba or SRST2 to see for sure - but this will take ages
+# leave it till my kraken jobs are donr
+
+# for now - look at CTXM-27

@@ -1,0 +1,8 @@
+## kraken running, assemblies are coming through
+
+can also do mash to look for crazy outliers
+
+PLAN
+Run check m and quast once assemblies finished
+Run ariba (SRST2 and MLST)
+Make mash sketch

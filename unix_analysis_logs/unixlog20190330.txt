@@ -1,0 +1,43 @@
+473 DASSIM genomes - woop
+
+bsub.py -q long --threads 16 20 roary roary -f /lustre/scratch118/infgen/team216/jl25/final_analysis/20190319_inc_new_D2/all_DASSIM_esco/annotation/roary -s -e --mafft -p 16 /lustre/scratch118/infgen/team216/jl25/final_analysis/20190319_inc_new_D2/all_DASSIM_esco/annotation/*.gff
+
+bsub -q long -o roary.o%J -e roary.e%J -J roary -n16 -R "span[hosts=1]" -M20000 -R "select[mem>20000] rusage[mem=20000]" "roary -f /lustre/scratch118/infgen/team216/jl25/final_analysis/20190319_inc_new_D2/all_DASSIM_esco/annotation/roary -s -e --mafft -p 16 /lustre/scratch118/infgen/team216/jl25/final_analysis/20190319_inc_new_D2/all_DASSIM_esco/annotation/*.gff"
+
+
+and gubbins on mapping
+
+bsub -q basement -o gubbins.o%J -e gubbins.e%J -M32000 -R "select[mem>32000] rusage[mem=32000]" -n16 -R "span[hosts=1]" 'run_gubbins.py --threads 16 DASSIM_esco_K12_MG1655_map.aln'
+
+and roary on 566 musicha / DASSIM genomes
+
+bsub.py -q long --threads 16 20 roary roary -f /lustre/scratch118/infgen/team216/jl25/final_analysis/20190319_inc_new_D2/all_DASSIM_esco_plus_musicha/annotations/roary -s -e --mafft -p 16 /lustre/scratch118/infgen/team216/jl25/final_analysis/20190319_inc_new_D2/all_DASSIM_esco_plus_musicha/annotations/*.gff
+
+
+bsub -q long -o roary_m.o%J -e roary_m.e%J -J roary_m -n16 -R "span[hosts=1]" -M32000 -R "select[mem>32000] rusage[mem=32000]" "roary -f /lustre/scratch118/infgen/team216/jl25/final_analysis/20190319_inc_new_D2/all_DASSIM_esco/annotation/roary -s -e --mafft -p 16 /lustre/scratch118/infgen/team216/jl25/final_analysis/20190319_inc_new_D2/all_DASSIM_esco/annotation/*.gff"
+
+and roary on ALL OF THEM MWAHAHAHAHAHA
+
+bsub.py -q basement --threads 16 40 roaryall roary -f /lustre/scratch118/infgen/team216/jl25/final_analysis/20190319_inc_new_D2/all_ESCO/annotations/roary -s -e --mafft -p 16 /lustre/scratch118/infgen/team216/jl25/final_analysis/20190319_inc_new_D2/all_ESCO/annotations/*.gff
+
+too long!
+
+do it as a bsub
+
+bsub -q basement -o roaryall.o%J -e roaryall.e%J -J roaryall -M40000 -R "select[mem>40000] rusage[mem=40000]" -n16  -R "span[hosts=1]" "roary -f /lustre/scratch118/infgen/team216/jl25/final_analysis/20190319_inc_new_D2/all_ESCO/annotations/roary -s -e --mafft -p 16 /lustre/scratch118/infgen/team216/jl25/final_analysis/20190319_inc_new_D2/all_ESCO/annotations/*.gff"
+
+works
+
+Toodle pip!
+
+where did musicha go?
+  
+GTR+F+ASC+R5 
+
+this without bs
+
+bsub.py --threads 16 24 iqtree_all iqtree -s -nt AUTO -ntmax 16 -mem 24G -m GTR+F+ASC+R5 -bb 1000  
+  
+
+
+

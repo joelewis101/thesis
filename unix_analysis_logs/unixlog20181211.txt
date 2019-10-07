@@ -1,0 +1,25 @@
+Roary worked with MAAFT alignment!
+
+Now build tree with iqtree
+
+fconst id a c g t
+
+bsub.py --threads 4 4 iqtree100bs /nfs/users/nfs_m/mb29/programs/executables/iqtree -s core_gene_aligmnet_snp_sites.aln -nt AUTO -ntmax 4 -mem 4G -m MFP+ASC -fconst 579054,586567,674917,575967 -bb 100 
+
+didn't work?Try this
+
+bsub.py --threads 4 4 iqtree /nfs/users/nfs_m/mb29/programs/executables/iqtree -s core_gene_snp_sites.aln -nt AUTO -ntmax 4 -mem 4G -m MFP+ASC -bb 1000
+
+and snp-dist
+
+bsub -o snps.o -e snps.e -q normal -M8000 snps snp-dists core_gene_alignment.aln 
+
+ggrrrrr iqtree killed - reached lim
+
+submit gain on long iwth more cores
+
+bsub.py -q long --threads 16 8 iqtree1000bs /nfs/users/nfs_m/mb29/programs/executables/iqtree -s core_gene_snp_sites.aln -nt AUTO -ntmax 16 -mem 8G -m MFP+ASC -bb 1000 
+
+try a cheeky faster version with 100 bootstraps only
+
+bsub.py --threads 4 4 iqtree /nfs/users/nfs_m/mb29/programs/executables/iqtree -s core_gene_snp_sites.aln -nt AUTO -ntmax 4 -mem 4G -m MFP+ASC -bb 100

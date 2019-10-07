@@ -1,0 +1,9 @@
+bsub.py -q long --threads 16 16 iqtree1000bs /nfs/users/nfs_m/mb29/programs/executables/iqtree -s core_gene_alignmet_snp_sites.fa -nt AUTO -ntmax 16 -mem 16G -m MFP+ASC -bb 1000    
+
+For musicha tree
+Was killed at 8g for overmen - added 16 now
+
+same command for dassim samples - but 8g mem obv
+
+roary on all samples killed for overmem (had 24 requested)
+

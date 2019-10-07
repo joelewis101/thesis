@@ -1,0 +1,10 @@
+gubbins killed *again* for being too long
+
+roary worked yey
+
+submit gubbins on basement when I can
+It wom’\t let me no wfor some reason - too may users.
+
+So i’ve tried doubling the numebr of cores:
+
+bsub -o gubbins.o -e gubbins.e -q basement -M8000 -R "select[mem>8000] rusage[mem=8000]" -n32 -R "span[hosts=1]"  'run_gubbins.py --threads 32 ESCO_lanes_excl_contam.txt_Escherichia_coli_str_K-12_substr_MG1655_v3_concatenated.aln'

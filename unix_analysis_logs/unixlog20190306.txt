@@ -1,0 +1,21 @@
+Woooo quast and checkm have run
+
+import and look at stats
+
+The other job for today is to collate a list of the genomes that will be context for the tree
+
+See /Users/joelewis/Documents/joe_macbook_backup2019/Sanger/DASSIM2/read_screen/bracken_on_reads.html for details of QC
+
+Three groups - 1) not esco 2) assemblies failed 3) contaminated
+
+run metabat on group 3 and see how it gets on
+
+bash ~/scripts/run_metabat2.sh DASSIM2_contam_contigs.txt /lustre/scratch118/infgen/team216/jl25/DASSIM2/denovoassembly/20190305/assemblyfind_5510 /lustre/scratch118/infgen/team216/jl25/DASSIM2/reads/pathfind_5510
+
+**I THINK MAT’S SCRIPT HAS AN ERROR - ONLY EVER GET ONE BIN ***
+**** GAAAAAAAAAH ***
+
+Modified it - is a path thing maybe?
+
+~/scripts/run_MetaBat_on_contaminated_contigs.sh 28099_1#122 28099_1#122.mb /lustre/scratch118/infgen/team216/jl25/DASSIM2/denovoassembly/20190305/assemblyfind_5510/28099_1#122.contigs_spades.fa /lustre/scratch118/infgen/team216/jl25/DASSIM2/reads/pathfind_5510/28099_1#122_1.fastq.gz /lustre/scratch118/infgen/team216/jl25/DASSIM2/reads/pathfind_5510/28099_1#122_2.fastq.gz
+

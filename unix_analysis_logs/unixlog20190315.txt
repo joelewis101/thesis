@@ -1,0 +1,10 @@
+
+iqtree killed for over time
+
+resbmit on basement - will checkpoint
+
+bsub.py -q basement --threads 16 16 iqtree1000bs /nfs/users/nfs_m/mb29/programs/executables/iqtree -s core_gene_alignmet_snp_sites.fa -nt AUTO -ntmax 16 -mem 16G -m MFP+ASC -bb 1000
+
+roary still pending :-(
+
+bsub -q normal -o snp-dist.o.%J -e snp-dist.e%J -R"select[mem>1000] rusage[mem=1000]" -M1000 "snp-dists -c core_gene_alignment.aln > snp_dists.csv"

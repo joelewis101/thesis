@@ -1,0 +1,37 @@
+# The mystery of the non running kraken/bracken files
+
+
+There are 708 fastqs in DASSIM 2 = 354 samples
+
+Only 353 bracken samples in kraken_ouput
+
+1 failed to run - and that stopped the nice summary being made
+
+Let’s get the code the kraken script uses and run it
+
+It’s python ~avt/Scripts/run_kraken/bin/kraken_parser.py 
+
+Throws a bunch of awk broken pipe errors but on checking these were in the dASSIM 1 log files too
+
+Spits out the .tsv we want
+
+woo 
+
+The one that did;t run
+
+cut -f 1 Bracken_species_composition.tsv > bracken_files_run_successfully.txt
+ls | grep -f bracken_files_run_successfully.txt -v
+
+is 
+
+28099_2#16_1.fastq.gz 
+
+Now check QC stats
+
+pf data --type study --id 5510 --stats
+
+generates
+
+5510.pathfind_stats.csv
+
+Then let’s play woop

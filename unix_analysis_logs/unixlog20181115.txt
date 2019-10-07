@@ -1,0 +1,11 @@
+15 nov 2018
+
+Spades assemblies still not done
+made similarity matrix of references and reads - Ecoli str K12 (as per patrick) most suitable
+
+Requested via QC grind to assemble to this ref
+
+Started with ska while that is going
+
+put ska in 
+/lustre/scratch118/infgen/team216/jl25/ska/SKA/bin/ska

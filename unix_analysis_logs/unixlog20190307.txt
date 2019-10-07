@@ -1,0 +1,16 @@
+So looks like metabat worked for 2 samples
+
+run quast and checkm on both
+
+bsub.py --threads 12 32 checkm ~mb29/bsub_scripts/checkm.sh /lustre/scratch118/infgen/team216/jl25/DASSIM2/denovoassembly/20190305/assemblyfind_5510/28099_2#52.metabat/28099_2#52.metabat/
+
+~/scripts/submit_quast2.sh /lustre/scratch118/infgen/team216/jl25/DASSIM2/denovoassembly/20190305/assemblyfind_5510/28099_2#52.metabat/28099_2#52.metabat
+
+~/scripts/submit_quast2.sh /lustre/scratch118/infgen/team216/jl25/DASSIM2/denovoassembly/20190305/assemblyfind_5510/28099_1#276.metabat/28099_1#276.metabat/
+
+One of them has only 1 contig in the second bin
+The other looks like it has worked
+
+Leave for now and talk this over with mat
+
+ 

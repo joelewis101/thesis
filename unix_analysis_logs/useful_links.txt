@@ -1,0 +1,26 @@
+
+Links to scripts:
+http://mediawiki.internal.sanger.ac.uk/index.php/Scripts_supported_by_Pathogen_Informatics#Chado
+ 
+http://mediawiki.internal.sanger.ac.uk/index.php/Team_81
+ 
+Sequencescape (for sequencing status):
+http://production.psd.sanger.ac.uk:6600
+ 
+QCgrind (for pathogen sequencing management):
+http://pathweb.internal.sanger.ac.uk:8000/cgi-bin/overview.pl
+
+
+scripts
+
+~avt/Scripts/run_kraken/run_kraken.py
+
+multiple_mappinga_to_bam_.py
+
+pathogen genomics github
+https://github.com/sanger-pathogens/pathogen-informatics-training
+
+my luster user directory
+
+/lustre/scratch118/infgen/team216/jl25/
+

@@ -1,0 +1,17 @@
+This combines the fastq’s and makes sketch files with the identifier from -I 
+
+zcat ../26141_1#189_1.fastq.gz ../26141_1#189_2.fastq.gz | mash sketch -o 26141_1#189.fastq -I 26141_1#189 -
+
+This sticks em together
+
+mash paste -o comb 26141_1#188.fastq.msh 26141_1#189.fastq.msh 
+
+Then similarity matrix from
+
+mash dist comb.msh comb.msh 
+
+So need to make a script to generate mash for each fastq
+
+Then mash paste
+
+Then mash

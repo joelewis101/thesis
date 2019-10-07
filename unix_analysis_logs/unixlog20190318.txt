@@ -1,0 +1,11 @@
+
+Extra assemblies are done
+
+QC then make final trees etc
+
+~/scripts/submit_quast2.sh /lustre/scratch118/infgen/team216/jl25/DASSIM2/20190318/extra_assemblies
+
+and 
+
+bsub.py --threads 6 40 checkm ~/scripts/checkm.sh /lustre/scratch118/infgen/team216/jl25/DASSIM2/20190318/extra_assemblies
+

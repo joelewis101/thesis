@@ -1,0 +1,9 @@
+Spades assemplies finished!
+Ran checkm with mat’s script
+
+bsub.py --threads 12 32 checkm ~mb29/bsub_scripts/checkm.sh /lustre/scratch118/infgen/team216/jl25/ESCO/assemblies/denovo/assemblyfind_5341
+
+Need to run quast
+
+Used script submit_quast.sh
+

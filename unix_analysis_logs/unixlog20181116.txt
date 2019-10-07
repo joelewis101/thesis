@@ -1,0 +1,27 @@
+assemble .ska files with default commands (ie not -v)
+
+
+
+
+Make a start on ariba
+
+Correct command:
+
+bsub -o  /lustre/scratch118/infgen/team216/jl25/ESCO/reads/ariba/ariba_on_srst2/runlogs/$name.o -e /lustre/scratch118/infgen/team216/jl25/ESCO/reads/ariba/ariba_on_srst2/runlogs/$name.e -R 'select[mem>500] rusage[mem=500]' -M500 "ariba run /lustre/scratch118/infgen/team216/jl25/ESCO/reads/ariba/ariba.ref.srst2.out ${array1[index]} ${array2[index]} /lustre/scratch118/infgen/team216/jl25/ESCO/reads/ariba/ariba_on_srst2/$name"
+
+
+#########
+
+array1=($(ls -1 /lustre/scratch118/infgen/team216/jl25/ESCO/reads/*_1.fastq*))
+array2=($(ls -1 /lustre/scratch118/infgen/team216/jl25/ESCO/reads/*_2.fastq*))
+
+
+for index in "${!array1[@]}"
+do
+        echo "$index"
+        name=$(basename "${array1[index]}")
+        bsub -o  “/lustre/scratch118/infgen/team216/jl25/ESCO/reads/ariba/runlogs/$name.o” -e “/lustre/scratch118/infgen/team216/jl25/ESCO/reads/ariba/runlogs/$name.e” -R 'select[mem>500] rusage[mem=500]' -M500 "ariba run /lustre/scratch118/infgen/team216/jl25/ESCO/reads/ariba/ariba.ref.srst2.out ${array1[index]} ${array2[index]} /lustre/scratch118/infgen/team216/jl25/ESCO/reads/ariba/$name"
+
+done
+
+In t

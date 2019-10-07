@@ -1,0 +1,43 @@
+
+2018_11_13
+
+Stuff is here
+
+/lustre/scratch118/infgen/team216/jl25
+
+This woz run
+
+~avt/Scripts/run_kraken/run_kraken.py -f readlist.txt -o DASSIM_readscreen
+
+5 samples are klpn
+
+There seems to be quite a lot of shigella - could this just be esco - lets see how this pans out
+
+1 sample has very low number of bases ~ 45Mb and hence coverage (x6)on the reference 
+
+
+Exlude these
+
+KLPN
+26141_1#167
+26141_1#264
+26141_1#269
+26141_1#281
+26141_1#294
+
+Low reads
+26141_1#234
+
+Files to exlcude are in
+
+/lustre/scratch118/infgen/team216/jl25/read_screening_conclusions.txt
+
+All the ESCO fastq’s put in:
+
+/lustre/scratch118/infgen/team216/jl25/ESCO/reads
+
+PLan for tomorrow:
+
+Wait for spades to finish assemblies
+Mash to find best reference genome 
+

@@ -1,0 +1,18 @@
+
+Both roary and gubbins killed for taking too long :-(
+
+Spoke to mat - both likely to be difficult cos lots of diversity
+Try submitting to long queue
+
+PLus - roary 
+
+do NOT split paralogs
+
+So -gubbins submitted by:
+
+bsub -o gubbins.o -e gubbins.e -q basement -M8000 -R "select[mem>8000] rusage[mem=8000]" -n16 -R "span[hosts=1]"  'run_gubbins.py --threads 16 ESCO_lanes_excl_contam.txt_Escherichia_coli_str_K-12_substr_MG1655_v3_concatenated.aln'
+
+and roary by:
+
+bsub.py -q long --threads 16 -o roarylog.o -e roarylog.e 20 roary roary -f /lustre/scratch118/infgen/team216/jl25/ESCO/assemblies/denovo/assemblyfind_5341/annotation/roary -s -p 16 /lustre/scratch118/infgen/team216/jl25/ESCO/assemblies/denovo/assemblyfind_5341/annotation/*.gff
+

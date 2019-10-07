@@ -1,0 +1,60 @@
+Now then
+
+Looking at 28099_2#16_1.fastq.gz the basic qc stats seem ok (maps to K12 ok)
+
+SO why did kraken fail?
+
+Try running again
+
+*WAIT* - those fastqs seem to have disappeared. Have mailed path-help. So this is what made the kraken run fall over
+
+**** edit ***** they don’t know why - have requested re-import
+
+Carry on then with QC for the other files
+
+These are recorded ads QC Failed
+					gen.cov	mapped	depth
+28099_1#315     DASSSIM27647563	?? can’t see on qc grind		           
+28099_1#329     DASSSIM27647372      	 ?? noqc
+28099_2#101     DASSSIM27647608	?? can’t see on qc grind	           
+28099_2#138     DASSSIM27647617           
+28099_2#154     DASSSIM27647621           
+28099_2#174     DASSSIM27647626           
+28099_2#178     DASSSIM27647627           
+28099_2#182     DASSSIM27647628     
+
+QCgrind seems to stop at 548 and says 
+Software error:
+Illegal division by zero at /var/www/cgi-bin/qc_grind.pl line 780, <DATA> line 788.    
+
+These are still running
+
+     Lane.Name                   QC
+112 28099_1#237 Running (02-03-2019)
+190 28099_1#335 Running (16-02-2019)
+193 28099_1#339 Running (02-03-2019)
+200 28099_1#347 Running (15-02-2019)
+
+Funny business here. On the whole the Bracken runs look fine for these samples ?????????? I guess it has stopped the assembly pipeline also. Have mailed path-help
+
+**** edit *** they say there was a problem with the pipeline - they have set them running again
+
+Meanwhile, run checkM on the assemblies that have been done
+
+bsub.py --threads 12 32 checkm ~mb29/bsub_scripts/checkm.sh /lustre/scratch118/infgen/team216/jl25/DASSIM2/denovoassembly/20190305/assemblyfind_5510
+
+And quast
+
+~/scripts/submit_quast2.sh /lustre/scratch118/infgen/team216/jl25/DASSIM2/denovoassembly/20190305/assemblyfind_5510/
+
+checkm killed after reaching mem limit
+
+rerun with 40Gb
+
+quast also killed
+rerun with 10gb
+*sigh*
+
+
+
+  
