@@ -1,0 +1,50 @@
+Joe Lewis PhD corrections
+
+Page 13, italicise mycobacterium tuberculosis
+Page 24, section 6.6 introduce gap between ST131 and ST410
+Page 30, paragraph 3: Systematic review reference (?Ref 15)
+Page 35, Table: Ssekitoleko 2011 (1) Numbers n=96 or 418?
+Page 40, remove gap from bracket and cryptococcus
+Page 40, add gap between, and Leptospira
+Page 41, italicise histoplasma
+Page 46, italicise the S. of S. Typhi
+Page 47, para 1: Missing reference ?26
+Page 51, figure 2.1 italicise the organism names
+Page 53, para 3: “...particular of blaCTX-M gene clusters...” not clear
+Page 53, for IS elements the formatting convention is to italicise the number after the IS, so for the inclusion of IS elements here un-italicise the I and the S, retaining the number italicised
+Page 53, change Coli to coli
+Page 54, para 4: “shole genome” should be whole. CSF sample, other usually...
+Page 55, para4: repeat of extremely.
+Page 58, figure 1.5, italicise the organism names, Not clear from the legend what distinguishes this from Figure 1.7?
+Page 60, italicise the organism names, in the text
+Page 87, add degree to-80 C
+Page 88, add degree symbol to 30C
+Page 87, change Coli to coli
+Page 87, para 2: nay should be any
+Page 90, un-italicise bacillus, diptheroids, and Streptococci
+Page 108, figure 3.4 legend, change culture of tuberculosis from blood to culture of M. tuberculosis (italice)
+Page 108, figure 3.4 legend, italicise mycobacterium tuberculosis
+Page 109, figure 3.5 legend, italicise mycobacterium tuberculosis
+Page 125, un-italicise probability distribution
+Page 127, figure 4.1 legend, add. To the end of the legend
+Page 161, figure 5.6, italicised the organism names
+Page 173, change refernce to reference
+Page 173, italicise Escherichia coli
+Page 173, the Abbreviation ST and sequence type are used in consecutive sentences. Be consistent with the use of abbreviations
+Page 174, italicise the organism names in figure 6.1
+Page 174, figure 6.1 legend, on italicise SPP.
+Page 178, figure legend four figure 6.5, change aglobal to a global
+Page 186, italicise the 26 of I S 26
+Page 192, italicise the 26 of I S 26
+Page 193 change K pneumoniae to K. pneumoniae
+Page 195, section 6.6 appendix, the accession number for the samples are missing for this Sanger data please add.
+Page 221, italicised the numbers and specific IDs of the IS elements
+Page 226, figure 7.4 legend, change decreas ein to decrease in
+Page 227, figure 7.5 legend, change clusetr to cluster
+Page 232, figure 7.7 this needs making larger so the text of the genes is readable, Particularly the antibiotic resistance jeans.
+Page 232, figure 7.7 legend italicise 26 of I S 26 
+Page 233, figure 7.8 legend italicised the 26 of I S 26
+Page 272: 2nd paragraph - Loving with HIV should be living with HIV Ref 27, 135, 136. Meaning of the star?
+Ref 184, 306, 308 are incomplete
+Ref 349 a repeat of 279 
+
