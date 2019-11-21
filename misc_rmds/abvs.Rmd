@@ -146,7 +146,7 @@ mmHg: Millimetres of mercury
 
 mRDT: Malaria rapid diagnostic test
 
-MTB: Mycobacterium tuberculosis
+MTB: _Mycobacterium tuberculosis_
 
 MWK: Malawian Kwacha
 
