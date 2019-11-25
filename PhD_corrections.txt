@@ -3,22 +3,62 @@ Joe Lewis PhD corrections
 Following viva 11th Nov
 
 Page 13, italicise mycobacterium tuberculosis
+Done
+
+
 Page 24, section 6.6 introduce gap between ST131 and ST410
+Done
+
 Page 30, paragraph 3: Systematic review reference (?Ref 15)
+Done
+
+
 Page 35, Table: Ssekitoleko 2011 (1) Numbers n=96 or 418?
+The Ssekitoleko (1) paper includes participants from Jacob 2012 and 96 new participants - the proportion of male participants and proportion with HIV is only presented for the whole cohort (n = 418) but outcome data can be extracted for the n=96 new participants. I have added a footnote to the table to clarify this.
+
 Page 40, remove gap from bracket and cryptococcus
+Done
+
 Page 40, add gap between, and Leptospira
+Done
+
 Page 41, italicise histoplasma
+Done
+
 Page 46, italicise the S. of S. Typhi
+Done
+
 Page 47, para 1: Missing reference ?26
+Done
+
 Page 51, figure 2.1 italicise the organism names
+I think this refers to figure 1.2 - the text has been italicised
+
+
 Page 53, para 3: “...particular of blaCTX-M gene clusters...” not clear
+This has been changed to 
+
+"blaCTX-M genes cluster by homology into groups and there is an association between particular blaCTX-M gene clusters and particular insertion sequences, consistent with a hypothesis of multiple mobilisation events."
+
 Page 53, for IS elements the formatting convention is to italicise the number after the IS, so for the inclusion of IS elements here un-italicise the I and the S, retaining the number italicised
+This has been changed as suggested. 
+
 Page 53, change Coli to coli
+Done
+
 Page 54, para 4: “shole genome” should be whole. CSF sample, other usually...
+Done
+
 Page 55, para4: repeat of extremely.
+
+
 Page 58, figure 1.5, italicise the organism names, Not clear from the legend what distinguishes this from Figure 1.7?
+This has been done, and the legends have been expanded to indicate that Figure 1.5 refers to invasive isolates and Figure 1.7 to carriage isolates.
+
+
 Page 60, italicise the organism names, in the text
+Done
+
 Page 87, add degree to-80 C
 Page 88, add degree symbol to 30C
 Page 87, change Coli to coli
