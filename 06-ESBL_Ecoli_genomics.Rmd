@@ -494,7 +494,7 @@ ggarrange(p,
 
 ```
 
-```{r wgs-131vs410-tree, echo = F, warning = F, message = F, fig.scap="Phylogeny of ST131,ST410 and ST167 \\textit{E. coli}.", out.extra='', fig.cap="Subtree of ST410 (A, left) and ST131 (B, right), and ST167 (C, bottom) showing multiple introductions of ST131 into Malawi, in comparison to a single introduction of clonal ST410 and ST167 clades. Colour of tree tip label indicates isolation from this study (red) or other studies (black), and coloured heatmap indicates country of isolation. Note that the scale bar in C is an order of magnitude different from A and B.", fig.height = 7, fig.width=6}
+```{r wgs-131vs410-tree, echo = F, warning = F, message = F, fig.scap="Phylogeny of ST131, ST410 and ST167 \\textit{E. coli}.", out.extra='', fig.cap="Subtree of ST410 (A, left) and ST131 (B, right), and ST167 (C, bottom) showing multiple introductions of ST131 into Malawi, in comparison to a single introduction of clonal ST410 and ST167 clades. Colour of tree tip label indicates isolation from this study (red) or other studies (black), and coloured heatmap indicates country of isolation. Note that the scale bar in C is an order of magnitude different from A and B.", fig.height = 7, fig.width=6}
 
 treeio::tree_subset(tree, 1864, levels_back = 0) -> st410tree
 
