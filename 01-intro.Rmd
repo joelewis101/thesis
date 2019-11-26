@@ -40,7 +40,7 @@ library(lme4)
 
 
 output = "latex"
-n_bootstraps <- 5
+n_bootstraps <- 1000
 
 ```
 ## Introduction
