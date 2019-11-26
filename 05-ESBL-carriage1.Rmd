@@ -788,6 +788,7 @@ lims_sens <- filter(lims_sens, n_not_na > 0 & !is.na(n_not_na))
 lims_sens %>% 
   select(-c(sample_number, n_not_na)) %>%
   pivot_longer(-organism) %>% 
+  mutate(name = recode(name, Meropenam = "Meropenem")) %>%
   filter(organism %in% c("Escherichia coli","Klebsiella pneumoniae")) %>% 
   mutate(value = as.character(value),
     value = recode_factor(value, 
@@ -800,11 +801,11 @@ lims_sens %>%
   facet_wrap(~ organism, ncol = 1) + 
   scale_fill_manual(values = c("#B3B3B3", "#FC8D62")) +
   theme_bw() + 
-  theme(legend.title = element_blank(),legend.position = "bottom", axis.text = element_text(size = 8)) + 
+  theme(legend.title = element_blank(),legend.position = "bottom", axis.text = element_text(size = 8),strip.text = element_text(face = "italic")) + 
   xlab(element_blank()) +
   ylab("Proportion") -> psens
 
-ggarrange(p.org, psens, ncol = 1, nrow = 2, heights = c(1,2))
+ggarrange(p.org, psens, ncol = 1, nrow = 2, heights = c(1,2), labels = c("A", "B"))
 ```
 
 ### Associations of ESBL colonisation
