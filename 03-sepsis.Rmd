@@ -664,7 +664,7 @@ group_rows(index=c(" " = 1, "TB diagnostics" = 3, "Other diagnostics" = 3)) %>%
 ```
 
 
-```{r sep-euler-plot, echo = F, warning = F, message = F, fig.scap="Venn diagram of positive diagnostic tests", out.extra='', fig.cap="Venn diagram showing overlap of positive diagnostic tests; culture of blood and CSF shown in red, malaria in green and TB diagnostics in blue. The CSF variable in includes either a positive culture for a pathogenic bacteria or positive cryptococcal antigen, BSI a positive aerobic culture of pathogenic bacteria from blood and MTB BSI a positive mycobacterial culture of tuberculosis from blood. BSI: Bloodstream infection, CSF: Cerebrospinal fluid, mRDT: Malaria rapid diagnostic test, MTB BSI: Mycobacterium tuberculosis bloodstream infection, uLAM: urinary lipoarabinomannan.", fig.width = 5, fig.height = 6, out.height = "70%"}
+```{r sep-euler-plot, echo = F, warning = F, message = F, fig.scap="Venn diagram of positive diagnostic tests", out.extra='', fig.cap="Venn diagram showing overlap of positive diagnostic tests; culture of blood and CSF shown in red, malaria in green and TB diagnostics in blue. The CSF variable in includes either a positive culture for a pathogenic bacteria or positive cryptococcal antigen, BSI a positive aerobic culture of pathogenic bacteria from blood and MTB BSI culture of \\textit{M. tuberculosis} from blood. BSI: Bloodstream infection, CSF: Cerebrospinal fluid, mRDT: Malaria rapid diagnostic test, MTB BSI: \\textit{Mycobacterium tuberculosis} bloodstream infection, uLAM: urinary lipoarabinomannan.", fig.width = 5, fig.height = 6, out.height = "70%"}
 
  set.seed (99)
 euler(as.data.frame(sapply(a[c(3:8, 10)], as.logical)), shape = "circle") -> eul
@@ -677,7 +677,7 @@ plot(eul, edges = "grey30", labels = list(labels = c("BSI","CSF","Malaria","MTB 
 ```
 
 
-```{r sep-upset-plot, echo = F, warning = F, message = F, fig.scap="UpSet plot of positive diagnostic tests", out.extra='', fig.cap="UpSet plot of overlap of positive diagnostic tests, showing that for the majority of participants, one test alone is positive. Red colour indicates HIV-infected; black is a composite of HIV-negative and unknown. The CSF variable in includes either a positive culture for a pathogenic bacteria or positive cryptococcal antigen, BSI a positive aerobic culture of pathogenic bacteria from blood and MTB BSI a positive mycobacterial culture of tuberculosis from blood. BSI: Bloodstream infection, CSF: Cerebrospinal fluid, CRAG: Cryptococcal antigen, mRDT: Malaria rapid diagnostic test, MTB BSI: Mycobacterium tuberculosis bloodstream infection, uLAM: urinary lipoarabinomannan.", fig.width = 6, fig.height = 5, out.height = "50%"}
+```{r sep-upset-plot, echo = F, warning = F, message = F, fig.scap="UpSet plot of positive diagnostic tests", out.extra='', fig.cap="UpSet plot of overlap of positive diagnostic tests, showing that for the majority of participants, one test alone is positive. Red colour indicates HIV-infected; black is a composite of HIV-negative and unknown. The CSF variable in includes either a positive culture for a pathogenic bacteria or positive cryptococcal antigen, BSI a positive aerobic culture of pathogenic bacteria from blood and MTB BSI culture of \\textit{M. tuberculosis} from blood. BSI: Bloodstream infection, CSF: Cerebrospinal fluid, CRAG: Cryptococcal antigen, mRDT: Malaria rapid diagnostic test, MTB BSI: \\textit{Mycobacterium tuberculosis} bloodstream infection, uLAM: urinary lipoarabinomannan.", fig.width = 6, fig.height = 5, out.height = "50%"}
 
 
 
