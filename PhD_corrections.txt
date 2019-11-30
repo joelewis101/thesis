@@ -60,33 +60,101 @@ Page 60, italicise the organism names, in the text
 Done
 
 Page 87, add degree to-80 C
+Done
+
 Page 88, add degree symbol to 30C
+Done
+
 Page 87, change Coli to coli
+Done
+
 Page 87, para 2: nay should be any
+Done
+
 Page 90, un-italicise bacillus, diptheroids, and Streptococci
+Done
+
 Page 108, figure 3.4 legend, change culture of tuberculosis from blood to culture of M. tuberculosis (italice)
+Done
+
 Page 108, figure 3.4 legend, italicise mycobacterium tuberculosis
+Done
+
 Page 109, figure 3.5 legend, italicise mycobacterium tuberculosis
+Done
+
 Page 125, un-italicise probability distribution
+Done
+
 Page 127, figure 4.1 legend, add. To the end of the legend
+Done
+
 Page 161, figure 5.6, italicised the organism names
+Done
+
 Page 173, change refernce to reference
+Done
+
+
 Page 173, italicise Escherichia coli
+Done
+
 Page 173, the Abbreviation ST and sequence type are used in consecutive sentences. Be consistent with the use of abbreviations
+Sequence type (ST) has been defined at first use and then referred to as ST throughout in the text.
+
 Page 174, italicise the organism names in figure 6.1
+Done
+
+
 Page 174, figure 6.1 legend, on italicise SPP.
+Done
+
 Page 178, figure legend four figure 6.5, change aglobal to a global
+Done
+
+
 Page 186, italicise the 26 of I S 26
+Done
+
 Page 192, italicise the 26 of I S 26
+Done
+
 Page 193 change K pneumoniae to K. pneumoniae
+Done
+
 Page 195, section 6.6 appendix, the accession number for the samples are missing for this Sanger data please add.
+Done - the accession numbers that were missing are for samples that are not yet published on Genbank - these have been added.
+
+
 Page 221, italicised the numbers and specific IDs of the IS elements
+Done
+
 Page 226, figure 7.4 legend, change decreas ein to decrease in
+Done
+
 Page 227, figure 7.5 legend, change clusetr to cluster
+Done
+
 Page 232, figure 7.7 this needs making larger so the text of the genes is readable, Particularly the antibiotic resistance jeans.
+
+
 Page 232, figure 7.7 legend italicise 26 of I S 26 
+done
+
 Page 233, figure 7.8 legend italicised the 26 of I S 26
-Page 272: 2nd paragraph - Loving with HIV should be living with HIV Ref 27, 135, 136. Meaning of the star?
+done
+
+Page 272: 2nd paragraph - Loving with HIV should be living with HIV 
+This has been changed
+
+Ref 27, 135, 136. Meaning of the star?
+These were typos and have been removed
+
 Ref 184, 306, 308 are incomplete
+184 has been corrected - this was a typo
+306 was a conference abstract and the paper has now been published - the reference has been updated
+308 had page number missed off by accident - this has been added.
+
 Ref 349 a repeat of 279 
+This has been corrected.
 
