@@ -161,7 +161,7 @@ The 473 samples contained 486 ESBL genes (Figure \@ref(fig:wgs-contig-map-to-tre
 
 The _cd-hit_ algorithm selects one member of a cluster (the longest) as the representative. The structure of these representative contigs was explored in an attempt to understand the type of MGE they were likely to represent. The length of the representative clusters was very variable, ranging from 1.8kbp to 905.8kbp, with median (IQR) 46.1kbp (11.1-215.5kbp). The other cluster members were usually fragments of these representative contigs with varying sizes - a median (IQR) 60% (36-100%) of the representative contig length - but had high sequence identity, median (IQR) 100.0% (99.7-100.0%) (Figure \@ref(fig:wgs-contig-stats-plot) in the appendix to this chapter).
 
-I then explored the insertion sequence (IS), AMR gene and plasmid replicon content of the representative contig for each cluster using BLAST against the SRST2, ISfinder and Plasmidfinder databases (Figures  \@ref(fig:wgs-contig-ggenes-plot1) and \@ref(fig:wgs-contig-ggenes-plot2) in the appendix to this chapter). Every ESBL gene was closely associated with at least one IS, commonly ISEcp1, IS26 and IS903B. IS26 was frequently associated with an apparent 108bp fragment of a _catB4_ chloramphenicol resistance determinant. Some ESBL-genes were associated with particular IS; $bla_{CTXM-15}$, $bla_{CTXM-9}$ and $bla_{CTXM-1}$, for example were very commonly associated with ISEcp1, whereas $bla_{SHV-12}$ was associated with IS26. ESBL genes were not infrequently associated with other resistance determinants, including commonly $bla_{CTXM-15}$ with $bla_{TEM-1}$. Plasmid replicons were occasionally identified, including an IncFIB plasmid carrying $bla_{CTXM-15}$ and an IncQ1 plasmid carrying $bla_{CTXM-27}$. It is clear that the same configuration of AMR genes and IS are seen across different contigs, despite a varying backbone, implying historical transposition events. Finally, to assess lineage associations of the identified ESBL-clusters, I mapped the clusters back to the tree, and found that there was often a strong lineage association (Figure \@ref(fig:wgs-contig-map-to-tree)C).
+I then explored the insertion sequence (IS), AMR gene and plasmid replicon content of the representative contig for each cluster using BLAST against the SRST2, ISfinder and Plasmidfinder databases (Figures  \@ref(fig:wgs-contig-ggenes-plot1) and \@ref(fig:wgs-contig-ggenes-plot2) in the appendix to this chapter). Every ESBL gene was closely associated with at least one IS, commonly IS*Ecp1*, IS*26* and IS*903B*. IS*26* was frequently associated with an apparent 108bp fragment of a _catB4_ chloramphenicol resistance determinant. Some ESBL-genes were associated with particular IS; $bla_{CTXM-15}$, $bla_{CTXM-9}$ and $bla_{CTXM-1}$, for example were very commonly associated with IS*Ecp1*, whereas $bla_{SHV-12}$ was associated with IS*26*. ESBL genes were not infrequently associated with other resistance determinants, including commonly $bla_{CTXM-15}$ with $bla_{TEM-1}$. Plasmid replicons were occasionally identified, including an IncFIB plasmid carrying $bla_{CTXM-15}$ and an IncQ1 plasmid carrying $bla_{CTXM-27}$. It is clear that the same configuration of AMR genes and IS are seen across different contigs, despite a varying backbone, implying historical transposition events. Finally, to assess lineage associations of the identified ESBL-clusters, I mapped the clusters back to the tree, and found that there was often a strong lineage association (Figure \@ref(fig:wgs-contig-map-to-tree)C).
 
 ```{r wgs-conig-setup, echo = F, warning = F, message = F}
 
@@ -316,6 +316,7 @@ df.f$direc <- TRUE
 df.f$direc[df.f$sstart > df.f$send] <- FALSE
 
 
+
 df.f15 <- subset(df.f, gene == "CTX-M-15")
 
 # how many to plot
@@ -352,6 +353,10 @@ subset(df.f15.1, pident >= 95) -> df.f15.1
 #levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
 #df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
 
+gsub("-", "", df.f15.1$sseqid) -> df.f15.1$sseqid
+gsub("-", "", df.f15.1$gene) -> df.f15.1$gene
+str_to_upper(df.f15.1$sseqid) -> df.f15.1$sseqid
+
 df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
 
 df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
@@ -360,23 +365,25 @@ df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[orde
 dummies1 <- make_alignment_dummies(
   df.f15.1,
   aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
-  on = "CTX-M-15")
+  on = "CTXM15")
 
 dummies1$direc <- TRUE
 dummies1$type <- NA
 
-df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-1"
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM217"] <- "TEM1"
 
 #df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
 
 #cols <- (hue_pal()(9)[c(1,2,4,6)])
 #cols <- (RColorBrewer::brewer.pal(4,"Set3")[c(4,2,1,3)])
 cat("meh1.02")
-ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) + geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+
+
+ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) + geom_gene_arrow(arrowhead_height = unit(7, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(7,"mm"), alpha = 0.5) +
     geom_blank(data = dummies1) +
-  facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
+  facet_wrap(~ clust.id, scales = "free", ncol =1) + #theme_genes() + 
   #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
-  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_discrete(name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c15
+  geom_gene_label(align = "left", height = unit(30, "mm"), grow = TRUE, min.size = 4) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_discrete(name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c15
 
 
 
@@ -419,18 +426,23 @@ subset(df.f15.1, pident >= 95) -> df.f15.1
 
 df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
 
+gsub("-", "", df.f15.1$sseqid) -> df.f15.1$sseqid
+gsub("-", "", df.f15.1$gene) -> df.f15.1$gene
+str_to_upper(df.f15.1$sseqid) -> df.f15.1$sseqid
+
+
 df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
 #names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
 
 dummies1 <- make_alignment_dummies(
   df.f15.1,
   aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
-  on = "CTX-M-27")
+  on = "CTXM27")
 
 dummies1$direc <- TRUE
 dummies1$type <- NA
 
-df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-1"
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM217"] <- "TEM1"
 
 #df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
 
@@ -439,14 +451,14 @@ df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-1"
 
 # fudge to stop overplotting
 
-df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
+df.f15.1$sseqid[df.f15.1$sseqid == "TN5393"] <- ""
 
 ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
-  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+  geom_gene_arrow(arrowhead_height = unit(7, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(7,"mm"), alpha = 0.5) +
     geom_blank(data = dummies1) +
   facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
   #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
-  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3), name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c27
+  geom_gene_label(align = "right", height = unit(30, "mm"), grow = TRUE, min.size = 4) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3), name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c27
 
 df.f15 <- subset(df.f, gene == "SHV-12")
 
@@ -486,18 +498,24 @@ subset(df.f15.1, pident >= 95) -> df.f15.1
 
 df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
 
+
+gsub("-", "", df.f15.1$sseqid) -> df.f15.1$sseqid
+gsub("-", "", df.f15.1$gene) -> df.f15.1$gene
+str_to_upper(df.f15.1$sseqid) -> df.f15.1$sseqid
+
+
 df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
 #names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
 
 dummies1 <- make_alignment_dummies(
   df.f15.1,
   aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
-  on = "SHV-12")
+  on = "SHV12")
 
 dummies1$direc <- TRUE
 dummies1$type <- NA
 
-df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-1"
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM217"] <- "TEM1"
 
 #df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
 
@@ -506,14 +524,14 @@ df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-1"
 
 # fudge to stop overplotting
 
-#df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
+#df.f15.1$sseqid[df.f15.1$sseqid == "TN5393"] <- ""
 
 ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
-  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+  geom_gene_arrow(arrowhead_height = unit(7, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(7,"mm"), alpha = 0.5) +
     geom_blank(data = dummies1) +
   facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
   #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
-  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.s12
+  geom_gene_label(align = "left", height = unit(30, "mm"), grow = TRUE, min.size = 4) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.s12
 
 
 df.f15 <- subset(df.f, gene == "CTX-M-14")
@@ -554,18 +572,23 @@ subset(df.f15.1, pident >= 95) -> df.f15.1
 
 df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
 
+gsub("-", "", df.f15.1$sseqid) -> df.f15.1$sseqid
+gsub("-", "", df.f15.1$gene) -> df.f15.1$gene
+str_to_upper(df.f15.1$sseqid) -> df.f15.1$sseqid
+
+
 df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
 #names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
 
 dummies1 <- make_alignment_dummies(
   df.f15.1,
   aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
-  on = "CTX-M-14")
+  on = "CTXM14")
 
 dummies1$direc <- TRUE
 dummies1$type <- NA
 
-df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-1"
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM217"] <- "TEM1"
 
 #df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
 
@@ -577,11 +600,11 @@ df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-1"
 #df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
 
 ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
-  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+  geom_gene_arrow(arrowhead_height = unit(7, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(7,"mm"), alpha = 0.5) +
     geom_blank(data = dummies1) +
   facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
   #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
-  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c14
+  geom_gene_label(align = "left", height = unit(30, "mm"), grow = TRUE, min.size = 4) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c14
 
 cat("meh1.4")
 #### ctxm-9
@@ -615,18 +638,23 @@ subset(df.f15.1, pident >= 95) -> df.f15.1
 
 df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
 
+gsub("-", "", df.f15.1$sseqid) -> df.f15.1$sseqid
+gsub("-", "", df.f15.1$gene) -> df.f15.1$gene
+str_to_upper(df.f15.1$sseqid) -> df.f15.1$sseqid
+
+
 df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
 #names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
 
 dummies1 <- make_alignment_dummies(
   df.f15.1,
   aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
-  on = "CTX-M-9")
+  on = "CTXM9")
 
 dummies1$direc <- TRUE
 dummies1$type <- NA
 
-df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-1"
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM217"] <- "TEM1"
 
 #df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
 
@@ -635,14 +663,14 @@ df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-1"
 
 # fudge to stop overplotting
 
-df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
+df.f15.1$sseqid[df.f15.1$sseqid == "TN5393"] <- ""
 
 ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
-  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+  geom_gene_arrow(arrowhead_height = unit(7, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(7,"mm"), alpha = 0.5) +
     geom_blank(data = dummies1) +
   facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
   #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
-  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c9
+  geom_gene_label(align = "left", height = unit(30, "mm"), grow = TRUE, min.size = 4) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c9
 
 ####
 ####
@@ -679,18 +707,23 @@ subset(df.f15.1, pident >= 95) -> df.f15.1
 
 df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
 
+gsub("-", "", df.f15.1$sseqid) -> df.f15.1$sseqid
+gsub("-", "", df.f15.1$gene) -> df.f15.1$gene
+str_to_upper(df.f15.1$sseqid) -> df.f15.1$sseqid
+
+
 df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
 #names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
 
 dummies1 <- make_alignment_dummies(
   df.f15.1,
   aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
-  on = "CTX-M-3")
+  on = "CTXM3")
 
 dummies1$direc <- TRUE
 dummies1$type <- NA
 
-df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-1"
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM217"] <- "TEM1"
 
 #df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
 
@@ -702,11 +735,11 @@ df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-1"
 #df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
 
 ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
-  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm"), alpha = 0.5) +
     geom_blank(data = dummies1) +
   facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
   #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
-  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c3
+  geom_gene_label(align = "left", height = unit(30, "mm"), grow = TRUE, min.size = 4) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c3
 
 ####
 ####
@@ -743,18 +776,22 @@ subset(df.f15.1, pident >= 95) -> df.f15.1
 
 df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
 
+gsub("-", "", df.f15.1$sseqid) -> df.f15.1$sseqid
+gsub("-", "", df.f15.1$gene) -> df.f15.1$gene
+str_to_upper(df.f15.1$sseqid) -> df.f15.1$sseqid
+
 df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
 #names(df.f15.1)[names(df.f15.1) == "typo"] <- "type"
 
 dummies1 <- make_alignment_dummies(
   df.f15.1,
   aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
-  on = "CTX-M-16")
+  on = "CTXM16")
 
 dummies1$direc <- TRUE
 dummies1$type <- NA
 
-df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-1"
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM217"] <- "TEM1"
 
 #df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
 
@@ -766,11 +803,11 @@ df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-1"
 #df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
 
 ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
-  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm"), alpha = 0.5) +
     geom_blank(data = dummies1) +
   facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
   #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
-  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c16
+  geom_gene_label(align = "left", height = unit(30, "mm"), grow = TRUE, min.size = 4) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c16
 
 ####
 ####
@@ -805,6 +842,10 @@ subset(df.f15.1, pident >= 95) -> df.f15.1
 #levels.df.f15.1 <- unique(select(df.f15.1, qseqid, n_clust))
 #df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels = levels.df.f15.1$clust.id[order(levels.df.f15.1$n_clust)])
 
+gsub("-", "", df.f15.1$sseqid) -> df.f15.1$sseqid
+gsub("-", "", df.f15.1$gene) -> df.f15.1$gene
+str_to_upper(df.f15.1$sseqid) -> df.f15.1$sseqid
+
 df.f15.1$qseqid <- factor(df.f15.1$qseqid, levels =  contigs_n$qseqid[order(contigs_n$n_clust, decreasing = T)])
 
 df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[order(contigs_n$n_clust, decreasing = T)])
@@ -813,12 +854,12 @@ df.f15.1$clust.id <- factor(df.f15.1$clust.id, levels =  contigs_n$clust.id[orde
 dummies1 <- make_alignment_dummies(
   df.f15.1,
   aes(xmin = qstart, xmax = qend, y = clust.id, id = sseqid, forward = direc),
-  on = "CTX-M-1")
+  on = "CTXM1")
 
 dummies1$direc <- TRUE
 dummies1$type <- NA
 
-df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-1"
+df.f15.1$sseqid[df.f15.1$sseqid == "TEM217"] <- "TEM1"
 
 #df.f15.1$type[df.f15.1$sseqid == "CTX-M-15"] <- "CTX-M-15"
 
@@ -830,20 +871,23 @@ df.f15.1$sseqid[df.f15.1$sseqid == "TEM-217"] <- "TEM-1"
 #df.f15.1$sseqid[df.f15.1$sseqid == "Tn5393"] <- ""
 
 ggplot(df.f15.1[order(df.f15.1$type, decreasing = T),], aes(xmin = qstart, xmax = qend, y = clust.id, fill = type, label = sseqid, forward = direc)) +
-  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm")) +
+  geom_gene_arrow(arrowhead_height = unit(4, "mm"), arrowhead_width = unit(1, "mm"), arrow_body_height = unit(4,"mm"), alpha = 0.5) +
     geom_blank(data = dummies1) +
   facet_wrap(~ clust.id, scales = "free", ncol =1) + theme_genes() + 
   #theme(legend.position="none") +#  geom_gene_arrow(arrowhead_height = unit(5, "mm"), arrowhead_width = unit(1, "mm")) +
-  geom_gene_label(align = "left",size = 5) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c1
+  geom_gene_label(align = "left", height = unit(30, "mm"), grow = TRUE, min.size = 4) + theme_genes() +  theme(legend.position = "bottom") + scale_fill_manual(values = hue_pal()(3),name = "", labels = c("AMR gene", "Insertion sequence (IS)", "Plasmid replicon") ) + ylab("") -> p.c1
 
-ggarrange(p.c15, p.c27, p.s12, nrow = 3, ncol = 1, heights = c(2,1,0.5), labels = c("A", "B", "C")) -> contigs1.plot
+ggarrange(p.c27, p.s12, nrow = 2, ncol = 1, heights = c(1,0.6), labels = c("A", "B")) -> contigs1.plot
 
 cat("meh2")
 ```
 
 ```{r wgs-contig-ggenes-plot2-setup, echo = F, warning = F, message = F}
 
-ggarrange(p.c14, p.c9, p.c3 , p.c16, p.c1, nrow = 5, ncol = 1, heights = c(.5,.7,.2,.2,.2),labels = c("A", "B", "C", "D", "E")) -> contigs.plot2
+ggarrange(p.c14, p.c9,  nrow = 2, ncol = 1, heights = c(0.71,1),labels = c("A", "B")) -> contigs.plot2
+
+ggarrange( p.c3 , p.c16, p.c1, nrow = 3, ncol = 1, heights = c(1,1,1),labels = c("A", "B", "C")) -> contigs.plot3
+
 
 ```
 
@@ -920,7 +964,7 @@ To answer the question as to what elements (bacteria or MGE) are conserved withi
 
 Having confirmed that there is a signal for within-participant temporal conservation of ESBL-E, I then sought to determine if the sequence clusters and ESBL-clusters were similarly conserved over time, and if so, which was the more conserved. The proportion of within-patient sample pairs that contained the same ESBL-cluster and sequence cluster were significantly greater than would be expected by chance when the time between the samples is less than 35 days for sequence cluster and 32 days for ESBL-cluster (Figure \@ref(fig:wgs-rollprop)A). After this time, the lower confidence interval of the sequence cluster and ESBL-cluster curve crossed the proportion of samples that would be expected to be the same by chance, suggesting that, after 35 or 32 days, the chance of any two within-patient samples having the same sequence cluster or ESBL-cluster (respectively) is the same as if the two samples were randomly picked from the data set without regard to patient. The two curves have a very similar appearance; to address the question of which element is most conserved within an individual - sequence cluster, ESBL-cluster, or both - I performed an all-against-all pairwise comparison of which elements were conserved (Figure \@ref(fig:wgs-rollprop)C), and found that only ESBL-cluster and sequence cluster together are conserved within patients at a significantly greater proportion than between patients ($p = 1.1 \times10^{-12}$).
 
-```{r, wgs-within-vs-between-snpdist, echo = F, warning = F, message = F, fig.cap="Within and between participant pairwise SNP distances. A: Scatterplot of pairwise SNP distances as a function of time with GAM model fitted curve. B: Pairwise SNP distance as function of time as a 2D density plot, showing cluster of isolates close to origin that are close together in time and SNP-distance. C: Pairwsise SNP distance distribution before and after 50 days, within and between patients, showing statistically significant descreas ein pairwise SNP distance within patients before 50 days. After 50 days, between- and within- patient distributuions are similar.", out.extra='', fig.scap="Within- and between pairwise SNP distance of isolates", fig.width = 8, fig.height = 5}
+```{r, wgs-within-vs-between-snpdist, echo = F, warning = F, message = F, fig.cap="Within and between participant pairwise SNP distances. A: Scatterplot of pairwise SNP distances as a function of time with GAM model fitted curve. B: Pairwise SNP distance as function of time as a 2D density plot, showing cluster of isolates close to origin that are close together in time and SNP-distance. C: Pairwsise SNP distance distribution before and after 50 days, within and between patients, showing statistically significant decrease in pairwise SNP distance within patients before 50 days. After 50 days, between- and within- patient distributuions are similar.", out.extra='', fig.scap="Within- and between pairwise SNP distance of isolates", fig.width = 8, fig.height = 5}
 
 subset(data.frame(table(sample_ids$Supplier.Name)), Freq > 1)$Var1 -> doubles
 select(subset(sample_ids, Supplier.Name %in% doubles), Lane, Supplier.Name) -> doubles.lanes
@@ -1114,7 +1158,7 @@ df.m$value_norm[df.m$same_pt == "Within patient"] <- df.m$value_norm[df.m$same_p
 df.m$value_norm[df.m$same_pt == "Between patient"] <- df.m$value_norm[df.m$same_pt == "Between patient"] / max(subset(df.m, same_pt == "Between patient")$value)
 
 df.m$variable <- as.character(df.m$variable)
-df.m$variable[df.m$variable == "same_hierb.only"] <- "Same hierBAPS-clusetr only"
+df.m$variable[df.m$variable == "same_hierb.only"] <- "Same hierBAPS-cluster only"
 df.m$variable[df.m$variable == "same.clu.only"] <- "Same ESBL-cluster only"
 df.m$variable[df.m$variable == "same.both"] <- "Same ESBL and hierBAPS cluster"
 
@@ -1196,15 +1240,37 @@ contig.stats.plot
 
 ```
 
-```{r wgs-contig-ggenes-plot1, echo = F, warning = F, message = F, fig.scap="AMR genes, IS and plasmid replicon content of ESBL-clusters, part 1", out.extra='', fig.cap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster, stratified by by ESBL gene and ordered by number of samples of cluster. IS26 is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS26 element. A: \\textit{blaCTXM15}, B: \\textit{blaCTXM27} , C: \\textit{blaSHV12}. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", fig.width = 13, fig.height = 15}
+\newpage
+\begin{landscape}
+
+
+
+
+```{r wgs-contig-ggenes-plot0, echo = F, warning = F, message = F, fig.scap="AMR genes, IS and plasmid replicon content of ESBL-clusters, \\textit{blaCTXM15}", out.extra='', fig.cap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster, for \\textit{blaCTXM15} containing contigs, ordered by number of samples of cluster from most (top) to least (bottom). IS\\textit{26} is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragment within the green IS\\textit{26} element. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", fig.width = 12, fig.height = 8.5}
+
+p.c15
+
+```
+
+
+
+```{r wgs-contig-ggenes-plot1, echo = F, warning = F, message = F, fig.scap="AMR genes, IS and plasmid replicon content of ESBL-clusters, \\textit{blaCTXM27} and \\textit{blaSHV12}.", out.extra='', fig.cap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster for \\textit{blaCTXM27} (A) and \\textit{blaSHV12} (B). Ordered by number of samples of cluster from top (largest) to bottom (smallest) for each ESBL gene. IS\\textit{26} is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS\\textit{26} element. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", fig.width = 12, fig.height = 5.5}
 
 contigs1.plot
 
 ```
 
-```{r wgs-contig-ggenes-plot2, echo = F, warning = F, message = F, fig.cap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster, stratified by by ESBL gene and ordered by number of samples in cluster. IS26 is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS26 element. A: \\textit{blaCTXM14}, B: \\textit{blaCTXM9} , C: \\textit{blaCTXM3}, D: \\textit{blaCTXM16}, E: \\textit{blaCTXM1}. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", out.extra='', fig.scap="AMR genes, IS and plasmid replicon content of ESBL-clusters, part 2", fig.width = 12, fig.height = 15}
+```{r wgs-contig-ggenes-plot2, echo = F, warning = F, message = F, fig.cap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster for  \\textit{blaCTXM14} (A) and \\textit{blaCTXM9} (B), ordered by number of samples in cluster from most (top) to least (bottom). IS\\textit{26} is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS\\textit{26} element. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", out.extra='', fig.scap="AMR genes, IS and plasmid replicon content of ESBL-clusters: \\textit{blaCTXM14} and \\textit{blaCTXM9}.", fig.width = 12, fig.height = 7}
 
 contigs.plot2
 
 ```
 
+```{r wgs-contig-ggenes-plot3, echo = F, warning = F, message = F, fig.cap="AMR genes, insertion sequences (IS) and plasmid replicons identified in the representative contig of each contig cluster for  \\textit{blaCTXM3} (A) and \\textit{blaCTXM16} (B) and \\textit{blaCTXM1} (C) , ordered by number of samples in cluster from most (top) to least (bottom). IS\\textit{26} is very frequently associated with a 108bp fragment of \\textit{catB4} chloramphenicol resistance gene, shown as a red fragnemt within the green IS\\textit{26} element. Plots show furthest IS/AMR gene or plasmid replicon up to +/- 10,000bp from the ESBL gene of interest.", out.extra='', fig.scap="AMR genes, IS and plasmid replicon content of ESBL-clusters: \\textit{blaCTXM16}, \\textit{blaCTXM3} and \\textit{blaCTXM3}.", fig.width = 12, fig.height = 5.5}
+
+contigs.plot3
+
+```
+
+
+\end{landscape}
