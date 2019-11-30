@@ -1022,7 +1022,7 @@ ggarrange(ggarrange(q1,q2, ncol = 1, nrow = 2 , labels = c("A", "B")), ggarrange
 # we'll accept *any* conserved cluster (f ther are more than 1) as a match
 
 contigs <- melt(select(df, Lane, clust.id))
-contigs %>% group_by(Lane) %>% mutate(id = paste0("contig", row_number())) -> contigs
+contigs %>% dplyr::group_by(Lane) %>% dplyr::mutate(id = paste0("contig", row_number())) -> contigs
 dcast(contigs, Lane ~ id, value.var = "clust.id") -> contigs
 sample_ids <- merge(sample_ids, contigs, all.x = T)
 
@@ -1129,7 +1129,7 @@ base::merge(dplyr::select(sample_ids, pid, Lane, data_date, contig1,contig2, con
          dplyr::select(sample_ids, pid, Lane, data_date, contig1,contig2, contig3, BAPS.l2), by = NULL) -> crossall
 
 crossall <- subset(crossall, Lane.x != Lane.y)
-apply(select(crossall, Lane.x, Lane.y), 1, function(x) paste(sort(x), collapse = "")) -> crossall$key
+apply(dplyr::select(crossall, Lane.x, Lane.y), 1, function(x) paste(sort(x), collapse = "")) -> crossall$key
 subset(crossall, !duplicated(key) ) -> crossall
 
 
@@ -1143,11 +1143,11 @@ crossall$same_hierb <- crossall$BAPS.l2.x == crossall$BAPS.l2.y
 crossall$same_pt <- crossall$pid.x == crossall$pid.y
 
 
-crossall %>% group_by(same_pt) %>% dplyr::summarise(same_hierb.only = sum(same_hierb == TRUE & same_contig == FALSE),
+crossall %>% dplyr::group_by(same_pt) %>% dplyr::summarise(same_hierb.only = sum(same_hierb == TRUE & same_contig == FALSE),
                                              same.clu.only = sum(same_hierb == FALSE & same_contig == TRUE),
                                              same.both = sum(same_hierb == TRUE & same_contig == TRUE),
                                              neither = sum(same_hierb == FALSE & same_contig == FALSE),
-                                             tots = n()) %>% filter(!is.na(same_pt)) -> crossall.sum
+                                             tots = dplyr::n()) %>% dplyr::filter(!is.na(same_pt)) -> crossall.sum
 melt(crossall.sum) -> df.m
 
 df.m$same_pt[df.m$same_pt == "FALSE"] <- "Between patient"
@@ -1162,7 +1162,7 @@ df.m$variable[df.m$variable == "same_hierb.only"] <- "Same hierBAPS-cluster only
 df.m$variable[df.m$variable == "same.clu.only"] <- "Same ESBL-cluster only"
 df.m$variable[df.m$variable == "same.both"] <- "Same ESBL and hierBAPS cluster"
 
-df.m$variable <- factor(df.m$variable, levels = rev(c("Same ESBL and hierBAPS cluster","Same ESBL-cluster only" ,"Same hierBAPS-clusetr only", "neither"  )))
+df.m$variable <- factor(df.m$variable, levels = rev(c("Same ESBL and hierBAPS cluster","Same ESBL-cluster only" ,"Same hierBAPS-cluster only", "neither"  )))
 
 #Calculate fishers
 
