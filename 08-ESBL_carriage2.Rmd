@@ -923,7 +923,8 @@ real[] return_time_varying_coefs_exp_flat(
          mu0 = theta[2];
          gammaz =   theta[3:(2+ x_i[3])];
          alphaz = theta[(3+ x_i[3]):(3+x_i[3] + x_i[1] + x_i[2] + x_i[3] -1)] ;
-         betaz = theta[(3+x_i[3] + x_i[1] + x_i[2] + x_i[3]):(2+x_i[3] + 2*(x_i[1] + x_i[2] + x_i[3]))];
+         betaz = theta[(3+x_i[3] + x_i[1] + x_i[2] +
+         x_i[3]):(2+x_i[3] + 2*(x_i[1] + x_i[2] + x_i[3]))];
          coefs = return_time_varying_coefs_exp_flat(x_r, t, x_i[4:size(x_i)], gammaz);
          lambda_pr = lambda0*exp(dot_product(coefs, betaz));
          mu_pr = mu0*exp(dot_product(coefs, alphaz));
