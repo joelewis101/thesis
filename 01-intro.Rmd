@@ -723,7 +723,7 @@ gp$variable[gp$variable == "SHV2" | gp$variable == "SHV28" | gp$variable == "SHV
 gp$variable[grepl("not specified",gp$variable)] <- NA
 
 lab <- c(unique(gp$variable))
-lab <- c(lab[!is.na(lab)], "Not available")
+lab <- c(lab[!is.na(lab)][order(lab[!is.na(lab)])], "Not available")
 
 ggplot(gp, aes(x= enzyme_group, y = n, fill = variable)) +
   geom_col() + facet_wrap(~ organism) +  theme_bw() + 
@@ -871,7 +871,8 @@ gp$variable[gp$variable == "SHV2" | gp$variable == "SHV28" | gp$variable == "SHV
 gp$variable[grepl("not specified",gp$variable)] <- NA
 
 lab <- c(unique(gp$variable))
-lab <- c(lab[!is.na(lab)], "Not available")
+#lab[is.na(lab)] <- "Not available"
+lab <- c(lab[!is.na(lab)][order(lab[!is.na(lab)])], "Not available")
 
 ggplot(gp, aes(x= enzyme_group, y = n, fill = variable)) +
   geom_col() + facet_wrap(~ organism) +  theme_bw() + 
