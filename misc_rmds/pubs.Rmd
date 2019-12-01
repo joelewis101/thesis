@@ -2,22 +2,24 @@
 
 ## Peer reviewed journal articles related to or arising from thesis{-}
 
-Lewis JM, Henrion, M, Rylance J. _Validity of the qSOFA Score in Low- and Middle-Income Countries._ **JAMA** 2018;320(19):2038-2039
+Lewis JM, Henrion, M, Rylance J. Validity of the qSOFA Score in Low- and Middle-Income Countries. _JAMA_ 2018;320(19):2038-2039
 
-Lewis JM, Feasey NA, Rylance J. _Aetiology and outcomes of sepsis in adults in sub-Saharan Africa: a systematic review and meta-analysis._ **Critical Care** 2019;23(1):212
+Lewis JM, Feasey NA, Rylance J. Aetiology and outcomes of sepsis in adults in sub-Saharan Africa: a systematic review and meta-analysis. _Critical Care_ 2019;23(1):212
 
-Barr D$^{*}$, Lewis JM$^{*}$, Feasey NA, Andrews B, Kelly P, Lakhi S et al. _Mycobacterium tuberculosis blood stream infection prevalence, diagnosis, and mortality hazard in HIV-positive adults: a systematic review and meta-analysis of individual patient data_ **Lancet Infectious Diseases** (accepted)
+Barr D$^{*}$, Lewis JM$^{*}$, Feasey NA, Andrews B, Kelly P, Lakhi S et al. Mycobacterium tuberculosis blood stream infection prevalence, diagnosis, and mortality hazard in HIV-positive adults: a systematic review and meta-analysis of individual patient data. _Lancet Infectious Diseases_ (accepted).
 
 $^{*}$ Joint first author
 
-Lewis JM, Abouyannis M, Katha G, Nyirenda M, Chatsika, G, Feasey NA, Rylance J. _Population incidence and mortality of sepsis in an urban African setting 2013-2016_ **Clinical Infectious Diseases** (online first 14 November 2019).
+Lewis JM, Abouyannis M, Katha G, Nyirenda M, Chatsika, G, Feasey NA, Rylance J. Population incidence and mortality of sepsis in an urban African setting 2013-2016. _Clinical Infectious Diseases_ (online first 14 November 2019).
 
-Lewis JM, Lester R, Garner P, Feasey NA. _Gut mucosal colonisation with extended-spectrum beta-lactamase producing Enterobacteriaceae in sub-Saharan Africa: a systematic review and meta-analysis [version 1; peer review: 1 approved]._ **Wellcome Open Research** 2019;4:160
+Lewis JM, Lester R, Garner P, Feasey NA. Gut mucosal colonisation with extended-spectrum beta-lactamase producing Enterobacteriaceae in sub-Saharan Africa: a systematic review and meta-analysis [version 1; peer review: 1 approved]. _Wellcome Open Research_ 2019;4:160
+
+Lewis JM, Lester R, Mphasa M, Banda R, Edwards T, Thomson NR, Feasey NA. Emergence of carbapenemase producing Enterobacteriaceae, Malawi. _Journal of Global Antimicrobial Resistance._ (under review).
 
 ## Oral presentations {-}
 
-_Identifying drivers of ESBL-E carriage in Malawian adults: interim analysis from the DASSIM study._ Malawi-Liverpool-Wellcome Clinical Research Programme Annual Scientific Meeting, Chester 2018 
+Identifying drivers of ESBL-E carriage in Malawian adults: interim analysis from the DASSIM study. Malawi-Liverpool-Wellcome Clinical Research Programme Annual Scientific Meeting, Chester 2018 
 
 ## Posters {-}
 
-_Developing an antimicrobial strategy for sepsis in Malawi: the DASSIM study._ Malawi-Liverpool-Wellcome Clinical Research Programme Annual Scientific Meeting, Malawi 2017 
+Developing an antimicrobial strategy for sepsis in Malawi: the DASSIM study. Malawi-Liverpool-Wellcome Clinical Research Programme Annual Scientific Meeting, Malawi 2017 
