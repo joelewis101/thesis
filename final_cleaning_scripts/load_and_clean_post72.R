@@ -87,6 +87,6 @@ tf <- subset(post72, pid %in% two.forms.one.day)
 
 cat("\n")
 cat("Done! \n")
-cat("Up to 72hr forms now in upto72 df.  \n  ")
+cat("Post 72hr forms now in post72 df.  \n  ")
 cat("Share and enjoy! \n  ")
 

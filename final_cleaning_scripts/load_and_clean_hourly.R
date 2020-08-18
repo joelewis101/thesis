@@ -322,7 +322,7 @@ hourly$assess_type[hourly$pid == "DAS12505" & hourly$assess_time == "11:00"] <- 
 
 #print("checking for missing assess_type...")
 #print("should be none!")
-print(subset(hourly, is.na(assess_type)))
+#print(subset(hourly, is.na(assess_type)))
 #cont <- readline("Continue?")
 #if (cont == "N") {stop()}
 
