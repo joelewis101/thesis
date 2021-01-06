@@ -1,7 +1,7 @@
 ## load and clean LIMS.csv ###
 ### v1 25 Jan 2018 ##
 ## JL ###
-
+require(plyr)
 require(tidyverse)
 
 cat(rep("DON'T PANIC ", 100))
@@ -643,6 +643,11 @@ names(fu.merge)[names(fu.merge) == "d2visit"] <- "visit"
 lims_dates <- merge(lims, select(fu.merge, pid, visit, d2visitnstoolsampletype, d2visitnstoolsampledate, stoolid), by = c("pid", "visit"), all.x = T)
 
 enroll.merge$visit <- 0
+# ADDED 3 OCT
+if (!"enroll_date" %in% names(enroll.merge)) {
+enroll.merge$enroll_date <- enroll.merge$data_date
+}
+###
 lims_dates <- merge(lims_dates, select(enroll.merge, pid, visit, enroll_date, stool, rswab, lid), by = c("pid", "visit"), all.x = T)
 
 names(lims_dates)[names(lims_dates) == "d2visitnstoolsampledate"] <- "data_date" 

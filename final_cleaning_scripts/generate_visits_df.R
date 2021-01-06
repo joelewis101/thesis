@@ -243,3 +243,5 @@ visits$fu <- as.numeric(difftime(today,visits$enrolled, units = "weeks"))
 visits$visitdue <- visits$next_visit - visits$fu 
 
 visits <- visits[c("pid","enrolled","arm","status","died_date", "fu", "w1","w4","w12","w24","next_visit","visitdue")]
+
+cat("Followup overview now in visits df")
